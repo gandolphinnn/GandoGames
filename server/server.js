@@ -37,7 +37,7 @@ class Client {
 					return;
 				let msg = JSON.parse(message.utf8Data);
 				console.log(msg);
-				client.conn.send(JSON.stringify({type: 'hey'}));
+				client.conn.send(JSON.stringify({type: 'Connessione riuscita'}));
 			});
 
 		//* user offline

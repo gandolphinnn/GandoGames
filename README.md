@@ -1,6 +1,7 @@
 # GandoGames
-    login using username and 4 digit pin
-    user data saved in a json file
-    commands in chat using '/' and admin users
-    single server for all functions
-    every page has a "pagename.html", a "scripts" folder for js files and a "styles" folder for css files
+	login using username and a password
+	user data saved in a json file LATER
+	commands in chat using '/' and admin users LATER
+	single server for all functions
+	every game has a "gamename" folder with and index.html and some files to include
+	every user is identified via an ID value decide by the server that the pages will pass using url GET

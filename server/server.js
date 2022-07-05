@@ -13,35 +13,34 @@
 	process.title = 'chatGL server '+ server.loc;
 	let wsServer = new webSocketServer({httpServer: httpserver});
 
-//* functions
-
-//* class
-class Client {
-	constructor (conn) {
-		this.conn = conn;
-	}
-}
-
 //* variables
+	class Client {
+		constructor (conn) {
+			this.conn = conn;
+		}
+		send(json) {
+			this.conn.send(JSON.stringify(json));
+		}
+	}
 	let clientsList = new Array();
 
 //* new connection
-	wsServer.on('request', function(request) {
+	wsServer.on('request', (request) => {
 		//* connection setup
 			let client = new Client(request.accept(null, request.origin));
 			console.log('New connection accepted from ' + client.conn.remoteAddress);
 
 		//* msg from client
-			client.conn.on('message', function(message) {
+			client.conn.on('message', (message) => {
 				if (message.type !== 'utf8') //? accept only text
 					return;
 				let msg = JSON.parse(message.utf8Data);
 				console.log(msg);
-				client.conn.send(JSON.stringify({type: 'Connessione riuscita'}));
+				client.send({type: 'Connessione riuscita'});
 			});
 
 		//* user offline
-			client.conn.on('close', function() {
+			client.conn.on('close', () => {
 				console.log('User disconnected');
 			});
 	});

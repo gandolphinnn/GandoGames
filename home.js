@@ -18,7 +18,7 @@ window.onload = () => {
 	);
 	
 //* msg from server
-	me.onmessage = (input) => {
+	me.conn.onmessage = (input) => {
 		let msg = JSON.parse(input.data);
 		console.log(msg);
 	};

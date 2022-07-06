@@ -10,11 +10,13 @@ class Conn {
 		//* opened connection
 			this.conn.onopen = () => {
 				this.status = 1;
+				console.log('connected');
 				this.login();
 				setInterval(() => { //? connection handling
 					if (this.conn.readyState > 1 && this.status == 1) { //? disconnected
 						errorCB('Errore, server disconnesso, attendi.');
 						this.status = 0;
+						console.log('disconnected');
 					}
 					if (this.conn.readyState > 1 && this.status == 0) { //? try to reconnect
 						this.conn = new WebSocket(wsAddr);
@@ -22,6 +24,7 @@ class Conn {
 					if (this.conn.readyState == 1 && this.status == 0) { //? managed to reconnect
 						document.getElementById('overlay').style.display = 'none';
 						this.status = 1;
+						console.log('reconnected');
 					}
 				}, 1000);
 			}
@@ -41,19 +44,18 @@ class Conn {
 								<button id="confirm">Conferma</button>
 							</fieldset>`;
 			document.getElementById('confirm').addEventListener('click', () => {
-				form = {
+				let form = {
+					type: document.getElementById('sign').checked? 'signin' : 'login',
 					un: document.getElementById('un').value,
-					pw: document.getElementById('pw').value,
-					action: document.getElementById('sign').checked? 'signin' : 'login'
+					pw: document.getElementById('pw').value
 				}
-				if (form.un == '' || form.pw == '') {
-					form = 'invalid';
+				if (form.un != '' && form.pw != '') {
+					this.send(form);
 				}
-				console.log(form);
 			});
 		}
 		else {
-			this.send({type: 'id_login', id: userID});
+			this.send({type: 'login', id: userID});
 		}
 	}
 	send(json) {

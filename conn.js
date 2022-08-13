@@ -1,5 +1,6 @@
+//? middleware
 class Conn {
-	constructor(wsAddr, errorCB) {
+	constructor(wsAddr, errorCB, loginForm) {
 		this.conn = new WebSocket(wsAddr);
 		this.status; //? -1 failed, 0 disconnected, 1 connected
 		//* server never found
@@ -11,7 +12,6 @@ class Conn {
 			this.conn.onopen = () => {
 				this.status = 1;
 				console.log('connected');
-				this.login();
 				setInterval(() => { //? connection handling
 					if (this.conn.readyState > 1 && this.status == 1) { //? disconnected
 						errorCB('Errore, server disconnesso, attendi.');
@@ -27,36 +27,27 @@ class Conn {
 						console.log('reconnected');
 					}
 				}, 1000);
-			}
-	}
-	login() {
-		let userID = new URLSearchParams(window.location.search).get('user');
-		if (userID == '' || userID == null) { //? unlogged
-			document.getElementById('main-page').innerHTML = `<fieldset id="form">
-								<legend>ACCEDI</legend>
-								<label for="un">Username</label>
-								<input type="text" id="un">
-								<label for="pw">Password</label>
-								<input type="password" id="pw">
-								<label for="sign">
-									<input type="checkbox" id="sign">Primo accesso
-								</label>
-								<button id="confirm">Conferma</button>
-							</fieldset>`;
-			document.getElementById('confirm').addEventListener('click', () => {
-				let form = {
-					type: document.getElementById('sign').checked? 'signin' : 'login',
-					un: document.getElementById('un').value,
-					pw: document.getElementById('pw').value
+			}		
+		//* msg from server
+			this.conn.onmessage = (input) => {
+				let msg = JSON.parse(input.data);
+				console.log(msg);
+				switch (msg.type) {
+					case 'login':
+						if (msg.result == 'session') {
+							this.un = msg.un;
+						}
+						else if (msg.result == 'accepted'){
+							window.location.replace('');
+						}
+						else {
+							loginForm(msg.result);
+						}
+						break;
+					case '':  break;
+					default: console.log('Invalid message type'); break;
 				}
-				if (form.un != '' && form.pw != '') {
-					this.send(form);
-				}
-			});
-		}
-		else {
-			this.send({type: 'login', id: userID});
-		}
+			};
 	}
 	send(json) {
 		this.conn.send(JSON.stringify(json))

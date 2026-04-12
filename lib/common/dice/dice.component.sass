@@ -1,0 +1,157 @@
+@use 'styles/variables' as *
+
+// ── Animation ────────────────────────────────────────────────────────────────
+
+@keyframes roll-odd
+  0%, 100%
+    transform: rotate(0deg) scale(1)
+  25%
+    transform: rotate(-22deg) scale(0.82)
+  55%
+    transform: rotate(14deg) scale(1.1)
+  80%
+    transform: rotate(-4deg) scale(0.97)
+
+@keyframes roll-even
+  0%, 100%
+    transform: rotate(0deg) scale(1)
+  25%
+    transform: rotate(22deg) scale(0.82)
+  55%
+    transform: rotate(-14deg) scale(1.1)
+  80%
+    transform: rotate(4deg) scale(0.97)
+
+// ── Die shell ────────────────────────────────────────────────────────────────
+
+.die
+  width: 64px
+  height: 64px
+  background: $bg-surface
+  border: 2px solid $border
+  border-radius: $radius-md
+  position: relative
+  flex-shrink: 0
+
+  @media (min-width: $bp-sm)
+    width: 72px
+    height: 72px
+
+// ── Face list ────────────────────────────────────────────────────────────────
+
+.die-list
+  list-style: none
+  margin: 0
+  padding: 0
+  width: 100%
+  height: 100%
+  position: relative
+
+  &.odd-roll
+    animation: roll-odd 0.45s ease
+
+  &.even-roll
+    animation: roll-even 0.45s ease
+
+// ── Faces ────────────────────────────────────────────────────────────────────
+
+.die-item
+  display: none
+  position: absolute
+  inset: 0
+
+// Show the face matching data-roll
+@for $i from 1 through 6
+  .die-list[data-roll="#{$i}"] .die-item[data-side="#{$i}"]
+    display: block
+
+// ── Dots ─────────────────────────────────────────────────────────────────────
+
+.dot
+  width: 10px
+  height: 10px
+  border-radius: 50%
+  background: $text
+  position: absolute
+  transform: translate(-50%, -50%)
+
+// Face 1 — center
+[data-side="1"]
+  .dot:nth-child(1)
+    top: 50%
+    left: 50%
+
+// Face 2 — top-right / bottom-left
+[data-side="2"]
+  .dot:nth-child(1)
+    top: 25%
+    left: 75%
+  .dot:nth-child(2)
+    top: 75%
+    left: 25%
+
+// Face 3 — diagonal + center
+[data-side="3"]
+  .dot:nth-child(1)
+    top: 25%
+    left: 75%
+  .dot:nth-child(2)
+    top: 50%
+    left: 50%
+  .dot:nth-child(3)
+    top: 75%
+    left: 25%
+
+// Face 4 — four corners
+[data-side="4"]
+  .dot:nth-child(1)
+    top: 25%
+    left: 25%
+  .dot:nth-child(2)
+    top: 25%
+    left: 75%
+  .dot:nth-child(3)
+    top: 75%
+    left: 25%
+  .dot:nth-child(4)
+    top: 75%
+    left: 75%
+
+// Face 5 — four corners + center
+[data-side="5"]
+  .dot:nth-child(1)
+    top: 25%
+    left: 25%
+  .dot:nth-child(2)
+    top: 25%
+    left: 75%
+  .dot:nth-child(3)
+    top: 50%
+    left: 50%
+  .dot:nth-child(4)
+    top: 75%
+    left: 25%
+  .dot:nth-child(5)
+    top: 75%
+    left: 75%
+
+// Face 6 — two columns of three
+[data-side="6"]
+  .dot:nth-child(1)
+    top: 25%
+    left: 25%
+  .dot:nth-child(2)
+    top: 25%
+    left: 75%
+  .dot:nth-child(3)
+    top: 50%
+    left: 25%
+  .dot:nth-child(4)
+    top: 50%
+    left: 75%
+  .dot:nth-child(5)
+    top: 75%
+    left: 25%
+  .dot:nth-child(6)
+    top: 75%
+    left: 75%

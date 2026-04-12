@@ -1,11 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
 	selector: 'gg-app',
-	imports: [],
+	imports: [RouterOutlet],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.sass',
 })
-export class App {
-	protected readonly title = signal('GandoGames');
-}
+export class App {}

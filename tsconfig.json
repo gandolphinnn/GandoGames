@@ -5,8 +5,8 @@
 	"compilerOptions": {
 		"baseUrl": ".",
 		"paths": {
-			"@gandogames/pankov": ["games/pankov/index.ts"],
-			"@gandogames/trio": ["games/trio/index.ts"]
+			"@gandogames/pankov": ["lib/games/pankov/index.ts"],
+			"@gandogames/trio": ["lib/games/trio/index.ts"]
 		},
 		"strict": true,
 		"noImplicitOverride": true,

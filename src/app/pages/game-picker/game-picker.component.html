@@ -1,0 +1,16 @@
+<main class="picker">
+	<header class="picker-header">
+		<h1 class="picker-title">GandoGames</h1>
+		<p class="picker-subtitle">Choose a game</p>
+	</header>
+
+	<div class="picker-grid">
+		@for (game of games; track game.id) {
+			<a class="game-card" [routerLink]="['play', game.id]">
+				<h2 class="game-card-name">{{ game.name }}</h2>
+				<p class="game-card-description">{{ game.description }}</p>
+				<span class="game-card-play">Play →</span>
+			</a>
+		}
+	</div>
+</main>

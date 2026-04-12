@@ -18,7 +18,11 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 
 **Component prefix:** `gg-` (e.g. `gg-app`, `gg-login`). The root element in `src/index.html` must match the root component's selector.
 
-**Styles:** SASS (`.sass` syntax, not `.scss`).
+**Styles:** SASS (`.sass` syntax, not `.scss`). `stylePreprocessorOptions.includePaths: ["src"]` is set, so any component can `@use 'styles/variables' as *` without a relative path.
+
+**CSS naming:** Use hyphens only — no underscores. BEM-like: `.block`, `.block-element`, `.block--modifier`. Never use `__` (e.g. `.panel-title` not `.panel__title`).
+
+**Responsiveness:** All components must be mobile-first. Use `@media (min-width: $bp-sm)` (defined in `src/styles/_variables.sass`) to scale up for larger screens. Touch targets must be at least 44×44 px.
 
 ### Game packages
 

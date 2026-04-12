@@ -5,16 +5,15 @@
 		<h1 class="pankov-title">Pankov</h1>
 	</header>
 
-	<!-- Players strip: hidden during setup and passing (next player shouldn't see who's current) -->
 	@if (game.phase() !== 'setup' && game.phase() !== 'passing') {
 		<div class="players-strip">
 			@for (player of game.players(); track $index) {
-				<div class="player-chip" [class.player-chip--current]="$index === game.currentPlayerIndex()"
-					[class.player-chip--eliminated]="player.lives === 0">
+				<div class="player-chip" [class.player-chip-current]="$index === game.currentPlayerIndex()"
+					[class.player-chip-eliminated]="player.lives === 0">
 					<span class="player-chip-name">{{ player.name }}</span>
 					<span class="player-chip-lives">
 						@for (i of livesRange; track i) {
-							<span class="life" [class.life--full]="i < player.lives">●</span>
+							<span class="life" [class.life-full]="i < player.lives">●</span>
 						}
 					</span>
 				</div>
@@ -40,10 +39,10 @@
 							</div>
 						}
 					</div>
-					@if (playerNames().length < MAX_PLAYERS) { <button class="btn btn--ghost" (click)="addPlayer()">+ Add
+					@if (playerNames().length < MAX_PLAYERS) { <button class="btn btn-ghost" (click)="addPlayer()">+ Add
 						player</button>
 						}
-						<button class="btn btn--primary" [disabled]="!canStart()" (click)="startGame()">
+						<button class="btn btn-primary" [disabled]="!canStart()" (click)="startGame()">
 							Start Game
 						</button>
 				</div>
@@ -57,7 +56,7 @@
 						<div class="declaration-badge">
 							<span class="declaration-badge-label">{{ game.previousPlayer()?.name }} declared</span>
 							<span class="declaration-badge-value"
-								[class.declaration-badge-value--pankov]="game.previousDeclaration() === 21">
+								[class.declaration-badge-value-pankov]="game.previousDeclaration() === 21">
 								{{ formatValue(game.previousDeclaration()!) }}
 							</span>
 						</div>
@@ -67,10 +66,10 @@
 					}
 					<div class="panel-actions">
 						@if (game.previousDeclaration() !== null) {
-							<button class="btn btn--danger" (click)="callFalse()">Call False</button>
+							<button class="btn btn-danger" (click)="callFalse()">Call False</button>
 						}
 						@if (!game.mustCallFalse()) {
-							<button class="btn btn--primary" (click)="roll()">Roll Dice</button>
+							<button class="btn btn-primary" (click)="roll()">Roll Dice</button>
 						}
 					</div>
 				</div>
@@ -83,8 +82,8 @@
 						<gg-dice [value]="game.currentDice()![0]" />
 						<gg-dice [value]="game.currentDice()![1]" />
 					</div>
-					<p class="roll-value" [class.roll-value--pankov]="game.currentRollValue() === 21"
-						[class.roll-value--couple]="game.currentDice()![0] === game.currentDice()![1]">
+					<p class="roll-value" [class.roll-value-pankov]="game.currentRollValue() === 21"
+						[class.roll-value-couple]="game.currentDice()![0] === game.currentDice()![1]">
 						{{ formatValue(game.currentRollValue()!) }}
 					</p>
 					@if (game.previousDeclaration() !== null) {
@@ -93,23 +92,28 @@
 						<p class="hint">Choose your declaration</p>
 					}
 					<div class="value-grid">
-						@for (val of allValues; track val) {
-							<button class="value-btn" [class.value-btn--pankov]="val === 21"
-								[class.value-btn--couple]="val !== 21 && val % 11 === 0" [disabled]="!isAvailable(val)"
-								(click)="declare(val)">
-								{{ val === 21 ? 'Pankov' : val }}
-							</button>
+						@for (group of groupedValues; track $index) {
+							<div class="value-row">
+								@for (val of group; track val) {
+									<button class="value-btn" [class.value-btn-pankov]="val === 21"
+										[class.value-btn-couple]="val !== 21 && val % 11 === 0"
+										[class.value-btn-rolled]="val === game.currentRollValue()"
+										[disabled]="!isAvailable(val)" (click)="declare(val)">
+										{{ formatValue(val) }}
+									</button>
+								}
+							</div>
 						}
 					</div>
 				</div>
 			}
 
 			@case ('passing') {
-				<div class="panel panel--centered">
+				<div class="panel panel-centered">
 					<p class="panel-eyebrow">Pass the device to</p>
 					<h2 class="panel-title">{{ game.nextPlayer()?.name }}</h2>
 					<p class="panel-subtitle">it's your turn!</p>
-					<button class="btn btn--primary" (click)="advanceTurn()">Ready</button>
+					<button class="btn btn-primary" (click)="advanceTurn()">Ready</button>
 				</div>
 			}
 
@@ -126,22 +130,22 @@
 							<span class="reveal-row-value">{{ formatValue(game.previousActualValue()!) }}</span>
 						</div>
 					</div>
-					<p class="reveal-verdict" [class.reveal-verdict--lie]="game.callResult()?.wasLying"
-						[class.reveal-verdict--honest]="!game.callResult()?.wasLying">
+					<p class="reveal-verdict" [class.reveal-verdict-lie]="game.callResult()?.wasLying"
+						[class.reveal-verdict-honest]="!game.callResult()?.wasLying">
 						{{ game.callResult()?.wasLying
 						? game.previousPlayer()?.name + ' was lying!'
 						: game.previousPlayer()?.name + ' was honest!' }}
 					</p>
 					<p class="reveal-loser"><strong>{{ game.loser()?.name }}</strong> loses a life.</p>
-					<button class="btn btn--primary" (click)="applyResult()">Continue</button>
+					<button class="btn btn-primary" (click)="applyResult()">Continue</button>
 				</div>
 			}
 
 			@case ('game-over') {
-				<div class="panel panel--centered">
+				<div class="panel panel-centered">
 					<p class="panel-eyebrow">Winner</p>
 					<h2 class="panel-title winner-name">{{ game.winner()?.name }}</h2>
-					<button class="btn btn--primary" (click)="reset()">Play Again</button>
+					<button class="btn btn-primary" (click)="reset()">Play Again</button>
 				</div>
 			}
 

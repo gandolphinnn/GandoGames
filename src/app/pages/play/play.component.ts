@@ -5,7 +5,7 @@ import { RouterOutlet } from '@angular/router';
 	selector: 'gg-play',
 	imports: [RouterOutlet],
 	templateUrl: './play.component.html',
-	styleUrl: './play.component.sass',
+	styleUrl: './play.component.scss',
 })
 export class PlayComponent implements OnInit {
 	ngOnInit(): void {

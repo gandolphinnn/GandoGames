@@ -1,0 +1,101 @@
+@use 'styles/variables' as *;
+
+.picker {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $s8;
+  padding: $s6;
+
+  @media (min-width: $bp-sm) {
+    gap: $s12;
+    padding: $s8;
+  }
+}
+
+.picker-header {
+  text-align: center;
+}
+
+.picker-title {
+  font-size: $text-3xl;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  @media (min-width: $bp-sm) {
+    font-size: $text-4xl;
+  }
+}
+
+.picker-subtitle {
+  margin-top: $s2;
+  font-size: $text-base;
+  color: $text-muted;
+
+  @media (min-width: $bp-sm) {
+    font-size: $text-lg;
+  }
+}
+
+.picker-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $s4;
+  justify-content: center;
+  width: 100%;
+
+  @media (min-width: $bp-sm) {
+    gap: $s6;
+    width: auto;
+  }
+}
+
+.game-card {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  padding: $s6;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: $s3;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color $transition, transform $transition, box-shadow $transition;
+
+  @media (min-width: $bp-sm) {
+    padding: $s8;
+    width: 220px;
+  }
+
+  &:hover {
+    border-color: $accent;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(124, 90, 246, 0.2);
+  }
+}
+
+.game-card-name {
+  font-size: $text-xl;
+  font-weight: 700;
+
+  @media (min-width: $bp-sm) {
+    font-size: $text-2xl;
+  }
+}
+
+.game-card-description {
+  color: $text-muted;
+  font-size: $text-sm;
+  flex: 1;
+  line-height: 1.5;
+}
+
+.game-card-play {
+  font-size: $text-sm;
+  font-weight: 600;
+  color: $accent;
+  margin-top: $s2;
+}

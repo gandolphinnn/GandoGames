@@ -5,6 +5,6 @@ import { RouterOutlet } from '@angular/router';
 	selector: 'gg-app',
 	imports: [RouterOutlet],
 	templateUrl: './app.component.html',
-	styleUrl: './app.component.sass',
+	styleUrl: './app.component.scss',
 })
 export class App {}

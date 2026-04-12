@@ -7,7 +7,7 @@ import { GAME_REGISTRY, GameDescriptor } from '../../game-registry';
 	selector: 'gg-game-picker',
 	imports: [RouterLink],
 	templateUrl: './game-picker.component.html',
-	styleUrl: './game-picker.component.sass',
+	styleUrl: './game-picker.component.scss',
 })
 export class GamePickerComponent {
 	protected games: GameDescriptor[] = GAME_REGISTRY;

@@ -11,12 +11,21 @@ import { PankovService } from '../pankov.service';
 	imports: [RouterLink, DiceComponent],
 	providers: [PankovService],
 	templateUrl: './pankov-game.component.html',
-	styleUrl: './pankov-game.component.sass',
+	styleUrl: './pankov-game.component.scss',
 })
 export class PankovGameComponent {
 	protected readonly game = inject(PankovService);
 
-	protected readonly allValues = ROLL_VALUES;
+	public readonly groupedValues: number[][] = (() => {
+		const normals = ROLL_VALUES.filter(v => v !== 21 && v % 11 !== 0);
+		const byFirst = new Map<number, number[]>();
+		for (const v of normals) {
+			const key = Math.floor(v / 10);
+			byFirst.set(key, [...(byFirst.get(key) ?? []), v]);
+		}
+		return [...byFirst.values(), ROLL_VALUES.filter(v => v % 11 === 0), [21]];
+	})();
+
 	protected readonly livesRange = Array.from({ length: INITIAL_LIVES }, (_, i) => i);
 	protected readonly MIN_PLAYERS = MIN_PLAYERS;
 	protected readonly MAX_PLAYERS = MAX_PLAYERS;

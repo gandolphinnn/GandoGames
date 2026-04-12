@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 	selector: 'gg-signup',
 	imports: [],
 	templateUrl: './signup.component.html',
-	styleUrl: './signup.component.sass',
+	styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
 

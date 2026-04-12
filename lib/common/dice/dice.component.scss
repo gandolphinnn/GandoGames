@@ -1,0 +1,56 @@
+@use 'styles/variables' as *;
+
+.dice {
+	--size: 64px;
+
+	display: grid;
+	grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+	place-items: center;
+	width: var(--size);
+	height: var(--size);
+	padding: $s2;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	box-shadow: $shadow-card;
+
+	@media (min-width: $bp-sm) {
+		--size: 80px;
+	}
+}
+
+.dot {
+	width: calc(var(--size) * 0.19);
+	height: calc(var(--size) * 0.19);
+	border-radius: $radius-full;
+	background: $text;
+}
+
+// ── face layouts ──────────────────────────────────────────────────────────────
+
+.v-1 .dot:nth-child(1) { grid-area: 2 / 2; }
+
+.v-2 .dot:nth-child(1) { grid-area: 1 / 3; }
+.v-2 .dot:nth-child(2) { grid-area: 3 / 1; }
+
+.v-3 .dot:nth-child(1) { grid-area: 1 / 3; }
+.v-3 .dot:nth-child(2) { grid-area: 2 / 2; }
+.v-3 .dot:nth-child(3) { grid-area: 3 / 1; }
+
+.v-4 .dot:nth-child(1) { grid-area: 1 / 1; }
+.v-4 .dot:nth-child(2) { grid-area: 1 / 3; }
+.v-4 .dot:nth-child(3) { grid-area: 3 / 1; }
+.v-4 .dot:nth-child(4) { grid-area: 3 / 3; }
+
+.v-5 .dot:nth-child(1) { grid-area: 1 / 1; }
+.v-5 .dot:nth-child(2) { grid-area: 1 / 3; }
+.v-5 .dot:nth-child(3) { grid-area: 2 / 2; }
+.v-5 .dot:nth-child(4) { grid-area: 3 / 1; }
+.v-5 .dot:nth-child(5) { grid-area: 3 / 3; }
+
+.v-6 .dot:nth-child(1) { grid-area: 1 / 1; }
+.v-6 .dot:nth-child(2) { grid-area: 1 / 3; }
+.v-6 .dot:nth-child(3) { grid-area: 2 / 1; }
+.v-6 .dot:nth-child(4) { grid-area: 2 / 3; }
+.v-6 .dot:nth-child(5) { grid-area: 3 / 1; }
+.v-6 .dot:nth-child(6) { grid-area: 3 / 3; }

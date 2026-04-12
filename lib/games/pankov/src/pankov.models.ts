@@ -59,6 +59,6 @@ export function formatValue(value: number): string {
 	if (value === 21) return 'Pankov';
 	const high = Math.floor(value / 10);
 	const low = value % 10;
-	if (high === low) return `Couple of ${high}`;
-	return `${high} - ${low}`;
+	if (high === low) return `Pair of ${high}`;
+	return `${high}${low}`;
 }

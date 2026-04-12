@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 	selector: 'gg-login',
 	imports: [],
 	templateUrl: './login.component.html',
-	styleUrl: './login.component.sass',
+	styleUrl: './login.component.scss',
 })
 export class LoginComponent {
 

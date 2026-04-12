@@ -7,7 +7,7 @@
 			"projectType": "application",
 			"schematics": {
 				"@schematics/angular:component": {
-					"style": "sass",
+					"style": "scss",
 					"skipTests": true,
 					"type": "component"
 				}
@@ -24,7 +24,7 @@
 							"zone.js"
 						],
 						"tsConfig": "tsconfig.app.json",
-						"inlineStyleLanguage": "sass",
+						"inlineStyleLanguage": "scss",
 						"assets": [
 							{
 								"glob": "**/*",
@@ -32,7 +32,7 @@
 							}
 						],
 						"styles": [
-							"src/styles.sass"
+							"src/styles.scss"
 						],
 						"stylePreprocessorOptions": {
 							"includePaths": [
@@ -87,7 +87,7 @@
 							"zone.js/testing"
 						],
 						"tsConfig": "tsconfig.spec.json",
-						"inlineStyleLanguage": "sass",
+						"inlineStyleLanguage": "scss",
 						"assets": [
 							{
 								"glob": "**/*",
@@ -95,7 +95,7 @@
 							}
 						],
 						"styles": [
-							"src/styles.sass"
+							"src/styles.scss"
 						]
 					}
 				}

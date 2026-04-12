@@ -1,59 +1,133 @@
 # GandoGames
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.3.
+Hobby multiplayer web app for playing games with friends.
 
-## Development server
+## Stack
 
-To start a local development server, run:
+| Layer | Technology |
+|---|---|
+| Frontend | Angular 20 (standalone components, SASS) |
+| API | Azure Functions v4 (TypeScript) |
+| Game services | Azure PlayFab (auth, rooms, statistics, game history) |
+| Hosting | Azure Static Web Apps |
+
+## Architecture
+
+### Project layout
+
+```
+gandogames/
+├── src/                      # Angular application
+│   └── app/
+│       ├── core/             # Guards, interceptors, services
+│       ├── features/         # Auth, lobby, game-host pages
+│       └── shell/            # Layout component
+├── games/                    # Self-contained game packages
+│   ├── pankov/               # Pankov game
+│   └── trio/                 # Trio game
+└── api/                      # Azure Functions API (to be added)
+```
+
+### How games work
+
+Each game lives in `games/<name>/` as a self-contained package.
+It exports an Angular `Routes` array and is lazy-loaded into the main app via a central `GAME_REGISTRY`.
+Adding a new game requires no changes to the core app logic.
+
+TypeScript path aliases make imports clean:
+
+```typescript
+import { PANKOV_ROUTES } from '@gandogames/pankov';
+import { TRIO_ROUTES } from '@gandogames/trio';
+```
+
+### Data storage
+
+No external database. Azure PlayFab covers all needs at this scale:
+
+| Need | PlayFab API |
+|---|---|
+| Auth | Login / Register with email |
+| Rooms | Lobbies API |
+| Game history | Custom Events (PlayStream) |
+| Player stats | Statistics API (built-in leaderboards) |
+| Player data | Entity Objects (JSON blobs) |
+
+### API responsibilities
+
+The Azure Functions API is a secure proxy to PlayFab.
+It keeps `PLAYFAB_SECRET_KEY` server-side and handles:
+auth, room CRUD, saving game results, and reading stats.
+Game logic itself runs in the Angular app.
+
+### Auth flow
+
+1. User submits login/register form → `POST /api/auth/login` or `/api/auth/register`
+2. Azure Function calls PlayFab with the secret key, returns session ticket + player profile
+3. Angular stores the session ticket and uses it for subsequent calls
+
+## Games
+
+| ID | Name | Path alias | Status |
+|---|---|---|---|
+| `pankov` | Pankov | `@gandogames/pankov` | In development |
+| `trio` | Trio | `@gandogames/trio` | In development |
+
+## Local development
 
 ```bash
+# Install dependencies
+npm install
+
+# Angular dev server (port 4200)
 ng serve
+
+# Azure Functions dev server (port 7071) — once api/ is set up
+cd api && func start
+
+# Run both via Azure SWA CLI (port 4280)
+swa start http://localhost:4200 --api-location api
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Environment setup
 
-## Code scaffolding
+### Angular (`src/environments/environment.ts`)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```typescript
+export const environment = {
+  production: false,
+  playfabTitleId: 'YOUR_TITLE_ID',
+  apiBaseUrl: 'http://localhost:7071/api'
+};
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Azure Functions (`api/local.settings.json`) — never commit this file
 
-```bash
-ng generate --help
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "PLAYFAB_TITLE_ID": "YOUR_TITLE_ID",
+    "PLAYFAB_SECRET_KEY": "YOUR_SECRET_KEY"
+  }
+}
 ```
 
-## Building
+## Adding a new game
 
-To build the project run:
+1. Create `games/<name>/index.ts` and implement routes + components inside `games/<name>/`
+2. Add path alias to `tsconfig.json`:
+   ```json
+   "@gandogames/<name>": ["games/<name>/index.ts"]
+   ```
+3. Add one entry to `src/app/game-registry.ts`
 
-```bash
-ng build
-```
+## Deployment
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Deployed via Azure Static Web Apps.
+Push to `main` triggers the GitHub Actions workflow which builds the Angular app and deploys static files + Azure Functions.
 
-## Running unit tests
+## Future work
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Push notifications: room invites via Web Push API + Angular Service Worker

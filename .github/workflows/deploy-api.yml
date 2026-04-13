@@ -28,13 +28,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Npm'
+      - name: Build
         shell: pwsh
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
           npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm run build
+          popd
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          $hasTests = Get-ChildItem -Path "src" -Recurse -Include "*.spec.ts","*.test.ts" -ErrorAction SilentlyContinue
+          if ($hasTests) { npm test } else { Write-Host "No tests found, skipping" }
           popd
 
       - name: Upload artifact for deployment job

@@ -25,7 +25,7 @@ export class LoginComponent {
 	}
 
 	public async continueAsGuest(): Promise<void> {
-		await this.try(this.auth.loginAsGuest);
+		await this.try(() => this.auth.loginAsGuest());
 	}
 
 	private async try(fn: () => Promise<void>) {

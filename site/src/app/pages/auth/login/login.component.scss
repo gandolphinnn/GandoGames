@@ -1,0 +1,126 @@
+@use 'styles/variables' as *;
+
+.auth-page {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $s4;
+}
+
+.auth-card {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	width: 100%;
+	max-width: 400px;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+
+	@media (min-width: $bp-sm) {
+		padding: $s8;
+	}
+}
+
+.auth-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+
+	@media (min-width: $bp-sm) {
+		font-size: $text-3xl;
+	}
+}
+
+.auth-subtitle {
+	font-size: $text-sm;
+	color: $text-muted;
+	margin-top: -$s2;
+}
+
+.auth-error {
+	padding: $s3 $s4;
+	background: rgba(248, 113, 113, 0.1);
+	border: 1px solid rgba(248, 113, 113, 0.25);
+	border-radius: $radius-md;
+	color: #f87171;
+	font-size: $text-sm;
+}
+
+.auth-form {
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+}
+
+.field-label {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.input {
+	padding: $s3 $s4;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text;
+	font-size: $text-base;
+	outline: none;
+	transition: border-color $transition;
+	min-height: 44px;
+
+	&:focus {
+		border-color: $accent;
+	}
+
+	&::placeholder {
+		color: $text-muted;
+	}
+}
+
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition, opacity $transition;
+	min-height: 44px;
+
+	&-primary {
+		background: $accent;
+		color: $text;
+
+		&:hover:not([disabled]) {
+			background: $accent-hover;
+		}
+	}
+
+	&[disabled] {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+}
+
+.auth-footer {
+	font-size: $text-sm;
+	color: $text-muted;
+	text-align: center;
+}
+
+.auth-link {
+	color: $accent;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}

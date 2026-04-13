@@ -1,1 +1,33 @@
-<p>signup works!</p>
+<div class="auth-page">
+	<div class="auth-card">
+		<h1 class="auth-title">Create account</h1>
+		<p class="auth-subtitle">Join GandoGames</p>
+
+		@if (error()) {
+			<div class="auth-error">{{ error() }}</div>
+		}
+
+		<form class="auth-form" (ngSubmit)="submit()">
+			<div class="field">
+				<label class="field-label" for="username">Username</label>
+				<input id="username" class="input" type="text" name="username" [(ngModel)]="username"
+					placeholder="YourName" required autocomplete="username" maxlength="24" />
+			</div>
+			<div class="field">
+				<label class="field-label" for="email">Email</label>
+				<input id="email" class="input" type="email" name="email" [(ngModel)]="email"
+					placeholder="you@example.com" required autocomplete="email" />
+			</div>
+			<div class="field">
+				<label class="field-label" for="password">Password</label>
+				<input id="password" class="input" type="password" name="password" [(ngModel)]="password"
+					placeholder="••••••••" required autocomplete="new-password" minlength="8" />
+			</div>
+			<button class="btn btn-primary" type="submit" [disabled]="loading()">
+				{{ loading() ? 'Creating account…' : 'Create account' }}
+			</button>
+		</form>
+
+		<p class="auth-footer">Already have an account? <a class="auth-link" routerLink="/login">Sign in</a></p>
+	</div>
+</div>

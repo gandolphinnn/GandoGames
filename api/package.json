@@ -3,14 +3,24 @@
 	"version": "1.0.0",
 	"main": "dist/src/functions/*.js",
 	"scripts": {
+		"build": "tsc",
 		"watch": "tsc -w",
-		"start": "tsc && func start"
+		"start": "tsc && func start",
+		"test": "jest"
+	},
+	"jest": {
+		"preset": "ts-jest",
+		"testEnvironment": "node",
+		"testMatch": ["**/*.spec.ts", "**/*.test.ts"]
 	},
 	"dependencies": {
 		"@azure/functions": "^4.0.0"
 	},
 	"devDependencies": {
+		"@types/jest": "^29.x",
 		"@types/node": "^22.x",
+		"jest": "^29.x",
+		"ts-jest": "^29.x",
 		"typescript": "^5.x"
 	}
 }

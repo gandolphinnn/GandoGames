@@ -1,13 +1,18 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
+/site/dist
+/site/tmp
+/site/out-tsc
+/site/bazel-out
+/api/dist
+
+# Azure Functions
+/api/local.settings.json
+/api/node_modules
 
 # Node
-/node_modules
+/site/node_modules
 npm-debug.log
 yarn-error.log
 
@@ -29,13 +34,13 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
+/site/.angular/cache
 .sass-cache/
-/connect.lock
-/coverage
+/site/connect.lock
+/site/coverage
 /libpeerconnection.log
 testem.log
-/typings
+/site/typings
 
 # System files
 .DS_Store

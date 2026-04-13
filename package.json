@@ -1,0 +1,8 @@
+{
+	"name": "gandogames",
+	"version": "1.0.0",
+	"scripts": {
+		"start-api": "npm --prefix api start",
+		"start-site": "npm --prefix site start"
+	}
+}

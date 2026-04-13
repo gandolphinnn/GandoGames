@@ -1,0 +1,16 @@
+{
+	"name": "gandogames-api",
+	"version": "1.0.0",
+	"main": "dist/src/functions/*.js",
+	"scripts": {
+		"watch": "tsc -w",
+		"start": "tsc && func start"
+	},
+	"dependencies": {
+		"@azure/functions": "^4.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "^22.x",
+		"typescript": "^5.x"
+	}
+}

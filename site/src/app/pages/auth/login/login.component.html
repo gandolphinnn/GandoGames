@@ -1,1 +1,38 @@
-<p>login works!</p>
+<div class="auth-page">
+	<div class="auth-card">
+		<h1 class="auth-title">Welcome back</h1>
+		<p class="auth-subtitle">Sign in to GandoGames</p>
+
+		@if (error()) {
+			<div class="auth-error">{{ error() }}</div>
+		}
+
+		<form class="auth-form" (ngSubmit)="submit()">
+			<div class="field">
+				<label class="field-label" for="email">Email</label>
+				<input id="email" class="input" type="email" name="email" [(ngModel)]="email"
+					placeholder="you@example.com" required autocomplete="email" />
+			</div>
+			<div class="field">
+				<label class="field-label" for="password">Password</label>
+				<input id="password" class="input" type="password" name="password" [(ngModel)]="password"
+					placeholder="••••••••" required autocomplete="current-password" />
+			</div>
+			<button class="btn btn-primary" type="submit" [disabled]="loading()">
+				{{ loading() ? 'Signing in…' : 'Sign in' }}
+			</button>
+		</form>
+
+		<p class="auth-footer">No account? <a class="auth-link" routerLink="/signup">Sign up</a></p>
+
+		<div class="auth-divider"><span>or</span></div>
+
+		<button class="btn btn-secondary" type="button" [disabled]="loading()" (click)="continueAsGuest()">
+			Continue as guest
+		</button>
+
+		<button class="btn btn-secondary" type="button" [disabled]="loading()" (click)="continueOffline()">
+			Continue offline
+		</button>
+	</div>
+</div>

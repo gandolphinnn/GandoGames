@@ -29,7 +29,7 @@ export class AuthService {
 
 	public async loginAsGuest(): Promise<void> {
 		const customId = this.getOrCreateGuestId();
-		const result = await this.backend.post<AuthResponse>('/auth/guest', { customId });
+		const result = await this.backend.post<AuthResponse>('/auth/guestLogin', { customId });
 		this.setSession({ ...result, isGuest: true });
 	}
 

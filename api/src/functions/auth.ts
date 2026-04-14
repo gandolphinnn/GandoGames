@@ -1,46 +1,46 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
-import { PlayFabHttp } from '../playfab';
-import { InnerFunction, registerAzureHttpFunction } from '../utils';
+import { InnerFunction, pfPromise, PlayFabClient, registerAzureHttpFunction } from '..';
 
-const guestLogin: InnerFunction<GuestLoginRequest, AuthResponse> = (request, _params) => {
-	const promise = PlayFabHttp.client<AuthResponse>('LoginWithCustomId', {
-		CustomId: request.customId,
-		CreateAccount: true,
-	});
-	return {
-		promise,
-		errorCode: 401,
-		errorMessage: 'Invalid custom ID',
-	} 
-}
+type LoginLike = PlayFabClientModels.LoginResult | PlayFabClientModels.RegisterPlayFabUserResult;
 
-const login: InnerFunction<LoginRequest, AuthResponse> = (request, _params) => {
-	const promise = PlayFabHttp.client<AuthResponse>('LoginWithEmailAddress', {
-		Email: request.email,
-		Password: request.password,
-	});
-	return {
-		promise,
-		errorCode: 401,
-		errorMessage: 'Invalid email or password',
-	}
-}
+const toAuthResponse = (r: LoginLike): AuthResponse => ({
+	SessionTicket: r.SessionTicket!,
+	PlayFabId: r.PlayFabId!,
+});
 
-const register: InnerFunction<RegisterRequest, AuthResponse> = (request, _params) => {
-	const promise = PlayFabHttp.client<AuthResponse>('RegisterPlayFabUser', {
-		Email: request.email,
-		Password: request.password,
-		Username: request.username,
-		RequireBothUsernameAndEmail: true,
-	});
-	return {
-		promise,
-		successCode: 201,
-		errorCode: 400,
-		errorMessage: 'Invalid registration data',
-	}
-}
+const guestLoginInner: InnerFunction<GuestLoginRequest, AuthResponse> = async (body, _params, options) => {
+	options.errorCode = 401;
+	options.errorMessage = 'Invalid custom ID';
+	const result = await pfPromise<PlayFabClientModels.LoginResult>(
+		cb => PlayFabClient.LoginWithCustomID({ CustomId: body.customId, CreateAccount: true }, cb),
+	);
+	return toAuthResponse(result);
+};
 
-registerAzureHttpFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLogin)
-registerAzureHttpFunction('auth_login', 'POST', 'auth/login', login)
-registerAzureHttpFunction('auth_register', 'POST', 'auth/register', register)
+const loginInner: InnerFunction<LoginRequest, AuthResponse> = async (body, _params, options) => {
+	options.errorCode = 401;
+	options.errorMessage = 'Invalid email or password';
+	const result = await pfPromise<PlayFabClientModels.LoginResult>(
+		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password }, cb),
+	);
+	return toAuthResponse(result);
+};
+
+const registerInner: InnerFunction<RegisterRequest, AuthResponse> = async (body, _params, options) => {
+	options.errorCode = 400;
+	options.successCode = 201;
+	options.errorMessage = 'Invalid registration data';
+	const result = await pfPromise<PlayFabClientModels.RegisterPlayFabUserResult>(
+		cb => PlayFabClient.RegisterPlayFabUser({
+			Email: body.email,
+			Password: body.password,
+			Username: body.username,
+			RequireBothUsernameAndEmail: true,
+		}, cb),
+	);
+	return toAuthResponse(result);
+};
+
+registerAzureHttpFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);
+registerAzureHttpFunction('auth_login', 'POST', 'auth/login', loginInner);
+registerAzureHttpFunction('auth_register', 'POST', 'auth/register', registerInner);

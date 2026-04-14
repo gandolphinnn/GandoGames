@@ -1,35 +1,33 @@
-import { PlayFabHttp } from '../playfab';
-import { UpdateStatsRequest, LeaderboardEntry } from '@gandogames/common/api';
-import { InnerFunction, registerAzureHttpFunction } from '../utils';
+import { LeaderboardEntry, UpdateStatsRequest } from '@gandogames/common/api';
+import { InnerFunction, pfPromise, PlayFabServer, registerAzureHttpFunction } from '..';
 
-interface PlayFabLeaderboardEntry {
-	PlayFabId: string;
-	DisplayName: string;
-	StatValue: number;
-	Position: number;
-}
+const statsUpdateInner: InnerFunction<UpdateStatsRequest, { success: boolean }> = async (body, _params, options) => {
+	options.errorCode = 500;
+	await pfPromise<PlayFabServerModels.UpdatePlayerStatisticsResult>(
+		cb => PlayFabServer.UpdatePlayerStatistics({
+			PlayFabId: body.playFabId,
+			Statistics: body.statistics.map(s => ({ StatisticName: s.name, Value: s.value })),
+		}, cb),
+	);
+	return { success: true };
+};
 
-const updateStats: InnerFunction<UpdateStatsRequest, { success: boolean }> = (body, _params) => ({
-	promise: PlayFabHttp.server('UpdatePlayerStatistics', {
-		PlayFabId: body.playFabId,
-		Statistics: body.statistics.map(s => ({ StatisticName: s.name, Value: s.value })),
-	}).then(() => ({ success: true })),
-	errorCode: 500,
-});
+const statsLeaderboardInner: InnerFunction<never, LeaderboardEntry[]> = async (_body, params, options) => {
+	options.errorCode = 500;
+	const data = await pfPromise<PlayFabServerModels.GetLeaderboardResult>(
+		cb => PlayFabServer.GetLeaderboard({
+			StatisticName: params['statName'],
+			StartPosition: 0,
+			MaxResultsCount: 10,
+		}, cb),
+	);
+	return (data.Leaderboard ?? []).map((e): LeaderboardEntry => ({
+		playFabId: e.PlayFabId!,
+		displayName: e.DisplayName!,
+		value: e.StatValue!,
+		position: e.Position!,
+	}));
+};
 
-const getLeaderboard: InnerFunction<undefined, LeaderboardEntry[]> = (_body, params) => ({
-	promise: PlayFabHttp.server<{ Leaderboard: PlayFabLeaderboardEntry[] }>('GetLeaderboard', {
-		StatisticName: params['statName'],
-		StartPosition: 0,
-		MaxResultsCount: 10,
-	}).then(data => data.Leaderboard.map(e => ({
-		playFabId: e.PlayFabId,
-		displayName: e.DisplayName,
-		value: e.StatValue,
-		position: e.Position,
-	}))),
-	errorCode: 500,
-});
-
-registerAzureHttpFunction('stats_update', 'POST', 'stats/update', updateStats);
-registerAzureHttpFunction('stats_getLeaderboard', 'GET', 'stats/leaderboard/{statName}', getLeaderboard);
+registerAzureHttpFunction('stats_update', 'POST', 'stats/update', statsUpdateInner);
+registerAzureHttpFunction('stats_getLeaderboard', 'GET', 'stats/leaderboard/{statName}', statsLeaderboardInner);

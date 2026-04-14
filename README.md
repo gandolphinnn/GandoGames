@@ -6,31 +6,32 @@ Hobby multiplayer web app for playing games with friends.
 
 | Layer | Technology |
 |---|---|
-| Frontend | Angular 20 (standalone components, SASS) |
+| Frontend | Angular 20 (standalone components, SCSS) |
 | API | Azure Functions v4 (TypeScript) |
-| Game services | Azure PlayFab (auth, rooms, statistics, game history) |
+| Game services | Azure PlayFab (auth, rooms, statistics) |
 | Hosting | Azure Static Web Apps |
 
-## Architecture
-
-### Project layout
+## Project layout
 
 ```
-gandogames/
-├── src/                      # Angular application
-│   └── app/
-│       ├── core/             # Guards, interceptors, services
-│       ├── features/         # Auth, lobby, game-host pages
-│       └── shell/            # Layout component
-├── games/                    # Self-contained game packages
-│   ├── pankov/               # Pankov game
-│   └── trio/                 # Trio game
-└── api/                      # Azure Functions API (to be added)
+GandoGames/
+├── common/
+│   └── api.ts              # Shared HTTP contract types (site + api)
+├── api/                    # Azure Functions v4 — secure PlayFab proxy
+│   └── src/
+│       ├── index.ts        # Barrel: registerAzureHttpFunction, pfPromise, PlayFab SDK
+│       └── functions/      # auth · rooms · game · stats · health
+└── site/                   # Angular SPA
+    ├── src/app/            # Core app, services, pages
+    ├── lib/games/          # Self-contained game packages
+    │   ├── pankov/
+    │   └── trio/
+    └── public/             # Static assets
 ```
 
-### How games work
+## How games work
 
-Each game lives in `games/<name>/` as a self-contained package.
+Each game lives in `site/lib/games/<name>/` as a self-contained package.
 It exports an Angular `Routes` array and is lazy-loaded into the main app via a central `GAME_REGISTRY`.
 Adding a new game requires no changes to the core app logic.
 
@@ -41,30 +42,27 @@ import { PANKOV_ROUTES } from '@gandogames/pankov';
 import { TRIO_ROUTES } from '@gandogames/trio';
 ```
 
-### Data storage
+## Data storage
 
 No external database. Azure PlayFab covers all needs at this scale:
 
 | Need | PlayFab API |
 |---|---|
-| Auth | Login / Register with email |
-| Rooms | Lobbies API |
-| Game history | Custom Events (PlayStream) |
+| Auth | Login / Register with email or custom ID |
+| Rooms | SharedGroups (room state as JSON) |
 | Player stats | Statistics API (built-in leaderboards) |
-| Player data | Entity Objects (JSON blobs) |
 
-### API responsibilities
+## API
 
-The Azure Functions API is a secure proxy to PlayFab.
-It keeps `PLAYFAB_SECRET_KEY` server-side and handles:
-auth, room CRUD, saving game results, and reading stats.
-Game logic itself runs in the Angular app.
+The Azure Functions API is a secure proxy to PlayFab — `PLAYFAB_SECRET_KEY` never leaves the server.
+Every endpoint is registered with `registerAzureHttpFunction` from `api/src/index.ts`.
+The `InnerFunction<TReq, TRes>` type defines handlers: return the response body directly, throw to produce an error, and set `options.errorCode` before throwing to control the status code.
 
-### Auth flow
+## Auth flow
 
 1. User submits login/register form → `POST /api/auth/login` or `/api/auth/register`
-2. Azure Function calls PlayFab with the secret key, returns session ticket + player profile
-3. Angular stores the session ticket and uses it for subsequent calls
+2. Azure Function calls PlayFab Client API, returns `{ SessionTicket, PlayFabId }`
+3. Angular stores the session ticket and passes it in subsequent requests for identity verification
 
 ## Games
 
@@ -76,27 +74,23 @@ Game logic itself runs in the Angular app.
 ## Local development
 
 ```bash
-# Install dependencies
-npm install
+# Angular dev server (from site/)
+cd site && npm install && ng serve        # → http://localhost:1212
 
-# Angular dev server (port 1212)
-ng serve
+# Azure Functions dev server (from api/)
+cd api && npm install && func start       # → http://localhost:7071
 
-# Azure Functions dev server (port 7071) — once api/ is set up
-cd api && func start
-
-# Run both via Azure SWA CLI (port 4280)
+# Run both behind Azure SWA CLI (from repo root)
 swa start http://localhost:1212 --api-location api
 ```
 
 ## Environment setup
 
-### Angular (`src/environments/environment.ts`)
+### Angular (`site/src/environments/environment.ts`)
 
 ```typescript
 export const environment = {
   production: false,
-  playfabTitleId: 'YOUR_TITLE_ID',
   apiBaseUrl: 'http://localhost:7071/api'
 };
 ```
@@ -116,18 +110,14 @@ export const environment = {
 
 ## Adding a new game
 
-1. Create `games/<name>/index.ts` and implement routes + components inside `games/<name>/`
-2. Add path alias to `tsconfig.json`:
+1. Create `site/lib/games/<name>/index.ts` with routes + components
+2. Add path alias to `site/tsconfig.json`:
    ```json
-   "@gandogames/<name>": ["games/<name>/index.ts"]
+   "@gandogames/<name>": ["./lib/games/<name>/index.ts"]
    ```
-3. Add one entry to `src/app/game-registry.ts`
+3. Add one entry to `site/src/app/game-registry.ts`
 
 ## Deployment
 
 Deployed via Azure Static Web Apps.
-Push to `main` triggers the GitHub Actions workflow which builds the Angular app and deploys static files + Azure Functions.
-
-## Future work
-
-- Push notifications: room invites via Web Push API + Angular Service Worker
+Push to `master` triggers the GitHub Actions workflow which builds the Angular app and deploys static files + Azure Functions.

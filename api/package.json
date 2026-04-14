@@ -17,7 +17,8 @@
 		]
 	},
 	"dependencies": {
-		"@azure/functions": "^4.0.0"
+		"@azure/functions": "^4.0.0",
+		"playfab-sdk": "^2.187.251205"
 	},
 	"devDependencies": {
 		"@types/jest": "^29.x",

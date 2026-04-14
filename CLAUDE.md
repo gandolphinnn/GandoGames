@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-ng serve          # dev server on :4200
+ng serve          # dev server on :1212
 ng build          # production build → dist/
 ng lint           # lint (if configured)
 ```

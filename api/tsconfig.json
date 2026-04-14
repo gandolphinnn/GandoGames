@@ -1,11 +1,15 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "node16",
 		"target": "ES2022",
 		"outDir": "dist",
-		"rootDir": ".",
+		"rootDir": "..",
 		"strict": true,
 		"esModuleInterop": true,
-		"moduleResolution": "node"
+		"moduleResolution": "node16",
+		"types": [ "node" ],
+		"paths": {
+			"@gandogames/common/*": ["../common/*"],
+		}
 	}
 }

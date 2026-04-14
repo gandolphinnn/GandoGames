@@ -1,63 +1,46 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { playfabClientPost } from '../playfab';
+import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
+import { PlayFabHttp } from '../playfab';
+import { InnerFunction, registerAzureHttpFunction } from '../utils';
 
-interface LoginBody { email: string; password: string; }
-interface RegisterBody { email: string; password: string; username: string; }
-interface GuestBody { customId: string; }
-interface AuthResult { SessionTicket: string; PlayFabId: string; }
+const guestLogin: InnerFunction<GuestLoginRequest, AuthResponse> = (request, _params) => {
+	const promise = PlayFabHttp.client<AuthResponse>('LoginWithCustomId', {
+		CustomId: request.customId,
+		CreateAccount: true,
+	});
+	return {
+		promise,
+		errorCode: 401,
+		errorMessage: 'Invalid custom ID',
+	} 
+}
 
-app.http('login', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'auth/login',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { email, password } = await request.json() as LoginBody;
-			const data = await playfabClientPost<AuthResult>('/Client/LoginWithEmailAddress', {
-				Email: email,
-				Password: password,
-			});
-			return { jsonBody: { sessionTicket: data.SessionTicket, playFabId: data.PlayFabId } };
-		} catch (err) {
-			return { status: 401, jsonBody: { error: (err as Error).message } };
-		}
-	},
-});
+const login: InnerFunction<LoginRequest, AuthResponse> = (request, _params) => {
+	const promise = PlayFabHttp.client<AuthResponse>('LoginWithEmailAddress', {
+		Email: request.email,
+		Password: request.password,
+	});
+	return {
+		promise,
+		errorCode: 401,
+		errorMessage: 'Invalid email or password',
+	}
+}
 
-app.http('register', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'auth/register',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { email, password, username } = await request.json() as RegisterBody;
-			const data = await playfabClientPost<AuthResult>('/Client/RegisterPlayFabUser', {
-				Email: email,
-				Password: password,
-				Username: username,
-				RequireBothUsernameAndEmail: true,
-			});
-			return { status: 201, jsonBody: { sessionTicket: data.SessionTicket, playFabId: data.PlayFabId } };
-		} catch (err) {
-			return { status: 400, jsonBody: { error: (err as Error).message } };
-		}
-	},
-});
+const register: InnerFunction<RegisterRequest, AuthResponse> = (request, _params) => {
+	const promise = PlayFabHttp.client<AuthResponse>('RegisterPlayFabUser', {
+		Email: request.email,
+		Password: request.password,
+		Username: request.username,
+		RequireBothUsernameAndEmail: true,
+	});
+	return {
+		promise,
+		successCode: 201,
+		errorCode: 400,
+		errorMessage: 'Invalid registration data',
+	}
+}
 
-app.http('loginAsGuest', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'auth/guest',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { customId } = await request.json() as GuestBody;
-			const data = await playfabClientPost<AuthResult>('/Client/LoginWithCustomId', {
-				CustomId: customId,
-				CreateAccount: true,
-			});
-			return { jsonBody: { sessionTicket: data.SessionTicket, playFabId: data.PlayFabId } };
-		} catch (err) {
-			return { status: 401, jsonBody: { error: (err as Error).message } };
-		}
-	},
-});
+registerAzureHttpFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLogin)
+registerAzureHttpFunction('auth_login', 'POST', 'auth/login', login)
+registerAzureHttpFunction('auth_register', 'POST', 'auth/register', register)

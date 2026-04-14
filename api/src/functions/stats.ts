@@ -1,8 +1,6 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { playfabServerPost } from '../playfab';
-
-interface Statistic { name: string; value: number; }
-interface UpdateBody { playFabId: string; statistics: Statistic[]; }
+import { PlayFabHttp } from '../playfab';
+import { UpdateStatsRequest, LeaderboardEntry } from '@gandogames/common/api';
+import { InnerFunction, registerAzureHttpFunction } from '../utils';
 
 interface PlayFabLeaderboardEntry {
 	PlayFabId: string;
@@ -11,46 +9,27 @@ interface PlayFabLeaderboardEntry {
 	Position: number;
 }
 
-app.http('updateStats', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'stats/update',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { playFabId, statistics } = await request.json() as UpdateBody;
-			await playfabServerPost('/Server/UpdatePlayerStatistics', {
-				PlayFabId: playFabId,
-				Statistics: statistics.map(s => ({ StatisticName: s.name, Value: s.value })),
-			});
-			return { jsonBody: { success: true } };
-		} catch (err) {
-			return { status: 500, jsonBody: { error: (err as Error).message } };
-		}
-	},
+const updateStats: InnerFunction<UpdateStatsRequest, { success: boolean }> = (body, _params) => ({
+	promise: PlayFabHttp.server('UpdatePlayerStatistics', {
+		PlayFabId: body.playFabId,
+		Statistics: body.statistics.map(s => ({ StatisticName: s.name, Value: s.value })),
+	}).then(() => ({ success: true })),
+	errorCode: 500,
 });
 
-app.http('getLeaderboard', {
-	methods: ['GET'],
-	authLevel: 'anonymous',
-	route: 'stats/leaderboard/{statName}',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const statName = request.params['statName'];
-			const data = await playfabServerPost<{ Leaderboard: PlayFabLeaderboardEntry[] }>('/Server/GetLeaderboard', {
-				StatisticName: statName,
-				StartPosition: 0,
-				MaxResultsCount: 10,
-			});
-			return {
-				jsonBody: data.Leaderboard.map(e => ({
-					playFabId: e.PlayFabId,
-					displayName: e.DisplayName,
-					value: e.StatValue,
-					position: e.Position,
-				})),
-			};
-		} catch (err) {
-			return { status: 500, jsonBody: { error: (err as Error).message } };
-		}
-	},
+const getLeaderboard: InnerFunction<undefined, LeaderboardEntry[]> = (_body, params) => ({
+	promise: PlayFabHttp.server<{ Leaderboard: PlayFabLeaderboardEntry[] }>('GetLeaderboard', {
+		StatisticName: params['statName'],
+		StartPosition: 0,
+		MaxResultsCount: 10,
+	}).then(data => data.Leaderboard.map(e => ({
+		playFabId: e.PlayFabId,
+		displayName: e.DisplayName,
+		value: e.StatValue,
+		position: e.Position,
+	}))),
+	errorCode: 500,
 });
+
+registerAzureHttpFunction('stats_update', 'POST', 'stats/update', updateStats);
+registerAzureHttpFunction('stats_getLeaderboard', 'GET', 'stats/leaderboard/{statName}', getLeaderboard);

@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AuthService } from '../../services/auth.service';
+import { AuthService, AuthUser } from '../../services/auth.service';
 
 @Component({
 	selector: 'gg-profile',
@@ -13,7 +13,7 @@ export class ProfileComponent {
 	private readonly auth = inject(AuthService);
 	private readonly router = inject(Router);
 
-	public readonly user = this.auth.user;
+	public readonly user: Signal<AuthUser | null> = this.auth.user;
 
 	public logout(): void {
 		this.auth.logout();

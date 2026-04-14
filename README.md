@@ -79,14 +79,14 @@ Game logic itself runs in the Angular app.
 # Install dependencies
 npm install
 
-# Angular dev server (port 4200)
+# Angular dev server (port 1212)
 ng serve
 
 # Azure Functions dev server (port 7071) — once api/ is set up
 cd api && func start
 
 # Run both via Azure SWA CLI (port 4280)
-swa start http://localhost:4200 --api-location api
+swa start http://localhost:1212 --api-location api
 ```
 
 ## Environment setup

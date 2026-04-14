@@ -3,10 +3,11 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
-		"baseUrl": ".",
+		"rootDir": "..",
 		"paths": {
-			"@gandogames/pankov": ["lib/games/pankov/index.ts"],
-			"@gandogames/trio": ["lib/games/trio/index.ts"]
+			"@gandogames/common/*": ["../common/*"],
+			"@gandogames/pankov": ["./lib/games/pankov/index.ts"],
+			"@gandogames/trio": ["./lib/games/trio/index.ts"]
 		},
 		"strict": true,
 		"noImplicitOverride": true,

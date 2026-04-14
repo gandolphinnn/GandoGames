@@ -1,12 +1,7 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { catchError, firstValueFrom, throwError } from 'rxjs';
 import { BackendService } from './backend.service';
+import { AuthResponse } from '@gandogames/common/api';
 
-interface AuthResponse {
-	sessionTicket: string;
-	playFabId: string;
-}
 export interface AuthUser extends AuthResponse {
 	isGuest: boolean;
 }

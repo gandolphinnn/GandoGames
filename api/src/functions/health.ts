@@ -1,10 +1,7 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
+import { InnerFunction, registerAzureHttpFunction } from '../utils';
 
-app.http('health', {
-	methods: ['GET'],
-	authLevel: 'anonymous',
-	route: 'health',
-	handler: async (_request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		return { status: 200, jsonBody: { status: 'ok' } };
-	},
+const health: InnerFunction<undefined, { status: string }> = (_body, _params) => ({
+	promise: Promise.resolve({ status: 'ok' }),
 });
+
+registerAzureHttpFunction('health', 'GET', 'health', health);

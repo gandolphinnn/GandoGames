@@ -1,5 +1,5 @@
 export const environment = {
 	production: true,
-	apiBaseUrl: 'https://api.gandogames.org/api',
+	apiBaseUrl: '/api',
 	siteBaseUrl: 'https://gandogames.org',
 };

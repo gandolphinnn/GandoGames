@@ -1,0 +1,101 @@
+@use 'styles/variables' as *;
+
+.profile-page {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $s4;
+}
+
+.profile-card {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	width: 100%;
+	max-width: 400px;
+	display: flex;
+	flex-direction: column;
+	gap: $s6;
+
+	@media (min-width: $bp-sm) {
+		padding: $s8;
+	}
+}
+
+.profile-header {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.profile-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+
+	@media (min-width: $bp-sm) {
+		font-size: $text-3xl;
+	}
+}
+
+.profile-badge {
+	padding: $s1 $s3;
+	background: rgba(251, 191, 36, 0.15);
+	border: 1px solid rgba(251, 191, 36, 0.3);
+	border-radius: $radius-md;
+	color: #fbbf24;
+	font-size: $text-sm;
+	font-weight: 600;
+}
+
+.profile-info {
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+}
+
+.info-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: $s4;
+	padding: $s3 0;
+	border-bottom: 1px solid $border;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.info-label {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.info-value {
+	font-size: $text-sm;
+	font-family: monospace;
+	word-break: break-all;
+}
+
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition;
+	min-height: 44px;
+
+	&-danger {
+		background: rgba(248, 113, 113, 0.15);
+		color: #f87171;
+		border: 1px solid rgba(248, 113, 113, 0.3);
+
+		&:hover {
+			background: rgba(248, 113, 113, 0.25);
+		}
+	}
+}

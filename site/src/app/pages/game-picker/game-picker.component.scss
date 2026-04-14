@@ -19,6 +19,20 @@
   text-align: center;
 }
 
+.profile-link {
+  position: fixed;
+  top: $s4;
+  right: $s4;
+  font-size: $text-sm;
+  font-weight: 600;
+  color: $accent;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .picker-title {
   font-size: $text-3xl;
   font-weight: 700;

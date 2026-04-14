@@ -7,7 +7,7 @@ interface AuthResponse {
 	sessionTicket: string;
 	playFabId: string;
 }
-interface AuthUser extends AuthResponse {
+export interface AuthUser extends AuthResponse {
 	isGuest: boolean;
 }
 

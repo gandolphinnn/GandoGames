@@ -7,16 +7,24 @@
 			<div class="auth-error">{{ error() }}</div>
 		}
 
-		<form class="auth-form" (ngSubmit)="submit()">
+		<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
 			<div class="field">
 				<label class="field-label" for="email">Email</label>
-				<input id="email" class="input" type="email" name="email" [(ngModel)]="email"
-					placeholder="you@example.com" required autocomplete="email" />
+				<input id="email" class="input" type="email" formControlName="email"
+					placeholder="you@example.com" autocomplete="email" />
+				@if (form.controls.email.touched && form.controls.email.hasError('required')) {
+					<span class="field-error">Email is required</span>
+				} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+					<span class="field-error">Enter a valid email</span>
+				}
 			</div>
 			<div class="field">
 				<label class="field-label" for="password">Password</label>
-				<input id="password" class="input" type="password" name="password" [(ngModel)]="password"
-					placeholder="••••••••" required autocomplete="current-password" />
+				<input id="password" class="input" type="password" formControlName="password"
+					placeholder="••••••••" autocomplete="current-password" />
+				@if (form.controls.password.touched && form.controls.password.hasError('required')) {
+					<span class="field-error">Password is required</span>
+				}
 			</div>
 			<button class="btn btn-primary" type="submit" [disabled]="loading()">
 				{{ loading() ? 'Signing in…' : 'Sign in' }}
@@ -29,10 +37,6 @@
 
 		<button class="btn btn-secondary" type="button" [disabled]="loading()" (click)="continueAsGuest()">
 			Continue as guest
-		</button>
-
-		<button class="btn btn-secondary" type="button" [disabled]="loading()" (click)="continueOffline()">
-			Continue offline
 		</button>
 	</div>
 </div>

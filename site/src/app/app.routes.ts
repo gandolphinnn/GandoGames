@@ -28,6 +28,11 @@ export const routes: Routes = [
 		canActivate: [noAuthGuard],
 	},
 	{
+		path: 'profile',
+		loadComponent: () => import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
+		canActivate: [authGuard],
+	},
+	{
 		path: '**',
 		redirectTo: '',
 	},

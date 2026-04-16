@@ -1,31 +1,38 @@
 import {
-	RoomPlayer, RevealResult, RoomSummary, RoomState,
+	RoomPlayer, RoomState, RoomSummary,
 	CreateRoomRequest, JoinRoomRequest, StartRoomRequest,
 } from '@gandogames/common/api';
-import { InnerFunction, pfPromise, PlayFabServer, registerAzureHttpFunction } from '..';
+import { InnerFunction, InnerFunctionOptions, pfPromise, PlayFabServer, registerAzureHttpFunction } from '..';
 
-export type { RoomPlayer, RevealResult, RoomSummary, RoomState };
-
+export type { RoomPlayer, RoomState, RoomSummary };
 
 // StoredRoomState is the API-internal shape — extends the public RoomState
-// with _actualRoll, which is stripped before sending responses to clients.
+// with _hiddenState, which is stripped before sending responses to clients.
 export interface StoredRoomState extends RoomState {
-	_actualRoll: number | null;
+	_hiddenState: unknown;
 }
 
+// ── Game registry ─────────────────────────────────────────────────────────────
 
-const INITIAL_LIVES = 8;
-const ROOMS_INDEX_ID = 'PANKOV_ROOMS';
+type GameInitFn = (players: RoomPlayer[]) => { gameState: unknown; hiddenState: unknown };
+const gameRegistry = new Map<string, GameInitFn>();
+
+export function registerGameInit(gameId: string, fn: GameInitFn): void {
+	gameRegistry.set(gameId, fn);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const roomsIndexId = (gameId: string) => `${gameId.toUpperCase()}_ROOMS`;
 
 function generateRoomCode(): string {
 	return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-
-async function loadIndex(): Promise<RoomSummary[]> {
+async function loadIndex(gameId: string): Promise<RoomSummary[]> {
 	try {
 		const result = await pfPromise<PlayFabServerModels.GetSharedGroupDataResult>(
-			cb => PlayFabServer.GetSharedGroupData({ SharedGroupId: ROOMS_INDEX_ID, Keys: ['rooms'] }, cb),
+			cb => PlayFabServer.GetSharedGroupData({ SharedGroupId: roomsIndexId(gameId), Keys: ['rooms'] }, cb),
 		);
 		const value = result.Data?.['rooms']?.Value;
 		return value ? (JSON.parse(value) as RoomSummary[]) : [];
@@ -34,43 +41,43 @@ async function loadIndex(): Promise<RoomSummary[]> {
 	}
 }
 
-async function saveIndex(rooms: RoomSummary[]): Promise<void> {
+async function saveIndex(gameId: string, rooms: RoomSummary[]): Promise<void> {
+	const indexId = roomsIndexId(gameId);
 	const data = { rooms: JSON.stringify(rooms) };
 	try {
 		await pfPromise<PlayFabServerModels.UpdateSharedGroupDataResult>(
-			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: ROOMS_INDEX_ID, Data: data }, cb),
+			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: indexId, Data: data }, cb),
 		);
 	} catch {
 		// Index group may not exist yet — create it and retry once
 		await pfPromise<PlayFabServerModels.CreateSharedGroupResult>(
-			cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: ROOMS_INDEX_ID }, cb),
+			cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: indexId }, cb),
 		);
 		await pfPromise<PlayFabServerModels.UpdateSharedGroupDataResult>(
-			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: ROOMS_INDEX_ID, Data: data }, cb),
+			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: indexId, Data: data }, cb),
 		);
 	}
 }
 
-async function addToIndex(summary: RoomSummary): Promise<void> {
-	const rooms = await loadIndex();
+async function addToIndex(gameId: string, summary: RoomSummary): Promise<void> {
+	const rooms = await loadIndex(gameId);
 	rooms.push(summary);
-	await saveIndex(rooms);
+	await saveIndex(gameId, rooms);
 }
 
-async function updateIndexPlayers(roomId: string, playerNames: string[]): Promise<void> {
-	const rooms = await loadIndex();
+async function updateIndexPlayers(gameId: string, roomId: string, playerNames: string[]): Promise<void> {
+	const rooms = await loadIndex(gameId);
 	const entry = rooms.find((r) => r.roomId === roomId);
 	if (entry) {
 		entry.players = playerNames;
-		await saveIndex(rooms);
+		await saveIndex(gameId, rooms);
 	}
 }
 
-export async function removeFromIndex(roomId: string): Promise<void> {
-	const rooms = await loadIndex();
-	await saveIndex(rooms.filter((r) => r.roomId !== roomId));
+export async function removeFromIndex(gameId: string, roomId: string): Promise<void> {
+	const rooms = await loadIndex(gameId);
+	await saveIndex(gameId, rooms.filter((r) => r.roomId !== roomId));
 }
-
 
 export async function getPlayFabId(sessionTicket: string): Promise<string> {
 	const result = await pfPromise<PlayFabServerModels.AuthenticateSessionTicketResult>(
@@ -99,16 +106,32 @@ export async function saveState(roomId: string, state: StoredRoomState): Promise
 }
 
 export function publicState(state: StoredRoomState): RoomState {
-	const { _actualRoll: _ignored, ...pub } = state;
+	const { _hiddenState: _ignored, ...pub } = state;
 	return pub;
 }
 
+// ── Game action registry ──────────────────────────────────────────────────────
 
-const roomListInner: InnerFunction<never, RoomSummary[]> = async () => {
-	return loadIndex();
+export type GameActionHandler = (
+	playFabId: string,
+	body: unknown,
+	options: InnerFunctionOptions,
+	roomId: string,
+	state: StoredRoomState,
+) => Promise<RoomState>;
+
+const gameActionRegistry = new Map<string, GameActionHandler>();
+
+export function registerGameAction(gameId: string, fn: GameActionHandler): void {
+	gameActionRegistry.set(gameId, fn);
+}
+
+// ── Endpoint handlers ─────────────────────────────────────────────────────────
+
+const roomListInner: InnerFunction<never, RoomSummary[]> = async (_body, _params, _options, query) => {
+	const gameId = query.get('gameId') ?? 'pankov';
+	return loadIndex(gameId);
 };
-
-
 
 const roomCreateInner: InnerFunction<CreateRoomRequest, { roomId: string }> = async (body, _params, options) => {
 	options.errorCode = 400;
@@ -122,21 +145,16 @@ const roomCreateInner: InnerFunction<CreateRoomRequest, { roomId: string }> = as
 	const state: StoredRoomState = {
 		phase: 'waiting',
 		hostId,
-		players: [{ playFabId: hostId, name: trimmedName, lives: INITIAL_LIVES }],
-		currentPlayerIndex: 0,
-		previousDeclaration: null,
-		previousPlayerIndex: null,
-		gamePhase: 'turn-start',
-		revealResult: null,
-		winnerName: null,
+		gameId: body.gameId,
+		players: [{ playFabId: hostId, name: trimmedName }],
+		gameState: null,
 		lastUpdated: new Date().toISOString(),
-		_actualRoll: null,
+		_hiddenState: null,
 	};
 	await saveState(roomId, state);
-	await addToIndex({ roomId, players: [trimmedName], createdAt: new Date().toISOString() });
+	await addToIndex(body.gameId, { roomId, players: [trimmedName], createdAt: new Date().toISOString() });
 	return { roomId };
 };
-
 
 const roomJoinInner: InnerFunction<JoinRoomRequest, { roomId: string }> = async (body, _params, options) => {
 	options.errorCode = 400;
@@ -147,9 +165,9 @@ const roomJoinInner: InnerFunction<JoinRoomRequest, { roomId: string }> = async 
 	if (state.players.length >= 6) throw new Error('Room is full');
 	if (state.players.some((p) => p.playFabId === playFabId)) throw new Error('Already in this room');
 	const trimmedName = body.playerName.trim();
-	state.players.push({ playFabId, name: trimmedName, lives: INITIAL_LIVES });
+	state.players.push({ playFabId, name: trimmedName });
 	await saveState(roomId, state);
-	await updateIndexPlayers(roomId, state.players.map((p) => p.name)).catch(() => { /* non-critical */ });
+	await updateIndexPlayers(state.gameId, roomId, state.players.map((p) => p.name)).catch(() => { /* non-critical */ });
 	return { roomId };
 };
 
@@ -170,12 +188,26 @@ const roomStartInner: InnerFunction<StartRoomRequest, RoomState> = async (body, 
 		throw new Error('Only the host can start');
 	}
 	if (state.players.length < 2) throw new Error('Need at least 2 players');
+	const initFn = gameRegistry.get(state.gameId);
+	if (!initFn) throw new Error(`Unknown game: ${state.gameId}`);
+	const { gameState, hiddenState } = initFn(state.players);
 	state.phase = 'playing';
-	state.gamePhase = 'turn-start';
-	state.currentPlayerIndex = 0;
+	state.gameState = gameState;
+	state._hiddenState = hiddenState;
 	await saveState(roomId, state);
-	await removeFromIndex(roomId).catch(() => { /* non-critical */ });
+	await removeFromIndex(state.gameId, roomId).catch(() => { /* non-critical */ });
 	return publicState(state);
+};
+
+const roomActionInner: InnerFunction<{ sessionTicket: string }, RoomState> = async (body, params, options) => {
+	options.errorCode = 400;
+	const roomId = params['roomId'];
+	const playFabId = await getPlayFabId(body.sessionTicket);
+	const state = await loadState(roomId);
+	if (state.phase !== 'playing') throw new Error('Game is not in progress');
+	const handler = gameActionRegistry.get(state.gameId);
+	if (!handler) throw new Error(`No action handler for game: ${state.gameId}`);
+	return handler(playFabId, body, options, roomId, state);
 };
 
 registerAzureHttpFunction('room_list', 'GET', 'rooms', roomListInner);
@@ -183,3 +215,4 @@ registerAzureHttpFunction('room_create', 'POST', 'rooms', roomCreateInner);
 registerAzureHttpFunction('room_join', 'POST', 'rooms/join', roomJoinInner);
 registerAzureHttpFunction('room_getState', 'GET', 'rooms/{roomId}', roomGetStateInner);
 registerAzureHttpFunction('room_start', 'POST', 'rooms/{roomId}/start', roomStartInner);
+registerAzureHttpFunction('room_action', 'POST', 'rooms/{roomId}/action', roomActionInner);

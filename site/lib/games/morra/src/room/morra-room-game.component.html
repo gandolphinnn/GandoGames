@@ -1,0 +1,174 @@
+<div class="room-game">
+
+	<header class="room-header">
+		<a class="room-back" routerLink="/">← Games</a>
+		<h1 class="room-title">Morra</h1>
+		@if (room.roomId()) {
+			<span class="room-code-badge">{{ room.roomId() }}</span>
+		}
+	</header>
+
+	@if (room.state(); as state) {
+
+		@if (state.gameState; as gs) {
+			<div class="players-strip">
+				@for (player of gs.players; track player.playFabId) {
+					<div class="player-chip"
+						[class.player-chip-me]="player.playFabId === room.myPlayFabId()"
+						[class.player-chip-eliminated]="player.lives === 0"
+						[class.player-chip-picked]="gs.gamePhase === 'picking' && player.hasPicked">
+						<span class="player-chip-name">{{ player.name }}</span>
+						<span class="player-chip-lives">
+							@for (i of livesRange; track i) {
+								<span class="life" [class.life-full]="i < player.lives">●</span>
+							}
+						</span>
+						@if (gs.gamePhase === 'picking') {
+							<span class="player-chip-status">{{ player.hasPicked ? 'Ready' : '…' }}</span>
+						}
+					</div>
+				}
+			</div>
+		}
+
+		<main class="game-panel">
+
+			@if (state.phase === 'waiting') {
+				<div class="panel">
+					<div class="waiting-code-block">
+						<p class="panel-eyebrow">Room code</p>
+						<div class="waiting-code-row">
+							<span class="waiting-code">{{ room.roomId() }}</span>
+							<button class="btn-icon" (click)="copyCode()" title="Copy code">⎘</button>
+						</div>
+						<p class="waiting-code-hint">Share this with friends</p>
+					</div>
+
+					<div class="waiting-players-section">
+						<p class="panel-eyebrow">Players ({{ state.players.length }}/6)</p>
+						<ul class="waiting-player-list">
+							@for (player of state.players; track player.playFabId) {
+								<li class="waiting-player-item">
+									<span class="waiting-player-name">{{ player.name }}</span>
+									@if (player.playFabId === state.hostId) {
+										<span class="waiting-player-badge">host</span>
+									}
+								</li>
+							}
+						</ul>
+					</div>
+
+					@if (error()) {
+						<p class="action-error">{{ error() }}</p>
+					}
+
+					@if (room.isHost()) {
+						<div class="panel-actions">
+							<button class="btn btn-primary"
+								[disabled]="state.players.length < 2 || loading()"
+								(click)="startGame()">
+								{{ loading() ? 'Starting…' : 'Start Game' }}
+							</button>
+						</div>
+						@if (state.players.length < 2) {
+							<p class="hint">Waiting for at least one more player.</p>
+						}
+					} @else {
+						<p class="waiting-text">Waiting for the host to start…</p>
+					}
+				</div>
+			}
+
+			@if (state.phase === 'playing') {
+				@if (state.gameState; as gs) {
+
+					@switch (gs.gamePhase) {
+
+						@case ('picking') {
+							@if (room.hasAlreadyPicked()) {
+								<div class="panel panel-centered">
+									<p class="panel-eyebrow">Waiting for others</p>
+									<p class="waiting-dots">· · ·</p>
+									@if (pickProgress(); as prog) {
+									<p class="hint">{{ prog.picked }} / {{ prog.alive }} ready</p>
+								}
+								</div>
+							} @else {
+								<div class="panel">
+									<p class="panel-eyebrow">Your turn</p>
+									<p class="panel-subtitle">Choose your hand</p>
+									<div class="hand-grid">
+										@for (hand of HANDS; track hand) {
+											<button class="hand-btn"
+												[disabled]="loading()"
+												(click)="pick(hand)">
+												{{ HAND_LABEL[hand] }}
+											</button>
+										}
+									</div>
+									@if (error()) {
+										<p class="action-error">{{ error() }}</p>
+									}
+								</div>
+							}
+						}
+
+						@case ('reveal') {
+							<div class="panel">
+								<h2 class="panel-title">Reveal</h2>
+								<div class="reveal-rows">
+									@for (player of gs.players; track player.playFabId) {
+										<div class="reveal-row"
+											[class.reveal-row-loser]="isLoser(player.playFabId)"
+											[class.reveal-row-draw]="gs.result!.isDraw">
+											<span class="reveal-row-name">{{ player.name }}</span>
+											<span class="reveal-row-hand">{{ HAND_LABEL[gs.result!.picks[player.playFabId]] }}</span>
+											@if (isLoser(player.playFabId)) {
+												<span class="reveal-row-tag reveal-tag-loss">−1 life</span>
+											} @else if (!gs.result!.isDraw) {
+												<span class="reveal-row-tag reveal-tag-win">Safe</span>
+											}
+										</div>
+									}
+								</div>
+								@if (gs.result!.isDraw) {
+									<p class="reveal-verdict reveal-verdict-draw">Draw — no change</p>
+								}
+								<button class="btn btn-primary" [disabled]="loading()" (click)="nextRound()">
+									Next Round
+								</button>
+								@if (error()) {
+									<p class="action-error">{{ error() }}</p>
+								}
+							</div>
+						}
+
+						@case ('game-over') {
+							<div class="panel panel-centered">
+								<p class="panel-eyebrow">Winner</p>
+								<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>
+								<button class="btn btn-primary" (click)="playAgain()">Play Again</button>
+							</div>
+						}
+
+					}
+				}
+			}
+
+			@if (state.phase === 'game-over' && state.gameState; as gs) {
+				<div class="panel panel-centered">
+					<p class="panel-eyebrow">Winner</p>
+					<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>
+					<button class="btn btn-primary" (click)="playAgain()">Play Again</button>
+				</div>
+			}
+
+		</main>
+
+	} @else {
+		<div class="loading-state">
+			<p>Loading room…</p>
+		</div>
+	}
+
+</div>

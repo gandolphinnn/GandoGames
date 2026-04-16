@@ -6,8 +6,8 @@
 		"rootDir": "..",
 		"paths": {
 			"@gandogames/common/*": ["../common/*"],
+			"@gandogames/morra": ["./lib/games/morra/index.ts"],
 			"@gandogames/pankov": ["./lib/games/pankov/index.ts"],
-			"@gandogames/trio": ["./lib/games/trio/index.ts"]
 		},
 		"strict": true,
 		"noImplicitOverride": true,

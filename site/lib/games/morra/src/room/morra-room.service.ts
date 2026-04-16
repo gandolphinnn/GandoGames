@@ -1,21 +1,19 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
-import { PankovGameState, PankovPlayer, PankovRoomState, RevealResult } from '@gandogames/common/pankov';
-import { RoomSummary, RoomState } from '@gandogames/common/api';
+import { Hand, MorraGameState, MorraPlayer, MorraRoomState } from '@gandogames/common/morra';
+import { RoomSummary } from '@gandogames/common/api';
 import { AuthService } from '../../../../../src/app/services/auth.service';
 import { BackendService } from '../../../../../src/app/services/backend.service';
 
-export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RoomSummary, RoomState };
-
-// ── Service ──────────────────────────────────────────────────────────────────
+export type { MorraPlayer, MorraGameState, MorraRoomState, RoomSummary };
 
 @Injectable({ providedIn: 'root' })
-export class PankovRoomService {
+export class MorraRoomService {
 	private readonly backend = inject(BackendService);
 	private readonly auth = inject(AuthService);
 
 	private readonly _roomId = signal<string | null>(null);
-	private readonly _state = signal<PankovRoomState | null>(null);
+	private readonly _state = signal<MorraRoomState | null>(null);
 
 	readonly roomId = this._roomId.asReadonly();
 	readonly state = this._state.asReadonly();
@@ -23,26 +21,14 @@ export class PankovRoomService {
 	readonly myPlayFabId = computed(() => this.auth.user()?.PlayFabId ?? null);
 	readonly isHost = computed(() => this._state()?.hostId === this.myPlayFabId());
 
-	readonly isMyTurn = computed(() => {
-		const state = this._state();
+	readonly myPlayer = computed(() => {
+		const s = this._state();
 		const me = this.myPlayFabId();
-		if (!state?.gameState || !me || state.phase !== 'playing') return false;
-		return state.gameState.players[state.gameState.currentPlayerIndex]?.playFabId === me;
+		if (!s?.gameState || !me) return null;
+		return s.gameState.players.find(p => p.playFabId === me) ?? null;
 	});
 
-	readonly currentPlayer = computed(() => {
-		const s = this._state();
-		if (!s?.gameState) return null;
-		return s.gameState.players[s.gameState.currentPlayerIndex] ?? null;
-	});
-
-	readonly previousPlayer = computed(() => {
-		const s = this._state();
-		if (!s?.gameState || s.gameState.previousPlayerIndex === null) return null;
-		return s.gameState.players[s.gameState.previousPlayerIndex] ?? null;
-	});
-
-	readonly mustCallFalse = computed(() => this._state()?.gameState?.previousDeclaration === 21);
+	readonly hasAlreadyPicked = computed(() => this.myPlayer()?.hasPicked ?? false);
 
 	private get sessionTicket(): string {
 		const user = this.auth.user();
@@ -53,17 +39,17 @@ export class PankovRoomService {
 	private pollHandle: ReturnType<typeof setInterval> | null = null;
 	private refreshing = false;
 
-	// ── API actions ─────────────────────────────────────────────────────────────
+	// ── API actions ──────────────────────────────────────────────────────────────
 
 	async fetchRooms(): Promise<RoomSummary[]> {
-		return await this.backend.get<RoomSummary[]>('/rooms?gameId=pankov');
+		return this.backend.get<RoomSummary[]>('/rooms?gameId=morra');
 	}
 
 	async createRoom(playerName: string): Promise<string> {
 		const result = await this.backend.post<{ roomId: string }>('/rooms', {
 			sessionTicket: this.sessionTicket,
 			playerName,
-			gameId: 'pankov',
+			gameId: 'morra',
 		});
 		this._roomId.set(result.roomId);
 		await this.refresh();
@@ -93,28 +79,19 @@ export class PankovRoomService {
 		await this.refresh();
 	}
 
-	async declare(declaration: number, actualRoll: number): Promise<void> {
+	async pick(hand: Hand): Promise<void> {
 		await this.backend.post(`/rooms/${this._roomId()}/action`, {
 			sessionTicket: this.sessionTicket,
-			type: 'declare',
-			declaration,
-			actualRoll,
+			type: 'pick',
+			hand,
 		});
 		await this.refresh();
 	}
 
-	async callFalse(): Promise<void> {
+	async nextRound(): Promise<void> {
 		await this.backend.post(`/rooms/${this._roomId()}/action`, {
 			sessionTicket: this.sessionTicket,
-			type: 'call-false',
-		});
-		await this.refresh();
-	}
-
-	async nextTurn(): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/action`, {
-			sessionTicket: this.sessionTicket,
-			type: 'next-turn',
+			type: 'next-round',
 		});
 		await this.refresh();
 	}
@@ -126,7 +103,7 @@ export class PankovRoomService {
 		if (!roomId || this.refreshing) return;
 		this.refreshing = true;
 		try {
-			const state = await this.backend.get<PankovRoomState>(`/rooms/${roomId}`);
+			const state = await this.backend.get<MorraRoomState>(`/rooms/${roomId}`);
 			this._state.set(state);
 		} catch {
 			// silently ignore poll errors to keep the interval alive

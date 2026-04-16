@@ -24,8 +24,8 @@ GandoGames/
 └── site/                   # Angular SPA
     ├── src/app/            # Core app, services, pages
     ├── lib/games/          # Self-contained game packages
-    │   ├── pankov/
-    │   └── trio/
+    │   ├── morra/
+    │   └── pankov/
     └── public/             # Static assets
 ```
 
@@ -39,7 +39,7 @@ TypeScript path aliases make imports clean:
 
 ```typescript
 import { PANKOV_ROUTES } from '@gandogames/pankov';
-import { TRIO_ROUTES } from '@gandogames/trio';
+import { MORRA_ROUTES } from '@gandogames/morra';
 ```
 
 ## Data storage
@@ -68,8 +68,8 @@ The `InnerFunction<TReq, TRes>` type defines handlers: return the response body 
 
 | ID | Name | Path alias | Status |
 |---|---|---|---|
+| `morra` | Morra | `@gandogames/morra` | In development |
 | `pankov` | Pankov | `@gandogames/pankov` | In development |
-| `trio` | Trio | `@gandogames/trio` | In development |
 
 ## Local development
 

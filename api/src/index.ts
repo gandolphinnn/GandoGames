@@ -6,7 +6,7 @@ PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 
 export { PlayFabClient, PlayFabServer };
 
-export type InnerFunction<TReq, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions) => Promise<TRes>;
+export type InnerFunction<TReq, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions, query: URLSearchParams) => Promise<TRes>;
 export type InnerFunctionOptions = {
 	/** The HTTP status code for a successful response. Default is 200. */
 	successCode?: number,
@@ -32,10 +32,11 @@ export function registerAzureHttpFunction<TReq, TRes>(
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
 				const params = request.params;
-				const result = await innerFunction(body, params, options);
+				const result = await innerFunction(body, params, options, request.query);
 				toRet.jsonBody = result
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {
+				console.error(err);
 				toRet.status = options?.errorCode ?? 500;
 				toRet.jsonBody = { error: options?.errorMessage ?? (err as Error).message ?? 'Internal Server Error' };
 			}

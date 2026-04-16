@@ -9,7 +9,7 @@ GandoGames/
 ├── common/api.ts          # Shared HTTP contract types (imported by both site/ and api/)
 ├── site/                  # Angular 20 SPA (Azure Static Web Apps)
 │   ├── src/               # App source
-│   ├── lib/games/         # Self-contained game packages (pankov, trio)
+│   ├── lib/games/         # Self-contained game packages (morra, pankov)
 │   └── public/            # Static assets (staticwebapp.config.json)
 └── api/                   # Azure Functions v4 (TypeScript)
     └── src/
@@ -51,8 +51,8 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 Games live in `site/lib/games/<name>/`, each with an `index.ts` as its public API. They are imported into the Angular app via TypeScript path aliases defined in `site/tsconfig.json`:
 
 ```
+@gandogames/morra  →  ./lib/games/morra/index.ts
 @gandogames/pankov  →  ./lib/games/pankov/index.ts
-@gandogames/trio    →  ./lib/games/trio/index.ts
 ```
 
 Each game package should export an Angular `Routes` array (e.g. `PANKOV_ROUTES`) that the main app lazy-loads. Game logic lives entirely in the game package — the Angular app only hosts and routes to it.

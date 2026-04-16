@@ -58,7 +58,7 @@ export class PankovRoomGameComponent implements OnInit, OnDestroy {
 	}
 
 	protected isAvailable(val: number): boolean {
-		const prev = this.room.state()?.previousDeclaration ?? null;
+		const prev = this.room.state()?.gameState?.previousDeclaration ?? null;
 		if (prev === null) return true;
 		return getRank(val) >= getRank(prev);
 	}

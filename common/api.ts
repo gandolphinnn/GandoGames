@@ -1,3 +1,5 @@
+import { GamePlayer, GameType } from './game'
+
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
 export interface LoginRequest {
@@ -16,46 +18,40 @@ export interface GuestLoginRequest {
 }
 
 export interface AuthResponse {
-	SessionTicket: string;
-	PlayFabId: string;
+	id: string;
+	sessionTicket: string;
+}
+
+/** Base request for logged users */
+export interface AuthorizedRequest {
+	sessionTicket: string;
+}
+
+/** Base request for logged users in a room */
+export interface RoomRequest extends AuthorizedRequest {
+	roomId: string;
+}
+
+export interface RoomResponse {
+	
 }
 
 // ── Rooms ─────────────────────────────────────────────────────────────────────
 
 export interface RoomPlayer {
-	playFabId: string;
+	id: string;
 	name: string;
 }
 
-export interface RoomSummary {
-	roomId: string;
-	players: string[];
-	createdAt: string;
-}
-
 export interface RoomState {
-	phase: 'waiting' | 'playing' | 'game-over';
+	phase: 'waiting' | 'playing' | 'ended';
+	name: string;
 	hostId: string;
-	gameId: string;
-	players: RoomPlayer[];
-	lastUpdated: string;
-	gameState: unknown;
+	gameId: GameType;
+	players: GamePlayer[];
 }
 
-// ── Room requests ─────────────────────────────────────────────────────────────
-
-export interface CreateRoomRequest {
-	sessionTicket: string;
-	playerName: string;
-	gameId: string;
-}
-
-export interface JoinRoomRequest {
-	sessionTicket: string;
-	roomCode: string;
-	playerName: string;
-}
-
-export interface StartRoomRequest {
-	sessionTicket: string;
+export interface CreateRoomRequest extends AuthorizedRequest {
+	game: GameType;
+	name: string;
 }

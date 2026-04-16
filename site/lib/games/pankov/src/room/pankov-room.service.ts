@@ -20,14 +20,14 @@ export class PankovRoomService {
 	readonly roomId = this._roomId.asReadonly();
 	readonly state = this._state.asReadonly();
 
-	readonly myPlayFabId = computed(() => this.auth.user()?.PlayFabId ?? null);
+	readonly myPlayFabId = computed(() => this.auth.user()?.id ?? null);
 	readonly isHost = computed(() => this._state()?.hostId === this.myPlayFabId());
 
 	readonly isMyTurn = computed(() => {
 		const state = this._state();
 		const me = this.myPlayFabId();
 		if (!state?.gameState || !me || state.phase !== 'playing') return false;
-		return state.gameState.players[state.gameState.currentPlayerIndex]?.playFabId === me;
+		return state.gameState.players[state.gameState.currentPlayerIndex]?.id === me;
 	});
 
 	readonly currentPlayer = computed(() => {
@@ -47,7 +47,7 @@ export class PankovRoomService {
 	private get sessionTicket(): string {
 		const user = this.auth.user();
 		if (!user) throw new Error('Not logged in');
-		return user.SessionTicket;
+		return user.sessionTicket;
 	}
 
 	private pollHandle: ReturnType<typeof setInterval> | null = null;

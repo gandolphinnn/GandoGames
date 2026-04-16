@@ -1,7 +1,7 @@
-import { InnerFunction, registerAzureHttpFunction } from '..';
+import { InnerFunction, registerFunction } from '..';
 
 const aliveInner: InnerFunction<never, { status: string }> = async () => {
 	return { status: 'alive' };
 };
 
-registerAzureHttpFunction('alive', 'GET', 'alive', aliveInner);
+registerFunction('alive', 'GET', 'alive', aliveInner);

@@ -18,14 +18,14 @@ export class MorraRoomService {
 	readonly roomId = this._roomId.asReadonly();
 	readonly state = this._state.asReadonly();
 
-	readonly myPlayFabId = computed(() => this.auth.user()?.PlayFabId ?? null);
+	readonly myPlayFabId = computed(() => this.auth.user()?.id ?? null);
 	readonly isHost = computed(() => this._state()?.hostId === this.myPlayFabId());
 
 	readonly myPlayer = computed(() => {
 		const s = this._state();
 		const me = this.myPlayFabId();
 		if (!s?.gameState || !me) return null;
-		return s.gameState.players.find(p => p.playFabId === me) ?? null;
+		return s.gameState.players.find(p => p.id === me) ?? null;
 	});
 
 	readonly hasAlreadyPicked = computed(() => this.myPlayer()?.hasPicked ?? false);
@@ -33,7 +33,7 @@ export class MorraRoomService {
 	private get sessionTicket(): string {
 		const user = this.auth.user();
 		if (!user) throw new Error('Not logged in');
-		return user.SessionTicket;
+		return user.sessionTicket;
 	}
 
 	private pollHandle: ReturnType<typeof setInterval> | null = null;

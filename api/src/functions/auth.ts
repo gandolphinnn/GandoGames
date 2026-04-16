@@ -1,11 +1,11 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
-import { InnerFunction, pfPromise, PlayFabClient, registerAzureHttpFunction } from '..';
+import { InnerFunction, pfPromise, PlayFabClient, registerFunction } from '..';
 
 type LoginLike = PlayFabClientModels.LoginResult | PlayFabClientModels.RegisterPlayFabUserResult;
 
 const toAuthResponse = (r: LoginLike): AuthResponse => ({
-	SessionTicket: r.SessionTicket!,
-	PlayFabId: r.PlayFabId!,
+	id: r.PlayFabId!,
+	sessionTicket: r.SessionTicket!,
 });
 
 const guestLoginInner: InnerFunction<GuestLoginRequest, AuthResponse> = async (body, _params, options) => {
@@ -41,6 +41,6 @@ const registerInner: InnerFunction<RegisterRequest, AuthResponse> = async (body,
 	return toAuthResponse(result);
 };
 
-registerAzureHttpFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);
-registerAzureHttpFunction('auth_login', 'POST', 'auth/login', loginInner);
-registerAzureHttpFunction('auth_register', 'POST', 'auth/register', registerInner);
+registerFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);
+registerFunction('auth_login', 'POST', 'auth/login', loginInner);
+registerFunction('auth_register', 'POST', 'auth/register', registerInner);

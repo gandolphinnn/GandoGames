@@ -1,5 +1,5 @@
 import { app, HttpMethod, HttpRequest, HttpRequestParams, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { AuthorizedRequest } from '@gandogames/common/api';
+import { BaseRequest } from '@gandogames/common/api';
 import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
@@ -17,13 +17,13 @@ export type InnerFunctionOptions = {
 };
 
 //#region Non authorized
-export type InnerFunction<TReq, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions) => Promise<TRes>;
+export type InnerPublicFunction<TReq, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions) => Promise<TRes>;
 
-export function registerFunction<TReq, TRes>(
+export function registerPublicFunction<TReq, TRes>(
 	name: string,
 	method: HttpMethod,
 	route: string,
-	innerFunction: InnerFunction<TReq, TRes>,
+	innerPublicFunction: InnerPublicFunction<TReq, TRes>,
 ) {
 	app.http(name, {
 		methods: [method],
@@ -35,7 +35,7 @@ export function registerFunction<TReq, TRes>(
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
 				const params = request.params;
-				const result = await innerFunction(body, params, options);
+				const result = await innerPublicFunction(body, params, options);
 				toRet.jsonBody = result
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {
@@ -50,12 +50,12 @@ export function registerFunction<TReq, TRes>(
 //#endregion Non authorized
 
 //#region Authorized
-export type InnerAuthorizedFunction<TReq extends AuthorizedRequest, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions, playerId: string) => Promise<TRes>;
-export function registerAuthorizedFunction<TReq extends AuthorizedRequest, TRes>(
+export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions, playerId: string) => Promise<TRes>;
+export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
 	method: HttpMethod,
 	route: string,
-	innerFunction: InnerAuthorizedFunction<TReq, TRes>,
+	innerFunction: InnerFunction<TReq, TRes>,
 ) {
 	app.http(name, {
 		methods: [method],
@@ -85,7 +85,7 @@ export function registerAuthorizedFunction<TReq extends AuthorizedRequest, TRes>
 /**
  * TODO CLAUDE: Add method documentation here
  */
-export async function authenticateSession(request: AuthorizedRequest, options: InnerFunctionOptions) {
+export async function authenticateSession(request: BaseRequest, options: InnerFunctionOptions) {
 	const { errorCode, errorMessage } = options;
 	options.errorCode = 401;
 	options.errorMessage = 'Session expired';

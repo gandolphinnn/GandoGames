@@ -1,7 +1,7 @@
-import { InnerFunction, registerFunction } from '..';
+import { InnerPublicFunction, registerPublicFunction } from '..';
 
-const aliveInner: InnerFunction<never, { status: string }> = async () => {
+const aliveInner: InnerPublicFunction<never, { status: string }> = async () => {
 	return { status: 'alive' };
 };
 
-registerFunction('alive', 'GET', 'alive', aliveInner);
+registerPublicFunction('alive', 'GET', 'alive', aliveInner);

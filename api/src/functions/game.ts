@@ -1,39 +1,4 @@
-import {
-	RoomPlayer, RoomState, RoomSummary, StartRoomRequest,
-} from '@gandogames/common/api';
-import { InnerAuthorizedFunction, InnerFunctionOptions, pfPromise, PlayFabServer, registerAuthorizedFunction } from '..';
-
-
-// StoredRoomState is the API-internal shape — extends the public RoomState
-// with _hiddenState, which is stripped before sending responses to clients.
-export interface StoredRoomState extends RoomState {
-	_hiddenState: unknown;
-}
-
-// ── Game registries ───────────────────────────────────────────────────────────
-
-export type GameInitFn = (players: RoomPlayer[]) => { gameState: unknown; hiddenState: unknown };
-
-export type GameActionHandler = (
-	playFabId: string,
-	body: unknown,
-	options: InnerFunctionOptions,
-	roomId: string,
-	state: StoredRoomState,
-) => Promise<RoomState>;
-
-const gameInitRegistry = new Map<string, GameInitFn>();
-const gameActionRegistry = new Map<string, GameActionHandler>();
-
-export function registerGameInit(gameId: string, fn: GameInitFn): void {
-	gameInitRegistry.set(gameId, fn);
-}
-
-export function registerGameAction(gameId: string, fn: GameActionHandler): void {
-	gameActionRegistry.set(gameId, fn);
-}
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
+import { InnerFunction, InnerFunctionOptions, pfPromise, PlayFabServer, registerFunction } from '..';
 
 const roomsIndexId = (gameId: string) => `${gameId.toUpperCase()}_ROOMS`;
 
@@ -98,14 +63,14 @@ export function publicState(state: StoredRoomState): RoomState {
 
 // ── Endpoint handlers ─────────────────────────────────────────────────────────
 
-const gameStateInner: InnerAuthorizedFunction<never, RoomState> = async (_body, params, options) => {
+const gameStateInner: InnerFunction<never, RoomState> = async (_body, params, options) => {
 	options.errorCode = 404;
 	options.errorMessage = 'Room not found';
 	const state = await loadState(params['roomId']);
 	return publicState(state);
 };
 
-const gameStartInner: InnerAuthorizedFunction<StartRoomRequest, RoomState> = async (body, params, options) => {
+const gameStartInner: InnerFunction<StartRoomRequest, RoomState> = async (body, params, options) => {
 	options.errorCode = 400;
 	const roomId = params['roomId'];
 	const playFabId = await getPlayFabId(body.sessionTicket);
@@ -126,7 +91,7 @@ const gameStartInner: InnerAuthorizedFunction<StartRoomRequest, RoomState> = asy
 	return publicState(state);
 };
 
-const gameActionInner: InnerAuthorizedFunction<{ sessionTicket: string }, RoomState> = async (body, params, options) => {
+const gameActionInner: InnerFunction<{ sessionTicket: string }, RoomState> = async (body, params, options) => {
 	options.errorCode = 400;
 	const roomId = params['roomId'];
 	const playFabId = await getPlayFabId(body.sessionTicket);
@@ -137,6 +102,6 @@ const gameActionInner: InnerAuthorizedFunction<{ sessionTicket: string }, RoomSt
 	return handler(playFabId, body, options, roomId, state);
 };
 
-registerAuthorizedFunction('game_state', 'GET', 'game/{roomId}', gameStateInner);
-registerAuthorizedFunction('game_start', 'POST', 'game/{roomId}/start', gameStartInner);
-registerAuthorizedFunction('game_action', 'POST', 'game/{roomId}/action', gameActionInner);
+registerFunction('game_state', 'GET', 'game/{roomId}', gameStateInner);
+registerFunction('game_start', 'POST', 'game/{roomId}/start', gameStartInner);
+registerFunction('game_action', 'POST', 'game/{roomId}/action', gameActionInner);

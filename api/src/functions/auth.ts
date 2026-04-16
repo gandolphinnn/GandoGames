@@ -1,5 +1,5 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
-import { InnerFunction, pfPromise, PlayFabClient, registerFunction } from '..';
+import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '..';
 
 type LoginLike = PlayFabClientModels.LoginResult | PlayFabClientModels.RegisterPlayFabUserResult;
 
@@ -8,7 +8,7 @@ const toAuthResponse = (r: LoginLike): AuthResponse => ({
 	sessionTicket: r.SessionTicket!,
 });
 
-const guestLoginInner: InnerFunction<GuestLoginRequest, AuthResponse> = async (body, _params, options) => {
+const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, _params, options) => {
 	options.errorCode = 401;
 	options.errorMessage = 'Invalid custom ID';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
@@ -17,7 +17,7 @@ const guestLoginInner: InnerFunction<GuestLoginRequest, AuthResponse> = async (b
 	return toAuthResponse(result);
 };
 
-const loginInner: InnerFunction<LoginRequest, AuthResponse> = async (body, _params, options) => {
+const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, _params, options) => {
 	options.errorCode = 401;
 	options.errorMessage = 'Invalid email or password';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
@@ -26,7 +26,7 @@ const loginInner: InnerFunction<LoginRequest, AuthResponse> = async (body, _para
 	return toAuthResponse(result);
 };
 
-const registerInner: InnerFunction<RegisterRequest, AuthResponse> = async (body, _params, options) => {
+const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, _params, options) => {
 	options.errorCode = 400;
 	options.successCode = 201;
 	options.errorMessage = 'Invalid registration data';
@@ -41,6 +41,6 @@ const registerInner: InnerFunction<RegisterRequest, AuthResponse> = async (body,
 	return toAuthResponse(result);
 };
 
-registerFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);
-registerFunction('auth_login', 'POST', 'auth/login', loginInner);
-registerFunction('auth_register', 'POST', 'auth/register', registerInner);
+registerPublicFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);
+registerPublicFunction('auth_login', 'POST', 'auth/login', loginInner);
+registerPublicFunction('auth_register', 'POST', 'auth/register', registerInner);

@@ -1,22 +1,19 @@
-import { CreateRoomRequest, RoomRequest } from '@gandogames/common/api';
-import { authenticateSession, InnerAuthorizedFunction, pfPromise, PlayFabServer, registerAuthorizedFunction } from '..';
+import { CreateRoomRequest, RoomBaseRequest, RoomGetResponse } from '@gandogames/common/api';
+import { authenticateSession, InnerFunction, pfPromise, PlayFabServer, registerFunction } from '..';
 import { StoredRoomState, loadState, saveState } from './game';
+import { GameType } from '@gandogames/common/game';
 
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const roomsIndexId = (gameId: string) => `${gameId.toUpperCase()}_ROOMS`;
+const ROOMS_INDEX_ID = 'ROOMS';
 
-function generateRoomCode(): string {
-	return Math.random().toString(36).substring(2, 8).toUpperCase();
-}
-
-async function loadIndex(gameId: string): Promise<RoomSummary[]> {
+async function loadIndex(...gameIds: GameType[]): Promise<RoomGetResponse[]> {
 	try {
 		const result = await pfPromise<PlayFabServerModels.GetSharedGroupDataResult>(
-			cb => PlayFabServer.GetSharedGroupData({ SharedGroupId: roomsIndexId(gameId), Keys: ['rooms'] }, cb),
+			cb => PlayFabServer.GetSharedGroupData({ SharedGroupId: ROOMS_INDEX_ID, Keys: gameIds }, cb),
 		);
-		const value = result.Data?.['rooms']?.Value;
+		const value = result.Data;
 		return value ? (JSON.parse(value) as RoomSummary[]) : [];
 	} catch {
 		return [];
@@ -24,7 +21,7 @@ async function loadIndex(gameId: string): Promise<RoomSummary[]> {
 }
 
 async function saveIndex(gameId: string, rooms: RoomSummary[]): Promise<void> {
-	const indexId = roomsIndexId(gameId);
+	const indexId = ROOMS_INDEX_ID;
 	const data = { rooms: JSON.stringify(rooms) };
 	try {
 		await pfPromise<PlayFabServerModels.UpdateSharedGroupDataResult>(
@@ -58,10 +55,10 @@ async function updateIndexPlayers(gameId: string, roomId: string, playerNames: s
 
 // ── Endpoint handlers ─────────────────────────────────────────────────────────
 
-const roomCreateInner: InnerAuthorizedFunction<CreateRoomRequest, { roomId: string }> = async (body, params, options, playerId) => {
+const roomCreateInner: InnerFunction<CreateRoomRequest, { roomId: string }> = async (body, params, options, playerId) => {
 	options.errorCode = 400;
 	options.successCode = 201;
-	const roomId = generateRoomCode();
+	const roomId = 
 	await pfPromise<PlayFabServerModels.CreateSharedGroupResult>(
 		cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: roomId }, cb),
 	);
@@ -80,7 +77,7 @@ const roomCreateInner: InnerAuthorizedFunction<CreateRoomRequest, { roomId: stri
 	return { roomId };
 };
 
-/* const roomJoinInner: InnerAuthorizedFunction<RoomRequest, { roomId: string }> = async (body, _params, options, playerId) => {
+const roomJoinInner: InnerFunction<RoomBaseRequest, { roomId: string }> = async (body, _params, options, playerId) => {
 	options.errorCode = 400;
 	const roomId = body.roomId.trim().toUpperCase();
 	const state = await loadState(roomId);
@@ -92,8 +89,8 @@ const roomCreateInner: InnerAuthorizedFunction<CreateRoomRequest, { roomId: stri
 	await saveState(roomId, state);
 	await updateIndexPlayers(state.gameId, roomId, state.players.map((p) => p.name)).catch(() => { /* non-critical */ });
 	return { roomId };
-}; */
+};
 
-registerAuthorizedFunction('room_create', 'POST', 'rooms', roomCreateInner);
-registerAuthorizedFunction('room_list', 'GET', 'rooms', roomListInner);
-registerAuthorizedFunction('room_join', 'POST', 'rooms/join', roomJoinInner);
+registerFunction('room_create', 'POST', 'rooms', roomCreateInner);
+registerFunction('room_list', 'GET', 'rooms', roomListInner);
+registerFunction('room_join', 'POST', 'rooms/join', roomJoinInner);

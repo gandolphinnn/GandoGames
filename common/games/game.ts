@@ -1,9 +1,6 @@
 import { MorraGame } from './morra'
 
-export enum GameType {
-	Morra = 'morra',
-	//Pankov = 'pankov',
-}
+export type GameType = 'morra' /* | 'pankov' */;
 
 export interface GamePlayer {
 	id: string,
@@ -26,9 +23,9 @@ export abstract class Game<TState extends GameState> {
 
 	public static Factory(type: GameType) {
 		switch (type) {
-			case GameType.Morra:
+			case 'morra':
 				return new MorraGame();
-			/* case GameType.Pankov:
+			/* case 'pankov':
 				return new PankovGame(); */
 		}
 	}

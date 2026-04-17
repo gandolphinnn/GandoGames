@@ -40,7 +40,7 @@ export class MorraGame extends Game<MorraState> {
 		} as MorraState;
 	}
 
-	public action(playerId: string) {
-
+	public action(player: GamePlayer, action: string, data: any): MorraState {
+		return {} as MorraState
 	}
 }

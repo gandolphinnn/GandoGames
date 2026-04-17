@@ -8,7 +8,7 @@ const toAuthResponse = (r: LoginLike): AuthResponse => ({
 	sessionTicket: r.SessionTicket!,
 });
 
-const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, _params, options) => {
+const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, options) => {
 	options.errorCode = 401;
 	options.errorMessage = 'Invalid custom ID';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
@@ -17,7 +17,7 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 	return toAuthResponse(result);
 };
 
-const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, _params, options) => {
+const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, options) => {
 	options.errorCode = 401;
 	options.errorMessage = 'Invalid email or password';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
@@ -26,7 +26,7 @@ const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body,
 	return toAuthResponse(result);
 };
 
-const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, _params, options) => {
+const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, options) => {
 	options.errorCode = 400;
 	options.successCode = 201;
 	options.errorMessage = 'Invalid registration data';

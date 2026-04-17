@@ -2,6 +2,16 @@ import { MorraGame } from './morra'
 
 export type GameType = 'morra' /* | 'pankov' */;
 
+export const GAMES_CONFIG: Record<GameType, {
+	minPlayers: number,
+	maxPlayers: number,
+}> = {
+	'morra': {
+		minPlayers: 2,
+		maxPlayers: 2,
+	},
+}
+
 export interface GamePlayer {
 	id: string,
 }
@@ -29,4 +39,6 @@ export abstract class Game<TState extends GameState> {
 				return new PankovGame(); */
 		}
 	}
+
+	public abstract action(player: GamePlayer, action: string, data: any): TState;
 }

@@ -1,6 +1,6 @@
 import { RoomData } from "@gandogames/common/api";
 import { pfPromise, PlayFabServer } from "..";
-import { GameState } from "@gandogames/common/games";
+import { GameState, GameType, MorraState } from "@gandogames/common/games";
 
 class PlayFabEntity<T> {
 	constructor(
@@ -86,7 +86,10 @@ class PlayFabEntity<T> {
 	}
 }
 
-export class PlayfabDB {
+export class PlayfabCtx {
 	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX')
-	public static readonly games = new PlayFabEntity<GameState>('GAMES_INDEX')
+
+	public static readonly game: Record<GameType, PlayFabEntity<GameState>> = {
+		'morra': new PlayFabEntity<MorraState>('MORRA_GAMES_INDEX'),
+	}
 }

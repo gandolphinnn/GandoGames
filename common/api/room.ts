@@ -10,7 +10,7 @@ export interface RoomData {
 	id: string;
 	name: string;
 	hostId: string;
-	gameId: GameType;
+	game: GameType;
 	players: GamePlayer[];
 	phase: 'waiting' | 'playing' | 'ended';
 }

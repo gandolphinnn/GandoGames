@@ -7,6 +7,7 @@ PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
 PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 
 export { PlayFabClient, PlayFabServer };
+export { PlayfabCtx } from './db/playfabCtx';
 
 //#region Shared types
 export type InnerFunctionOptions = {
@@ -20,7 +21,7 @@ export type InnerFunctionOptions = {
 //#endregion Shared types
 
 //#region Non authorized
-export type InnerPublicFunction<TReq, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions) => Promise<TRes>;
+export type InnerPublicFunction<TReq, TRes> = (body: TReq, options: InnerFunctionOptions) => Promise<TRes>;
 
 export function registerPublicFunction<TReq, TRes>(
 	name: string,
@@ -38,7 +39,7 @@ export function registerPublicFunction<TReq, TRes>(
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
 				const params = request.params;
-				const result = await innerPublicFunction(body, params, options);
+				const result = await innerPublicFunction(body, options);
 				toRet.jsonBody = result
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {
@@ -53,15 +54,14 @@ export function registerPublicFunction<TReq, TRes>(
 //#endregion Non authorized
 
 //#region Authorized
-export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions, player: GamePlayer) => Promise<TRes>;
+export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, options: InnerFunctionOptions, player: GamePlayer) => Promise<TRes>;
 export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
-	method: HttpMethod,
 	route: string,
 	innerFunction: InnerFunction<TReq, TRes>,
 ) {
 	app.http(name, {
-		methods: [method],
+		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
 		handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
@@ -71,7 +71,7 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 				const body = await request.json().catch(() => undefined) as TReq;
 				const params = request.params;
 				const player = await authenticateSession(body, options);
-				const result = await innerFunction(body, params, options, player);
+				const result = await innerFunction(body, options, player);
 				toRet.jsonBody = result
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {

@@ -1,96 +1,57 @@
-import { CreateRoomRequest, RoomBaseRequest, RoomGetResponse } from '@gandogames/common/api';
-import { authenticateSession, InnerFunction, pfPromise, PlayFabServer, registerFunction } from '..';
-import { StoredRoomState, loadState, saveState } from './game';
-import { GameType } from '@gandogames/common/game';
+import { RoomCreateRequest, RoomBaseRequest, RoomData, BaseRequest } from '@gandogames/common/api';
+import { InnerFunction, registerFunction } from '..';
+import { PlayfabDB } from '../db/db';
 
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-const ROOMS_INDEX_ID = 'ROOMS';
-
-async function loadIndex(...gameIds: GameType[]): Promise<RoomGetResponse[]> {
-	try {
-		const result = await pfPromise<PlayFabServerModels.GetSharedGroupDataResult>(
-			cb => PlayFabServer.GetSharedGroupData({ SharedGroupId: ROOMS_INDEX_ID, Keys: gameIds }, cb),
-		);
-		const value = result.Data;
-		return value ? (JSON.parse(value) as RoomSummary[]) : [];
-	} catch {
-		return [];
-	}
-}
-
-async function saveIndex(gameId: string, rooms: RoomSummary[]): Promise<void> {
-	const indexId = ROOMS_INDEX_ID;
-	const data = { rooms: JSON.stringify(rooms) };
-	try {
-		await pfPromise<PlayFabServerModels.UpdateSharedGroupDataResult>(
-			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: indexId, Data: data }, cb),
-		);
-	} catch {
-		// Index group may not exist yet — create it and retry once
-		await pfPromise<PlayFabServerModels.CreateSharedGroupResult>(
-			cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: indexId }, cb),
-		);
-		await pfPromise<PlayFabServerModels.UpdateSharedGroupDataResult>(
-			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: indexId, Data: data }, cb),
-		);
-	}
-}
-
-async function addToIndex(gameId: string, summary: RoomSummary): Promise<void> {
-	const rooms = await loadIndex(gameId);
-	rooms.push(summary);
-	await saveIndex(gameId, rooms);
-}
-
-async function updateIndexPlayers(gameId: string, roomId: string, playerNames: string[]): Promise<void> {
-	const rooms = await loadIndex(gameId);
-	const entry = rooms.find((r) => r.roomId === roomId);
-	if (entry) {
-		entry.players = playerNames;
-		await saveIndex(gameId, rooms);
-	}
-}
-
-// ── Endpoint handlers ─────────────────────────────────────────────────────────
-
-const roomCreateInner: InnerFunction<CreateRoomRequest, { roomId: string }> = async (body, params, options, playerId) => {
-	options.errorCode = 400;
+//#region Endpoint handlers
+const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, _params, options, player) => {
 	options.successCode = 201;
-	const roomId = 
-	await pfPromise<PlayFabServerModels.CreateSharedGroupResult>(
-		cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: roomId }, cb),
-	);
-	const trimmedName = body.name.trim();
-	const state: StoredRoomState = {
-		phase: 'waiting',
-		hostId,
+	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+	const room: RoomData = {
+		id: roomId,
+		name: body.name.trim(),
+		hostId: player.id,
 		gameId: body.game,
-		players: [{ id: hostId, name: trimmedName }],
-		gameState: null,
-		lastUpdated: new Date().toISOString(),
-		_hiddenState: null,
+		players: [player],
+		phase: 'waiting',
 	};
-	await saveState(roomId, state);
-	await addToIndex(body.game, { roomId, players: [trimmedName], createdAt: new Date().toISOString() });
-	return { roomId };
+	await PlayfabDB.rooms.upsert(roomId, room)
+	return room;
 };
 
-const roomJoinInner: InnerFunction<RoomBaseRequest, { roomId: string }> = async (body, _params, options, playerId) => {
-	options.errorCode = 400;
-	const roomId = body.roomId.trim().toUpperCase();
-	const state = await loadState(roomId);
-	if (state.phase !== 'waiting') throw new Error('Game already started');
-	if (state.players.length >= 6) throw new Error('Room is full');
-	if (state.players.some((p) => p.id === playFabId)) throw new Error('Already in this room');
-	const trimmedName = body.playerName.trim();
-	state.players.push({ id: playFabId, name: trimmedName });
-	await saveState(roomId, state);
-	await updateIndexPlayers(state.gameId, roomId, state.players.map((p) => p.name)).catch(() => { /* non-critical */ });
-	return { roomId };
+const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _params, _options, _player) => {
+	return await PlayfabDB.rooms.list();
+};
+
+const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, _params, options, player) => {
+	const room = await PlayfabDB.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.phase !== 'waiting') throw new Error('Game already started');
+	if (room.players.some(p => p.id === player.id)) throw new Error('Already in this room');
+
+	room.players.push(player);
+	await PlayfabDB.rooms.upsert(body.roomId, room);
+	return room;
+};
+
+const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, _params, options, player) => {
+	const room = await PlayfabDB.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (!room.players.some(p => p.id === player.id)) throw new Error('You are not in this room');
+
+	if (room.players.length == 1) {
+		await PlayfabDB.rooms.delete(body.roomId);
+		return;
+	}
+
+	room.players = room.players.filter(p => p.id != player.id);
+	if (room.hostId == player.id) {
+		room.hostId = room.players[0].id;
+	}
+	await PlayfabDB.rooms.upsert(body.roomId, room);
 };
 
 registerFunction('room_create', 'POST', 'rooms', roomCreateInner);
-registerFunction('room_list', 'GET', 'rooms', roomListInner);
+registerFunction('room_list', 'POST', 'rooms/list', roomListInner);
 registerFunction('room_join', 'POST', 'rooms/join', roomJoinInner);
+registerFunction('room_leave', 'POST', 'rooms/leave', roomLeaveInner);
+//#endregion Endpoint handlers

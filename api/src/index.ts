@@ -1,5 +1,6 @@
 import { app, HttpMethod, HttpRequest, HttpRequestParams, HttpResponseInit, InvocationContext } from '@azure/functions';
 import { BaseRequest } from '@gandogames/common/api';
+import { GamePlayer } from '@gandogames/common/games';
 import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
@@ -7,6 +8,7 @@ PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 
 export { PlayFabClient, PlayFabServer };
 
+//#region Shared types
 export type InnerFunctionOptions = {
 	/** The HTTP status code for a successful response. Default is 200. */
 	successCode?: number,
@@ -15,6 +17,7 @@ export type InnerFunctionOptions = {
 	/** The error message for an error response when no FunctionError is thrown. Default is the caught exception message. */
 	errorMessage?: string
 };
+//#endregion Shared types
 
 //#region Non authorized
 export type InnerPublicFunction<TReq, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions) => Promise<TRes>;
@@ -50,7 +53,7 @@ export function registerPublicFunction<TReq, TRes>(
 //#endregion Non authorized
 
 //#region Authorized
-export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions, playerId: string) => Promise<TRes>;
+export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, params: HttpRequestParams, options: InnerFunctionOptions, player: GamePlayer) => Promise<TRes>;
 export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
 	method: HttpMethod,
@@ -67,8 +70,8 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
 				const params = request.params;
-				const playerId = await authenticateSession(body, options);
-				const result = await innerFunction(body, params, options, playerId);
+				const player = await authenticateSession(body, options);
+				const result = await innerFunction(body, params, options, player);
 				toRet.jsonBody = result
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {
@@ -82,10 +85,8 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 }
 //#endregion Authorized
 
-/**
- * TODO CLAUDE: Add method documentation here
- */
-export async function authenticateSession(request: BaseRequest, options: InnerFunctionOptions) {
+//#region PlayFab
+export async function authenticateSession(request: BaseRequest, options: InnerFunctionOptions): Promise<GamePlayer> {
 	const { errorCode, errorMessage } = options;
 	options.errorCode = 401;
 	options.errorMessage = 'Session expired';
@@ -94,7 +95,7 @@ export async function authenticateSession(request: BaseRequest, options: InnerFu
 	);
 	options.errorCode = errorCode;
 	options.errorMessage = errorMessage;
-	return result.UserInfo!.PlayFabId!;
+	return { id: result.UserInfo!.PlayFabId! };
 }
 
 /** Wraps a PlayFab SDK callback call into a Promise. */
@@ -108,3 +109,4 @@ export function pfPromise<T extends PlayFabModule.IPlayFabResultCommon>(
 		});
 	});
 }
+//#endregion PlayFab

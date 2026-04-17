@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"start": "tsc && func start",
+		"start": "if exist dist rd /s /q dist && tsc && func start",
 		"test": "jest"
 	},
 	"jest": {

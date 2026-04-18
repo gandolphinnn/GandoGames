@@ -1,6 +1,6 @@
 import { RoomData } from "@gandogames/common/api";
 import { pfPromise, PlayFabServer } from "..";
-import { GameState, GameType, MorraState } from "@gandogames/common/games";
+import { GameState, GameType, MorraState } from "../games";
 
 class PlayFabEntity<T> {
 	constructor(

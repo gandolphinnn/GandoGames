@@ -9,7 +9,8 @@
 		"moduleResolution": "node16",
 		"types": [ "node" ],
 		"paths": {
-			"@gandogames/common/*": ["../common/*/index"],
+			"@gandogames/common/api": ["../common/index"],
+			"@gandogames/common/morra": ["../common/games/morra"],
 		}
 	}
 }

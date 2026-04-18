@@ -1,6 +1,6 @@
 import { RoomCreateRequest, RoomBaseRequest, RoomData, BaseRequest } from '@gandogames/common/api';
+import { GAMES_CONFIG } from '../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '..';
-import { GAMES_CONFIG } from '@gandogames/common/games';
 
 const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, options, player) => {
 	options.successCode = 201;

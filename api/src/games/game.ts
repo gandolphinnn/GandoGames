@@ -1,6 +1,5 @@
+import { GamePlayer, GameState, GameType } from '@gandogames/common/api';
 import { MorraGame } from './morra'
-
-export type GameType = 'morra' /* | 'pankov' */;
 
 export const GAMES_CONFIG: Record<GameType, {
 	minPlayers: number,
@@ -10,14 +9,6 @@ export const GAMES_CONFIG: Record<GameType, {
 		minPlayers: 2,
 		maxPlayers: 2,
 	},
-}
-
-export interface GamePlayer {
-	id: string,
-}
-
-export interface GameState {
-	lastUpdate: Date;
 }
 
 export abstract class Game<TState extends GameState> {

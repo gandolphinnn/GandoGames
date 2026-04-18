@@ -1,5 +1,4 @@
-import { BaseRequest } from "./auth";
-import { GamePlayer, GameType } from '../games/game'
+import { BaseRequest, GamePlayer, GameType } from "..";
 
 /** Base request for logged users in a room */
 export interface RoomBaseRequest extends BaseRequest {

@@ -1,6 +1,5 @@
-import { app, HttpMethod, HttpRequest, HttpRequestParams, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { BaseRequest } from '@gandogames/common/api';
-import { GamePlayer } from '@gandogames/common/games';
+import { app, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
+import { BaseRequest, GamePlayer } from '@gandogames/common/api';
 import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;

@@ -1,5 +1,5 @@
 import { RoomCreateRequest, RoomBaseRequest, RoomData, BaseRequest } from '@gandogames/common/api';
-import { GAMES_CONFIG } from '../games';
+import { Game, GAMES_CONFIG } from '../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '..';
 
 const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, options, player) => {
@@ -42,11 +42,13 @@ const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, op
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 	
 	const gameConfig = GAMES_CONFIG[room.game];
-	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max player for this game');
-	if (room.players.length < gameConfig.maxPlayers) throw new Error('Max player for this game');
+	if (room.players.length > gameConfig.maxPlayers) throw new Error('Max player for this game');
+	if (room.players.length < gameConfig.minPlayers) throw new Error('Not enought player for this game');
 
-	room.players.push(player);
+	room.phase = 'playing';
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	const state = Game.Factory(room.game).state!;
+	await PlayfabCtx.game[room.game].upsert(body.roomId, state);
 	return room;
 };
 

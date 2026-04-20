@@ -1,13 +1,16 @@
 import { Routes } from '@angular/router';
 
-
-export const routes: Routes = [
+export const PLAY_ROUTES: Routes = [
 	{
-		path: 'pankov',
-		loadChildren: () => import('@gandogames/pankov').then((m) => m.PANKOV_ROUTES),
+		path: '',
+		loadComponent: () => import('./rooms.component').then((m) => m.RoomsComponent),
 	},
 	{
-		path: 'morra',
-		loadChildren: () => import('@gandogames/morra').then((m) => m.MORRA_ROUTES),
+		path: ':gameId',
+		loadComponent: () => import('./rooms.component').then((m) => m.RoomsComponent),
+	},
+	{
+		path: ':gameId/:roomId',
+		loadComponent: () => import('./room-detail.component').then((m) => m.RoomDetailComponent),
 	},
 ];

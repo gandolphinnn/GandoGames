@@ -1,0 +1,83 @@
+<div class="rooms-page">
+	<div class="filter-bar">
+		@for (game of allGames; track game.id) {
+			<button
+				class="filter-btn"
+				[class.active]="activeGames().includes(game.id)"
+				(click)="toggleGame(game.id)"
+			>
+				{{ game.name }}
+			</button>
+		}
+	</div>
+
+	@if (mode() === 'browse') {
+		<div class="room-list-wrap">
+			@if (error()) {
+				<p class="status-msg error-msg">{{ error() }}</p>
+			}
+
+			@if (filteredRooms().length === 0) {
+				<p class="status-msg">No open rooms. Be the first!</p>
+			} @else {
+				<ul class="room-list">
+					@for (room of filteredRooms(); track room.id) {
+						<li class="room-card" (click)="navigateToRoom(room)">
+							<div class="room-card-info">
+								<span class="room-card-name">{{ room.name }}</span>
+								<span class="room-card-game">{{ gameLabel(room.game) }}</span>
+							</div>
+							<span class="room-card-players">
+								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
+							</span>
+						</li>
+					}
+				</ul>
+			}
+
+			<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
+		</div>
+	} @else {
+		<div class="create-form">
+			<h2 class="form-title">New Room</h2>
+
+			<label class="field-label" for="game-select">Game</label>
+			<select
+				id="game-select"
+				class="field-input"
+				[value]="createGameId()"
+				(change)="setCreateGameId($any($event).target.value)"
+			>
+				@for (game of allGames; track game.id) {
+					<option [value]="game.id">{{ game.name }}</option>
+				}
+			</select>
+
+			<label class="field-label" for="room-name">Room name</label>
+			<input
+				id="room-name"
+				class="field-input"
+				type="text"
+				placeholder="e.g. Friday Night"
+				[value]="createRoomName()"
+				(input)="setCreateRoomName($any($event).target.value)"
+				(keydown.enter)="create()"
+			/>
+
+			@if (error()) {
+				<p class="error-msg">{{ error() }}</p>
+			}
+
+			<div class="form-actions">
+				<button class="btn-secondary" (click)="mode.set('browse')">Cancel</button>
+				<button
+					class="btn-primary"
+					[disabled]="!createRoomName().trim() || loading()"
+					(click)="create()"
+				>
+					{{ loading() ? 'Creating…' : 'Create' }}
+				</button>
+			</div>
+		</div>
+	}
+</div>

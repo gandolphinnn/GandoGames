@@ -1,0 +1,118 @@
+<div class="room-detail">
+
+	@if (!room() && !error()) {
+		<p class="status-msg">Loading room…</p>
+	} @else if (!room()) {
+		<div class="room-not-found">
+			<p class="error-msg">Room not found.</p>
+			<a class="btn-secondary" [routerLink]="['/play', gameId()]">← Back</a>
+		</div>
+	} @else {
+
+		<header class="room-header">
+			<a class="back-link" [routerLink]="['/play', gameId()]">← {{ gameName() }}</a>
+			<div class="room-code-wrap">
+				<span class="room-name">{{ room()!.name }}</span>
+				<button class="code-btn" (click)="copyCode()">
+					{{ roomId() }} {{ copied() ? '✓' : '⧉' }}
+				</button>
+			</div>
+		</header>
+
+		<div class="players-strip">
+			@for (player of room()!.players; track player.id) {
+				<div class="player-chip" [class.host]="player.id === room()!.hostId" [class.me]="player.id === myId()">
+					{{ shortId(player.id) }}
+					@if (player.id === room()!.hostId) { <span class="badge">HOST</span> }
+					@if (player.id === myId()) { <span class="badge">YOU</span> }
+				</div>
+			}
+		</div>
+
+		@if (error()) {
+			<p class="error-msg">{{ error() }}</p>
+		}
+
+		@switch (room()!.phase) {
+
+			@case ('waiting') {
+				<div class="phase-panel">
+					@if (!isInRoom()) {
+						@if (canJoin()) {
+							<p class="status-msg">This room is open. Join to play.</p>
+							<button class="btn-primary" [disabled]="loading()" (click)="join()">
+								{{ loading() ? 'Joining…' : 'Join' }}
+							</button>
+						} @else {
+							<p class="status-msg">This room is full.</p>
+						}
+					} @else {
+						<p class="status-msg">Waiting for players…</p>
+						@if (isHost()) {
+							@if (canStart()) {
+								<button class="btn-primary" [disabled]="loading()" (click)="start()">
+									{{ loading() ? 'Starting…' : 'Start Game' }}
+								</button>
+							} @else {
+								<p class="hint">Need at least {{ room()!.players.length }} more player(s) to start.</p>
+							}
+						}
+						<button class="btn-danger" (click)="leave()">Leave Room</button>
+					}
+				</div>
+			}
+
+			@case ('playing') {
+				<div class="phase-panel">
+					@if (gameId() === 'morra') {
+						<div class="morra-game">
+							@if (!gameState()) {
+								<p class="status-msg">Loading game state…</p>
+							} @else {
+								<div class="morra-players">
+									@for (player of gameState()!.players; track player.id) {
+										<div class="morra-player">
+											<div class="morra-player-header">
+												<span class="player-name">{{ shortId(player.id) }}</span>
+												<span class="lives">{{ player.lives }} ♥</span>
+											</div>
+
+											@if (player.id === myId()) {
+												@if (!player.currentPick) {
+													<div class="hand-buttons">
+														@for (hand of morraHands; track hand) {
+															<button class="hand-btn" (click)="pick(hand)">{{ hand }}</button>
+														}
+													</div>
+												} @else {
+													<span class="pick-status picked">✓ Picked</span>
+												}
+											} @else {
+												@if (player.currentPick) {
+													<span class="pick-status picked">✓ Ready</span>
+												} @else {
+													<span class="pick-status waiting">Waiting…</span>
+												}
+											}
+										</div>
+									}
+								</div>
+							}
+						</div>
+					} @else {
+						<p class="status-msg">Game in progress.</p>
+					}
+				</div>
+			}
+
+			@case ('ended') {
+				<div class="phase-panel game-over">
+					<h2>Game Over</h2>
+					<a class="btn-primary" [routerLink]="['/play', gameId()]">Find another room</a>
+				</div>
+			}
+
+		}
+	}
+
+</div>

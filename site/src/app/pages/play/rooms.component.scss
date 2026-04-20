@@ -1,0 +1,168 @@
+@use 'styles/variables' as *;
+
+.rooms-page {
+	padding: $s6;
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+// Filter bar
+.filter-bar {
+	display: flex;
+	gap: $s2;
+	flex-wrap: wrap;
+	margin-bottom: $s6;
+}
+
+.filter-btn {
+	padding: $s2 $s4;
+	border-radius: $radius-full;
+	border: 1px solid $border;
+	background: transparent;
+	color: $text-muted;
+	font-size: $text-sm;
+	cursor: pointer;
+	transition: background $transition, color $transition, border-color $transition;
+	min-height: 44px;
+
+	&:hover { color: $text; border-color: $text-muted; }
+
+	&.active {
+		background: $accent;
+		border-color: $accent;
+		color: #fff;
+	}
+}
+
+// Room list
+.room-list-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+}
+
+.status-msg {
+	color: $text-muted;
+	font-size: $text-sm;
+}
+
+.error-msg { color: #f87171; }
+
+.room-list {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+}
+
+.room-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s4 $s6;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	cursor: pointer;
+	transition: border-color $transition;
+	min-height: 44px;
+
+	&:hover { border-color: $accent; }
+}
+
+.room-card-info {
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+}
+
+.room-card-name {
+	font-weight: 600;
+	font-size: $text-base;
+}
+
+.room-card-game {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.room-card-players {
+	font-size: $text-sm;
+	color: $accent;
+	font-weight: 500;
+}
+
+// Buttons
+.btn-primary {
+	padding: $s3 $s6;
+	background: $accent;
+	color: #fff;
+	border: none;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	align-self: flex-start;
+	min-height: 44px;
+	transition: background $transition;
+
+	&:hover:not(:disabled) { background: $accent-hover; }
+	&:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// Create form
+.create-form {
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	max-width: 400px;
+}
+
+.form-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.field-label {
+	font-size: $text-sm;
+	color: $text-muted;
+	margin-bottom: -$s2;
+}
+
+.field-input {
+	padding: $s3 $s4;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text;
+	font-size: $text-base;
+	min-height: 44px;
+	width: 100%;
+
+	&:focus {
+		outline: none;
+		border-color: $accent;
+	}
+
+	option { background: $bg-surface; }
+}
+
+.form-actions {
+	display: flex;
+	gap: $s3;
+}
+
+.btn-secondary {
+	padding: $s3 $s6;
+	background: transparent;
+	color: $text-muted;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	cursor: pointer;
+	min-height: 44px;
+	transition: color $transition, border-color $transition;
+
+	&:hover { color: $text; border-color: $text-muted; }
+}

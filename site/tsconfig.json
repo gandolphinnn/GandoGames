@@ -5,7 +5,8 @@
 	"compilerOptions": {
 		"rootDir": "..",
 		"paths": {
-			"@gandogames/common/*": ["../common/*"],
+			"@gandogames/common/api": ["../common/index"],
+			"@gandogames/common/morra": ["../common/games/morra"],
 			"@gandogames/morra": ["./lib/games/morra/index.ts"],
 			"@gandogames/pankov": ["./lib/games/pankov/index.ts"],
 		},

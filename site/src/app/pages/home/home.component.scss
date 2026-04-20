@@ -1,0 +1,89 @@
+@use 'styles/variables' as *;
+
+.site-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s4 $s6;
+	border-bottom: 1px solid $border;
+}
+
+.site-title {
+	font-size: $text-xl;
+	font-weight: 700;
+	color: $accent;
+	letter-spacing: -0.02em;
+}
+
+.site-nav {
+	display: flex;
+	gap: $s4;
+}
+
+.nav-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+}
+
+.home-main {
+	padding: $s8 $s6;
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+.home-title {
+	font-size: $text-3xl;
+	font-weight: 700;
+	margin-bottom: $s8;
+	letter-spacing: -0.03em;
+}
+
+.game-grid {
+	display: grid;
+	gap: $s4;
+
+	@media (min-width: $bp-sm) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.game-card {
+	display: block;
+	padding: $s6;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	text-decoration: none;
+	color: $text;
+	transition: border-color $transition, transform $transition;
+	box-shadow: $shadow-card;
+	min-height: 44px;
+
+	&:hover {
+		border-color: $accent;
+		transform: translateY(-2px);
+	}
+}
+
+.game-card-name {
+	font-size: $text-xl;
+	font-weight: 600;
+	margin-bottom: $s2;
+}
+
+.game-card-desc {
+	font-size: $text-sm;
+	color: $text-muted;
+	line-height: 1.5;
+	margin-bottom: $s4;
+}
+
+.game-card-players {
+	font-size: $text-sm;
+	color: $accent;
+	font-weight: 500;
+}

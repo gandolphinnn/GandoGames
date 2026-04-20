@@ -1,5 +1,4 @@
 import { GamePlayer, GameState, GameType } from '@gandogames/common/api';
-import { MorraGame } from './morra'
 
 export const GAMES_CONFIG: Record<GameType, {
 	minPlayers: number,
@@ -18,18 +17,13 @@ export abstract class Game<TState extends GameState> {
 
 	public state: TState | null = null;
 	public abstract getPublicState(requestingPlayerId: string): TState;
-	public setState(json: string) {
+	public parseState(json: string) {
 		this.state = JSON.parse(json) as TState;
 	}
 
-	public static Factory(type: GameType) {
-		switch (type) {
-			case 'morra':
-				return new MorraGame();
-			/* case 'pankov':
-				return new PankovGame(); */
-		}
-	}
+	public static Factory: (type: GameType) => Game<GameState> = (_type) => {
+		throw new Error('Game.Factory not wired — import from api/src/games');
+	};
 
 	public abstract action(player: GamePlayer, action: string, data: any): TState;
 }

@@ -1,21 +1,18 @@
 import { Routes } from '@angular/router';
-
-import { GamePickerComponent } from './pages/game-picker/game-picker.component';
 import { PlayComponent } from './pages/play/play.component';
+import { PLAY_ROUTES } from './pages/play/play.routes';
 import { authGuard } from './guards/auth.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
 
 export const routes: Routes = [
 	{
 		path: '',
-		component: GamePickerComponent,
+		loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
 		canActivate: [authGuard],
 	},
 	{
-		path: 'play',
-		component: PlayComponent,
-		canActivate: [authGuard],
-		loadChildren: () => import('./pages/play/play.routes').then((m) => m.routes),
+		path: 'about',
+		loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
 	},
 	{
 		path: 'login',
@@ -31,6 +28,12 @@ export const routes: Routes = [
 		path: 'profile',
 		loadComponent: () => import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
 		canActivate: [authGuard],
+	},
+	{
+		path: 'play',
+		component: PlayComponent,
+		canActivate: [authGuard],
+		children: PLAY_ROUTES,
 	},
 	{
 		path: '**',

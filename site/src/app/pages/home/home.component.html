@@ -1,0 +1,20 @@
+<header class="site-header">
+	<span class="site-title">GandoGames</span>
+	<nav class="site-nav">
+		<a routerLink="/about" class="nav-link">About</a>
+		<a routerLink="/profile" class="nav-link">Profile</a>
+	</nav>
+</header>
+
+<main class="home-main">
+	<h1 class="home-title">Pick a game</h1>
+	<div class="game-grid">
+		@for (game of games; track game.id) {
+			<a class="game-card" [routerLink]="['/play', game.id]">
+				<h2 class="game-card-name">{{ game.name }}</h2>
+				<p class="game-card-desc">{{ game.description }}</p>
+				<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>
+			</a>
+		}
+	</div>
+</main>

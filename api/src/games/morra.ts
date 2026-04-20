@@ -21,6 +21,11 @@ export class MorraGame extends Game<MorraState> {
 	public override minPlayers: number = 2;
 	public override maxPlayers: number = 2;
 
+	public constructor() {
+		super();
+		//TODO set the initial state
+	}
+
 	public override getPublicState(playerId: string): MorraState {
 		const selfPlayer = this.state?.players.find(p => p.id == playerId);
 		const otherPlayer = { ...this.state?.players.find(p => p.id != playerId) };

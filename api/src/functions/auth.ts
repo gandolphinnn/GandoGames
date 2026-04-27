@@ -1,5 +1,6 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
 import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '..';
+import { PlayFabProfiles } from 'playfab-sdk';
 
 type LoginLike = { //PlayFabClientModels.LoginResult
 	PlayFabId?: string;
@@ -20,16 +21,28 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithCustomID({ CustomId: body.customId, CreateAccount: true }, cb),
 	);
-	return toAuthResponse(result, result.InfoResultPayload?.PlayerProfile?.DisplayName);
+	return toAuthResponse(result, 'Guest');
 };
 
 const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, options) => {
 	options.errorCode = 401;
 	options.errorMessage = 'Invalid email or password';
+	const infoRequestParameters: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
+		GetCharacterInventories: false,
+		GetCharacterList: false,
+		GetPlayerProfile: false,
+		GetPlayerStatistics: false,
+		GetTitleData: false,
+		GetUserAccountInfo: true,
+		GetUserData: false,
+		GetUserInventory: false,
+		GetUserReadOnlyData: false,
+		GetUserVirtualCurrency: false,
+	};
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
-		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password }, cb),
+		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password, InfoRequestParameters: infoRequestParameters }, cb),
 	);
-	return toAuthResponse(result, result.InfoResultPayload?.PlayerProfile?.DisplayName);
+	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username);
 };
 
 const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, options) => {

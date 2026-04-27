@@ -21,6 +21,12 @@ const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _opt
 	return await PlayfabCtx.rooms.list();
 };
 
+const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, _options, _player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	return room;
+};
+
 const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, options, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -69,8 +75,9 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, option
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 };
 
-registerFunction('room_create', 'rooms', roomCreateInner);
+registerFunction('room_create', 'rooms/create', roomCreateInner);
 registerFunction('room_list', 'rooms/list', roomListInner);
+registerFunction('room_get', 'rooms/get', roomGetInner);
 registerFunction('room_join', 'rooms/join', roomJoinInner);
 registerFunction('room_start', 'rooms/start', roomStartInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);

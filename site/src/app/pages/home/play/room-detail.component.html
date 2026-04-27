@@ -5,12 +5,12 @@
 	} @else if (!room()) {
 		<div class="room-not-found">
 			<p class="error-msg">Room not found.</p>
-			<a class="btn-secondary" [routerLink]="['/play', gameId()]">← Back</a>
+			<a class="btn-secondary" [routerLink]="['/play']">← Back</a>
 		</div>
 	} @else {
 
 		<header class="room-header">
-			<a class="back-link" [routerLink]="['/play', gameId()]">← {{ gameName() }}</a>
+			<a class="back-link" [routerLink]="['/play']">← Back</a>
 			<div class="room-code-wrap">
 				<span class="room-name">{{ room()!.name }}</span>
 				<button class="code-btn" (click)="copyCode()">
@@ -72,7 +72,7 @@
 			@case ('ended') {
 				<div class="phase-panel game-over">
 					<h2>Game Over</h2>
-					<a class="btn-primary" [routerLink]="['/play', gameId()]">Find another room</a>
+					<a class="btn-primary" [routerLink]="['/play']">Find another room</a>
 				</div>
 			}
 

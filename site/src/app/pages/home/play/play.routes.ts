@@ -6,11 +6,7 @@ export const PLAY_ROUTES: Routes = [
 		loadComponent: () => import('./rooms.component').then((m) => m.RoomsComponent),
 	},
 	{
-		path: ':gameId',
-		loadComponent: () => import('./rooms.component').then((m) => m.RoomsComponent),
-	},
-	{
-		path: ':gameId/:roomId',
+		path: ':roomId',
 		loadComponent: () => import('./room-detail.component').then((m) => m.RoomDetailComponent),
 	},
 ];

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
 import { AuthService } from '../../../services/auth.service';
@@ -11,7 +11,7 @@ import { RoomService } from '../../../services/room.service';
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
-export class RoomDetailComponent implements OnInit, OnDestroy {
+export class RoomDetailComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
@@ -44,23 +44,15 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		return r.players.length >= game.minPlayers;
 	});
 
-	private pollTimer?: ReturnType<typeof setInterval>;
-
 	public ngOnInit(): void {
 		this.gameId.set(this.route.snapshot.params['gameId']);
 		this.roomId.set(this.route.snapshot.params['roomId']);
 		this.loadRoom();
-		this.pollTimer = setInterval(() => this.loadRoom(), 2000);
-	}
-
-	public ngOnDestroy(): void {
-		clearInterval(this.pollTimer);
 	}
 
 	private async loadRoom(): Promise<void> {
 		try {
-			const rooms = await this.roomService.listRooms();
-			const room = rooms.find((r) => r.id === this.roomId()) ?? null;
+			const room = await this.roomService.getRoom(this.roomId());
 			this.room.set(room);
 		} catch (e) {
 			this.error.set((e as Error).message);
@@ -96,7 +88,7 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	public async leave(): Promise<void> {
 		try {
 			await this.roomService.leaveRoom(this.roomId());
-			this.router.navigate(['/play', this.gameId()]);
+			this.router.navigate(['/play']);
 		} catch (e) {
 			this.error.set((e as Error).message);
 		}

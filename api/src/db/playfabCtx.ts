@@ -9,7 +9,12 @@ class PlayFabEntity<T> {
 	}
 	
 	private parse(raw: string | undefined) {
-		return raw ? JSON.parse(raw) as T : null;
+		return this.OnDeserialized(raw ? JSON.parse(raw) as T : null);
+	}
+
+	protected OnDeserialized(value: T | null): T | null {
+		// can be overridden to do some processing after deserialization
+		return value;
 	}
 	
 	private hasInit = false;

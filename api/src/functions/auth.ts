@@ -47,6 +47,6 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 	return toAuthResponse(result, body.username);
 };
 
-registerPublicFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);
-registerPublicFunction('auth_login', 'POST', 'auth/login', loginInner);
-registerPublicFunction('auth_register', 'POST', 'auth/register', registerInner);
+registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
+registerPublicFunction('auth_login', 'auth/login', loginInner);
+registerPublicFunction('auth_register', 'auth/register', registerInner);

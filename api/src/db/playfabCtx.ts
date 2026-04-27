@@ -18,16 +18,12 @@ class PlayFabEntity<T> {
 		if (this.hasInit)
 			return;
 
+		this.hasInit = true;
 		try {
-			const result = await pfPromise<PlayFabServerModels.CreateSharedGroupResult>(
+			await pfPromise<PlayFabServerModels.CreateSharedGroupResult>(
 				cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: this.groupId }, cb),
 			);
-
-			//? https://learn.microsoft.com/it-it/rest/api/playfab/server/shared-group-data/create-shared-group?view=playfab-rest#error-codes
-			if (result.errorCode == 1088)
-				this.hasInit = true;
-		} catch(err) {
-			console.error(err);
+		} catch (err) {
 		}
 	}
 	

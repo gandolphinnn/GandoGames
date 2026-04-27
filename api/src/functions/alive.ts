@@ -1,7 +1,13 @@
-import { InnerPublicFunction, registerPublicFunction } from '..';
+import { app, HttpResponseInit } from '@azure/functions';
 
-const aliveInner: InnerPublicFunction<never, { status: string }> = async () => {
-	return { status: 'alive' };
-};
-
-registerPublicFunction('alive', 'GET', 'alive', aliveInner);
+app.http('alive', {
+	methods: ['GET', 'POST'],
+	authLevel: 'anonymous',
+	route: 'alive',
+	handler: () => {
+		return {
+			jsonBody: { status: 'alive' },
+			status: 200,
+		} as HttpResponseInit;
+	},
+});

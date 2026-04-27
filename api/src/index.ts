@@ -24,12 +24,11 @@ export type InnerPublicFunction<TReq, TRes> = (body: TReq, options: InnerFunctio
 
 export function registerPublicFunction<TReq, TRes>(
 	name: string,
-	method: HttpMethod,
 	route: string,
 	innerPublicFunction: InnerPublicFunction<TReq, TRes>,
 ) {
 	app.http(name, {
-		methods: [method],
+		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
 		handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {

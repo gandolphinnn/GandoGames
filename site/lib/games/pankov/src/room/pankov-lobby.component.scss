@@ -1,0 +1,251 @@
+@use 'styles/variables' as *;
+
+.lobby {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	padding: $s4;
+	max-width: 640px;
+	margin: 0 auto;
+
+	@media (min-width: $bp-sm) {
+		gap: $s6;
+		padding: $s6;
+	}
+}
+
+.lobby-header {
+	display: flex;
+	align-items: center;
+	gap: $s4;
+}
+
+.lobby-back {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	transition: color $transition;
+
+	&:hover { color: $accent; }
+}
+
+.lobby-title {
+	font-size: $text-xl;
+	font-weight: 700;
+}
+
+// ── Room grid ─────────────────────────────────────────────────────────────────
+
+.room-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: $s3;
+
+	@media (min-width: $bp-sm) {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+.rooms-empty {
+	grid-column: 1 / -1;
+	font-size: $text-sm;
+	color: $text-muted;
+	padding: $s4 0;
+}
+
+// ── Room card ─────────────────────────────────────────────────────────────────
+
+.room-card {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s4;
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+	transition: border-color $transition;
+
+	&:hover {
+		border-color: rgba(120, 120, 180, 0.3);
+	}
+
+	@media (min-width: $bp-sm) {
+		padding: $s6;
+	}
+}
+
+.room-card-header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: $s3;
+}
+
+.room-card-code {
+	font-size: $text-xl;
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	color: $accent;
+}
+
+.room-card-count {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.room-card-players {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+	flex: 1;
+}
+
+.room-card-player {
+	font-size: $text-sm;
+	color: $text-muted;
+
+	&::before {
+		content: '· ';
+	}
+}
+
+.room-card-join {
+	align-self: flex-start;
+	margin-top: $s1;
+}
+
+// ── Create new card ───────────────────────────────────────────────────────────
+
+.room-card-new {
+	background: transparent;
+	border: 1px dashed rgba(124, 90, 246, 0.35);
+	border-radius: $radius-lg;
+	padding: $s6 $s4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: $s3;
+	cursor: pointer;
+	min-height: 120px;
+	transition: border-color $transition, background $transition;
+
+	&:hover {
+		border-color: $accent;
+		background: rgba(124, 90, 246, 0.06);
+	}
+}
+
+.room-card-new-icon {
+	font-size: $text-2xl;
+	color: $accent;
+	line-height: 1;
+}
+
+.room-card-new-label {
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $accent;
+}
+
+// ── Panel (form) ──────────────────────────────────────────────────────────────
+
+.panel {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	align-items: flex-start;
+
+	@media (min-width: $bp-sm) {
+		padding: $s8;
+		gap: $s6;
+	}
+}
+
+.panel-eyebrow {
+	font-size: $text-sm;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.panel-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+
+.panel-actions {
+	display: flex;
+	gap: $s3;
+	flex-wrap: wrap;
+}
+
+// ── Form ──────────────────────────────────────────────────────────────────────
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	width: 100%;
+}
+
+.form-label {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.form-error {
+	font-size: $text-sm;
+	color: #f87171;
+}
+
+// ── Shared ─────────────────────────────────────────────────────────────────────
+
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition, opacity $transition;
+	min-height: 44px;
+
+	&-primary {
+		background: $accent;
+		color: $text;
+		&:hover { background: $accent-hover; }
+	}
+
+	&-ghost {
+		background: transparent;
+		color: $text-muted;
+		border: 1px solid $border;
+		&:hover { color: $text; border-color: $text-muted; }
+	}
+
+	&[disabled] { opacity: 0.4; cursor: not-allowed; }
+}
+
+.input {
+	flex: 1;
+	padding: $s3 $s4;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text;
+	font-size: $text-base;
+	outline: none;
+	transition: border-color $transition;
+	min-height: 44px;
+
+	&:focus { border-color: $accent; }
+	&::placeholder { color: $text-muted; }
+}

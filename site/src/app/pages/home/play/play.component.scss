@@ -1,0 +1,28 @@
+@use 'styles/variables' as *;
+
+.play-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s4 $s6;
+	border-bottom: 1px solid $border;
+}
+
+.back-link,
+.nav-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+}
+
+.play-title {
+	font-size: $text-lg;
+	font-weight: 600;
+	color: $accent;
+}

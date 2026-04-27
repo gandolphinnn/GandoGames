@@ -1,0 +1,236 @@
+@use 'styles/variables' as *;
+
+.room-detail {
+	padding: $s6;
+	max-width: 720px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: $s6;
+}
+
+.status-msg {
+	color: $text-muted;
+	font-size: $text-sm;
+}
+
+.error-msg { color: #f87171; font-size: $text-sm; }
+
+.room-not-found {
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+}
+
+// Header
+.room-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: $s3;
+}
+
+.back-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+}
+
+.room-code-wrap {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.room-name {
+	font-weight: 600;
+	font-size: $text-lg;
+}
+
+.code-btn {
+	padding: $s2 $s3;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-sm;
+	color: $text-muted;
+	font-size: $text-sm;
+	cursor: pointer;
+	min-height: 44px;
+	font-family: monospace;
+	transition: color $transition, border-color $transition;
+
+	&:hover { color: $text; border-color: $text-muted; }
+}
+
+// Players strip
+.players-strip {
+	display: flex;
+	gap: $s2;
+	flex-wrap: wrap;
+}
+
+.player-chip {
+	padding: $s2 $s3;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-full;
+	font-size: $text-sm;
+	display: flex;
+	align-items: center;
+	gap: $s2;
+
+	&.host { border-color: $accent; }
+	&.me { font-weight: 600; }
+}
+
+.badge {
+	font-size: 0.65rem;
+	font-weight: 700;
+	color: $accent;
+	letter-spacing: 0.04em;
+}
+
+// Phase panels
+.phase-panel {
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+}
+
+.hint {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+// Buttons
+.btn-primary {
+	padding: $s3 $s6;
+	background: $accent;
+	color: #fff;
+	border: none;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	align-self: flex-start;
+	min-height: 44px;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	transition: background $transition;
+
+	&:hover:not(:disabled) { background: $accent-hover; }
+	&:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.btn-secondary {
+	padding: $s3 $s6;
+	background: transparent;
+	color: $text-muted;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	cursor: pointer;
+	min-height: 44px;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+}
+
+.btn-danger {
+	padding: $s3 $s6;
+	background: transparent;
+	color: #f87171;
+	border: 1px solid rgba(248, 113, 113, 0.3);
+	border-radius: $radius-md;
+	font-size: $text-base;
+	cursor: pointer;
+	align-self: flex-start;
+	min-height: 44px;
+	transition: background $transition;
+
+	&:hover { background: rgba(248, 113, 113, 0.08); }
+}
+
+// Morra game
+.morra-game { display: flex; flex-direction: column; gap: $s4; }
+
+.morra-players {
+	display: grid;
+	gap: $s4;
+
+	@media (min-width: $bp-sm) {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+.morra-player {
+	padding: $s4;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+}
+
+.morra-player-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.player-name { font-weight: 600; }
+
+.lives { color: #f87171; font-weight: 600; }
+
+.hand-buttons {
+	display: flex;
+	gap: $s2;
+	flex-wrap: wrap;
+}
+
+.hand-btn {
+	padding: $s2 $s4;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text;
+	font-size: $text-sm;
+	cursor: pointer;
+	min-height: 44px;
+	text-transform: capitalize;
+	transition: border-color $transition, background $transition;
+
+	&:hover { border-color: $accent; background: rgba(124, 90, 246, 0.1); }
+}
+
+.pick-status {
+	font-size: $text-sm;
+	font-weight: 500;
+
+	&.picked { color: #4ade80; }
+	&.waiting { color: $text-muted; }
+}
+
+// Game over
+.game-over {
+	align-items: flex-start;
+	gap: $s6;
+
+	h2 {
+		font-size: $text-3xl;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+	}
+}

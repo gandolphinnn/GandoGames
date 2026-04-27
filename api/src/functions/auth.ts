@@ -1,63 +1,52 @@
-import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { playfabClientPost } from '../playfab';
+import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
+import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '..';
 
-interface LoginBody { email: string; password: string; }
-interface RegisterBody { email: string; password: string; username: string; }
-interface GuestBody { customId: string; }
-interface AuthResult { SessionTicket: string; PlayFabId: string; }
+type LoginLike = { //PlayFabClientModels.LoginResult
+	PlayFabId?: string;
+	SessionTicket?: string;
+};
 
-app.http('login', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'auth/login',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { email, password } = await request.json() as LoginBody;
-			const data = await playfabClientPost<AuthResult>('/Client/LoginWithEmailAddress', {
-				Email: email,
-				Password: password,
-			});
-			return { jsonBody: { sessionTicket: data.SessionTicket, playFabId: data.PlayFabId } };
-		} catch (err) {
-			return { status: 401, jsonBody: { error: (err as Error).message } };
-		}
+const toAuthResponse = (response: LoginLike, name: string | undefined): AuthResponse => ({
+	player: {
+		id: response.PlayFabId!,
+		name: name || response.PlayFabId!,
 	},
+	sessionTicket: response.SessionTicket!,
 });
 
-app.http('register', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'auth/register',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { email, password, username } = await request.json() as RegisterBody;
-			const data = await playfabClientPost<AuthResult>('/Client/RegisterPlayFabUser', {
-				Email: email,
-				Password: password,
-				Username: username,
-				RequireBothUsernameAndEmail: true,
-			});
-			return { status: 201, jsonBody: { sessionTicket: data.SessionTicket, playFabId: data.PlayFabId } };
-		} catch (err) {
-			return { status: 400, jsonBody: { error: (err as Error).message } };
-		}
-	},
-});
+const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, options) => {
+	options.errorCode = 401;
+	options.errorMessage = 'Invalid custom ID';
+	const result = await pfPromise<PlayFabClientModels.LoginResult>(
+		cb => PlayFabClient.LoginWithCustomID({ CustomId: body.customId, CreateAccount: true }, cb),
+	);
+	return toAuthResponse(result, result.InfoResultPayload?.PlayerProfile?.DisplayName);
+};
 
-app.http('loginAsGuest', {
-	methods: ['POST'],
-	authLevel: 'anonymous',
-	route: 'auth/guest',
-	handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
-		try {
-			const { customId } = await request.json() as GuestBody;
-			const data = await playfabClientPost<AuthResult>('/Client/LoginWithCustomId', {
-				CustomId: customId,
-				CreateAccount: true,
-			});
-			return { jsonBody: { sessionTicket: data.SessionTicket, playFabId: data.PlayFabId } };
-		} catch (err) {
-			return { status: 401, jsonBody: { error: (err as Error).message } };
-		}
-	},
-});
+const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, options) => {
+	options.errorCode = 401;
+	options.errorMessage = 'Invalid email or password';
+	const result = await pfPromise<PlayFabClientModels.LoginResult>(
+		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password }, cb),
+	);
+	return toAuthResponse(result, result.InfoResultPayload?.PlayerProfile?.DisplayName);
+};
+
+const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, options) => {
+	options.errorCode = 400;
+	options.successCode = 201;
+	options.errorMessage = 'Invalid registration data';
+	const result = await pfPromise<PlayFabClientModels.RegisterPlayFabUserResult>(
+		cb => PlayFabClient.RegisterPlayFabUser({
+			Email: body.email,
+			Password: body.password,
+			Username: body.username,
+			RequireBothUsernameAndEmail: true,
+		}, cb),
+	);
+	return toAuthResponse(result, body.username);
+};
+
+registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
+registerPublicFunction('auth_login', 'auth/login', loginInner);
+registerPublicFunction('auth_register', 'auth/register', registerInner);

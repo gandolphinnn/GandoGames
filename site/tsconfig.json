@@ -3,10 +3,13 @@
 {
 	"compileOnSave": false,
 	"compilerOptions": {
-		"baseUrl": ".",
+		"rootDir": "..",
 		"paths": {
-			"@gandogames/pankov": ["lib/games/pankov/index.ts"],
-			"@gandogames/trio": ["lib/games/trio/index.ts"]
+			"@gandogames/common/api": ["../common/index"],
+			"@gandogames/common/morra": ["../common/games/morra"],
+			"@gandogames/common/pankov": ["../common/games/pankov"],
+			"@gandogames/morra": ["./lib/games/morra/index.ts"],
+			"@gandogames/pankov": ["./lib/games/pankov/index.ts"],
 		},
 		"strict": true,
 		"noImplicitOverride": true,

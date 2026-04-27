@@ -1,0 +1,397 @@
+@use 'styles/variables' as *;
+
+// ── Layout ────────────────────────────────────────────────────────────────────
+
+.room-game {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	padding: $s4;
+	max-width: 540px;
+	margin: 0 auto;
+
+	@media (min-width: $bp-sm) {
+		gap: $s6;
+		padding: $s6;
+	}
+}
+
+.room-header {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.room-back {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	transition: color $transition;
+
+	&:hover { color: $accent; }
+}
+
+.room-title {
+	font-size: $text-xl;
+	font-weight: 700;
+	flex: 1;
+}
+
+.room-code-badge {
+	font-size: $text-sm;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	color: $accent;
+	background: rgba(124, 90, 246, 0.1);
+	border: 1px solid rgba(124, 90, 246, 0.25);
+	border-radius: $radius-full;
+	padding: $s1 $s3;
+}
+
+// ── Players strip ─────────────────────────────────────────────────────────────
+
+.players-strip {
+	display: flex;
+	gap: $s2;
+	flex-wrap: wrap;
+
+	@media (min-width: $bp-sm) { gap: $s3; }
+}
+
+.player-chip {
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	padding: $s2 $s3;
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+	transition: border-color $transition;
+
+	&-me { border-color: rgba(124, 90, 246, 0.4); }
+	&-eliminated { opacity: 0.35; }
+	&-picked { border-color: #4ade80; }
+}
+
+.player-chip-name {
+	font-size: $text-sm;
+	font-weight: 600;
+}
+
+.player-chip-lives {
+	display: flex;
+	gap: 3px;
+}
+
+.life {
+	font-size: 10px;
+	color: $border;
+
+	&-full { color: $accent; }
+}
+
+.player-chip-status {
+	font-size: 10px;
+	color: $text-muted;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+
+.game-panel {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.panel {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	align-items: flex-start;
+
+	@media (min-width: $bp-sm) {
+		padding: $s8;
+		gap: $s6;
+	}
+
+	&-centered {
+		align-items: center;
+		text-align: center;
+	}
+}
+
+.panel-eyebrow {
+	font-size: $text-sm;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.panel-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+	line-height: 1.1;
+
+	@media (min-width: $bp-sm) { font-size: $text-3xl; }
+}
+
+.panel-subtitle {
+	font-size: $text-base;
+	color: $text-muted;
+}
+
+.panel-actions {
+	display: flex;
+	gap: $s3;
+	flex-wrap: wrap;
+}
+
+// ── Waiting room ──────────────────────────────────────────────────────────────
+
+.waiting-code-block {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	width: 100%;
+}
+
+.waiting-code-row {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.waiting-code {
+	font-size: $text-3xl;
+	font-weight: 700;
+	letter-spacing: 0.18em;
+	color: $accent;
+	line-height: 1;
+}
+
+.waiting-code-hint {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.waiting-players-section {
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+	width: 100%;
+}
+
+.waiting-player-list {
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+}
+
+.waiting-player-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s3 $s4;
+	background: $bg-surface;
+	border-radius: $radius-md;
+}
+
+.waiting-player-name {
+	font-size: $text-base;
+	font-weight: 500;
+}
+
+.waiting-player-badge {
+	font-size: $text-sm;
+	color: $accent;
+	background: rgba(124, 90, 246, 0.12);
+	border-radius: $radius-full;
+	padding: 2px $s3;
+}
+
+.waiting-text {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+// ── Hand pick grid ────────────────────────────────────────────────────────────
+
+.hand-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: $s3;
+	width: 100%;
+}
+
+.hand-btn {
+	height: 80px;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	color: $text;
+	font-size: $text-base;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background $transition, border-color $transition, transform $transition;
+
+	&:hover:not([disabled]) {
+		background: rgba(124, 90, 246, 0.12);
+		border-color: $accent;
+		transform: translateY(-2px);
+	}
+
+	&[disabled] {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
+	@media (min-width: $bp-sm) { height: 96px; font-size: $text-lg; }
+}
+
+// ── Waiting animation ─────────────────────────────────────────────────────────
+
+.waiting-dots {
+	color: $text-muted;
+	font-size: $text-xl;
+	letter-spacing: 0.2em;
+	animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+
+// ── Reveal ────────────────────────────────────────────────────────────────────
+
+.reveal-rows {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	width: 100%;
+}
+
+.reveal-row {
+	display: grid;
+	grid-template-columns: 1fr auto auto;
+	align-items: center;
+	gap: $s3;
+	padding: $s3 $s4;
+	background: $bg-surface;
+	border-radius: $radius-md;
+	border: 1px solid transparent;
+	transition: border-color $transition;
+
+	&-loser { border-color: rgba(248, 113, 113, 0.3); }
+	&-draw { border-color: $border; }
+}
+
+.reveal-row-name {
+	font-size: $text-base;
+	font-weight: 600;
+}
+
+.reveal-row-hand {
+	font-size: $text-base;
+	font-weight: 700;
+	color: $accent;
+}
+
+.reveal-row-tag {
+	font-size: $text-sm;
+	font-weight: 700;
+	border-radius: $radius-full;
+	padding: 2px $s3;
+}
+
+.reveal-tag-loss {
+	background: rgba(248, 113, 113, 0.12);
+	color: #f87171;
+}
+
+.reveal-tag-win {
+	background: rgba(74, 222, 128, 0.12);
+	color: #4ade80;
+}
+
+.reveal-verdict {
+	font-size: $text-base;
+	font-weight: 600;
+	padding: $s3 $s4;
+	border-radius: $radius-md;
+
+	&-draw {
+		background: rgba(120, 120, 180, 0.08);
+		color: $text-muted;
+	}
+}
+
+// ── Game over ─────────────────────────────────────────────────────────────────
+
+.winner-name { color: $accent; }
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+
+.action-error {
+	font-size: $text-sm;
+	color: #f87171;
+}
+
+.loading-state {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: $text-muted;
+}
+
+// ── Shared: buttons ───────────────────────────────────────────────────────────
+
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition, opacity $transition;
+	min-height: 44px;
+
+	&-primary {
+		background: $accent;
+		color: $text;
+		&:hover { background: $accent-hover; }
+	}
+
+	&[disabled] { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn-icon {
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	font-size: $text-lg;
+	cursor: pointer;
+	padding: $s2 $s3;
+	min-height: 44px;
+	transition: color $transition, border-color $transition;
+
+	&:hover { color: $text; border-color: $text-muted; }
+}
+
+.hint {
+	font-size: $text-sm;
+	color: $text-muted;
+}

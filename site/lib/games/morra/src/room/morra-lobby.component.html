@@ -1,0 +1,87 @@
+<div class="lobby">
+
+	<header class="lobby-header">
+		<a class="lobby-back" routerLink="/">← Games</a>
+		<h1 class="lobby-title">Morra</h1>
+	</header>
+
+	@switch (mode()) {
+
+		@case ('browse') {
+			<div class="room-grid">
+
+				@if (loadingRooms() && rooms().length === 0) {
+					<p class="rooms-empty">Loading rooms…</p>
+				} @else if (rooms().length === 0) {
+					<p class="rooms-empty">No open rooms yet. Create one!</p>
+				}
+
+				@for (r of rooms(); track r.id) {
+					<div class="room-card">
+						<div class="room-card-header">
+							<span class="room-card-code">{{ r.name }}</span>
+							<span class="room-card-count">{{ r.players.length }}/6</span>
+						</div>
+						<ul class="room-card-players">
+							@for (player of r.players; track player.id) {
+								<li class="room-card-player">{{ player.name }}</li>
+							}
+						</ul>
+						<button class="btn btn-primary room-card-join" (click)="startJoin(r.id)">
+							Join
+						</button>
+					</div>
+				}
+
+				<button class="room-card room-card-new" (click)="startCreate()">
+					<span class="room-card-new-icon">＋</span>
+					<span class="room-card-new-label">Create new room</span>
+				</button>
+
+			</div>
+		}
+
+		@case ('create') {
+			<main class="panel">
+				<h2 class="panel-title">Create Room</h2>
+				<div class="form-group">
+					<label class="form-label">Room name</label>
+					<input class="input" type="text" [value]="roomName()"
+						(input)="updateRoomName($any($event.target).value)"
+						placeholder="Enter room name" maxlength="30" />
+				</div>
+				@if (error()) {
+					<p class="form-error">{{ error() }}</p>
+				}
+				<div class="panel-actions">
+					<button class="btn btn-ghost" (click)="back()">← Back</button>
+					<button class="btn btn-primary"
+						[disabled]="loading() || !roomName().trim()"
+						(click)="createRoom()">
+						{{ loading() ? 'Creating…' : 'Create' }}
+					</button>
+				</div>
+			</main>
+		}
+
+		@case ('join') {
+			<main class="panel">
+				<p class="panel-eyebrow">Joining</p>
+				<h2 class="panel-title">{{ joiningRoomId() }}</h2>
+				@if (error()) {
+					<p class="form-error">{{ error() }}</p>
+				}
+				<div class="panel-actions">
+					<button class="btn btn-ghost" (click)="back()">← Back</button>
+					<button class="btn btn-primary"
+						[disabled]="loading()"
+						(click)="joinRoom()">
+						{{ loading() ? 'Joining…' : 'Join' }}
+					</button>
+				</div>
+			</main>
+		}
+
+	}
+
+</div>

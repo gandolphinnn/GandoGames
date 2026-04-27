@@ -1,0 +1,240 @@
+<div class="room-game">
+
+	<header class="room-header">
+		<a class="room-back" routerLink="/">← Games</a>
+		<h1 class="room-title">Pankov</h1>
+		@if (room.roomId()) {
+			<span class="room-code-badge">{{ room.roomId() }}</span>
+		}
+	</header>
+
+	@if (room.state(); as state) {
+
+		@if (state.gameState; as gs) {
+			<div class="players-strip">
+				@for (player of gs.players; track player.id) {
+					<div class="player-chip"
+						[class.player-chip-current]="$index === gs.currentPlayerIndex && state.phase === 'playing'"
+						[class.player-chip-me]="player.id === room.myPlayFabId()"
+						[class.player-chip-eliminated]="player.lives === 0">
+						<span class="player-chip-name">{{ player.name }}</span>
+						<span class="player-chip-lives">
+							@for (i of livesRange; track i) {
+								<span class="life" [class.life-full]="i < player.lives">●</span>
+							}
+						</span>
+					</div>
+				}
+			</div>
+		}
+
+		<main class="game-panel">
+
+			@if (state.phase === 'waiting') {
+				<div class="panel">
+					<div class="waiting-code-block">
+						<p class="panel-eyebrow">Room code</p>
+						<div class="waiting-code-row">
+							<span class="waiting-code">{{ room.roomId() }}</span>
+							<button class="btn-icon" (click)="copyCode()" title="Copy code">⎘</button>
+						</div>
+						<p class="waiting-code-hint">Share this with friends</p>
+					</div>
+
+					<div class="waiting-players-section">
+						<p class="panel-eyebrow">Players ({{ state.players.length }}/6)</p>
+						<ul class="waiting-player-list">
+							@for (player of state.players; track player.id) {
+								<li class="waiting-player-item">
+									<span class="waiting-player-name">{{ player.name }}</span>
+									@if (player.id === state.hostId) {
+										<span class="waiting-player-badge">host</span>
+									}
+								</li>
+							}
+						</ul>
+					</div>
+
+					@if (error()) {
+						<p class="action-error">{{ error() }}</p>
+					}
+
+					@if (room.isHost()) {
+						<div class="panel-actions">
+							<button class="btn btn-primary"
+								[disabled]="state.players.length < 2 || loading()"
+								(click)="startGame()">
+								{{ loading() ? 'Starting…' : 'Start Game' }}
+							</button>
+						</div>
+						@if (state.players.length < 2) {
+							<p class="hint">Waiting for at least one more player.</p>
+						}
+					} @else {
+						<p class="waiting-text">Waiting for the host to start…</p>
+					}
+				</div>
+			}
+
+			@if (state.phase === 'playing') {
+				@if (state.gameState; as gs) {
+
+					@switch (gs.gamePhase) {
+
+						@case ('turn-start') {
+							@if (room.isMyTurn()) {
+								<!-- My turn -->
+								<div class="panel">
+									<p class="panel-eyebrow">Your turn</p>
+									<h2 class="panel-title">{{ room.currentPlayer()?.name }}</h2>
+
+									@if (gs.previousDeclaration !== null) {
+										<div class="declaration-badge">
+											<span class="declaration-badge-label">{{ room.previousPlayer()?.name }} declared</span>
+											<span class="declaration-badge-value"
+												[class.declaration-badge-value-pankov]="gs.previousDeclaration === 21">
+												{{ formatValue(gs.previousDeclaration) }}
+											</span>
+										</div>
+										@if (room.mustCallFalse()) {
+											<p class="hint">Pankov declared — you must call their bluff.</p>
+										}
+									}
+
+									@if (rolledDice()) {
+										<!-- Rolled: show dice and declaration grid -->
+										<div class="dice-display">
+											<gg-dice [value]="rolledDice()![0]" />
+											<gg-dice [value]="rolledDice()![1]" />
+										</div>
+										<p class="roll-value"
+											[class.roll-value-pankov]="rolledValue() === 21"
+											[class.roll-value-couple]="rolledDice()![0] === rolledDice()![1]">
+											{{ formatValue(rolledValue()!) }}
+										</p>
+										@if (gs.previousDeclaration !== null) {
+											<p class="hint">Must declare <strong>{{ formatValue(gs.previousDeclaration) }}</strong> or higher</p>
+										} @else {
+											<p class="hint">Choose your declaration</p>
+										}
+										<div class="value-grid">
+											@for (group of groupedValues; track $index) {
+												<div class="value-row">
+													@for (val of group; track val) {
+														<button class="value-btn"
+															[class.value-btn-pankov]="val === 21"
+															[class.value-btn-couple]="val !== 21 && val % 11 === 0"
+															[class.value-btn-rolled]="val === rolledValue()"
+															[disabled]="!isAvailable(val) || loading()"
+															(click)="declare(val)">
+															{{ formatValue(val) }}
+														</button>
+													}
+												</div>
+											}
+										</div>
+									} @else {
+										<!-- Not yet rolled -->
+										<div class="panel-actions">
+											@if (gs.previousDeclaration !== null && !room.mustCallFalse()) {
+												<button class="btn btn-danger" [disabled]="loading()" (click)="callFalse()">
+													Call False
+												</button>
+											}
+											@if (!room.mustCallFalse()) {
+												<button class="btn btn-primary" [disabled]="loading()" (click)="roll()">
+													Roll Dice
+												</button>
+											}
+											@if (room.mustCallFalse()) {
+												<button class="btn btn-danger" [disabled]="loading()" (click)="callFalse()">
+													Call False
+												</button>
+											}
+										</div>
+									}
+
+									@if (error()) {
+										<p class="action-error">{{ error() }}</p>
+									}
+								</div>
+							} @else {
+								<!-- Not my turn -->
+								<div class="panel panel-centered">
+									<p class="panel-eyebrow">Waiting for</p>
+									<h2 class="panel-title">{{ room.currentPlayer()?.name }}</h2>
+									@if (gs.previousDeclaration !== null) {
+										<div class="declaration-badge">
+											<span class="declaration-badge-label">{{ room.previousPlayer()?.name }} declared</span>
+											<span class="declaration-badge-value"
+												[class.declaration-badge-value-pankov]="gs.previousDeclaration === 21">
+												{{ formatValue(gs.previousDeclaration) }}
+											</span>
+										</div>
+									}
+									<p class="waiting-dots">· · ·</p>
+								</div>
+							}
+						}
+
+						@case ('result') {
+							<div class="panel">
+								<h2 class="panel-title">Reveal</h2>
+								<div class="reveal-rows">
+									<div class="reveal-row">
+										<span class="reveal-row-label">{{ room.previousPlayer()?.name }} declared</span>
+										<span class="reveal-row-value">{{ formatValue(gs.revealResult!.declared) }}</span>
+									</div>
+									<div class="reveal-row">
+										<span class="reveal-row-label">Actually rolled</span>
+										<span class="reveal-row-value">{{ formatValue(gs.revealResult!.actual) }}</span>
+									</div>
+								</div>
+								<p class="reveal-verdict"
+									[class.reveal-verdict-lie]="gs.revealResult!.wasLying"
+									[class.reveal-verdict-honest]="!gs.revealResult!.wasLying">
+									{{ gs.revealResult!.wasLying
+										? (room.previousPlayer()?.name + ' was lying!')
+										: (room.previousPlayer()?.name + ' was honest!') }}
+								</p>
+								<p class="reveal-loser">
+									<strong>{{ gs.players[gs.revealResult!.loserIndex]?.name }}</strong> loses a life.
+								</p>
+								<button class="btn btn-primary" [disabled]="loading()" (click)="nextTurn()">
+									Continue
+								</button>
+								@if (error()) {
+									<p class="action-error">{{ error() }}</p>
+								}
+							</div>
+						}
+
+						@case ('game-over') {
+							<div class="panel panel-centered">
+								<p class="panel-eyebrow">Winner</p>
+								<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>
+								<button class="btn btn-primary" (click)="playAgain()">Play Again</button>
+							</div>
+						}
+
+					}
+				}
+			}
+
+			@if (state.phase === 'ended' && state.gameState; as gs) {
+				<div class="panel panel-centered">
+					<p class="panel-eyebrow">Winner</p>
+					<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>
+					<button class="btn btn-primary" (click)="playAgain()">Play Again</button>
+				</div>
+			}
+
+		</main>
+
+	} @else {
+		<div class="loading-state">
+			<p>Loading room…</p>
+		</div>
+	}
+
+</div>

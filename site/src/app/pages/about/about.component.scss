@@ -1,0 +1,45 @@
+@use 'styles/variables' as *;
+
+.page-header {
+	padding: $s4 $s6;
+	border-bottom: 1px solid $border;
+}
+
+.back-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+
+	&:hover { color: $text; }
+}
+
+.about-main {
+	padding: $s8 $s6;
+	max-width: 640px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+
+	h1 {
+		font-size: $text-3xl;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+	}
+
+	p { color: $text-muted; line-height: 1.6; }
+}
+
+.github-link {
+	color: $accent;
+	text-decoration: none;
+	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+
+	&:hover { color: $accent-hover; }
+}

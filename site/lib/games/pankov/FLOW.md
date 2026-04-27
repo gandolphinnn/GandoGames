@@ -1,0 +1,4 @@
+- Decide which player starts, at random
+- TURN:
+- If not the first player, get the previous player claim
+- Call FALSE: Get the previous player real roll

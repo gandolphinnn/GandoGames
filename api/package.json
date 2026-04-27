@@ -1,24 +1,28 @@
 {
 	"name": "gandogames-api",
 	"version": "1.0.0",
-	"main": "dist/src/functions/*.js",
+	"main": "dist/api/src/functions/*.js",
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"start": "tsc && func start",
+		"start": "if exist dist rd /s /q dist && tsc && func start",
 		"test": "jest"
 	},
 	"jest": {
 		"preset": "ts-jest",
 		"testEnvironment": "node",
-		"testMatch": ["**/*.spec.ts", "**/*.test.ts"]
+		"testMatch": [
+			"**/*.spec.ts",
+			"**/*.test.ts"
+		]
 	},
 	"dependencies": {
-		"@azure/functions": "^4.0.0"
+		"@azure/functions": "^4.0.0",
+		"playfab-sdk": "^2.187.251205"
 	},
 	"devDependencies": {
 		"@types/jest": "^29.x",
-		"@types/node": "^22.x",
+		"@types/node": "^22.19.17",
 		"jest": "^29.x",
 		"ts-jest": "^29.x",
 		"typescript": "^5.x"

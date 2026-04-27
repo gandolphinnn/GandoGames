@@ -22,7 +22,7 @@
 		<div class="players-strip">
 			@for (player of room()!.players; track player.id) {
 				<div class="player-chip" [class.host]="player.id === room()!.hostId" [class.me]="player.id === myId()">
-					{{ shortId(player.id) }}
+					{{ player.name }}
 					@if (player.id === room()!.hostId) { <span class="badge">HOST</span> }
 					@if (player.id === myId()) { <span class="badge">YOU</span> }
 				</div>
@@ -54,7 +54,7 @@
 									{{ loading() ? 'Starting…' : 'Start Game' }}
 								</button>
 							} @else {
-								<p class="hint">Need at least {{ room()!.players.length }} more player(s) to start.</p>
+								<p class="hint">Need more players to start.</p>
 							}
 						}
 						<button class="btn-danger" (click)="leave()">Leave Room</button>
@@ -64,44 +64,8 @@
 
 			@case ('playing') {
 				<div class="phase-panel">
-					@if (gameId() === 'morra') {
-						<div class="morra-game">
-							@if (!gameState()) {
-								<p class="status-msg">Loading game state…</p>
-							} @else {
-								<div class="morra-players">
-									@for (player of gameState()!.players; track player.id) {
-										<div class="morra-player">
-											<div class="morra-player-header">
-												<span class="player-name">{{ shortId(player.id) }}</span>
-												<span class="lives">{{ player.lives }} ♥</span>
-											</div>
-
-											@if (player.id === myId()) {
-												@if (!player.currentPick) {
-													<div class="hand-buttons">
-														@for (hand of morraHands; track hand) {
-															<button class="hand-btn" (click)="pick(hand)">{{ hand }}</button>
-														}
-													</div>
-												} @else {
-													<span class="pick-status picked">✓ Picked</span>
-												}
-											} @else {
-												@if (player.currentPick) {
-													<span class="pick-status picked">✓ Ready</span>
-												} @else {
-													<span class="pick-status waiting">Waiting…</span>
-												}
-											}
-										</div>
-									}
-								</div>
-							}
-						</div>
-					} @else {
-						<p class="status-msg">Game in progress.</p>
-					}
+					<p class="status-msg">Game in progress.</p>
+					<button class="btn-danger" (click)="leave()">Leave Room</button>
 				</div>
 			}
 

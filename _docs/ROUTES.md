@@ -10,6 +10,5 @@
 - `/profile` -> Profile page
 
 ### Play
-- `/play` -> Show rooms for ALL games
-- `/play/:game_id` -> Show rooms for that game
-- `/play/:game_id/:room_id` -> Join the room, if possible
+- `/play` -> Show rooms for all games
+- `/play/:room_id` -> Join the room, if possible

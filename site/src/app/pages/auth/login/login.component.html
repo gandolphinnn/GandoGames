@@ -1,7 +1,7 @@
 <div class="auth-page">
 	<div class="auth-card">
 		<h1 class="auth-title">Welcome back</h1>
-		<p class="auth-subtitle">Sign in to GandoGames</p>
+		<p class="auth-subtitle">Log in to GandoGames</p>
 
 		@if (error()) {
 			<div class="auth-error">{{ error() }}</div>
@@ -27,7 +27,7 @@
 				}
 			</div>
 			<button class="btn btn-primary" type="submit" [disabled]="loading()">
-				{{ loading() ? 'Signing in…' : 'Sign in' }}
+				{{ loading() ? 'Logging in…' : 'Log in' }}
 			</button>
 		</form>
 

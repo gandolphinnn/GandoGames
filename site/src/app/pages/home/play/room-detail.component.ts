@@ -1,10 +1,9 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { GameType, RoomData } from '@gandogames/common/api';
-import { MorraGameState, Hand } from '@gandogames/common/morra';
-import { AuthService } from '../../services/auth.service';
-import { GAME_REGISTRY } from '../../game-registry';
-import { RoomService } from '../../services/room.service';
+import { RoomData } from '@gandogames/common/api';
+import { AuthService } from '../../../services/auth.service';
+import { GAME_REGISTRY } from '../../../game-registry';
+import { RoomService } from '../../../services/room.service';
 
 @Component({
 	selector: 'gg-room-detail',
@@ -21,7 +20,6 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	public readonly gameId = signal('');
 	public readonly roomId = signal('');
 	public readonly room = signal<RoomData | null>(null);
-	public readonly gameState = signal<MorraGameState | null>(null);
 	public readonly error = signal('');
 	public readonly loading = signal(false);
 	public readonly copied = signal(false);
@@ -46,12 +44,6 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		return r.players.length >= game.minPlayers;
 	});
 
-	public readonly morraHands: Hand[] = ['rock', 'paper', 'scissors'];
-
-	public shortId(id: string): string {
-		return id.slice(-6).toUpperCase();
-	}
-
 	private pollTimer?: ReturnType<typeof setInterval>;
 
 	public ngOnInit(): void {
@@ -70,11 +62,6 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 			const rooms = await this.roomService.listRooms();
 			const room = rooms.find((r) => r.id === this.roomId()) ?? null;
 			this.room.set(room);
-
-			if (room?.phase === 'playing' && this.isInRoom()) {
-				const state = await this.roomService.getGameState(room.game as GameType, room.id);
-				this.gameState.set(state as MorraGameState | null);
-			}
 		} catch (e) {
 			this.error.set((e as Error).message);
 		}
@@ -110,24 +97,6 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		try {
 			await this.roomService.leaveRoom(this.roomId());
 			this.router.navigate(['/play', this.gameId()]);
-		} catch (e) {
-			this.error.set((e as Error).message);
-		}
-	}
-
-	public async pick(hand: Hand): Promise<void> {
-		try {
-			await this.roomService.gameAction(this.gameId() as GameType, this.roomId(), 'pick', { hand });
-			await this.loadRoom();
-		} catch (e) {
-			this.error.set((e as Error).message);
-		}
-	}
-
-	public async nextRound(): Promise<void> {
-		try {
-			await this.roomService.gameAction(this.gameId() as GameType, this.roomId(), 'next-round');
-			await this.loadRoom();
 		} catch (e) {
 			this.error.set((e as Error).message);
 		}

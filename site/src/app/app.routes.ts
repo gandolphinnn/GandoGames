@@ -1,15 +1,8 @@
 import { Routes } from '@angular/router';
-import { PlayComponent } from './pages/play/play.component';
-import { PLAY_ROUTES } from './pages/play/play.routes';
 import { authGuard } from './guards/auth.guard';
 import { noAuthGuard } from './guards/no-auth.guard';
 
 export const routes: Routes = [
-	{
-		path: '',
-		loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
-		canActivate: [authGuard],
-	},
 	{
 		path: 'about',
 		loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
@@ -25,15 +18,10 @@ export const routes: Routes = [
 		canActivate: [noAuthGuard],
 	},
 	{
-		path: 'profile',
-		loadComponent: () => import('./pages/profile/profile.component').then((m) => m.ProfileComponent),
+		path: '',
+		loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
 		canActivate: [authGuard],
-	},
-	{
-		path: 'play',
-		component: PlayComponent,
-		canActivate: [authGuard],
-		children: PLAY_ROUTES,
+		loadChildren: () => import('./pages/home/home.routes').then((m) => m.HOME_ROUTES),
 	},
 	{
 		path: '**',

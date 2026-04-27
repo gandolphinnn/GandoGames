@@ -1,8 +1,8 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
-import { GAME_REGISTRY, GameDescriptor } from '../../game-registry';
-import { RoomService } from '../../services/room.service';
+import { GAME_REGISTRY, GameDescriptor } from '../../../game-registry';
+import { RoomService } from '../../../services/room.service';
 
 @Component({
 	selector: 'gg-rooms',

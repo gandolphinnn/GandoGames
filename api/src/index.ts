@@ -94,7 +94,7 @@ export async function authenticateSession(request: BaseRequest, options: InnerFu
 	);
 	options.errorCode = errorCode;
 	options.errorMessage = errorMessage;
-	return { id: result.UserInfo!.PlayFabId! };
+	return { id: result.UserInfo!.PlayFabId!, name: result.UserInfo!.Username || 'Unknown' };
 }
 
 /** Wraps a PlayFab SDK callback call into a Promise. */

@@ -1,11 +1,17 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
 import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '..';
 
-type LoginLike = PlayFabClientModels.LoginResult | PlayFabClientModels.RegisterPlayFabUserResult;
+type LoginLike = { //PlayFabClientModels.LoginResult
+	PlayFabId?: string;
+	SessionTicket?: string;
+};
 
-const toAuthResponse = (r: LoginLike): AuthResponse => ({
-	id: r.PlayFabId!,
-	sessionTicket: r.SessionTicket!,
+const toAuthResponse = (response: LoginLike, name: string | undefined): AuthResponse => ({
+	player: {
+		id: response.PlayFabId!,
+		name: name || response.PlayFabId!,
+	},
+	sessionTicket: response.SessionTicket!,
 });
 
 const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, options) => {
@@ -14,7 +20,7 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithCustomID({ CustomId: body.customId, CreateAccount: true }, cb),
 	);
-	return toAuthResponse(result);
+	return toAuthResponse(result, result.InfoResultPayload?.PlayerProfile?.DisplayName);
 };
 
 const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, options) => {
@@ -23,7 +29,7 @@ const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body,
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password }, cb),
 	);
-	return toAuthResponse(result);
+	return toAuthResponse(result, result.InfoResultPayload?.PlayerProfile?.DisplayName);
 };
 
 const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, options) => {
@@ -38,7 +44,7 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 			RequireBothUsernameAndEmail: true,
 		}, cb),
 	);
-	return toAuthResponse(result);
+	return toAuthResponse(result, body.username);
 };
 
 registerPublicFunction('auth_guestLogin', 'POST', 'auth/guestLogin', guestLoginInner);

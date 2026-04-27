@@ -12,9 +12,9 @@
 
 		@if (state.gameState; as gs) {
 			<div class="players-strip">
-				@for (player of gs.players; track player.playFabId) {
+				@for (player of gs.players; track player.id) {
 					<div class="player-chip"
-						[class.player-chip-me]="player.playFabId === room.myPlayFabId()"
+						[class.player-chip-me]="player.id === room.myPlayFabId()"
 						[class.player-chip-eliminated]="player.lives === 0"
 						[class.player-chip-picked]="gs.gamePhase === 'picking' && player.hasPicked">
 						<span class="player-chip-name">{{ player.name }}</span>
@@ -47,10 +47,10 @@
 					<div class="waiting-players-section">
 						<p class="panel-eyebrow">Players ({{ state.players.length }}/6)</p>
 						<ul class="waiting-player-list">
-							@for (player of state.players; track player.playFabId) {
+							@for (player of state.players; track player.id) {
 								<li class="waiting-player-item">
 									<span class="waiting-player-name">{{ player.name }}</span>
-									@if (player.playFabId === state.hostId) {
+									@if (player.id === state.hostId) {
 										<span class="waiting-player-badge">host</span>
 									}
 								</li>
@@ -117,13 +117,13 @@
 							<div class="panel">
 								<h2 class="panel-title">Reveal</h2>
 								<div class="reveal-rows">
-									@for (player of gs.players; track player.playFabId) {
+									@for (player of gs.players; track player.id) {
 										<div class="reveal-row"
-											[class.reveal-row-loser]="isLoser(player.playFabId)"
+											[class.reveal-row-loser]="isLoser(player.id)"
 											[class.reveal-row-draw]="gs.result!.isDraw">
 											<span class="reveal-row-name">{{ player.name }}</span>
-											<span class="reveal-row-hand">{{ HAND_LABEL[gs.result!.picks[player.playFabId]] }}</span>
-											@if (isLoser(player.playFabId)) {
+											<span class="reveal-row-hand">{{ HAND_LABEL[gs.result!.picks[player.id]] }}</span>
+											@if (isLoser(player.id)) {
 												<span class="reveal-row-tag reveal-tag-loss">−1 life</span>
 											} @else if (!gs.result!.isDraw) {
 												<span class="reveal-row-tag reveal-tag-win">Safe</span>
@@ -155,7 +155,7 @@
 				}
 			}
 
-			@if (state.phase === 'game-over' && state.gameState; as gs) {
+			@if (state.phase === 'ended' && state.gameState; as gs) {
 				<div class="panel panel-centered">
 					<p class="panel-eyebrow">Winner</p>
 					<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>

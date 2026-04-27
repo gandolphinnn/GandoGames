@@ -12,10 +12,10 @@
 
 		@if (state.gameState; as gs) {
 			<div class="players-strip">
-				@for (player of gs.players; track player.playFabId) {
+				@for (player of gs.players; track player.id) {
 					<div class="player-chip"
 						[class.player-chip-current]="$index === gs.currentPlayerIndex && state.phase === 'playing'"
-						[class.player-chip-me]="player.playFabId === room.myPlayFabId()"
+						[class.player-chip-me]="player.id === room.myPlayFabId()"
 						[class.player-chip-eliminated]="player.lives === 0">
 						<span class="player-chip-name">{{ player.name }}</span>
 						<span class="player-chip-lives">
@@ -44,10 +44,10 @@
 					<div class="waiting-players-section">
 						<p class="panel-eyebrow">Players ({{ state.players.length }}/6)</p>
 						<ul class="waiting-player-list">
-							@for (player of state.players; track player.playFabId) {
+							@for (player of state.players; track player.id) {
 								<li class="waiting-player-item">
 									<span class="waiting-player-name">{{ player.name }}</span>
-									@if (player.playFabId === state.hostId) {
+									@if (player.id === state.hostId) {
 										<span class="waiting-player-badge">host</span>
 									}
 								</li>
@@ -221,7 +221,7 @@
 				}
 			}
 
-			@if (state.phase === 'game-over' && state.gameState; as gs) {
+			@if (state.phase === 'ended' && state.gameState; as gs) {
 				<div class="panel panel-centered">
 					<p class="panel-eyebrow">Winner</p>
 					<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>

@@ -1,8 +1,9 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
+import { RoomData } from '@gandogames/common/api';
 import { AuthService } from '../../../../../src/app/services/auth.service';
-import { MorraRoomService, RoomSummary } from './morra-room.service';
+import { MorraRoomService } from './morra-room.service';
 
 @Component({
 	selector: 'gg-morra-lobby',
@@ -17,9 +18,9 @@ export class MorraLobbyComponent implements OnInit, OnDestroy {
 	private readonly auth = inject(AuthService);
 
 	protected readonly mode = signal<'browse' | 'create' | 'join'>('browse');
-	protected readonly rooms = signal<RoomSummary[]>([]);
+	protected readonly rooms = signal<RoomData[]>([]);
 	protected readonly joiningRoomId = signal<string | null>(null);
-	protected readonly playerName = signal('');
+	protected readonly roomName = signal('');
 	protected readonly loading = signal(false);
 	protected readonly loadingRooms = signal(false);
 	protected readonly error = signal<string | null>(null);
@@ -53,14 +54,13 @@ export class MorraLobbyComponent implements OnInit, OnDestroy {
 
 	protected startCreate(): void {
 		this.joiningRoomId.set(null);
-		this.playerName.set('');
+		this.roomName.set('');
 		this.error.set(null);
 		this.mode.set('create');
 	}
 
 	protected startJoin(roomId: string): void {
 		this.joiningRoomId.set(roomId);
-		this.playerName.set('');
 		this.error.set(null);
 		this.mode.set('join');
 	}
@@ -70,16 +70,16 @@ export class MorraLobbyComponent implements OnInit, OnDestroy {
 		this.error.set(null);
 	}
 
-	protected updatePlayerName(value: string): void {
-		this.playerName.set(value);
+	protected updateRoomName(value: string): void {
+		this.roomName.set(value);
 	}
 
 	protected async createRoom(): Promise<void> {
-		if (!this.playerName().trim()) return;
+		if (!this.roomName().trim()) return;
 		this.loading.set(true);
 		this.error.set(null);
 		try {
-			const roomId = await this.room.createRoom(this.playerName().trim());
+			const roomId = await this.room.createRoom(this.roomName().trim());
 			this.router.navigate(['/play/morra/room', roomId]);
 		} catch (err) {
 			this.error.set((err as Error).message);
@@ -89,11 +89,11 @@ export class MorraLobbyComponent implements OnInit, OnDestroy {
 	}
 
 	protected async joinRoom(): Promise<void> {
-		if (!this.playerName().trim() || !this.joiningRoomId()) return;
+		if (!this.joiningRoomId()) return;
 		this.loading.set(true);
 		this.error.set(null);
 		try {
-			const roomId = await this.room.joinRoom(this.joiningRoomId()!, this.playerName().trim());
+			const roomId = await this.room.joinRoom(this.joiningRoomId()!);
 			this.router.navigate(['/play/morra/room', roomId]);
 		} catch (err) {
 			this.error.set((err as Error).message);

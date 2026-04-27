@@ -1,10 +1,9 @@
-import { GamePlayer, GameState, GameType } from '@gandogames/common/api';
-import { Hand, MorraState } from '@gandogames/common/morra';
+import { GamePlayer } from '@gandogames/common/api';
+import { Hand, MorraGameState } from '@gandogames/common/morra';
 import { Game } from './game';
 
 export const HANDS: Hand[] = ['rock', 'paper', 'scissors'];
 
-/** Maps each hand to the hand it beats. */
 export const BEATS: Record<Hand, Hand> = {
 	rock: 'scissors',
 	scissors: 'paper',
@@ -17,7 +16,7 @@ export const HAND_LABEL: Record<Hand, string> = {
 	scissors: 'Scissors',
 };
 
-export class MorraGame extends Game<MorraState> {
+export class MorraGame extends Game<MorraGameState> {
 	public override minPlayers: number = 2;
 	public override maxPlayers: number = 2;
 
@@ -26,17 +25,17 @@ export class MorraGame extends Game<MorraState> {
 		//TODO set the initial state
 	}
 
-	public override getPublicState(playerId: string): MorraState {
+	public override getPublicState(playerId: string): MorraGameState {
 		const selfPlayer = this.state?.players.find(p => p.id == playerId);
 		const otherPlayer = { ...this.state?.players.find(p => p.id != playerId) };
 		delete otherPlayer?.currentPick;
 		return {
-			lastUpdate: this.state?.lastUpdate,
-			players: [ selfPlayer, otherPlayer]
-		} as MorraState;
+			...this.state,
+			players: [selfPlayer, otherPlayer]
+		} as MorraGameState;
 	}
 
-	public action(player: GamePlayer, action: string, data: any): MorraState {
-		return {} as MorraState
+	public action(player: GamePlayer, action: string, data: any): MorraGameState {
+		return {} as MorraGameState;
 	}
 }

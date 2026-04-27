@@ -7,6 +7,7 @@
 		"paths": {
 			"@gandogames/common/api": ["../common/index"],
 			"@gandogames/common/morra": ["../common/games/morra"],
+			"@gandogames/common/pankov": ["../common/games/pankov"],
 			"@gandogames/morra": ["./lib/games/morra/index.ts"],
 			"@gandogames/pankov": ["./lib/games/pankov/index.ts"],
 		},

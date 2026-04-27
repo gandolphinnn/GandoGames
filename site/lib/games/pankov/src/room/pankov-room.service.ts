@@ -1,13 +1,13 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { PankovGameState, PankovPlayer, PankovRoomState, RevealResult } from '@gandogames/common/pankov';
-import { RoomSummary, RoomState } from '@gandogames/common/api';
+import { GameType, RoomData } from '@gandogames/common/api';
 import { AuthService } from '../../../../../src/app/services/auth.service';
 import { BackendService } from '../../../../../src/app/services/backend.service';
 
-export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RoomSummary, RoomState };
+export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RoomData };
 
-// ── Service ──────────────────────────────────────────────────────────────────
+const PANKOV_GAME = 'pankov' as GameType;
 
 @Injectable({ providedIn: 'root' })
 export class PankovRoomService {
@@ -20,7 +20,7 @@ export class PankovRoomService {
 	readonly roomId = this._roomId.asReadonly();
 	readonly state = this._state.asReadonly();
 
-	readonly myPlayFabId = computed(() => this.auth.user()?.id ?? null);
+	readonly myPlayFabId = computed(() => this.auth.user()?.player.id ?? null);
 	readonly isHost = computed(() => this._state()?.hostId === this.myPlayFabId());
 
 	readonly isMyTurn = computed(() => {
@@ -55,30 +55,30 @@ export class PankovRoomService {
 
 	// ── API actions ─────────────────────────────────────────────────────────────
 
-	async fetchRooms(): Promise<RoomSummary[]> {
-		return await this.backend.get<RoomSummary[]>('/rooms?gameId=pankov');
+	async fetchRooms(): Promise<RoomData[]> {
+		const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.sessionTicket });
+		return rooms.filter(r => r.game === PANKOV_GAME);
 	}
 
-	async createRoom(playerName: string): Promise<string> {
-		const result = await this.backend.post<{ roomId: string }>('/rooms', {
+	async createRoom(roomName: string): Promise<string> {
+		const result = await this.backend.post<RoomData>('/rooms', {
 			sessionTicket: this.sessionTicket,
-			playerName,
-			gameId: 'pankov',
+			game: PANKOV_GAME,
+			name: roomName,
 		});
-		this._roomId.set(result.roomId);
-		await this.refresh();
-		return result.roomId;
+		this._roomId.set(result.id);
+		this._state.set(result as PankovRoomState);
+		return result.id;
 	}
 
-	async joinRoom(roomCode: string, playerName: string): Promise<string> {
-		const result = await this.backend.post<{ roomId: string }>('/rooms/join', {
+	async joinRoom(roomId: string): Promise<string> {
+		const result = await this.backend.post<RoomData>('/rooms/join', {
 			sessionTicket: this.sessionTicket,
-			roomCode,
-			playerName,
+			roomId,
 		});
-		this._roomId.set(result.roomId);
-		await this.refresh();
-		return result.roomId;
+		this._roomId.set(result.id);
+		this._state.set(result as PankovRoomState);
+		return result.id;
 	}
 
 	async loadRoom(roomId: string): Promise<void> {
@@ -87,34 +87,42 @@ export class PankovRoomService {
 	}
 
 	async startRoom(): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/start`, {
+		await this.backend.post('/rooms/start', {
 			sessionTicket: this.sessionTicket,
+			roomId: this._roomId(),
 		});
 		await this.refresh();
 	}
 
 	async declare(declaration: number, actualRoll: number): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/action`, {
+		await this.backend.post('/game/action', {
 			sessionTicket: this.sessionTicket,
-			type: 'declare',
-			declaration,
-			actualRoll,
+			game: PANKOV_GAME,
+			roomId: this._roomId(),
+			action: 'declare',
+			data: { declaration, actualRoll },
 		});
 		await this.refresh();
 	}
 
 	async callFalse(): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/action`, {
+		await this.backend.post('/game/action', {
 			sessionTicket: this.sessionTicket,
-			type: 'call-false',
+			game: PANKOV_GAME,
+			roomId: this._roomId(),
+			action: 'call-false',
+			data: null,
 		});
 		await this.refresh();
 	}
 
 	async nextTurn(): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/action`, {
+		await this.backend.post('/game/action', {
 			sessionTicket: this.sessionTicket,
-			type: 'next-turn',
+			game: PANKOV_GAME,
+			roomId: this._roomId(),
+			action: 'next-turn',
+			data: null,
 		});
 		await this.refresh();
 	}
@@ -126,8 +134,19 @@ export class PankovRoomService {
 		if (!roomId || this.refreshing) return;
 		this.refreshing = true;
 		try {
-			const state = await this.backend.get<PankovRoomState>(`/rooms/${roomId}`);
-			this._state.set(state);
+			const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.sessionTicket });
+			const room = rooms.find(r => r.id === roomId);
+			if (!room) return;
+			let gameState: PankovGameState | undefined;
+			if (room.phase === 'playing' || room.phase === 'ended') {
+				const state = await this.backend.post<PankovGameState | null>('/game/state', {
+					sessionTicket: this.sessionTicket,
+					game: PANKOV_GAME,
+					roomId,
+				});
+				gameState = state ?? undefined;
+			}
+			this._state.set({ ...room, gameState } as PankovRoomState);
 		} catch {
 			// silently ignore poll errors to keep the interval alive
 		} finally {

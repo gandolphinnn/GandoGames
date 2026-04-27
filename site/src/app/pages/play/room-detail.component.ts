@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GameType, RoomData } from '@gandogames/common/api';
-import { MorraState, Hand } from '@gandogames/common/morra';
+import { MorraGameState, Hand } from '@gandogames/common/morra';
 import { AuthService } from '../../services/auth.service';
 import { GAME_REGISTRY } from '../../game-registry';
 import { RoomService } from '../../services/room.service';
@@ -21,12 +21,12 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	public readonly gameId = signal('');
 	public readonly roomId = signal('');
 	public readonly room = signal<RoomData | null>(null);
-	public readonly gameState = signal<MorraState | null>(null);
+	public readonly gameState = signal<MorraGameState | null>(null);
 	public readonly error = signal('');
 	public readonly loading = signal(false);
 	public readonly copied = signal(false);
 
-	public readonly myId = computed(() => this.auth.user()?.id ?? '');
+	public readonly myId = computed(() => this.auth.user()?.player.id ?? '');
 	public readonly isHost = computed(() => this.room()?.hostId === this.myId());
 	public readonly isInRoom = computed(() => this.room()?.players.some((p) => p.id === this.myId()) ?? false);
 	public readonly gameName = computed(() => GAME_REGISTRY.find((g) => g.id === this.gameId())?.name ?? this.gameId());
@@ -73,7 +73,7 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 
 			if (room?.phase === 'playing' && this.isInRoom()) {
 				const state = await this.roomService.getGameState(room.game as GameType, room.id);
-				this.gameState.set(state as MorraState | null);
+				this.gameState.set(state as MorraGameState | null);
 			}
 		} catch (e) {
 			this.error.set((e as Error).message);

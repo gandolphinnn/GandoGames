@@ -1,11 +1,11 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { Hand, MorraGameState, MorraPlayer, MorraRoomState } from '@gandogames/common/morra';
-import { RoomSummary } from '@gandogames/common/api';
+import { RoomData } from '@gandogames/common/api';
 import { AuthService } from '../../../../../src/app/services/auth.service';
 import { BackendService } from '../../../../../src/app/services/backend.service';
 
-export type { MorraPlayer, MorraGameState, MorraRoomState, RoomSummary };
+export type { MorraPlayer, MorraGameState, MorraRoomState, RoomData };
 
 @Injectable({ providedIn: 'root' })
 export class MorraRoomService {
@@ -18,7 +18,7 @@ export class MorraRoomService {
 	readonly roomId = this._roomId.asReadonly();
 	readonly state = this._state.asReadonly();
 
-	readonly myPlayFabId = computed(() => this.auth.user()?.id ?? null);
+	readonly myPlayFabId = computed(() => this.auth.user()?.player.id ?? null);
 	readonly isHost = computed(() => this._state()?.hostId === this.myPlayFabId());
 
 	readonly myPlayer = computed(() => {
@@ -41,30 +41,30 @@ export class MorraRoomService {
 
 	// ── API actions ──────────────────────────────────────────────────────────────
 
-	async fetchRooms(): Promise<RoomSummary[]> {
-		return this.backend.get<RoomSummary[]>('/rooms?gameId=morra');
+	async fetchRooms(): Promise<RoomData[]> {
+		const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.sessionTicket });
+		return rooms.filter(r => r.game === 'morra');
 	}
 
-	async createRoom(playerName: string): Promise<string> {
-		const result = await this.backend.post<{ roomId: string }>('/rooms', {
+	async createRoom(roomName: string): Promise<string> {
+		const result = await this.backend.post<RoomData>('/rooms', {
 			sessionTicket: this.sessionTicket,
-			playerName,
-			gameId: 'morra',
+			game: 'morra',
+			name: roomName,
 		});
-		this._roomId.set(result.roomId);
-		await this.refresh();
-		return result.roomId;
+		this._roomId.set(result.id);
+		this._state.set(result as MorraRoomState);
+		return result.id;
 	}
 
-	async joinRoom(roomCode: string, playerName: string): Promise<string> {
-		const result = await this.backend.post<{ roomId: string }>('/rooms/join', {
+	async joinRoom(roomId: string): Promise<string> {
+		const result = await this.backend.post<RoomData>('/rooms/join', {
 			sessionTicket: this.sessionTicket,
-			roomCode,
-			playerName,
+			roomId,
 		});
-		this._roomId.set(result.roomId);
-		await this.refresh();
-		return result.roomId;
+		this._roomId.set(result.id);
+		this._state.set(result as MorraRoomState);
+		return result.id;
 	}
 
 	async loadRoom(roomId: string): Promise<void> {
@@ -73,25 +73,31 @@ export class MorraRoomService {
 	}
 
 	async startRoom(): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/start`, {
+		await this.backend.post('/rooms/start', {
 			sessionTicket: this.sessionTicket,
+			roomId: this._roomId(),
 		});
 		await this.refresh();
 	}
 
 	async pick(hand: Hand): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/action`, {
+		await this.backend.post('/game/action', {
 			sessionTicket: this.sessionTicket,
-			type: 'pick',
-			hand,
+			game: 'morra',
+			roomId: this._roomId(),
+			action: 'pick',
+			data: { hand },
 		});
 		await this.refresh();
 	}
 
 	async nextRound(): Promise<void> {
-		await this.backend.post(`/rooms/${this._roomId()}/action`, {
+		await this.backend.post('/game/action', {
 			sessionTicket: this.sessionTicket,
-			type: 'next-round',
+			game: 'morra',
+			roomId: this._roomId(),
+			action: 'next-round',
+			data: null,
 		});
 		await this.refresh();
 	}
@@ -103,8 +109,19 @@ export class MorraRoomService {
 		if (!roomId || this.refreshing) return;
 		this.refreshing = true;
 		try {
-			const state = await this.backend.get<MorraRoomState>(`/rooms/${roomId}`);
-			this._state.set(state);
+			const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.sessionTicket });
+			const room = rooms.find(r => r.id === roomId);
+			if (!room) return;
+			let gameState: MorraGameState | undefined;
+			if (room.phase === 'playing' || room.phase === 'ended') {
+				const state = await this.backend.post<MorraGameState | null>('/game/state', {
+					sessionTicket: this.sessionTicket,
+					game: 'morra',
+					roomId,
+				});
+				gameState = state ?? undefined;
+			}
+			this._state.set({ ...room, gameState } as MorraRoomState);
 		} catch {
 			// silently ignore poll errors to keep the interval alive
 		} finally {

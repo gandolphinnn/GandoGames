@@ -1,3 +1,5 @@
+import { GamePlayer } from "./game";
+
 export interface LoginRequest {
 	email: string;
 	password: string;
@@ -14,7 +16,7 @@ export interface GuestLoginRequest {
 }
 
 export interface AuthResponse {
-	id: string;
+	player: GamePlayer;
 	sessionTicket: string;
 }
 

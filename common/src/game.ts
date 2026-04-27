@@ -4,6 +4,7 @@ export type GameType = 'morra' /* | 'pankov' */;
 
 export interface GamePlayer {
 	id: string,
+	name: string,
 }
 
 export interface GameState {

@@ -2,8 +2,7 @@ import { RoomCreateRequest, RoomBaseRequest, RoomData, BaseRequest } from '@gand
 import { Game, GAMES_CONFIG } from '../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '..';
 
-const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, options, player) => {
-	options.successCode = 201;
+const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, notifier, player) => {
 	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
 	const room: RoomData = {
 		id: roomId,
@@ -14,21 +13,21 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		phase: 'waiting',
 	};
 	await PlayfabCtx.rooms.upsert(roomId, room);
-	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
+	notifier.roomUpsert(room);
 	return room;
 };
 
-const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _options, _player) => {
+const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _notifier, _player) => {
 	return await PlayfabCtx.rooms.list();
 };
 
-const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, _options, _player) => {
+const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, _notifier, _player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
 	return room;
 };
 
-const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, options, player) => {
+const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
 	if (room.phase !== 'waiting') throw new Error('Game already started');
@@ -39,12 +38,12 @@ const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, opt
 
 	room.players.push(player);
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
-	options.signalR.push({ action: 'add', userId: player.id, groupName: `room-${body.roomId}` });
-	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
+	notifier.addToGroup(player.id, body.roomId);
+	notifier.roomUpsert(room);
 	return room;
 };
 
-const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, options, player) => {
+const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
 	if (room.hostId != player.id) throw new Error('You are not the host of this room');
@@ -58,20 +57,20 @@ const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, op
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	const state = Game.Factory(room.game).state!;
 	await PlayfabCtx.game[room.game].upsert(body.roomId, state);
-	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
+	notifier.roomUpsert(room);
 	return room;
 };
 
-const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, options, player) => {
+const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
 	if (!room.players.some(p => p.id === player.id)) throw new Error('You are not in this room');
 
-	options.signalR.push({ action: 'remove', userId: player.id, groupName: `room-${body.roomId}` });
+	notifier.removeFromGroup(player.id, body.roomId);
 
 	if (room.players.length == 1) {
 		await PlayfabCtx.rooms.delete(body.roomId);
-		options.signalR.push({ target: 'roomDeleted', arguments: [body.roomId] });
+		notifier.roomDeleted(body.roomId);
 		return;
 	}
 
@@ -80,7 +79,7 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, option
 		room.hostId = room.players[0].id;
 	}
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
-	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
+	notifier.roomUpsert(room);
 };
 
 registerFunction('room_create', 'rooms/create', roomCreateInner);

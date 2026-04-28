@@ -1,5 +1,5 @@
 import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { BaseRequest, GamePlayer } from '@gandogames/common/api';
+import { BaseRequest, GamePlayer, RoomData, SignalREventType } from '@gandogames/common/api';
 import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
@@ -17,25 +17,48 @@ export const signalROutput = output.generic({
 });
 
 export type SignalRMessage =
-	| { target: string; arguments: unknown[]; userId?: string; groupName?: string }
+	| { target: SignalREventType; arguments: unknown[]; }
+	| { target: SignalREventType; arguments: unknown[]; userId: string; }
+	| { target: SignalREventType; arguments: unknown[]; groupName: string }
 	| { action: 'add' | 'remove'; userId: string; groupName: string };
 //#endregion SignalR
 
 //#region Shared types
-export type InnerFunctionOptions = {
-	/** The HTTP status code for a successful response. Default is 200. */
-	successCode?: number,
+export class InnerFunctionNotifier {
 	/** The HTTP status code for an error response when no FunctionError is thrown. Default is 500. */
-	errorCode?: number,
+	errorCode = 500;
 	/** The error message for an error response when no FunctionError is thrown. Default is the caught exception message. */
-	errorMessage?: string,
+	errorMessage?: string;
+
 	/** SignalR messages to broadcast after a successful response. */
-	signalR: SignalRMessage[],
+	private signalR: SignalRMessage[] = [];
+
+	//#region SignalR methods
+	addToGroup(userId: string, groupName: string) {
+		this.signalR.push({ action: 'add', userId, groupName: `room-${groupName}`});
+	}
+	removeFromGroup(userId: string, groupName: string) {
+		this.signalR.push({ action: 'remove', userId, groupName: `room-${groupName}`});
+	}
+	roomUpsert(room: RoomData) {
+		this.signalR.push({ target: 'roomUpsert', arguments: [room] });
+	}
+	roomDeleted(roomId: string) {
+		this.signalR.push({ target: 'roomDeleted', arguments: [roomId] });
+	}
+	gameStateUpdated(roomId: string, state: unknown) {
+		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], groupName: `room-${roomId}` });
+	}
+	//#endregion SignalR methods
+
+	prepareContext(context: InvocationContext) {
+		if (this.signalR.length) context.extraOutputs.set(signalROutput, this.signalR);
+	}
 };
 //#endregion Shared types
 
 //#region Non authorized
-export type InnerPublicFunction<TReq, TRes> = (body: TReq, options: InnerFunctionOptions) => Promise<TRes>;
+export type InnerPublicFunction<TReq, TRes> = (body: TReq, notifier: InnerFunctionNotifier) => Promise<TRes>;
 
 export function registerPublicFunction<TReq, TRes>(
 	name: string,
@@ -49,17 +72,17 @@ export function registerPublicFunction<TReq, TRes>(
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
-			const options: InnerFunctionOptions = { signalR: [] };
+			const notifier = new InnerFunctionNotifier();
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
-				const result = await innerPublicFunction(body, options);
-				if (options.signalR.length) context.extraOutputs.set(signalROutput, options.signalR);
+				const result = await innerPublicFunction(body, notifier);
+				notifier.prepareContext(context);
 				toRet.jsonBody = result;
-				toRet.status = options.successCode ?? 200;
+				toRet.status = 200;
 			} catch (err) {
 				console.error(err);
-				toRet.status = options?.errorCode ?? 500;
-				toRet.jsonBody = { error: options?.errorMessage ?? (err as Error).message ?? 'Internal Server Error' };
+				toRet.status = notifier?.errorCode ?? 500;
+				toRet.jsonBody = { error: notifier?.errorMessage ?? (err as Error).message ?? 'Internal Server Error' };
 			}
 			return toRet;
 		},
@@ -68,7 +91,7 @@ export function registerPublicFunction<TReq, TRes>(
 //#endregion Non authorized
 
 //#region Authorized
-export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, options: InnerFunctionOptions, player: GamePlayer) => Promise<TRes>;
+export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, notifier: InnerFunctionNotifier, player: GamePlayer) => Promise<TRes>;
 export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
 	route: string,
@@ -81,18 +104,18 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
-			const options: InnerFunctionOptions = { signalR: [] };
+			const notifier = new InnerFunctionNotifier();
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
-				const player = await authenticateSession(body, options);
-				const result = await innerFunction(body, options, player);
-				if (options.signalR.length) context.extraOutputs.set(signalROutput, options.signalR);
+				const player = await authenticateSession(body, notifier);
+				const result = await innerFunction(body, notifier, player);
+				notifier.prepareContext(context);
 				toRet.jsonBody = result;
-				toRet.status = options.successCode ?? 200;
+				toRet.status = 200;
 			} catch (err) {
 				console.error(err);
-				toRet.status = options?.errorCode ?? 500;
-				toRet.jsonBody = { error: options?.errorMessage ?? (err as Error).message ?? 'Internal Server Error' };
+				toRet.status = notifier?.errorCode ?? 500;
+				toRet.jsonBody = { error: notifier?.errorMessage ?? (err as Error).message ?? 'Internal Server Error' };
 			}
 			return toRet;
 		},
@@ -101,15 +124,15 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 //#endregion Authorized
 
 //#region PlayFab
-export async function authenticateSession(request: BaseRequest, options: InnerFunctionOptions): Promise<GamePlayer> {
-	const { errorCode, errorMessage } = options;
-	options.errorCode = 401;
-	options.errorMessage = 'Session expired';
+export async function authenticateSession(request: BaseRequest, notifier: InnerFunctionNotifier): Promise<GamePlayer> {
+	const { errorCode, errorMessage } = notifier;
+	notifier.errorCode = 401;
+	notifier.errorMessage = 'Session expired';
 	const result = await pfPromise<PlayFabServerModels.AuthenticateSessionTicketResult>(
 		cb => PlayFabServer.AuthenticateSessionTicket({ SessionTicket: request.sessionTicket }, cb),
 	);
-	options.errorCode = errorCode;
-	options.errorMessage = errorMessage;
+	notifier.errorCode = errorCode;
+	notifier.errorMessage = errorMessage;
 	return { id: result.UserInfo!.PlayFabId!, name: result.UserInfo!.Username || 'Guest' };
 }
 

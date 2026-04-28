@@ -1,6 +1,6 @@
 import { app, input } from '@azure/functions';
 import { BaseRequest } from '@gandogames/common/api';
-import { authenticateSession, InnerFunctionOptions } from '..';
+import { authenticateSession, InnerFunctionNotifier } from '..';
 
 const connInfoInput = input.generic({
 	type: 'signalRConnectionInfo',
@@ -18,8 +18,10 @@ app.http('negotiate', {
 	handler: async (request, context) => {
 		try {
 			const body = await request.json().catch(() => undefined) as BaseRequest;
-			const options: InnerFunctionOptions = { signalR: [], errorCode: 401, errorMessage: 'Unauthorized' };
-			const player = await authenticateSession(body, options);
+			const notifier = new InnerFunctionNotifier()
+			notifier.errorCode = 401,
+			notifier.errorMessage = 'Unauthorized';
+			const player = await authenticateSession(body, notifier);
 			if (player.id !== request.query.get('userId')) {
 				return { status: 401, jsonBody: { error: 'Unauthorized' } };
 			}

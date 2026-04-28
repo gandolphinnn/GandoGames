@@ -2,33 +2,40 @@ import { inject, Injectable, signal } from '@angular/core';
 import { GameState, GameType, RoomData } from '@gandogames/common/api';
 import { AuthService } from './auth.service';
 import { BackendService } from './backend.service';
+import { SignalRService } from './signalr.service';
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
 	private readonly backend = inject(BackendService);
 	private readonly auth = inject(AuthService);
+	private readonly signalR = inject(SignalRService);
 
-	public rooms = signal<RoomData[]>(this.loadRooms());
+	public readonly rooms = signal<RoomData[]>([]);
 
 	private get ticket(): string {
 		return this.auth.user()!.sessionTicket;
 	}
 
-	private pollTimer?: ReturnType<typeof setInterval>;
+	constructor() {
+		this.signalR.events.roomUpsert.subscribe((room) => {
+			this.rooms.update((rooms) => {
+				const idx = rooms.findIndex((r) => r.id === room.id);
+				if (idx >= 0) {
+					const updated = [...rooms];
+					updated[idx] = room;
+					return updated;
+				}
+				return [...rooms, room];
+			});
+		});
+		this.signalR.events.roomDeleted.subscribe((roomId) => {
+			this.rooms.update((rooms) => rooms.filter((r) => r.id !== roomId));
+		});
+	}
 
-	private loadRooms() {
-		const poll = async () => {
-			try {
-				const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.ticket });
-				this.rooms.set(rooms);
-			} catch (e) {
-				console.error('Failed to load rooms:', e);
-				this.pollTimer = undefined;
-			}
-		}
-		if (!this.pollTimer) this.pollTimer = setInterval(poll, 5000);
-
-		return [] as RoomData[]; // initial value, will be replaced by poll
+	public async loadRooms(): Promise<void> {
+		const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.ticket });
+		return this.rooms.set(rooms);
 	}
 
 	public createRoom(game: GameType, name: string): Promise<RoomData> {

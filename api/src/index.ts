@@ -1,4 +1,4 @@
-import { app, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
+import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
 import { BaseRequest, GamePlayer } from '@gandogames/common/api';
 import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
@@ -8,6 +8,19 @@ PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 export { PlayFabClient, PlayFabServer };
 export { PlayfabCtx } from './db/playfabCtx';
 
+//#region SignalR
+export const signalROutput = output.generic({
+	type: 'signalR',
+	name: 'signalRMessages',
+	hubName: 'gameHub',
+	connectionStringSetting: 'AzureSignalRConnectionString',
+});
+
+export type SignalRMessage =
+	| { target: string; arguments: unknown[]; userId?: string; groupName?: string }
+	| { action: 'add' | 'remove'; userId: string; groupName: string };
+//#endregion SignalR
+
 //#region Shared types
 export type InnerFunctionOptions = {
 	/** The HTTP status code for a successful response. Default is 200. */
@@ -15,7 +28,9 @@ export type InnerFunctionOptions = {
 	/** The HTTP status code for an error response when no FunctionError is thrown. Default is 500. */
 	errorCode?: number,
 	/** The error message for an error response when no FunctionError is thrown. Default is the caught exception message. */
-	errorMessage?: string
+	errorMessage?: string,
+	/** SignalR messages to broadcast after a successful response. */
+	signalR: SignalRMessage[],
 };
 //#endregion Shared types
 
@@ -31,14 +46,15 @@ export function registerPublicFunction<TReq, TRes>(
 		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
-		handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
+		extraOutputs: [signalROutput],
+		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
-			const options: InnerFunctionOptions = {}
+			const options: InnerFunctionOptions = { signalR: [] };
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
-				const params = request.params;
 				const result = await innerPublicFunction(body, options);
-				toRet.jsonBody = result
+				if (options.signalR.length) context.extraOutputs.set(signalROutput, options.signalR);
+				toRet.jsonBody = result;
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {
 				console.error(err);
@@ -62,15 +78,16 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
-		handler: async (request: HttpRequest, _context: InvocationContext): Promise<HttpResponseInit> => {
+		extraOutputs: [signalROutput],
+		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
-			const options: InnerFunctionOptions = {}
+			const options: InnerFunctionOptions = { signalR: [] };
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
-				const params = request.params;
 				const player = await authenticateSession(body, options);
 				const result = await innerFunction(body, options, player);
-				toRet.jsonBody = result
+				if (options.signalR.length) context.extraOutputs.set(signalROutput, options.signalR);
+				toRet.jsonBody = result;
 				toRet.status = options.successCode ?? 200;
 			} catch (err) {
 				console.error(err);

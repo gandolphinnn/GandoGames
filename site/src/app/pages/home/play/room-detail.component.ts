@@ -1,9 +1,11 @@
-import { Component, computed, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
+import { SignalRService } from '@gandogames/services/signalr.service';
 
 @Component({
 	selector: 'gg-room-detail',
@@ -16,6 +18,8 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(AuthService);
+	private readonly signalR = inject(SignalRService);
+	private readonly destroyRef = inject(DestroyRef);
 
 	private hasLeft = false;
 
@@ -63,6 +67,7 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		this.gameId.set(this.route.snapshot.params['gameId']);
 		this.roomId.set(this.route.snapshot.params['roomId']);
 		this.loadRoom();
+		this.subscribeToRoomEvents();
 	}
 
 	private async loadRoom(): Promise<void> {
@@ -72,6 +77,19 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		} catch (e) {
 			this.error.set((e as Error).message);
 		}
+	}
+
+	private subscribeToRoomEvents(): void {
+		this.signalR.events.roomUpsert.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((room) => {
+			if (room.id === this.roomId()) {
+				this.room.set(room);
+			}
+		});
+		this.signalR.events.roomDeleted.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((roomId) => {
+			if (roomId === this.roomId()) {
+				void this.router.navigate(['/play']);
+			}
+		});
 	}
 
 	public async join(): Promise<void> {

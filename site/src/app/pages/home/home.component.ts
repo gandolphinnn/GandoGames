@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { SignalRService } from '@gandogames/services/signalr.service';
 
 @Component({
 	selector: 'gg-home',
@@ -8,4 +9,8 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 	styleUrl: './home.component.scss',
 })
 export class HomeComponent {
+	private readonly signalR = inject(SignalRService);
+	public get status() {
+		return this.signalR.connectionStatus || 'unknown';
+	} 
 }

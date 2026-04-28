@@ -13,7 +13,8 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		players: [player],
 		phase: 'waiting',
 	};
-	await PlayfabCtx.rooms.upsert(roomId, room)
+	await PlayfabCtx.rooms.upsert(roomId, room);
+	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
 	return room;
 };
 
@@ -35,9 +36,11 @@ const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, opt
 
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max player for this game');
-	
+
 	room.players.push(player);
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	options.signalR.push({ action: 'add', userId: player.id, groupName: `room-${body.roomId}` });
+	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
 	return room;
 };
 
@@ -46,7 +49,7 @@ const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, op
 	if (room == null) throw new Error('Room not found');
 	if (room.hostId != player.id) throw new Error('You are not the host of this room');
 	if (room.phase !== 'waiting') throw new Error('Game already started');
-	
+
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length > gameConfig.maxPlayers) throw new Error('Max player for this game');
 	if (room.players.length < gameConfig.minPlayers) throw new Error('Not enought player for this game');
@@ -55,6 +58,7 @@ const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, op
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	const state = Game.Factory(room.game).state!;
 	await PlayfabCtx.game[room.game].upsert(body.roomId, state);
+	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
 	return room;
 };
 
@@ -63,8 +67,11 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, option
 	if (room == null) throw new Error('Room not found');
 	if (!room.players.some(p => p.id === player.id)) throw new Error('You are not in this room');
 
+	options.signalR.push({ action: 'remove', userId: player.id, groupName: `room-${body.roomId}` });
+
 	if (room.players.length == 1) {
 		await PlayfabCtx.rooms.delete(body.roomId);
+		options.signalR.push({ target: 'roomDeleted', arguments: [body.roomId] });
 		return;
 	}
 
@@ -73,6 +80,7 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, option
 		room.hostId = room.players[0].id;
 	}
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	options.signalR.push({ target: 'roomUpdated', arguments: [room] });
 };
 
 registerFunction('room_create', 'rooms/create', roomCreateInner);

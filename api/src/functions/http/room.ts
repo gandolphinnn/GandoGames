@@ -1,6 +1,6 @@
 import { RoomCreateRequest, RoomBaseRequest, RoomData, BaseRequest } from '@gandogames/common/api';
-import { Game, GAMES_CONFIG } from '../games';
-import { InnerFunction, PlayfabCtx, registerFunction } from '..';
+import { Game, GAMES_CONFIG } from '../../games';
+import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 
 const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, notifier, player) => {
 	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -11,6 +11,7 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		game: body.game,
 		players: [player],
 		phase: 'waiting',
+		lastUpdate: new Date(),
 	};
 	await PlayfabCtx.rooms.upsert(roomId, room);
 	notifier.roomUpsert(room);

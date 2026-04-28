@@ -1,6 +1,6 @@
 import { GameActionRequest, GameBaseRequest, GameState } from '@gandogames/common/api';
-import { InnerFunction, PlayfabCtx, registerFunction } from '..';
-import { Game } from '../games';
+import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
+import { Game } from '../../games';
 
 const gameStateInner: InnerFunction<GameBaseRequest, GameState | null> = async (body, _notifier, _player) => {
 	return await PlayfabCtx.game[body.game].get(body.roomId);

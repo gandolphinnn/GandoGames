@@ -1,6 +1,6 @@
 import { app, input } from '@azure/functions';
 import { BaseRequest } from '@gandogames/common/api';
-import { authenticateSession, InnerFunctionNotifier } from '..';
+import { authenticateSession, InnerFunctionNotifier } from '../..';
 
 const connInfoInput = input.generic({
 	type: 'signalRConnectionInfo',

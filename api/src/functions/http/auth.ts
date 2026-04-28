@@ -1,7 +1,7 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
 import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '../..';
 
-type LoginLike = { //PlayFabClientModels.LoginResult
+type LoginLike = {
 	PlayFabId?: string;
 	SessionTicket?: string;
 };

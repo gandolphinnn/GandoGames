@@ -1,5 +1,6 @@
-import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
+import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext, Timer } from '@azure/functions';
 import { BaseRequest, GamePlayer, RoomData, SignalREventType } from '@gandogames/common/api';
+import { run } from 'node:test';
 import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
@@ -9,7 +10,7 @@ export { PlayFabClient, PlayFabServer };
 export { PlayfabCtx } from './db/playfabCtx';
 
 //#region SignalR
-export const signalROutput = output.generic({
+const signalROutput = output.generic({
 	type: 'signalR',
 	name: 'signalRMessages',
 	hubName: 'gameHub',
@@ -92,6 +93,7 @@ export function registerPublicFunction<TReq, TRes>(
 
 //#region Authorized
 export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, notifier: InnerFunctionNotifier, player: GamePlayer) => Promise<TRes>;
+
 export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
 	route: string,
@@ -122,6 +124,33 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 	});
 }
 //#endregion Authorized
+
+//#region Time
+export type InnerTimeFunction = (timer: Timer, context: InvocationContext) => Promise<void>;
+
+export function registerTimeFunction(
+	name: string,
+	cron: string,
+	runOnStartup: boolean,
+	innerTimeFunction: InnerTimeFunction,
+) {
+	app.timer(name, {
+		schedule: cron,
+		runOnStartup: runOnStartup,
+		useMonitor: !runOnStartup,
+		extraOutputs: [signalROutput],
+		handler: async (timer: Timer, context: InvocationContext): Promise<void> => {
+			const notifier = new InnerFunctionNotifier();
+			try {
+				await innerTimeFunction(timer, context);
+				notifier.prepareContext(context);
+			} catch (err) {
+				console.error(err);
+			}
+		},
+	});
+}
+//#endregion Time
 
 //#region PlayFab
 export async function authenticateSession(request: BaseRequest, notifier: InnerFunctionNotifier): Promise<GamePlayer> {

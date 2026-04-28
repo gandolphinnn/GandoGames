@@ -10,6 +10,7 @@ export class SignalRService {
 	private readonly auth = inject(AuthService);
 	private readonly backend = inject(BackendService);
 	private connection?: HubConnection;
+	private negotiateCache?: { response: NegotiateResponse; expiresAt: number };
 
 	public get connectionStatus() {
 		return this.connection?.state;
@@ -30,10 +31,13 @@ export class SignalRService {
 	}
 
 	private async getNegotiateResponse(): Promise<NegotiateResponse> {
+		const now = Date.now();
+		if (this.negotiateCache && now < this.negotiateCache.expiresAt) return this.negotiateCache.response;
 		const user = this.auth.user();
 		if (!user) throw new Error('Not authenticated');
 		const res = await this.backend.post<NegotiateResponse>(`/negotiate?userId=${encodeURIComponent(user.player.id)}`, { sessionTicket: user.sessionTicket });
 		if (!res.url || !res.accessToken) throw new Error('SignalR negotiate failed');
+		this.negotiateCache = { response: res, expiresAt: now + 30_000 };
 		return res;
 	}
 
@@ -66,6 +70,7 @@ export class SignalRService {
 	}
 
 	private async disconnect(): Promise<void> {
+		this.negotiateCache = undefined;
 		await this.connection?.stop();
 		this.connection = undefined;
 	}

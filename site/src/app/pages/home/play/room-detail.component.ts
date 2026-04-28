@@ -1,9 +1,9 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
-import { AuthService } from '../../../services/auth.service';
-import { GAME_REGISTRY } from '../../../game-registry';
-import { RoomService } from '../../../services/room.service';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
+import { AuthService } from '@gandogames/services/auth.service';
+import { RoomService } from '@gandogames/services/room.service';
 
 @Component({
 	selector: 'gg-room-detail',
@@ -11,11 +11,13 @@ import { RoomService } from '../../../services/room.service';
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
-export class RoomDetailComponent implements OnInit {
+export class RoomDetailComponent implements OnInit, OnDestroy {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(AuthService);
+
+	private hasLeft = false;
 
 	public readonly gameId = signal('');
 	public readonly roomId = signal('');
@@ -43,6 +45,19 @@ export class RoomDetailComponent implements OnInit {
 		if (!game) return false;
 		return r.players.length >= game.minPlayers;
 	});
+
+	public ngOnDestroy(): void {
+		if (!this.hasLeft && this.isInRoom()) {
+			void this.roomService.leaveRoom(this.roomId());
+		}
+	}
+
+	@HostListener('window:beforeunload')
+	public onBeforeUnload(): void {
+		if (!this.hasLeft && this.isInRoom()) {
+			void this.roomService.leaveRoom(this.roomId());
+		}
+	}
 
 	public ngOnInit(): void {
 		this.gameId.set(this.route.snapshot.params['gameId']);
@@ -86,10 +101,12 @@ export class RoomDetailComponent implements OnInit {
 	}
 
 	public async leave(): Promise<void> {
+		this.hasLeft = true;
 		try {
 			await this.roomService.leaveRoom(this.roomId());
 			this.router.navigate(['/play']);
 		} catch (e) {
+			this.hasLeft = false;
 			this.error.set((e as Error).message);
 		}
 	}

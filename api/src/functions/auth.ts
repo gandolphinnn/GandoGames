@@ -1,6 +1,5 @@
 import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
 import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '..';
-import { PlayFabProfiles } from 'playfab-sdk';
 
 type LoginLike = { //PlayFabClientModels.LoginResult
 	PlayFabId?: string;

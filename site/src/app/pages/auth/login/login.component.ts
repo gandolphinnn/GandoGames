@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '@gandogames/services/auth.service';
 
 @Component({
 	selector: 'gg-login',

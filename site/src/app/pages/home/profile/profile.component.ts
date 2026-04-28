@@ -1,7 +1,7 @@
 import { Component, inject, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AuthService, AuthUser } from '../../../services/auth.service';
+import { AuthService, AuthUser } from '@gandogames/services/auth.service';
 
 @Component({
 	selector: 'gg-profile',

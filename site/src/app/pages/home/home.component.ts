@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { GAME_REGISTRY } from '../../game-registry';
 
 @Component({
 	selector: 'gg-home',

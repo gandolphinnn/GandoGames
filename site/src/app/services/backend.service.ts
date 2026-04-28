@@ -28,6 +28,16 @@ export class BackendService {
 		);
 	}
 
+	// Fire-and-forget POST guaranteed to reach the server even during page unload.
+	public postBeacon(url: string, body: any): void {
+		void fetch(this.baseUrl + url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+			keepalive: true,
+		});
+	}
+
 	private handleError(err: HttpErrorResponse) {
 		const message: string = err.error?.error ?? err.message;
 		return throwError(() => new Error(message));

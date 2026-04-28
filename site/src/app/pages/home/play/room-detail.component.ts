@@ -59,7 +59,7 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	@HostListener('window:beforeunload')
 	public onBeforeUnload(): void {
 		if (!this.hasLeft && this.isInRoom()) {
-			void this.roomService.leaveRoom(this.roomId());
+			this.roomService.leaveRoomBeacon(this.roomId());
 		}
 	}
 

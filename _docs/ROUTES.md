@@ -1,14 +1,14 @@
-# ROUTES
+# Routes
 
 ### Public
-- `/` -> Home page
-- `/about` -> Page with infos about this project and the creator, e.g. the github repo link
+- `/about` — project info
 
-### Auth & Profile
-- `/login` -> Login page
-- `/signup` -> Signup page
-- `/profile` -> Profile page
+### Auth (redirect to `/play` if already logged in)
+- `/login`
+- `/signup`
 
-### Play
-- `/play` -> Show rooms for all games
-- `/play/:room_id` -> Join the room, if possible
+### Authenticated (redirect to `/login` if not logged in)
+- `/` → redirects to `/play`
+- `/profile`
+- `/play` — room list for all games
+- `/play/:roomId` — room detail (join / start / leave)

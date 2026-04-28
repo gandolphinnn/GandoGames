@@ -58,6 +58,10 @@ export class RoomService {
 		return this.backend.post('/rooms/leave', { sessionTicket: this.ticket, roomId });
 	}
 
+	public leaveRoomBeacon(roomId: string): void {
+		this.backend.postBeacon('/rooms/leave', { sessionTicket: this.ticket, roomId });
+	}
+
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {
 		return this.backend.post<GameState | null>('/game/state', { sessionTicket: this.ticket, game, roomId });
 	}

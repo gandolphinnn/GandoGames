@@ -1,13 +1,16 @@
-# PLAY
+# Play
 
-### play
-Show rooms for ALL games. Include a filter to toggle each game rooms.
+## `/play`
+Lists rooms for all games. Shows a filter to toggle per-game visibility.  
+Rooms update in real-time via SignalR (`roomUpsert`, `roomDeleted` events).  
+Initial load fetches all rooms via `POST /rooms/list`.
 
-### play:game_id`
-Show rooms for that game only. Exactly the same as above, but with only that game toggled on.
+## `/play/:roomId`
+Shows the detail for a specific room.
 
-### play:game_id/:room_id`
-Check if a room with that id exists for that game.
-If so, display its info and if it's possible to join that room.
-A room is joinable if it hasn't reached the max player count.
-If so, enable a button "JOIN", otherwise disabled.
+- Loads room via `POST /rooms/get` on init.
+- Updates reactively via `roomUpsert` / `roomDeleted` SignalR events.
+- **Join** — visible if room is `waiting`, user is not already in it, and player count < max.
+- **Start** — visible to host only if room is `waiting` and player count ≥ min.
+- **Leave** — navigates back to `/play` and notifies the API.
+- On any navigation away or tab close, calls `leaveRoom` (beacon fetch with `keepalive: true` on unload).

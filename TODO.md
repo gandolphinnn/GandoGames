@@ -1,9 +1,13 @@
-- [ ] ReturnUrl if not logged in
-- [ ] Improved room participation handling
-- [ ] Remove room names, show participants instead
-- [ ] Navbar rework
-- [ ] Room link copy the full link, not just the room id
-- [ ] Chat
-- [ ] Guest auto-naming
-- [ ] TimeTrigger function that automatically delets inactive guest users every month
-- [ ] Queue system if 20 signalR connection are already occupied
+- ReturnUrl if not logged in
+- Improved room participation handling, better auto-leave, kicking players if you are the host
+- Remove room names, show participants instead
+- Navbar rework
+- Room link copy the full link, not just the room id
+- Chat
+- Guest auto-naming
+- Statistics
+- Push notifications
+- Friends
+- Graphics redo
+- TimeTrigger function that automatically delets inactive guest users every month
+- Queue system if 20 signalR connection are already occupied

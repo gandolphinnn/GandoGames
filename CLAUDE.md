@@ -6,15 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```
 GandoGames/
-├── common/api.ts          # Shared HTTP contract types (imported by both site/ and api/)
-├── site/                  # Angular 20 SPA (Azure Static Web Apps)
-│   ├── src/               # App source
-│   ├── lib/games/         # Self-contained game packages (morra, pankov)
-│   └── public/            # Static assets (staticwebapp.config.json)
-└── api/                   # Azure Functions v4 (TypeScript)
+├── common/
+│   ├── index.ts               # Re-exports all shared types (imported as @gandogames/common/api)
+│   └── src/                   # Shared HTTP contract types used by both site/ and api/
+│       ├── auth.ts            # AuthResponse, LoginRequest, RegisterRequest, GuestLoginRequest, BaseRequest
+│       ├── room.ts            # RoomData, RoomCreateRequest, RoomBaseRequest
+│       ├── game.ts            # GameType, GamePlayer, GameState, GameBaseRequest, GameActionRequest
+│       └── signalr.ts        # NegotiateResponse, SignalREvent types
+├── site/                      # Angular 20 SPA (Azure Static Web Apps)
+│   ├── src/                   # App source
+│   ├── lib/games/             # Self-contained game packages (morra, pankov)
+│   └── public/                # Static assets (staticwebapp.config.json)
+└── api/                       # Azure Functions v4 (TypeScript)
     └── src/
-        ├── index.ts       # Barrel: registerAzureHttpFunction, pfPromise, PlayFabClient, PlayFabServer
-        └── functions/     # One file per concern (auth, rooms, game, stats, health)
+        ├── index.ts           # Barrel: register wrappers, pfPromise, PlayFabClient, PlayFabServer, SignalR output
+        └── functions/         # One file per concern (auth, rooms, game, signalr, alive)
 ```
 
 ## Commands
@@ -46,34 +52,45 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 
 **Responsiveness:** All components must be mobile-first. Use `@media (min-width: $bp-sm)` (defined in `src/styles/_variables.scss`) to scale up for larger screens. Touch targets must be at least 44×44 px.
 
+**Path aliases** (`site/tsconfig.json`):
+```
+@gandogames/common/api  →  ../common/index
+@gandogames/lib/*       →  ./lib/*
+@gandogames/services/*  →  ./src/app/services/*
+```
+
+### Services
+
+All in `src/app/services/`, imported via `@gandogames/services/<name>.service`.
+
+- `AuthService` — user signal, login/register/guest/logout
+- `BackendService` — `get()`, `post()`, `postBeacon()` (keepalive fetch for page-unload calls)
+- `RoomService` — rooms signal, CRUD methods, subscribes to SignalR events for reactive updates
+- `SignalRService` — manages HubConnection lifecycle (auto-connect on auth), exposes `events.roomUpsert`, `events.roomDeleted`, `events.gameStateUpdated` as RxJS Subjects
+
 ### Game packages
 
-Games live in `site/lib/games/<name>/`, each with an `index.ts` as its public API. They are imported into the Angular app via TypeScript path aliases defined in `site/tsconfig.json`:
-
-```
-@gandogames/morra  →  ./lib/games/morra/index.ts
-@gandogames/pankov  →  ./lib/games/pankov/index.ts
-```
-
-Each game package should export an Angular `Routes` array (e.g. `PANKOV_ROUTES`) that the main app lazy-loads. Game logic lives entirely in the game package — the Angular app only hosts and routes to it.
+Games live in `site/lib/games/<name>/`, each with an `index.ts` as its public API. They are imported via TypeScript path aliases. Each game exports an Angular `Routes` array that the main app lazy-loads.
 
 To add a new game: create `site/lib/games/<name>/index.ts`, add a path alias to `site/tsconfig.json`, and register it in the game registry (`src/app/game-registry.ts`).
 
 ## API (Azure Functions)
 
-`api/` is an Azure Functions v4 TypeScript app. It acts as a secure proxy to Azure PlayFab — the `PLAYFAB_SECRET_KEY` never reaches the client.
+`api/` is an Azure Functions v4 TypeScript app. Secure proxy to PlayFab — `PLAYFAB_SECRET_KEY` never reaches the client.
 
-**Barrel (`api/src/index.ts`):** All shared utilities are exported from here. Function files import from `'..'`.
+**Barrel (`api/src/index.ts`):**
 
-- `registerAzureHttpFunction(name, method, route, innerFn)` — wraps `app.http()` with `authLevel: 'anonymous'` and a try/catch that maps success/error to `HttpResponseInit`.
-- `InnerFunction<TReq, TRes>` — `async (body, params, options) => TRes`. Set `options.errorCode`, `options.successCode`, `options.errorMessage` before throwing to control the HTTP response.
-- `pfPromise<T>(call)` — wraps a PlayFab SDK callback call into a Promise.
-- `PlayFabClient`, `PlayFabServer` — re-exported from `playfab-sdk` after settings are initialised.
+- `registerPublicFunction<TReq, TRes>(name, route, fn)` — unauthenticated POST; includes SignalR output binding
+- `registerFunction<TReq extends BaseRequest, TRes>(name, route, fn)` — authenticates `sessionTicket` via PlayFab before calling `fn`; includes SignalR output binding
+- `registerNegotiateFunction(name, route)` — SignalR negotiate endpoint with `signalRConnectionInfo` input binding
+- `InnerFunctionOptions` — `{ successCode?, errorCode?, errorMessage?, signalR: SignalRMessage[] }` — populate `signalR` to broadcast after a successful response
+- `pfPromise<T>(call)` — wraps PlayFab SDK callbacks into Promises
+- `PlayFabClient`, `PlayFabServer` — re-exported after settings are initialised
 
-**Shared types:** `common/api.ts` (at the repo root, imported as `@gandogames/common/api`) is the single source of truth for all HTTP request/response shapes shared between `api/` and `site/`.
+**SignalR:** Azure SignalR Service in serverless mode. `signalROutput` output binding on all registered functions. Push `SignalRMessage` objects into `options.signalR` to broadcast to users or groups.
 
-**Data storage:** No database. PlayFab SharedGroups store room state:
-- `PANKOV_ROOMS` — index of open rooms (array of `RoomSummary`)
-- `{roomCode}` — full `StoredRoomState` JSON for each room
+**Shared types:** `common/index.ts` (imported as `@gandogames/common/api`) is the single source of truth for all HTTP request/response shapes.
 
-**Secrets:** `PLAYFAB_TITLE_ID` and `PLAYFAB_SECRET_KEY` go in `api/local.settings.json` locally (gitignored) and in Azure Function App settings in production. Never commit secrets.
+**Data storage:** PlayFab SharedGroups store room and game state. PlayFab is also used for auth.
+
+**Secrets:** `PLAYFAB_TITLE_ID`, `PLAYFAB_SECRET_KEY`, and `AzureSignalRConnectionString` go in `api/local.settings.json` locally (gitignored) and in Azure Function App settings in production. Never commit secrets.

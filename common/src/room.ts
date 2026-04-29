@@ -12,6 +12,7 @@ export interface RoomData {
 	game: GameType;
 	players: GamePlayer[];
 	phase: 'waiting' | 'playing' | 'ended';
+	lastUpdate: Date;
 }
 
 export interface RoomCreateRequest extends BaseRequest {

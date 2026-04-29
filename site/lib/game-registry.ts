@@ -1,5 +1,7 @@
+import { GameType } from "@gandogames/common/api";
+
 export interface GameDescriptor {
-	id: string;
+	id: GameType;
 	name: string;
 	description: string;
 	minPlayers: number;

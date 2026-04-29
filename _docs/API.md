@@ -2,18 +2,13 @@
 
 Base URL (local): `http://localhost:7071/api`
 
-All endpoints are anonymous (no Azure-level auth key required). Authentication is handled via PlayFab `sessionTicket` in the request body where needed.
-
-Errors return `{ "error": "<message>" }` with the relevant HTTP status code.
+All endpoints are `POST` unless noted. Auth is handled via `sessionTicket` in the request body. Errors return `{ "error": "<message>" }`.
 
 ---
 
 ## Alive
 
 ### `GET /alive`
-Returns server status.
-
-**Response `200`**
 ```json
 { "status": "alive" }
 ```
@@ -22,226 +17,103 @@ Returns server status.
 
 ## Auth
 
-### `POST /auth/guestLogin`
-Logs in as a guest using a device-local custom ID. Creates a new PlayFab account if none exists for that ID.
-
-**Body**
-```json
-{ "customId": "string" }
-```
-
-**Response `200`**
-```json
-{ "SessionTicket": "string", "PlayFabId": "string" }
-```
-
-**Errors** `401` — invalid custom ID
-
----
+All auth endpoints are unauthenticated. Successful responses include `{ player: { id, name }, sessionTicket }`.
 
 ### `POST /auth/login`
-Logs in with email and password.
-
-**Body**
 ```json
 { "email": "string", "password": "string" }
 ```
 
-**Response `200`**
-```json
-{ "SessionTicket": "string", "PlayFabId": "string" }
-```
-
-**Errors** `401` — invalid credentials
-
----
-
 ### `POST /auth/register`
-Creates a new account.
-
-**Body**
 ```json
 { "email": "string", "password": "string", "username": "string" }
 ```
+**201** on success.
 
-**Response `201`**
+### `POST /auth/guestLogin`
 ```json
-{ "SessionTicket": "string", "PlayFabId": "string" }
+{ "customId": "string" }
 ```
-
-**Errors** `400` — invalid registration data
 
 ---
 
 ## Rooms
 
-Rooms are generic and game-agnostic. The `gameId` field determines which game's logic is used.
+All room endpoints require `sessionTicket`.
 
-### `GET /rooms?gameId=<gameId>`
-Lists all open rooms for the given game. Defaults to `pankov` if `gameId` is omitted.
+### `POST /rooms/list`
+Returns all open rooms. Body: `{ sessionTicket }`. Response: `RoomData[]`.
 
-**Response `200`**
+### `POST /rooms/create`
 ```json
-[
-  {
-    "roomId": "string",
-    "players": ["string"],
-    "createdAt": "ISO8601"
-  }
-]
+{ "sessionTicket": "string", "game": "GameType", "name": "string" }
 ```
+**201** — returns `RoomData`. Broadcasts `roomUpsert` via SignalR.
 
----
-
-### `POST /rooms`
-Creates a new room.
-
-**Body**
+### `POST /rooms/get`
 ```json
-{ "sessionTicket": "string", "playerName": "string", "gameId": "string" }
+{ "sessionTicket": "string", "roomId": "string" }
 ```
-
-**Response `201`**
-```json
-{ "roomId": "string" }
-```
-
-**Errors** `400`
-
----
+Returns `RoomData`.
 
 ### `POST /rooms/join`
-Joins an existing room by room code.
-
-**Body**
 ```json
-{ "sessionTicket": "string", "roomCode": "string", "playerName": "string" }
+{ "sessionTicket": "string", "roomId": "string" }
 ```
+Returns `RoomData`. Broadcasts `roomUpsert` via SignalR.
 
-**Response `200`**
+### `POST /rooms/start`
+Host only. Requires ≥ min players for the game.
 ```json
-{ "roomId": "string" }
+{ "sessionTicket": "string", "roomId": "string" }
 ```
+Returns `RoomData`. Broadcasts `roomUpsert` via SignalR.
 
-**Errors** `400` — game already started / room full / already in room
+### `POST /rooms/leave`
+```json
+{ "sessionTicket": "string", "roomId": "string" }
+```
+Broadcasts `roomUpsert` or `roomDeleted` via SignalR.
 
 ---
 
-### `GET /rooms/{roomId}`
-Returns the current public state of a room. The shape of `gameState` depends on the game.
+## Game
 
-**Response `200`**
+### `POST /game/state`
 ```json
-{
-  "phase": "waiting | playing | game-over",
-  "hostId": "string",
-  "gameId": "string",
-  "players": [{ "playFabId": "string", "name": "string" }],
-  "lastUpdated": "ISO8601",
-  "gameState": "<game-specific — see below>"
-}
+{ "sessionTicket": "string", "roomId": "string", "game": "GameType" }
 ```
+Returns `GameState | null`.
 
-**Errors** `404` — room not found
+### `POST /game/action`
+```json
+{ "sessionTicket": "string", "roomId": "string", "game": "GameType", "action": "string", "data": "any" }
+```
+Returns `GameState | null`. Broadcasts `gameStateUpdated` to the room group via SignalR.
 
 ---
 
-### `POST /rooms/{roomId}/start`
-Starts the game. Host only. Requires ≥ 2 players.
+## SignalR
 
-**Body**
+### `POST /negotiate?userId=<playFabId>`
+Authenticates the session ticket and returns Azure SignalR hub connection info.
 ```json
 { "sessionTicket": "string" }
 ```
-
-**Response `200`** — full room state (same shape as `GET /rooms/{roomId}`)
-
-**Errors** `400`, `403` — not the host
+**Response:** `{ "url": "string", "accessToken": "string" }`
 
 ---
 
-### `POST /rooms/{roomId}/action`
-Submits a game action. The request body and effect depend on `gameId` (see per-game sections below).
+## Shared types (`common/src/`)
 
-**Errors** `400`, `403`
+```ts
+type GameType = 'morra' | 'pankov'
 
----
-
-## Game state shapes
-
-### Pankov — `gameState`
-
-```json
-{
-  "gamePhase": "turn-start | result | game-over",
-  "currentPlayerIndex": 0,
-  "previousDeclaration": "number | null",
-  "previousPlayerIndex": "number | null",
-  "revealResult": {
-    "wasLying": true,
-    "loserIndex": 0,
-    "declared": 65,
-    "actual": 32
-  },
-  "winnerName": "string | null",
-  "players": [
-    { "playFabId": "string", "name": "string", "lives": 8 }
-  ]
+interface GamePlayer { id: string; name: string }
+interface GameState { lastUpdate: Date }
+interface RoomData {
+  id: string; name: string; hostId: string;
+  game: GameType; players: GamePlayer[];
+  phase: 'waiting' | 'playing' | 'ended'
 }
 ```
-
-#### Pankov actions (`POST /rooms/{roomId}/action`)
-
-**declare**
-```json
-{ "sessionTicket": "string", "type": "declare", "declaration": 65, "actualRoll": 32 }
-```
-Current player declares a roll value (must be higher rank than the previous declaration) and submits their actual roll (hidden from others).
-
-**call-false**
-```json
-{ "sessionTicket": "string", "type": "call-false" }
-```
-Current player challenges the previous declaration. Reveals the actual roll and determines who loses a life.
-
-**next-turn**
-```json
-{ "sessionTicket": "string", "type": "next-turn" }
-```
-Any player advances past the reveal screen. Applies the life penalty and resets for the next turn.
-
----
-
-### Morra — `gameState`
-
-```json
-{
-  "gamePhase": "picking | reveal | game-over",
-  "players": [
-    { "playFabId": "string", "name": "string", "lives": 3, "hasPicked": false }
-  ],
-  "result": {
-    "picks": { "<playFabId>": "rock | paper | scissors" },
-    "losers": ["<playFabId>"],
-    "isDraw": false
-  },
-  "winnerName": "string | null"
-}
-```
-
-`hasPicked` is visible to all clients — what was picked is hidden until all alive players have submitted.
-
-#### Morra actions (`POST /rooms/{roomId}/action`)
-
-**pick**
-```json
-{ "sessionTicket": "string", "type": "pick", "hand": "rock | paper | scissors" }
-```
-Submit this player's hand for the round. Once all alive players have picked, the round resolves automatically and `gamePhase` transitions to `reveal`.
-
-**next-round**
-```json
-{ "sessionTicket": "string", "type": "next-round" }
-```
-Any player advances past the reveal screen. Resets picks and starts the next round.
-

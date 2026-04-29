@@ -1,6 +1,6 @@
 import { RoomBaseRequest } from "./room";
 
-export type GameType = 'morra' /* | 'pankov' */;
+export type GameType = 'morra' | 'pankov';
 
 export interface GamePlayer {
 	id: string,

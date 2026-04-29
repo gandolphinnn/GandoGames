@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { environment } from '../../environments/environment';
 import { catchError, firstValueFrom, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
 	providedIn: 'root',
@@ -26,6 +26,16 @@ export class BackendService {
 				catchError(this.handleError)
 			)
 		);
+	}
+
+	// Fire-and-forget POST guaranteed to reach the server even during page unload.
+	public postBeacon(url: string, body: any): void {
+		void fetch(this.baseUrl + url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+			keepalive: true,
+		});
 	}
 
 	private handleError(err: HttpErrorResponse) {

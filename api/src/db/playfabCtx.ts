@@ -1,10 +1,17 @@
 import { GameState, GameType, RoomData } from "@gandogames/common/api";
 import { MorraGameState } from "@gandogames/common/morra";
-import { pfPromise, PlayFabClient, PlayFabServer } from "..";
+import { PankovGameState } from "@gandogames/common/pankov";
+import { pfPromise, PlayFabServer } from "..";
+
+export interface PlayFabEntityHooks<T> {
+	beforeUpsert?(id: string, value: T): void | Promise<void>;
+}
 
 class PlayFabEntity<T> {
+
 	constructor(
-		public readonly groupId: string
+		public readonly groupId: string,
+		public readonly hooks: PlayFabEntityHooks<T> = {},
 	) {
 	}
 	
@@ -59,6 +66,7 @@ class PlayFabEntity<T> {
 
 	public async upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
 		await this.init();
+		if (this.hooks.beforeUpsert) await this.hooks.beforeUpsert(id, value);
 		const data = {
 			[id]: JSON.stringify(value),
 		}
@@ -88,9 +96,10 @@ class PlayFabEntity<T> {
 }
 
 export class PlayfabCtx {
-	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX')
+	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', { beforeUpsert: (id, value) => { value.lastUpdate = new Date() } });
 
 	public static readonly game: Record<GameType, PlayFabEntity<GameState>> = {
 		'morra': new PlayFabEntity<MorraGameState>('MORRA_GAMES_INDEX'),
+		'pankov': new PlayFabEntity<PankovGameState>('PANKOV_GAMES_INDEX'),
 	}
 }

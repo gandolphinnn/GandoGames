@@ -1,7 +1,7 @@
 {
 	"name": "gandogames-api",
 	"version": "1.0.0",
-	"main": "dist/api/src/functions/*.js",
+	"main": "dist/api/src/functions/**/*.js",
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",

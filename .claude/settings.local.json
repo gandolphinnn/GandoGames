@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm \"D:/Personale/GandoGames/.claude/commands/new-game.md\")",
+      "Bash(rmdir \"D:/Personale/GandoGames/.claude/commands\")",
+      "Bash(mkdir -p \"D:/Personale/GandoGames/.claude/skills/new-game\")"
+    ]
+  }
+}

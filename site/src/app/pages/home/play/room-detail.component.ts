@@ -1,23 +1,30 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
+import { Component, computed, DestroyRef, HostListener, inject, OnDestroy, OnInit, signal, Type } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
-import { AuthService } from '../../../services/auth.service';
-import { GAME_REGISTRY } from '../../../game-registry';
-import { RoomService } from '../../../services/room.service';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
+import { AuthService } from '@gandogames/services/auth.service';
+import { RoomService } from '@gandogames/services/room.service';
+import { SignalRService } from '@gandogames/services/signalr.service';
+import { GAME_COMPONENT_REGISTRY } from '../../../game-component-registry';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink],
+	imports: [RouterLink, NgComponentOutlet],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
-export class RoomDetailComponent implements OnInit {
+export class RoomDetailComponent implements OnInit, OnDestroy {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(AuthService);
+	private readonly signalR = inject(SignalRService);
+	private readonly destroyRef = inject(DestroyRef);
 
-	public readonly gameId = signal('');
+	private hasLeft = false;
+
 	public readonly roomId = signal('');
 	public readonly room = signal<RoomData | null>(null);
 	public readonly error = signal('');
@@ -27,7 +34,6 @@ export class RoomDetailComponent implements OnInit {
 	public readonly myId = computed(() => this.auth.user()?.player.id ?? '');
 	public readonly isHost = computed(() => this.room()?.hostId === this.myId());
 	public readonly isInRoom = computed(() => this.room()?.players.some((p) => p.id === this.myId()) ?? false);
-	public readonly gameName = computed(() => GAME_REGISTRY.find((g) => g.id === this.gameId())?.name ?? this.gameId());
 
 	public readonly canJoin = computed(() => {
 		const r = this.room();
@@ -44,19 +50,54 @@ export class RoomDetailComponent implements OnInit {
 		return r.players.length >= game.minPlayers;
 	});
 
+	public readonly gameComponentType = computed((): Type<unknown> | null => {
+		const r = this.room();
+		if (!r || r.phase !== 'playing') return null;
+		return GAME_COMPONENT_REGISTRY[r.game] ?? null;
+	});
+
+	public ngOnDestroy(): void {
+		if (!this.hasLeft && this.isInRoom()) {
+			void this.roomService.leaveRoom(this.roomId());
+		}
+	}
+
+	@HostListener('window:beforeunload')
+	public onBeforeUnload(): void {
+		if (!this.hasLeft && this.isInRoom()) {
+			this.roomService.leaveRoomBeacon(this.roomId());
+		}
+	}
+
 	public ngOnInit(): void {
-		this.gameId.set(this.route.snapshot.params['gameId']);
 		this.roomId.set(this.route.snapshot.params['roomId']);
-		this.loadRoom();
+		void this.loadRoom();
+		this.subscribeToRoomEvents();
 	}
 
 	private async loadRoom(): Promise<void> {
 		try {
 			const room = await this.roomService.getRoom(this.roomId());
 			this.room.set(room);
+			if (room.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
+				void this.router.navigate(['/play']);
+			}
 		} catch (e) {
 			this.error.set((e as Error).message);
 		}
+	}
+
+	private subscribeToRoomEvents(): void {
+		this.signalR.events.roomUpsert.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((room) => {
+			if (room.id === this.roomId()) {
+				this.room.set(room);
+			}
+		});
+		this.signalR.events.roomDeleted.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((roomId) => {
+			if (roomId === this.roomId()) {
+				void this.router.navigate(['/play']);
+			}
+		});
 	}
 
 	public async join(): Promise<void> {
@@ -86,10 +127,12 @@ export class RoomDetailComponent implements OnInit {
 	}
 
 	public async leave(): Promise<void> {
+		this.hasLeft = true;
 		try {
 			await this.roomService.leaveRoom(this.roomId());
 			this.router.navigate(['/play']);
 		} catch (e) {
+			this.hasLeft = false;
 			this.error.set((e as Error).message);
 		}
 	}

@@ -1,4 +1,4 @@
-export type { Hand, MorraPlayer, MorraGameState, MorraRoomState, MorraRoundResult, MorraActionRequest } from '@gandogames/common/morra';
+export type { MorraPlayer, MorraGameState, MorraRoomState, MorraRoundResult, MorraActionRequest } from '@gandogames/common/morra';
 
 export const HANDS = ['rock', 'paper', 'scissors'] as const;
 export type Hand = (typeof HANDS)[number];

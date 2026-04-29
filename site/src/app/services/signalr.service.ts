@@ -19,7 +19,7 @@ export class SignalRService {
 	public readonly events = {
 		roomUpsert: new Subject<RoomData>(),
 		roomDeleted: new Subject<string>(),
-		gameStateUpdated: new Subject<GameState>(),
+		gameStateUpdated: new Subject<{ roomId: string; state: GameState }>(),
 	}
 
 	constructor() {
@@ -60,7 +60,7 @@ export class SignalRService {
 
 			this.connection.on('roomUpsert', (room) => this.events.roomUpsert.next(room));
 			this.connection.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
-			this.connection.on('gameStateUpdated', (state) => this.events.gameStateUpdated.next(state));
+			this.connection.on('gameStateUpdated', (roomId: string, state: GameState) => this.events.gameStateUpdated.next({ roomId, state }));
 
 			await this.connection.start();
 		} catch (err) {

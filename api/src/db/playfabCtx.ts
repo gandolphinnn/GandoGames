@@ -3,7 +3,7 @@ import { MorraGameState } from "@gandogames/common/morra";
 import { pfPromise, PlayFabClient, PlayFabServer } from "..";
 
 export interface PlayFabEntityHooks<T> {
-	beforeUpsert?(id: string, value: T): void;
+	beforeUpsert?(id: string, value: T): void | Promise<void>;
 }
 
 class PlayFabEntity<T> {
@@ -65,7 +65,7 @@ class PlayFabEntity<T> {
 
 	public async upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
 		await this.init();
-		if (this.hooks.beforeUpsert) this.hooks.beforeUpsert(id, value);
+		if (this.hooks.beforeUpsert) await this.hooks.beforeUpsert(id, value);
 		const data = {
 			[id]: JSON.stringify(value),
 		}

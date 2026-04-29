@@ -50,6 +50,9 @@ export class InnerFunctionNotifier {
 	gameStateUpdated(roomId: string, state: unknown) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], groupName: `room-${roomId}` });
 	}
+	gameStateUpdatedForPlayer(userId: string, roomId: string, state: unknown) {
+		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], userId });
+	}
 	//#endregion SignalR methods
 
 	prepareContext(context: InvocationContext) {

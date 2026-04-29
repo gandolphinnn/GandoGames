@@ -1,5 +1,7 @@
+import { GameType } from "@gandogames/common/api";
+
 export interface GameDescriptor {
-	id: string;
+	id: GameType;
 	name: string;
 	description: string;
 	minPlayers: number;
@@ -14,11 +16,11 @@ export const GAME_REGISTRY: GameDescriptor[] = [
 		minPlayers: 2,
 		maxPlayers: 2,
 	},
-	{
+	/* {
 		id: 'pankov',
 		name: 'Pankov',
 		description: 'Roll two dice and bluff your way to victory. Call out liars or lose a life.',
 		minPlayers: 2,
 		maxPlayers: 6,
-	},
+	}, */
 ];

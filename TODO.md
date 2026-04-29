@@ -1,3 +1,2 @@
 - [ ] TimeTrigger function that automatically delets inactive guest users every month
-- [ ] Add displayName or username to every instance of a player object
 - [ ] Queue system if 20 signalR connection are already occupied

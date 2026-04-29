@@ -1,0 +1,326 @@
+@use 'styles/variables' as *;
+
+// ── Loading ───────────────────────────────────────────────────────────────────
+
+.game-loading {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: $text-muted;
+}
+
+// ── Layout ────────────────────────────────────────────────────────────────────
+
+.pankov-game {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	padding: $s4;
+	max-width: 600px;
+	margin: 0 auto;
+
+	@media (min-width: $bp-sm) {
+		gap: $s6;
+		padding: $s6;
+	}
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+.game-header {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.game-back {
+	background: none;
+	border: none;
+	color: $text-muted;
+	font-size: $text-sm;
+	cursor: pointer;
+	padding: 0;
+	transition: color $transition;
+
+	&:hover { color: $accent; }
+}
+
+.game-title {
+	font-size: $text-xl;
+	font-weight: 700;
+}
+
+// ── Players strip ─────────────────────────────────────────────────────────────
+
+.players-strip {
+	display: flex;
+	gap: $s2;
+	flex-wrap: wrap;
+
+	@media (min-width: $bp-sm) { gap: $s3; }
+}
+
+.player-chip {
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	padding: $s2 $s3;
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+	transition: border-color $transition;
+
+	&-me { border-color: rgba(124, 90, 246, 0.4); }
+	&-eliminated { opacity: 0.35; }
+	&-active { border-color: #4ade80; }
+}
+
+.player-chip-name {
+	font-size: $text-sm;
+	font-weight: 600;
+}
+
+.player-chip-lives {
+	display: flex;
+	gap: 3px;
+}
+
+.life {
+	font-size: 10px;
+	color: $border;
+
+	&-full { color: $accent; }
+}
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+
+.game-panel {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.panel {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	align-items: flex-start;
+
+	@media (min-width: $bp-sm) {
+		padding: $s8;
+		gap: $s6;
+	}
+
+	&-centered {
+		align-items: center;
+		text-align: center;
+	}
+}
+
+.panel-eyebrow {
+	font-size: $text-sm;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.panel-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+	line-height: 1.1;
+
+	@media (min-width: $bp-sm) { font-size: $text-3xl; }
+}
+
+.panel-claim {
+	font-size: $text-3xl;
+	font-weight: 800;
+	color: $accent;
+	line-height: 1;
+
+	&-roll { color: #4ade80; }
+
+	@media (min-width: $bp-sm) { font-size: $text-4xl; }
+}
+
+.hint {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+// ── Action row ────────────────────────────────────────────────────────────────
+
+.action-row {
+	display: flex;
+	gap: $s3;
+	flex-wrap: wrap;
+}
+
+// ── Declaration grid ──────────────────────────────────────────────────────────
+
+.declare-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: $s2;
+	width: 100%;
+
+	@media (min-width: $bp-sm) {
+		grid-template-columns: repeat(5, 1fr);
+		gap: $s3;
+	}
+}
+
+.declare-btn {
+	height: 60px;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text;
+	font-size: $text-sm;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background $transition, border-color $transition, transform $transition;
+
+	&:hover:not([disabled]) {
+		background: rgba(124, 90, 246, 0.12);
+		border-color: $accent;
+		transform: translateY(-2px);
+	}
+
+	&-honest {
+		border-color: #4ade80;
+
+		&:hover:not([disabled]) {
+			background: rgba(74, 222, 128, 0.12);
+			border-color: #4ade80;
+		}
+	}
+
+	&-pankov {
+		border-color: #f59e0b;
+		color: #f59e0b;
+
+		&:hover:not([disabled]) {
+			background: rgba(245, 158, 11, 0.12);
+			border-color: #f59e0b;
+		}
+	}
+
+	&[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+	@media (min-width: $bp-sm) { height: 72px; font-size: $text-base; }
+}
+
+// ── Waiting animation ─────────────────────────────────────────────────────────
+
+.waiting-dots {
+	color: $text-muted;
+	font-size: $text-xl;
+	letter-spacing: 0.2em;
+	animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+
+// ── Reveal ────────────────────────────────────────────────────────────────────
+
+.reveal-panel {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	width: 100%;
+}
+
+.reveal-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: $s3 $s4;
+	background: $bg-surface;
+	border-radius: $radius-md;
+	border: 1px solid $border;
+}
+
+.reveal-label {
+	font-size: $text-sm;
+	color: $text-muted;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.reveal-value {
+	font-size: $text-lg;
+	font-weight: 800;
+	color: $accent;
+}
+
+.verdict {
+	font-size: $text-base;
+	font-weight: 600;
+	padding: $s3 $s4;
+	border-radius: $radius-md;
+	width: 100%;
+
+	&-lie {
+		background: rgba(248, 113, 113, 0.1);
+		color: #f87171;
+		border: 1px solid rgba(248, 113, 113, 0.2);
+	}
+
+	&-honest {
+		background: rgba(74, 222, 128, 0.1);
+		color: #4ade80;
+		border: 1px solid rgba(74, 222, 128, 0.2);
+	}
+}
+
+// ── Game over ─────────────────────────────────────────────────────────────────
+
+.winner-name { color: $accent; }
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+
+.action-error {
+	font-size: $text-sm;
+	color: #f87171;
+}
+
+// ── Buttons ───────────────────────────────────────────────────────────────────
+
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition, opacity $transition;
+	min-height: 44px;
+
+	&-primary {
+		background: $accent;
+		color: $text;
+		&:hover { background: $accent-hover; }
+	}
+
+	&-danger {
+		background: rgba(248, 113, 113, 0.15);
+		color: #f87171;
+		border: 1px solid rgba(248, 113, 113, 0.3);
+		&:hover { background: rgba(248, 113, 113, 0.25); }
+	}
+
+	&[disabled] { opacity: 0.4; cursor: not-allowed; }
+}

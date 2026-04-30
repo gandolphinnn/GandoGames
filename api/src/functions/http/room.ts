@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomData, BaseRequest } from '@gandogames/common/api';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomData, BaseRequest } from '@gandogames/common/api';
 import { Game, GAMES_CONFIG } from '../../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 
@@ -6,7 +6,6 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
 	const room: RoomData = {
 		id: roomId,
-		name: body.name.trim(),
 		hostId: player.id,
 		game: body.game,
 		players: [player],
@@ -89,9 +88,27 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, notifi
 	notifier.roomUpsert(room);
 };
 
+const roomKickInner: InnerFunction<RoomKickRequest, RoomData> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.phase !== 'waiting') throw new Error('Cannot kick players after the game has started');
+	if (body.playerId === player.id) throw new Error('You cannot kick yourself');
+	if (!room.players.some(p => p.id === body.playerId)) throw new Error('Player not found in this room');
+
+	notifier.removeFromGroup(body.playerId, body.roomId);
+	notifier.roomDeletedForPlayer(body.playerId, body.roomId);
+
+	room.players = room.players.filter(p => p.id !== body.playerId);
+	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	notifier.roomUpsert(room);
+	return room;
+};
+
 registerFunction('room_create', 'rooms/create', roomCreateInner);
 registerFunction('room_list', 'rooms/list', roomListInner);
 registerFunction('room_get', 'rooms/get', roomGetInner);
 registerFunction('room_join', 'rooms/join', roomJoinInner);
 registerFunction('room_start', 'rooms/start', roomStartInner);
+registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);

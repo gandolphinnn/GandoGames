@@ -47,6 +47,9 @@ export class InnerFunctionNotifier {
 	roomDeleted(roomId: string) {
 		this.signalR.push({ target: 'roomDeleted', arguments: [roomId] });
 	}
+	roomDeletedForPlayer(userId: string, roomId: string) {
+		this.signalR.push({ target: 'roomDeleted', arguments: [roomId], userId });
+	}
 	gameStateUpdated(roomId: string, state: unknown) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], groupName: `room-${roomId}` });
 	}

@@ -18,12 +18,9 @@
 
 			<header class="room-header">
 				<a class="back-link" [routerLink]="['/play']">← Back</a>
-				<div class="room-code-wrap">
-					<span class="room-name">{{ room()!.name }}</span>
-					<button class="code-btn" (click)="copyCode()">
-						{{ roomId() }} {{ copied() ? '✓' : '⧉' }}
-					</button>
-				</div>
+				<button class="code-btn" (click)="copyCode()">
+					{{ roomId() }} {{ copied() ? '✓' : '⧉' }}
+				</button>
 			</header>
 
 			<div class="players-strip">
@@ -32,6 +29,9 @@
 						{{ player.name }}
 						@if (player.id === room()!.hostId) { <span class="badge">HOST</span> }
 						@if (player.id === myId()) { <span class="badge">YOU</span> }
+						@if (isHost() && player.id !== myId() && room()!.phase === 'waiting') {
+							<button class="kick-btn" (click)="kick(player.id)" title="Kick player">✕</button>
+						}
 					</div>
 				}
 			</div>

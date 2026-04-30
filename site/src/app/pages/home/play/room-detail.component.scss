@@ -43,17 +43,6 @@
 	&:hover { color: $text; }
 }
 
-.room-code-wrap {
-	display: flex;
-	align-items: center;
-	gap: $s3;
-}
-
-.room-name {
-	font-weight: 600;
-	font-size: $text-lg;
-}
-
 .code-btn {
 	padding: $s2 $s3;
 	background: $bg-surface;
@@ -95,6 +84,30 @@
 	font-weight: 700;
 	color: $accent;
 	letter-spacing: 0.04em;
+}
+
+.kick-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	margin-left: $s1;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: $radius-full;
+	color: $text-muted;
+	font-size: 0.65rem;
+	line-height: 1;
+	cursor: pointer;
+	transition: color $transition, border-color $transition, background $transition;
+
+	&:hover {
+		color: #f87171;
+		border-color: rgba(248, 113, 113, 0.4);
+		background: rgba(248, 113, 113, 0.08);
+	}
 }
 
 // Phase panels

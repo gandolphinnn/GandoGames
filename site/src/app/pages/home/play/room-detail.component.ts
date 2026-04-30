@@ -137,8 +137,17 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	public async kick(playerId: string): Promise<void> {
+		try {
+			this.error.set('');
+			await this.roomService.kickPlayer(this.roomId(), playerId);
+		} catch (e) {
+			this.error.set((e as Error).message);
+		}
+	}
+
 	public async copyCode(): Promise<void> {
-		await navigator.clipboard.writeText(this.roomId());
+		await navigator.clipboard.writeText(window.location.href);
 		this.copied.set(true);
 		setTimeout(() => this.copied.set(false), 2000);
 	}

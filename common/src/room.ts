@@ -7,7 +7,6 @@ export interface RoomBaseRequest extends BaseRequest {
 
 export interface RoomData {
 	id: string;
-	name: string;
 	hostId: string;
 	game: GameType;
 	players: GamePlayer[];
@@ -17,5 +16,8 @@ export interface RoomData {
 
 export interface RoomCreateRequest extends BaseRequest {
 	game: GameType;
-	name: string;
+}
+
+export interface RoomKickRequest extends RoomBaseRequest {
+	playerId: string;
 }

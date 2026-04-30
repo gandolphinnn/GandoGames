@@ -12,14 +12,14 @@
 		} @else if (!room()) {
 			<div class="room-not-found">
 				<p class="error-msg">Room not found.</p>
-				<a class="btn-secondary" [routerLink]="['/play']">← Back</a>
+				<a class="btn-secondary" [routerLink]="['/play']"><i class="fa-solid fa-arrow-left"></i> Back</a>
 			</div>
 		} @else {
 
 			<header class="room-header">
-				<a class="back-link" [routerLink]="['/play']">← Back</a>
+				<a class="back-link" [routerLink]="['/play']"><i class="fa-solid fa-arrow-left"></i> Back</a>
 				<button class="code-btn" (click)="copyCode()">
-					{{ roomId() }} {{ copied() ? '✓' : '⧉' }}
+					{{ roomId() }} <i [class]="copied() ? 'fa-solid fa-check' : 'fa-regular fa-copy'"></i>
 				</button>
 			</header>
 
@@ -30,7 +30,7 @@
 						@if (player.id === room()!.hostId) { <span class="badge">HOST</span> }
 						@if (player.id === myId()) { <span class="badge">YOU</span> }
 						@if (isHost() && player.id !== myId() && room()!.phase === 'waiting') {
-							<button class="kick-btn" (click)="kick(player.id)" title="Kick player">✕</button>
+							<button class="kick-btn" (click)="kick(player.id)" title="Kick player"><i class="fa-solid fa-xmark"></i></button>
 						}
 					</div>
 				}

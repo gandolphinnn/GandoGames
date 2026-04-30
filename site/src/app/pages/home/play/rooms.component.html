@@ -9,7 +9,7 @@
 					[class.active]="activeGames().includes(game.id)"
 					(click)="toggleGame(game.id)"
 				>
-					{{ game.emoji }} {{ game.name }}
+					<i [class]="game.icon"></i> {{ game.name }}
 				</button>
 			}
 		</div>
@@ -21,7 +21,7 @@
 
 			@if (filteredRooms().length === 0) {
 				<div class="empty-state">
-					<span class="empty-icon">🎮</span>
+					<i class="fa-solid fa-gamepad empty-icon"></i>
 					<p class="empty-title">No open rooms</p>
 					<p class="empty-subtitle">Create one and invite your friends.</p>
 					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
@@ -59,7 +59,7 @@
 						[class.selected]="createGameId() === game.id"
 						(click)="setCreateGameId(game.id)"
 					>
-						<span class="game-card-emoji">{{ game.emoji }}</span>
+						<i [class]="'game-card-icon fa-fw ' + game.icon"></i>
 						<span class="game-card-name">{{ game.name }}</span>
 						<span class="game-card-desc">{{ game.description }}</span>
 						<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>

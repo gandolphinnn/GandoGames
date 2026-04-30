@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '@gandogames/services/auth.service';
 
@@ -14,6 +14,7 @@ import { AuthService } from '@gandogames/services/auth.service';
 export class LoginComponent {
 	private readonly auth = inject(AuthService);
 	private readonly router = inject(Router);
+	private readonly route = inject(ActivatedRoute);
 
 	public readonly form = new FormGroup({
 		email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
@@ -38,7 +39,8 @@ export class LoginComponent {
 		this.loading.set(true);
 		try {
 			await fn();
-			await this.router.navigate(['/']);
+			const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/';
+			await this.router.navigateByUrl(returnUrl);
 		} catch (err) {
 			this.error.set((err as Error).message);
 		} finally {

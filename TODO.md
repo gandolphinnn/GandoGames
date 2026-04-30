@@ -1,4 +1,3 @@
-- ReturnUrl if not logged in
 - Improved room participation handling, better auto-leave, kicking players if you are the host
 - Remove room names, show participants instead
 - Navbar rework

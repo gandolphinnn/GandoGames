@@ -1,0 +1,36 @@
+@use 'styles/variables' as *;
+
+:host {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+.site-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s4 $s6;
+	border-bottom: 1px solid $border;
+}
+
+.site-nav {
+	display: flex;
+	gap: $s4;
+}
+
+.nav-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+
+	&.title {
+		font-size: $text-xl;
+		font-weight: 700;
+		color: $accent;
+		letter-spacing: -0.02em;
+	}
+}

@@ -94,8 +94,70 @@
 		color: #f87171;
 		border: 1px solid rgba(248, 113, 113, 0.3);
 
-		&:hover {
+		&:hover:not(:disabled) {
 			background: rgba(248, 113, 113, 0.25);
 		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
 	}
+
+	&-danger-outline {
+		background: transparent;
+		color: #f87171;
+		border: 1px solid rgba(248, 113, 113, 0.3);
+
+		&:hover {
+			background: rgba(248, 113, 113, 0.1);
+		}
+	}
+
+	&-ghost {
+		background: transparent;
+		color: $text-muted;
+		border: 1px solid $border;
+
+		&:hover:not(:disabled) {
+			background: rgba(255, 255, 255, 0.05);
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+	}
+}
+
+.profile-error {
+	color: #f87171;
+	font-size: $text-sm;
+}
+
+.danger-zone {
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+	padding-top: $s4;
+	border-top: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.danger-zone-title {
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.danger-zone-warn {
+	font-size: $text-sm;
+	color: #f87171;
+}
+
+.danger-zone-actions {
+	display: flex;
+	gap: $s3;
+	flex-wrap: wrap;
 }

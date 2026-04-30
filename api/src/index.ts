@@ -1,12 +1,11 @@
 import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext, Timer } from '@azure/functions';
 import { BaseRequest, GamePlayer, RoomData, SignalREventType } from '@gandogames/common/api';
-import { run } from 'node:test';
-import { PlayFab, PlayFabClient, PlayFabServer } from 'playfab-sdk';
+import { PlayFab, PlayFabAdmin, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
 PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 
-export { PlayFabClient, PlayFabServer };
+export { PlayFabAdmin, PlayFabClient, PlayFabServer };
 export { PlayfabCtx } from './db/playfabCtx';
 
 //#region SignalR

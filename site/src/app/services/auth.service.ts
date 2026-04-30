@@ -38,6 +38,15 @@ export class AuthService {
 		localStorage.removeItem(STORAGE_KEY);
 	}
 
+	public async deleteAccount(): Promise<void> {
+		const user = this._user();
+		if (!user) return;
+		await this.backend.post('/auth/delete', { sessionTicket: user.sessionTicket });
+		this._user.set(null);
+		localStorage.removeItem(STORAGE_KEY);
+		if (user.isGuest) localStorage.removeItem(GUEST_ID_KEY);
+	}
+
 	private setSession(user: AuthUser): void {
 		this._user.set(user);
 		localStorage.setItem(STORAGE_KEY, JSON.stringify(user));

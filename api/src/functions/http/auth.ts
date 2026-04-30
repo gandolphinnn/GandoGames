@@ -1,5 +1,5 @@
-import { AuthResponse, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
-import { InnerPublicFunction, pfPromise, PlayFabClient, registerPublicFunction } from '../..';
+import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
+import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabAdmin, PlayFabClient, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {
 	PlayFabId?: string;
@@ -76,6 +76,14 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 	return toAuthResponse(result, body.username);
 };
 
+const deleteProfileInner: InnerFunction<BaseRequest, Record<string, never>> = async (_body, _notifier, player) => {
+	await pfPromise<PlayFabAdminModels.DeletePlayerResult>(
+		cb => PlayFabAdmin.DeletePlayer({ PlayFabId: player.id }, cb),
+	);
+	return {};
+};
+
 registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
 registerPublicFunction('auth_login', 'auth/login', loginInner);
 registerPublicFunction('auth_register', 'auth/register', registerInner);
+registerFunction('auth_deleteProfile', 'auth/delete', deleteProfileInner);

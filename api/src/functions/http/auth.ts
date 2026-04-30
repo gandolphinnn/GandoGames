@@ -6,6 +6,19 @@ type LoginLike = {
 	SessionTicket?: string;
 };
 
+const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
+	GetCharacterInventories: false,
+	GetCharacterList: false,
+	GetPlayerProfile: true,
+	GetPlayerStatistics: false,
+	GetTitleData: false,
+	GetUserAccountInfo: true,
+	GetUserData: false,
+	GetUserInventory: false,
+	GetUserReadOnlyData: false,
+	GetUserVirtualCurrency: false,
+};
+
 const toAuthResponse = (response: LoginLike, name: string | undefined): AuthResponse => ({
 	player: {
 		id: response.PlayFabId!,
@@ -14,30 +27,35 @@ const toAuthResponse = (response: LoginLike, name: string | undefined): AuthResp
 	sessionTicket: response.SessionTicket!,
 });
 
+const guestUsername = (customId: string): string => {
+	const n = parseInt(customId.replace(/-/g, '').slice(0, 8), 16) % 1_000_000;
+	return `Guest${String(n).padStart(6, '0')}`;
+};
+
 const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, notifier) => {
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Invalid custom ID';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
-		cb => PlayFabClient.LoginWithCustomID({ CustomId: body.customId, CreateAccount: true }, cb),
+		cb => PlayFabClient.LoginWithCustomID({
+			CustomId: body.customId,
+			CreateAccount: true,
+			InfoRequestParameters: INFO_REQUEST_PARAMS,
+		}, cb),
 	);
-	return toAuthResponse(result, 'Guest');
+	let name = result.InfoResultPayload?.PlayerProfile?.DisplayName;
+	if (!name) {
+		name = guestUsername(body.customId);
+		await pfPromise<PlayFabClientModels.UpdateUserTitleDisplayNameResult>(
+			cb => PlayFabClient.UpdateUserTitleDisplayName({ DisplayName: name! }, cb),
+		);
+	}
+	return toAuthResponse(result, name);
 };
 
 const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, notifier) => {
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Invalid email or password';
-	const infoRequestParameters: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
-		GetCharacterInventories: false,
-		GetCharacterList: false,
-		GetPlayerProfile: false,
-		GetPlayerStatistics: false,
-		GetTitleData: false,
-		GetUserAccountInfo: true,
-		GetUserData: false,
-		GetUserInventory: false,
-		GetUserReadOnlyData: false,
-		GetUserVirtualCurrency: false,
-	};
+	const infoRequestParameters = INFO_REQUEST_PARAMS;
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password, InfoRequestParameters: infoRequestParameters }, cb),
 	);

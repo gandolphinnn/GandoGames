@@ -1,68 +1,71 @@
 <div class="rooms-page">
-	<div class="filter-bar">
-		@for (game of allGames; track game.id) {
-			<button
-				class="filter-btn"
-				[class.active]="activeGames().includes(game.id)"
-				(click)="toggleGame(game.id)"
-			>
-				{{ game.name }}
-			</button>
-		}
-	</div>
 
 	@if (mode() === 'browse') {
+
+		<div class="filter-bar">
+			@for (game of allGames; track game.id) {
+				<button
+					class="filter-btn"
+					[class.active]="activeGames().includes(game.id)"
+					(click)="toggleGame(game.id)"
+				>
+					<i [class]="game.icon"></i> {{ game.name }}
+				</button>
+			}
+		</div>
+
 		<div class="room-list-wrap">
 			@if (error()) {
 				<p class="status-msg error-msg">{{ error() }}</p>
 			}
 
 			@if (filteredRooms().length === 0) {
-				<p class="status-msg">No open rooms. Be the first!</p>
+				<div class="empty-state">
+					<i class="fa-solid fa-gamepad empty-icon"></i>
+					<p class="empty-title">No open rooms</p>
+					<p class="empty-subtitle">Create one and invite your friends.</p>
+					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
+				</div>
 			} @else {
 				<ul class="room-list">
 					@for (room of filteredRooms(); track room.id) {
 						<li class="room-card" (click)="navigateToRoom(room)">
 							<div class="room-card-info">
-								<span class="room-card-name">{{ room.name }}</span>
 								<span class="room-card-game">{{ gameLabel(room.game) }}</span>
+								<span class="room-card-players-list">{{ playerNames(room) }}</span>
 							</div>
-							<span class="room-card-players">
+							<span class="room-card-count">
 								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
 							</span>
 						</li>
 					}
 				</ul>
+				<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
 			}
-
-			<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
 		</div>
+
 	} @else {
+
 		<div class="create-form">
-			<h2 class="form-title">New Room</h2>
+			<div class="create-header">
+				<h2 class="form-title">New Room</h2>
+				<p class="form-subtitle">Pick a game to play</p>
+			</div>
 
-			<label class="field-label" for="game-select">Game</label>
-			<select
-				id="game-select"
-				class="field-input"
-				[value]="createGameId()"
-				(change)="setCreateGameId($any($event).target.value)"
-			>
+			<div class="game-grid">
 				@for (game of allGames; track game.id) {
-					<option [value]="game.id">{{ game.name }}</option>
+					<button
+						class="game-card"
+						[class.selected]="createGameId() === game.id"
+						(click)="setCreateGameId(game.id)"
+					>
+						<i [class]="'game-card-icon fa-fw ' + game.icon"></i>
+						<span class="game-card-name">{{ game.name }}</span>
+						<span class="game-card-desc">{{ game.description }}</span>
+						<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>
+					</button>
 				}
-			</select>
-
-			<label class="field-label" for="room-name">Room name</label>
-			<input
-				id="room-name"
-				class="field-input"
-				type="text"
-				placeholder="e.g. Friday Night"
-				[value]="createRoomName()"
-				(input)="setCreateRoomName($any($event).target.value)"
-				(keydown.enter)="create()"
-			/>
+			</div>
 
 			@if (error()) {
 				<p class="error-msg">{{ error() }}</p>
@@ -72,12 +75,14 @@
 				<button class="btn-secondary" (click)="mode.set('browse')">Cancel</button>
 				<button
 					class="btn-primary"
-					[disabled]="!createRoomName().trim() || loading()"
+					[disabled]="!createGameId() || loading()"
 					(click)="create()"
 				>
-					{{ loading() ? 'Creating…' : 'Create' }}
+					{{ loading() ? 'Creating…' : 'Create Room' }}
 				</button>
 			</div>
 		</div>
+
 	}
+
 </div>

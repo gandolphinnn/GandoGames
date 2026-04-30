@@ -9,7 +9,7 @@
 	<div class="morra-game">
 
 		<header class="game-header">
-			<button class="game-back" (click)="backToLobby()">← Back</button>
+			<button class="game-back" (click)="backToLobby()"><i class="fa-solid fa-arrow-left"></i> Back</button>
 			<h1 class="game-title">Morra</h1>
 		</header>
 
@@ -22,7 +22,7 @@
 					<span class="player-chip-name">{{ player.name }}</span>
 					<span class="player-chip-lives">
 						@for (i of livesRange; track i) {
-							<span class="life" [class.life-full]="i < player.lives">●</span>
+							<i class="fa-solid fa-circle life" [class.life-full]="i < player.lives"></i>
 						}
 					</span>
 					@if (gs.gamePhase === 'picking') {

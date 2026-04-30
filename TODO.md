@@ -1,2 +1,13 @@
-- [ ] TimeTrigger function that automatically delets inactive guest users every month
-- [ ] Queue system if 20 signalR connection are already occupied
+- Improved room participation handling, better auto-leave
+- Navbar and navigation rework
+- Delete profile
+- Graphics redo
+- Game rules customization in the room lobby or in the room creation (tbd)
+- Game state history
+	On the right sight of the screen (on mobile is a togglable modal), show a list of every game state changes available to the user
+- Statistics
+- Chat
+- Push notifications
+- Friends
+- TimeTrigger function that automatically delets inactive guest users every month
+- Queue system if 20 signalR connection are already occupied

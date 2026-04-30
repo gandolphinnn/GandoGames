@@ -1,6 +1,7 @@
 # GandoGames
 
 Hobby multiplayer web app for playing games with friends.
+Try playing at this [url](https://www.gandogames.org/).
 
 ## Stack
 

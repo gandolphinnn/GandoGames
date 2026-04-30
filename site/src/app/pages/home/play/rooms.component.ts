@@ -23,7 +23,6 @@ export class RoomsComponent implements OnInit {
 
 	public readonly mode = signal<'browse' | 'create'>('browse');
 	public readonly createGameId = signal('');
-	public readonly createRoomName = signal('');
 
 	public readonly filteredRooms = computed(() => {
 		const active = this.activeGames();
@@ -38,11 +37,14 @@ export class RoomsComponent implements OnInit {
 		return this.allGames.find((g) => g.id === id)?.maxPlayers ?? 0;
 	}
 
+	public playerNames(room: RoomData): string {
+		return room.players.map((p) => p.name).join(', ');
+	}
+
 	public ngOnInit(): void {
 		const paramGameId = this.route.snapshot.params['gameId'] as string | undefined;
 		this.activeGames.set(paramGameId ? [paramGameId] : this.allGames.map((g) => g.id));
-		if (paramGameId) this.createGameId.set(paramGameId);
-		else this.createGameId.set(this.allGames[0]?.id ?? '');
+		this.createGameId.set(paramGameId ?? this.allGames[0]?.id ?? '');
 		void this.fetchRooms();
 	}
 
@@ -68,11 +70,11 @@ export class RoomsComponent implements OnInit {
 	}
 
 	public async create(): Promise<void> {
-		if (!this.createRoomName().trim() || !this.createGameId()) return;
+		if (!this.createGameId()) return;
 		try {
 			this.loading.set(true);
 			this.error.set('');
-			const room = await this.roomService.createRoom(this.createGameId() as any, this.createRoomName().trim());
+			const room = await this.roomService.createRoom(this.createGameId() as any);
 			this.router.navigate(['/play', room.id]);
 		} catch (e) {
 			this.error.set((e as Error).message);
@@ -83,10 +85,6 @@ export class RoomsComponent implements OnInit {
 
 	public navigateToRoom(room: RoomData): void {
 		this.router.navigate(['/play', room.id]);
-	}
-
-	public setCreateRoomName(value: string): void {
-		this.createRoomName.set(value);
 	}
 
 	public setCreateGameId(value: string): void {

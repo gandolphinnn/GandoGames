@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"scripts": {
 		"start-api": "npm --prefix api start",
-		"start-site": "npm --prefix site start"
+		"start-site": "npm --prefix site start",
+		"publish": "git checkout master && git merge develop --no-edit -X theirs && git push origin master && git checkout develop"
 	}
 }

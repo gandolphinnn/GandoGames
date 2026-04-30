@@ -47,6 +47,9 @@ export class InnerFunctionNotifier {
 	roomDeleted(roomId: string) {
 		this.signalR.push({ target: 'roomDeleted', arguments: [roomId] });
 	}
+	roomDeletedForPlayer(userId: string, roomId: string) {
+		this.signalR.push({ target: 'roomDeleted', arguments: [roomId], userId });
+	}
 	gameStateUpdated(roomId: string, state: unknown) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], groupName: `room-${roomId}` });
 	}
@@ -165,7 +168,7 @@ export async function authenticateSession(request: BaseRequest, notifier: InnerF
 	);
 	notifier.errorCode = errorCode;
 	notifier.errorMessage = errorMessage;
-	return { id: result.UserInfo!.PlayFabId!, name: result.UserInfo!.Username || 'Guest' };
+	return { id: result.UserInfo!.PlayFabId!, name: result.UserInfo!.TitleInfo?.DisplayName || result.UserInfo!.Username || 'Guest' };
 }
 
 /** Wraps a PlayFab SDK callback call into a Promise. */

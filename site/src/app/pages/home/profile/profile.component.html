@@ -17,14 +17,10 @@
 					<span class="info-label">Username</span>
 					<span class="info-value">{{ u.player.name }}</span>
 				</div>
-				<div class="info-row">
-					<span class="info-label">Account type</span>
-					<span class="info-value">{{ u.isGuest ? 'Guest' : 'Registered' }}</span>
-				</div>
 			</div>
 
 			<button class="btn btn-danger" type="button" (click)="logout()">
-				Log out
+				<i class="fa-solid fa-sign-out-alt"></i> Log out
 			</button>
 		</div>
 	</div>

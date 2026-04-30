@@ -38,8 +38,8 @@ export class RoomService {
 		return this.rooms.set(rooms);
 	}
 
-	public createRoom(game: GameType, name: string): Promise<RoomData> {
-		return this.backend.post<RoomData>('/rooms/create', { sessionTicket: this.ticket, game, name });
+	public createRoom(game: GameType): Promise<RoomData> {
+		return this.backend.post<RoomData>('/rooms/create', { sessionTicket: this.ticket, game });
 	}
 
 	public getRoom(roomId: string): Promise<RoomData> {
@@ -52,6 +52,10 @@ export class RoomService {
 
 	public startRoom(roomId: string): Promise<RoomData> {
 		return this.backend.post<RoomData>('/rooms/start', { sessionTicket: this.ticket, roomId });
+	}
+
+	public kickPlayer(roomId: string, playerId: string): Promise<void> {
+		return this.backend.post('/rooms/kick', { sessionTicket: this.ticket, roomId, playerId });
 	}
 
 	public leaveRoom(roomId: string): Promise<void> {

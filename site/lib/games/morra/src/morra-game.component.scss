@@ -72,9 +72,9 @@
 	gap: $s1;
 	transition: border-color $transition;
 
-	&-me { border-color: rgba(124, 90, 246, 0.4); }
+	&-me { border-color: $accent-emphasis; }
 	&-eliminated { opacity: 0.35; }
-	&-picked { border-color: #4ade80; }
+	&-picked { border-color: $color-success; }
 }
 
 .player-chip-name {
@@ -174,7 +174,7 @@
 	transition: background $transition, border-color $transition, transform $transition;
 
 	&:hover:not([disabled]) {
-		background: rgba(124, 90, 246, 0.12);
+		background: $accent-muted;
 		border-color: $accent;
 		transform: translateY(-2px);
 	}
@@ -221,7 +221,7 @@
 	border: 1px solid transparent;
 	transition: border-color $transition;
 
-	&-loser { border-color: rgba(248, 113, 113, 0.3); }
+	&-loser { border-color: $color-danger-border; }
 	&-draw { border-color: $border; }
 }
 
@@ -244,13 +244,13 @@
 }
 
 .reveal-tag-loss {
-	background: rgba(248, 113, 113, 0.12);
-	color: #f87171;
+	background: $color-danger-bg;
+	color: $color-danger;
 }
 
 .reveal-tag-win {
-	background: rgba(74, 222, 128, 0.12);
-	color: #4ade80;
+	background: $color-success-bg;
+	color: $color-success;
 }
 
 .reveal-verdict {
@@ -260,7 +260,7 @@
 	border-radius: $radius-md;
 
 	&-draw {
-		background: rgba(120, 120, 180, 0.08);
+		background: $color-neutral-subtle;
 		color: $text-muted;
 	}
 }
@@ -273,7 +273,7 @@
 
 .action-error {
 	font-size: $text-sm;
-	color: #f87171;
+	color: $color-danger;
 }
 
 .hint {
@@ -295,7 +295,7 @@
 
 	&-primary {
 		background: $accent;
-		color: $text;
+		color: $color-on-accent;
 		&:hover { background: $accent-hover; }
 	}
 

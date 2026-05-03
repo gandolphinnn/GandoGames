@@ -19,10 +19,12 @@ const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParam
 	GetUserVirtualCurrency: false,
 };
 
+const CREATOR_ID = '7F29F448E164BF64';
 const toAuthResponse = (response: LoginLike, name: string | undefined): AuthResponse => ({
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
+		permissions: (response.PlayFabId === CREATOR_ID) ? ['admin'] : [],
 	},
 	sessionTicket: response.SessionTicket!,
 });

@@ -1,4 +1,4 @@
-import { GamePlayer } from "./game";
+export type Permission = 'admin';
 
 export interface LoginRequest {
 	email: string;
@@ -13,6 +13,12 @@ export interface RegisterRequest {
 
 export interface GuestLoginRequest {
 	customId: string;
+}
+
+export interface GamePlayer {
+	id: string,
+	name: string,
+	permissions?: Permission[],
 }
 
 export interface AuthResponse {

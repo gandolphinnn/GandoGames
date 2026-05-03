@@ -1,0 +1,117 @@
+@use 'styles/variables' as *;
+
+:host {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+// ── Split layout ──────────────────────────────────────────────
+
+.palette-split {
+	display: flex;
+	flex: 1;
+	overflow: hidden;
+}
+
+.palette-half {
+	flex: 1;
+	overflow-y: auto;
+	background: var(--bg);
+	color: var(--text);
+	display: flex;
+	flex-direction: column;
+	padding: $s4 $s6 $s8;
+	gap: $s1;
+}
+
+.split-divider {
+	width: 2px;
+	flex-shrink: 0;
+	background: rgba(128, 128, 128, 0.25);
+}
+
+// ── Half header ───────────────────────────────────────────────
+
+.half-header {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: var(--bg-surface);
+	border-bottom: 1px solid var(--border-color);
+	padding: $s3 0 $s3;
+	font-size: $text-base;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	margin-bottom: $s4;
+	display: flex;
+	align-items: center;
+	gap: $s2;
+}
+
+// ── Section labels ────────────────────────────────────────────
+
+.section-label {
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	color: var(--text-muted);
+	padding: $s3 0 $s1;
+	border-bottom: 1px solid var(--border-color);
+	margin-bottom: $s1;
+}
+
+// ── Swatch rows ───────────────────────────────────────────────
+
+.swatch-row {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+	padding: $s2 0;
+}
+
+.swatch-wrap {
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: $radius-md;
+	overflow: hidden;
+	border: 1px solid var(--border-color);
+	background: var(--bg-card);
+}
+
+.swatch {
+	width: 100%;
+	height: 100%;
+}
+
+.shadow-demo {
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: $radius-md;
+}
+
+// ── Swatch info ───────────────────────────────────────────────
+
+.swatch-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.swatch-name {
+	font-size: $text-sm;
+	font-weight: 600;
+	font-family: monospace;
+}
+
+.swatch-value {
+	font-size: 0.7rem;
+	color: var(--text-muted);
+	font-family: monospace;
+	word-break: break-all;
+	line-height: 1.3;
+}

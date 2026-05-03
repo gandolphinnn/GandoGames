@@ -11,7 +11,9 @@ import { ThemeService } from './services/theme.service';
 	styleUrl: './app.component.scss',
 })
 export class App {
-	public readonly isLoggedIn = inject(AuthService).isLoggedIn;
+	private readonly authService = inject(AuthService);
+	public readonly isLoggedIn = this.authService.isLoggedIn;
+	public readonly isAdmin = computed(() => this.authService.user()?.player.permissions?.includes('admin'));
 
 	private readonly themeService = inject(ThemeService);
 	public readonly isDark = this.themeService.isDark;

@@ -1,21 +1,5 @@
 @use 'styles/variables' as *;
 
-.page-header {
-	padding: $s4 $s6;
-	border-bottom: 1px solid $border;
-}
-
-.back-link {
-	color: $text-muted;
-	text-decoration: none;
-	font-size: $text-sm;
-	display: inline-flex;
-	align-items: center;
-	min-height: 44px;
-
-	&:hover { color: $text; }
-}
-
 .about-main {
 	padding: $s8 $s6;
 	max-width: 640px;

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
 	selector: 'gg-home',
-	imports: [RouterLink, RouterOutlet],
+	imports: [RouterOutlet],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 })

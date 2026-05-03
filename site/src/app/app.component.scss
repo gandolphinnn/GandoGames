@@ -1,0 +1,57 @@
+@use 'styles/variables' as *;
+
+:host {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+.site-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s4 $s6;
+	border-bottom: 1px solid $border;
+}
+
+.site-nav {
+	display: flex;
+	align-items: center;
+	gap: $s4;
+}
+
+.nav-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+
+	&.title {
+		font-size: $text-xl;
+		font-weight: 700;
+		color: $accent;
+		letter-spacing: -0.02em;
+	}
+}
+
+.theme-toggle {
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	cursor: pointer;
+	width: 44px;
+	height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $text-base;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text;
+		background: $hover-overlay;
+	}
+}

@@ -1,5 +1,33 @@
 @use './styles/variables' as *;
 
+// === Dark theme (default) ===
+:root {
+  --bg: #0a0a14;
+  --bg-surface: #12121e;
+  --bg-card: #1c1c2e;
+  --accent: #7c5af6;
+  --accent-hover: #6644e0;
+  --text: #eeeef4;
+  --text-muted: #7878a0;
+  --border-color: rgba(120, 120, 180, 0.12);
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.4);
+  --hover-overlay: rgba(255, 255, 255, 0.05);
+}
+
+// === Light theme ===
+[data-theme="light"] {
+  --bg: #f4f4fb;
+  --bg-surface: #ffffff;
+  --bg-card: #ededf8;
+  --accent: #6244d4;
+  --accent-hover: #4f33bb;
+  --text: #14141e;
+  --text-muted: #585880;
+  --border-color: rgba(80, 80, 140, 0.18);
+  --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.1);
+  --hover-overlay: rgba(0, 0, 0, 0.05);
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;

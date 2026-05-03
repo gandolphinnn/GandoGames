@@ -20,5 +20,5 @@ const cleanerPlayersInner: InnerTimeFunction = async (_timer, _context) => {
 	//TODO: Remove all the guest players that have been inactive for a while
 };
 
-registerTimeFunction('cleaner_rooms', '0 */20 * * * *', false, cleanerRoomsInner);
+//registerTimeFunction('cleaner_rooms', '0 */20 * * * *', false, cleanerRoomsInner);
 //registerTimeFunction('cleaner_players', '0 */20 * * * *', true, cleanerPlayersInner);

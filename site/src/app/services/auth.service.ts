@@ -15,6 +15,7 @@ export class AuthService {
 
 	private readonly _user = signal<AuthUser | null>(this.loadFromStorage());
 	public readonly user = this._user.asReadonly();
+	public readonly permissions = computed(() => this._user()?.player.permissions || []);
 	public readonly isLoggedIn = computed(() => this._user() !== null);
 
 	public async login(email: string, password: string): Promise<void> {

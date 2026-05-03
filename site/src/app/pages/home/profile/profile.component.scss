@@ -46,10 +46,10 @@
 
 .profile-badge {
 	padding: $s1 $s3;
-	background: rgba(251, 191, 36, 0.15);
-	border: 1px solid rgba(251, 191, 36, 0.3);
+	background: $color-warning-bg;
+	border: 1px solid $color-warning-border;
 	border-radius: $radius-md;
-	color: #fbbf24;
+	color: $color-warning;
 	font-size: $text-sm;
 	font-weight: 600;
 }
@@ -95,12 +95,12 @@
 	min-height: 44px;
 
 	&-danger {
-		background: rgba(248, 113, 113, 0.15);
-		color: #f87171;
-		border: 1px solid rgba(248, 113, 113, 0.3);
+		background: $color-danger-muted;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
 
 		&:hover:not(:disabled) {
-			background: rgba(248, 113, 113, 0.25);
+			background: $color-danger-dim;
 		}
 
 		&:disabled {
@@ -111,11 +111,11 @@
 
 	&-danger-outline {
 		background: transparent;
-		color: #f87171;
-		border: 1px solid rgba(248, 113, 113, 0.3);
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
 
 		&:hover {
-			background: rgba(248, 113, 113, 0.1);
+			background: $color-danger-bg;
 		}
 	}
 
@@ -136,7 +136,7 @@
 }
 
 .profile-error {
-	color: #f87171;
+	color: $color-danger;
 	font-size: $text-sm;
 }
 
@@ -145,7 +145,7 @@
 	flex-direction: column;
 	gap: $s3;
 	padding-top: $s4;
-	border-top: 1px solid rgba(248, 113, 113, 0.2);
+	border-top: 1px solid $color-danger-dim;
 }
 
 .danger-zone-title {
@@ -158,7 +158,7 @@
 
 .danger-zone-warn {
 	font-size: $text-sm;
-	color: #f87171;
+	color: $color-danger;
 }
 
 .danger-zone-actions {

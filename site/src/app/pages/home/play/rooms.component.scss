@@ -33,7 +33,7 @@
 	&.active {
 		background: $accent;
 		border-color: $accent;
-		color: #fff;
+		color: $color-on-accent;
 	}
 }
 
@@ -45,7 +45,7 @@
 }
 
 .status-msg { color: $text-muted; font-size: $text-sm; }
-.error-msg  { color: #f87171; font-size: $text-sm; }
+.error-msg  { color: $color-danger; font-size: $text-sm; }
 
 .room-list {
 	list-style: none;
@@ -68,7 +68,7 @@
 
 	&:hover {
 		border-color: $accent;
-		background: rgba(124, 90, 246, 0.04);
+		background: $accent-tint;
 	}
 }
 
@@ -125,7 +125,7 @@
 .btn-primary {
 	padding: $s3 $s6;
 	background: $accent;
-	color: #fff;
+	color: $color-on-accent;
 	border: none;
 	border-radius: $radius-md;
 	font-size: $text-base;
@@ -202,15 +202,15 @@
 	transition: border-color $transition, background $transition, transform $transition, box-shadow $transition;
 
 	&:hover {
-		border-color: rgba(124, 90, 246, 0.4);
+		border-color: $accent-emphasis;
 		transform: translateY(-2px);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+		box-shadow: $shadow-hover;
 	}
 
 	&.selected {
 		border-color: $accent;
-		background: rgba(124, 90, 246, 0.08);
-		box-shadow: 0 0 0 1px $accent, 0 8px 24px rgba(124, 90, 246, 0.15);
+		background: $accent-subtle;
+		box-shadow: 0 0 0 1px $accent, $shadow-hover;
 	}
 }
 

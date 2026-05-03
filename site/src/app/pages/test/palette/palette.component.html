@@ -1,0 +1,48 @@
+<div class="palette-split">
+
+	<!-- Light half -->
+	<div class="palette-half" data-theme="light">
+		<ng-container *ngTemplateOutlet="halfContent; context: { $implicit: 'light' }"></ng-container>
+	</div>
+
+	<div class="split-divider"></div>
+
+	<!-- Dark half -->
+	<div class="palette-half" data-theme="dark">
+		<ng-container *ngTemplateOutlet="halfContent; context: { $implicit: 'dark' }"></ng-container>
+	</div>
+
+</div>
+
+<ng-template #halfContent let-theme>
+	<div class="half-header">
+		@if (theme === 'light') {
+			<i class="fa-solid fa-sun"></i> Light — pine/oak
+		} @else {
+			<i class="fa-solid fa-moon"></i> Dark — walnut
+		}
+	</div>
+
+	@for (section of sections; track section.title) {
+		<div class="section-label">{{ section.title }}</div>
+
+		@for (swatch of section.swatches; track swatch.name) {
+			<div class="swatch-row">
+				@if (swatch.isShadow) {
+					<div class="shadow-demo"
+						[style.background]="'var(--bg-card)'"
+						[style.box-shadow]="getValue(swatch, theme)">
+					</div>
+				} @else {
+					<div class="swatch-wrap">
+						<div class="swatch" [style.background]="swatch.cssRef"></div>
+					</div>
+				}
+				<div class="swatch-info">
+					<span class="swatch-name">{{ swatch.name }}</span>
+					<span class="swatch-value">{{ getValue(swatch, theme) }}</span>
+				</div>
+			</div>
+		}
+	}
+</ng-template>

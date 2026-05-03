@@ -72,9 +72,9 @@
 	gap: $s1;
 	transition: border-color $transition;
 
-	&-me { border-color: rgba(124, 90, 246, 0.4); }
+	&-me { border-color: $accent-emphasis; }
 	&-eliminated { opacity: 0.35; }
-	&-active { border-color: #4ade80; }
+	&-active { border-color: $color-success; }
 }
 
 .player-chip-name {
@@ -146,7 +146,7 @@
 	color: $accent;
 	line-height: 1;
 
-	&-roll { color: #4ade80; }
+	&-roll { color: $color-success; }
 
 	@media (min-width: $bp-sm) { font-size: $text-4xl; }
 }
@@ -190,27 +190,27 @@
 	transition: background $transition, border-color $transition, transform $transition;
 
 	&:hover:not([disabled]) {
-		background: rgba(124, 90, 246, 0.12);
+		background: $accent-muted;
 		border-color: $accent;
 		transform: translateY(-2px);
 	}
 
 	&-honest {
-		border-color: #4ade80;
+		border-color: $color-success;
 
 		&:hover:not([disabled]) {
-			background: rgba(74, 222, 128, 0.12);
-			border-color: #4ade80;
+			background: $color-success-bg;
+			border-color: $color-success;
 		}
 	}
 
 	&-pankov {
-		border-color: #f59e0b;
-		color: #f59e0b;
+		border-color: $color-warning;
+		color: $color-warning;
 
 		&:hover:not([disabled]) {
-			background: rgba(245, 158, 11, 0.12);
-			border-color: #f59e0b;
+			background: $color-warning-bg;
+			border-color: $color-warning;
 		}
 	}
 
@@ -274,15 +274,15 @@
 	width: 100%;
 
 	&-lie {
-		background: rgba(248, 113, 113, 0.1);
-		color: #f87171;
-		border: 1px solid rgba(248, 113, 113, 0.2);
+		background: $color-danger-bg;
+		color: $color-danger;
+		border: 1px solid $color-danger-dim;
 	}
 
 	&-honest {
-		background: rgba(74, 222, 128, 0.1);
-		color: #4ade80;
-		border: 1px solid rgba(74, 222, 128, 0.2);
+		background: $color-success-bg;
+		color: $color-success;
+		border: 1px solid $color-success-border;
 	}
 }
 
@@ -294,7 +294,7 @@
 
 .action-error {
 	font-size: $text-sm;
-	color: #f87171;
+	color: $color-danger;
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
@@ -311,15 +311,15 @@
 
 	&-primary {
 		background: $accent;
-		color: $text;
+		color: $color-on-accent;
 		&:hover { background: $accent-hover; }
 	}
 
 	&-danger {
-		background: rgba(248, 113, 113, 0.15);
-		color: #f87171;
-		border: 1px solid rgba(248, 113, 113, 0.3);
-		&:hover { background: rgba(248, 113, 113, 0.25); }
+		background: $color-danger-muted;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
+		&:hover { background: $color-danger-dim; }
 	}
 
 	&[disabled] { opacity: 0.4; cursor: not-allowed; }

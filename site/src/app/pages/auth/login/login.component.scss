@@ -41,10 +41,10 @@
 
 .auth-error {
 	padding: $s3 $s4;
-	background: rgba(248, 113, 113, 0.1);
-	border: 1px solid rgba(248, 113, 113, 0.25);
+	background: $color-danger-bg;
+	border: 1px solid $color-danger-dim;
 	border-radius: $radius-md;
-	color: #f87171;
+	color: $color-danger;
 	font-size: $text-sm;
 }
 

@@ -1,12 +1,14 @@
-// === Colors ===
-$bg: #0a0a14;
-$bg-surface: #12121e;
-$bg-card: #1c1c2e;
-$accent: #7c5af6;
-$accent-hover: #6644e0;
-$text: #eeeef4;
-$text-muted: #7878a0;
-$border: rgba(120, 120, 180, 0.12);
+// === Colors (CSS custom properties — dark/light values defined in styles.scss) ===
+$bg: var(--bg);
+$bg-surface: var(--bg-surface);
+$bg-card: var(--bg-card);
+$accent: var(--accent);
+$accent-hover: var(--accent-hover);
+$text: var(--text);
+$text-muted: var(--text-muted);
+$border: var(--border-color);
+$shadow-card: var(--shadow-card);
+$hover-overlay: var(--hover-overlay);
 
 // === Typography ===
 $font: Inter, system-ui, -apple-system, sans-serif;
@@ -38,5 +40,4 @@ $radius-full: 9999px;
 $bp-sm: 480px;
 
 // === Misc ===
-$shadow-card: 0 4px 32px rgba(0, 0, 0, 0.4);
 $transition: 200ms ease;

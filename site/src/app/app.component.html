@@ -7,6 +7,13 @@
 		} @else {
 			<a routerLink="/login" class="nav-link">Log in</a>
 		}
+		<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
+			@if (isDark()) {
+				<i class="fa-solid fa-sun"></i>
+			} @else {
+				<i class="fa-solid fa-moon"></i>
+			}
+		</button>
 	</nav>
 </header>
 

@@ -16,6 +16,7 @@
 
 .site-nav {
 	display: flex;
+	align-items: center;
 	gap: $s4;
 }
 
@@ -32,5 +33,25 @@
 		font-weight: 700;
 		color: $accent;
 		letter-spacing: -0.02em;
+	}
+}
+
+.theme-toggle {
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	cursor: pointer;
+	width: 44px;
+	height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $text-base;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text;
+		background: $hover-overlay;
 	}
 }

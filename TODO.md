@@ -1,6 +1,4 @@
 - Improved room participation handling, better auto-leave
-- Navbar and navigation rework
-- Graphics redo
 - Game rules customization in the room lobby or in the room creation (tbd)
 - Game state history
 	On the right sight of the screen (on mobile is a togglable modal), show a list of every game state changes available to the user

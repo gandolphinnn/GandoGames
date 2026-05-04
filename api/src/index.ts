@@ -131,7 +131,7 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 //#endregion Authorized
 
 //#region Time
-export type InnerTimeFunction = (timer: Timer, context: InvocationContext) => Promise<void>;
+export type InnerTimeFunction = (timer: Timer, notifier: InnerFunctionNotifier) => Promise<void>;
 
 export function registerTimeFunction(
 	name: string,
@@ -147,7 +147,7 @@ export function registerTimeFunction(
 		handler: async (timer: Timer, context: InvocationContext): Promise<void> => {
 			const notifier = new InnerFunctionNotifier();
 			try {
-				await innerTimeFunction(timer, context);
+				await innerTimeFunction(timer, notifier);
 				notifier.prepareContext(context);
 			} catch (err) {
 				console.error(err);

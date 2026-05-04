@@ -1,5 +1,5 @@
 import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext, Timer } from '@azure/functions';
-import { BaseRequest, GamePlayer, RoomData, SignalREventType } from '@gandogames/common/api';
+import { BaseRequest, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/common/api';
 import { PlayFab, PlayFabAdmin, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
@@ -52,7 +52,7 @@ export class InnerFunctionNotifier {
 	gameStateUpdated(roomId: string, state: unknown) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], groupName: `room-${roomId}` });
 	}
-	gameStateUpdatedForPlayer(userId: string, roomId: string, state: unknown) {
+	gameStateUpdatedForPlayer(userId: string, roomId: string, state: GameState) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], userId });
 	}
 	//#endregion SignalR methods

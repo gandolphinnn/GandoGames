@@ -1,5 +1,4 @@
-import { NgComponentOutlet } from '@angular/common';
-import { Component, computed, DestroyRef, HostListener, inject, OnDestroy, OnInit, signal, Type } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
@@ -7,11 +6,11 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
-import { GAME_COMPONENT_REGISTRY } from '../../../game-component-registry';
+import { RoomPlayComponent } from './room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink, NgComponentOutlet],
+	imports: [RouterLink, RoomPlayComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -48,12 +47,6 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		const game = GAME_REGISTRY.find((g) => g.id === r.game);
 		if (!game) return false;
 		return r.players.length >= game.minPlayers;
-	});
-
-	public readonly gameComponentType = computed((): Type<unknown> | null => {
-		const r = this.room();
-		if (!r || r.phase !== 'playing') return null;
-		return GAME_COMPONENT_REGISTRY[r.game] ?? null;
 	});
 
 	public ngOnDestroy(): void {

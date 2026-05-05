@@ -1,8 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
+import { RoomService } from './services/room.service';
+import { ToastService } from './services/toast.service';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 
 @Component({
 	selector: 'gg-app',
@@ -19,7 +22,22 @@ export class App {
 	public readonly isDark = this.themeService.isDark;
 	public readonly themeLabel = computed(() => this.isDark() ? 'Switch to light mode' : 'Switch to dark mode');
 
+	private readonly roomService = inject(RoomService);
+	public readonly toastService = inject(ToastService);
+	private readonly router = inject(Router);
+	public readonly myRoom = this.roomService.myRoom;
+	public readonly myRoomGameName = computed(() => {
+		const room = this.myRoom();
+		if (!room) return '';
+		return GAME_REGISTRY.find(g => g.id === room.game)?.name ?? room.game;
+	});
+
 	public toggleTheme(): void {
 		this.themeService.toggle();
+	}
+
+	public goToMyRoom(): void {
+		const room = this.myRoom();
+		if (room) void this.router.navigate(['/play', room.id]);
 	}
 }

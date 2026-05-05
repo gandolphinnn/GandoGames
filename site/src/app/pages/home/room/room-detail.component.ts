@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, HostListener, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, HostListener, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
@@ -6,6 +6,7 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
+import { ToastService } from '@gandogames/services/toast.service';
 import { RoomPlayComponent } from './room-play.component';
 
 @Component({
@@ -14,12 +15,13 @@ import { RoomPlayComponent } from './room-play.component';
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
-export class RoomDetailComponent implements OnInit, OnDestroy {
+export class RoomDetailComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(AuthService);
 	private readonly signalR = inject(SignalRService);
+	private readonly toast = inject(ToastService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	private hasLeft = false;
@@ -37,6 +39,7 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	public readonly canJoin = computed(() => {
 		const r = this.room();
 		if (!r || r.phase !== 'waiting' || this.isInRoom()) return false;
+		if (r.kickedPlayers?.includes(this.myId())) return false;
 		const maxPlayers = GAME_REGISTRY.find((g) => g.id === r.game)?.maxPlayers ?? 0;
 		return r.players.length < maxPlayers;
 	});
@@ -49,15 +52,18 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		return r.players.length >= game.minPlayers;
 	});
 
-	public ngOnDestroy(): void {
-		if (!this.hasLeft && this.isInRoom()) {
-			void this.roomService.leaveRoom(this.roomId());
-		}
-	}
+	private readonly myOtherRoom = computed(() => {
+		const my = this.roomService.myRoom();
+		return my?.id !== this.roomId() ? my : null;
+	});
+
+	public readonly joinLabel = computed(() =>
+		this.myOtherRoom() ? 'Leave your room and join this one' : 'Join'
+	);
 
 	@HostListener('window:beforeunload')
 	public onBeforeUnload(): void {
-		if (!this.hasLeft && this.isInRoom()) {
+		if (!this.hasLeft && this.isInRoom() && this.room()?.phase === 'waiting') {
 			this.roomService.leaveRoomBeacon(this.roomId());
 		}
 	}
@@ -71,6 +77,10 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 	private async loadRoom(): Promise<void> {
 		try {
 			const room = await this.roomService.getRoom(this.roomId());
+			if (room.kickedPlayers?.includes(this.myId())) {
+				void this.router.navigate(['/play']);
+				return;
+			}
 			this.room.set(room);
 			if (room.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
 				void this.router.navigate(['/play']);
@@ -82,9 +92,13 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 
 	private subscribeToRoomEvents(): void {
 		this.signalR.events.roomUpsert.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((room) => {
-			if (room.id === this.roomId()) {
-				this.room.set(room);
+			if (room.id !== this.roomId()) return;
+			if (room.kickedPlayers?.includes(this.myId())) {
+				this.toast.show('You have been kicked from the room.', 'warning');
+				void this.router.navigate(['/play']);
+				return;
 			}
+			this.room.set(room);
 		});
 		this.signalR.events.roomDeleted.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((roomId) => {
 			if (roomId === this.roomId()) {
@@ -97,6 +111,8 @@ export class RoomDetailComponent implements OnInit, OnDestroy {
 		try {
 			this.loading.set(true);
 			this.error.set('');
+			const other = this.myOtherRoom();
+			if (other) await this.roomService.leaveRoom(other.id);
 			await this.roomService.joinRoom(this.roomId());
 			await this.loadRoom();
 		} catch (e) {

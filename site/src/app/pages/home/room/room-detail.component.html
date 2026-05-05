@@ -45,7 +45,7 @@
 							@if (canJoin()) {
 								<p class="status-msg">This room is open. Join to play.</p>
 								<button class="btn-primary" [disabled]="loading()" (click)="join()">
-									{{ loading() ? 'Joining…' : 'Join' }}
+									{{ loading() ? 'Joining…' : joinLabel() }}
 								</button>
 							} @else {
 								<p class="status-msg">This room is full.</p>

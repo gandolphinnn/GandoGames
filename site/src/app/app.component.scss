@@ -9,9 +9,23 @@
 .site-header {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
 	padding: $s4 $s6;
 	border-bottom: 1px solid $border;
+}
+
+.site-header-start,
+.site-header-end {
+	flex: 1;
+}
+
+.site-header-end {
+	justify-content: flex-end;
+}
+
+.site-header-center {
+	flex: 0 0 auto;
+	display: flex;
+	justify-content: center;
 }
 
 .site-nav {
@@ -34,6 +48,83 @@
 		color: $accent;
 		letter-spacing: -0.02em;
 	}
+}
+
+.my-room-card {
+	display: inline-flex;
+	align-items: center;
+	gap: $s2;
+	height: 36px;
+	padding: 0 $s4;
+	background: $color-success-bg;
+	border: 1px solid $color-success-border;
+	border-radius: $radius-full;
+	color: $color-success;
+	font-size: $text-sm;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background $transition, border-color $transition;
+
+	i { font-size: 0.55em; }
+
+	&:hover {
+		background: rgba(74, 222, 128, 0.2);
+		border-color: $color-success;
+	}
+}
+
+.my-room-badge {
+	font-size: 0.65em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	background: $color-success;
+	color: #fff;
+	border-radius: $radius-sm;
+	padding: 1px 5px;
+}
+
+.toast-container {
+	position: fixed;
+	bottom: $s6;
+	right: $s6;
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+	z-index: 1000;
+	pointer-events: none;
+}
+
+.toast {
+	padding: $s3 $s4;
+	border-radius: $radius-md;
+	font-size: $text-sm;
+	font-weight: 500;
+	cursor: pointer;
+	pointer-events: auto;
+	animation: toast-in 200ms ease;
+
+	&.toast-info {
+		background: $bg-card;
+		border: 1px solid $border;
+		color: $text;
+	}
+
+	&.toast-warning {
+		background: $color-warning-bg;
+		border: 1px solid $color-warning-border;
+		color: $color-warning;
+	}
+
+	&.toast-error {
+		background: $color-danger-bg;
+		border: 1px solid $color-danger-border;
+		color: $color-danger;
+	}
+}
+
+@keyframes toast-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
 }
 
 .theme-toggle {

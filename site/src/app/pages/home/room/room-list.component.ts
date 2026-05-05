@@ -18,6 +18,7 @@ export class RoomListComponent implements OnInit {
 	public readonly allGames = GAME_REGISTRY;
 	public readonly activeGames = signal<string[]>([]);
 	public readonly rooms = this.roomService.rooms;
+	public readonly myRoom = this.roomService.myRoom;
 	public readonly loading = signal(false);
 	public readonly error = signal('');
 

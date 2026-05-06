@@ -6,6 +6,7 @@ import { ThemeService } from './services/theme.service';
 import { RoomService } from './services/room.service';
 import { ToastService } from './services/toast.service';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
+import { SignalRService } from './services/signalr.service';
 
 @Component({
 	selector: 'gg-app',
@@ -31,6 +32,10 @@ export class App {
 		if (!room) return '';
 		return GAME_REGISTRY.find(g => g.id === room.game)?.name ?? room.game;
 	});
+
+	private readonly signalRService = inject(SignalRService);
+	public readonly onlineCount = this.signalRService.onlineCount;
+	public readonly onlineUsers = this.signalRService.onlineUsers;
 
 	public toggleTheme(): void {
 		this.themeService.toggle();

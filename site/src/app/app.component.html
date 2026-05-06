@@ -32,6 +32,18 @@
 				<i class="fa-solid fa-moon"></i>
 			}
 		</button>
+		@if (isLoggedIn()) {
+			<span class="online-count">
+				<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
+				<div class="online-tooltip">
+					@for (name of onlineUsers(); track name) {
+						<span class="online-tooltip-name">{{ name }}</span>
+					} @empty {
+						<span class="online-tooltip-empty">No one online</span>
+					}
+				</div>
+			</span>
+		}
 	</nav>
 </header>
 

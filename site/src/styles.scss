@@ -66,11 +66,13 @@
   padding: 0;
 }
 
-html, body {
+html {
   height: 100%;
+  overflow-x: hidden;
 }
 
 body {
+  height: 100%;
   font-family: $font;
   background-color: $bg;
   color: $text;

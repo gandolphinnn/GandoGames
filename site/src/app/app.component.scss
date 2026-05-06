@@ -1,9 +1,13 @@
 @use 'styles/variables' as *;
 
+// Navbar switches to desktop layout above this width (independent of global $bp-sm)
+$bp-nav: 768px;
+
 :host {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+	overflow-x: hidden;
 }
 
 .site-header {
@@ -16,9 +20,12 @@
 .site-header-start,
 .site-header-end {
 	flex: 1;
+	min-width: 0;
 }
 
 .site-header-end {
+	display: flex;
+	align-items: center;
 	justify-content: flex-end;
 }
 
@@ -29,9 +36,82 @@
 }
 
 .site-nav {
-	display: flex;
+	display: none;
 	align-items: center;
 	gap: $s4;
+
+	@media (min-width: $bp-nav) { display: flex; }
+}
+
+.hamburger {
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	cursor: pointer;
+	width: 44px;
+	height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $text-base;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text;
+		background: $hover-overlay;
+	}
+
+	@media (min-width: $bp-nav) { display: none; }
+}
+
+.mobile-menu-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 400;
+	background: rgba(0, 0, 0, 0.4);
+
+	@media (min-width: $bp-nav) { display: none; }
+}
+
+.mobile-menu {
+	position: fixed;
+	top: 0;
+	right: 0;
+	height: 100dvh;
+	width: 260px;
+	z-index: 500;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	padding: $s4 $s6;
+	background: $bg-surface;
+	border-left: 1px solid $border;
+	box-shadow: $shadow-card;
+
+	@media (min-width: $bp-nav) { display: none; }
+}
+
+.mobile-menu-header {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: $s2;
+}
+
+.mobile-menu-footer {
+	margin-top: auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	.online-count {
+		flex: 1;
+
+		.online-tooltip {
+			top: auto;
+			bottom: calc(100% + $s2);
+		}
+	}
 }
 
 .nav-link {
@@ -48,6 +128,14 @@
 		color: $accent;
 		letter-spacing: -0.02em;
 	}
+}
+
+.title-short { display: inline; }
+.title-full  { display: none; }
+
+@media (min-width: $bp-nav) {
+	.title-short { display: none; }
+	.title-full  { display: inline; }
 }
 
 .my-room-card {

@@ -1,13 +1,16 @@
 <header class="site-header">
 	<div class="site-header-start">
-		<a routerLink="/" class="nav-link title">GandoGames</a>
+		<a routerLink="/" class="nav-link title">
+			<span class="title-full">GandoGames</span>
+			<span class="title-short">GG</span>
+		</a>
 	</div>
 
 	<div class="site-header-center">
 		@if (myRoom()) {
 			<button class="my-room-card" (click)="goToMyRoom()">
 				<i class="fa-solid fa-circle-dot"></i>
-				{{ myRoomGameName() }}
+				{{ myRoom()!.id }}
 				@if (myRoom()!.phase === 'playing') {
 					<span class="my-room-badge">LIVE</span>
 				}
@@ -15,37 +18,83 @@
 		}
 	</div>
 
-	<nav class="site-nav site-header-end">
-		<a routerLink="/about" class="nav-link">About</a>
-		@if (isAdmin()) {
-			<a routerLink="/test/palette" class="nav-link">Palette</a>
-		}
-		@if (isLoggedIn()) {
-			<a routerLink="/profile" class="nav-link">Profile</a>
-		} @else {
-			<a routerLink="/login" class="nav-link">Log in</a>
-		}
-		<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
-			@if (isDark()) {
-				<i class="fa-solid fa-sun"></i>
-			} @else {
-				<i class="fa-solid fa-moon"></i>
+	<div class="site-header-end">
+		<nav class="site-nav">
+			<a routerLink="/about" class="nav-link">About</a>
+			@if (isAdmin()) {
+				<a routerLink="/test/palette" class="nav-link">Palette</a>
 			}
+			@if (isLoggedIn()) {
+				<a routerLink="/profile" class="nav-link">Profile</a>
+			} @else {
+				<a routerLink="/login" class="nav-link">Log in</a>
+			}
+			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
+				@if (isDark()) {
+					<i class="fa-solid fa-sun"></i>
+				} @else {
+					<i class="fa-solid fa-moon"></i>
+				}
+			</button>
+			@if (isLoggedIn()) {
+				<span class="online-count">
+					<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
+					<div class="online-tooltip">
+						@for (name of onlineUsers(); track name) {
+							<span class="online-tooltip-name">{{ name }}</span>
+						} @empty {
+							<span class="online-tooltip-empty">No one online</span>
+						}
+					</div>
+				</span>
+			}
+		</nav>
+		<button class="hamburger" (click)="toggleMenu()" title="Open menu">
+			<i class="fa-solid fa-bars"></i>
 		</button>
-		@if (isLoggedIn()) {
-			<span class="online-count">
-				<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
-				<div class="online-tooltip">
-					@for (name of onlineUsers(); track name) {
-						<span class="online-tooltip-name">{{ name }}</span>
-					} @empty {
-						<span class="online-tooltip-empty">No one online</span>
-					}
-				</div>
-			</span>
-		}
-	</nav>
+	</div>
 </header>
+
+@if (menuOpen()) {
+	<div class="mobile-menu-backdrop" (click)="closeMenu()"></div>
+	<nav class="mobile-menu">
+		<div class="mobile-menu-header">
+			<button class="hamburger" (click)="closeMenu()" title="Close menu">
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		</div>
+		@if (isLoggedIn()) {
+			<a routerLink="/profile" class="nav-link" (click)="closeMenu()">Profile</a>
+		} @else {
+			<a routerLink="/login" class="nav-link" (click)="closeMenu()">Log in</a>
+		}
+		<a routerLink="/about" class="nav-link" (click)="closeMenu()">About</a>
+		@if (isAdmin()) {
+			<a routerLink="/test/palette" class="nav-link" (click)="closeMenu()">Palette</a>
+		}
+		<div class="mobile-menu-footer">
+			@if (isLoggedIn()) {
+				<span class="online-count">
+					<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
+					<div class="online-tooltip">
+						@for (name of onlineUsers(); track name) {
+							<span class="online-tooltip-name">{{ name }}</span>
+						} @empty {
+							<span class="online-tooltip-empty">No one online</span>
+						}
+					</div>
+				</span>
+			}
+			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
+				@if (isDark()) {
+					<i class="fa-solid fa-sun"></i>
+				} @else {
+					<i class="fa-solid fa-moon"></i>
+				}
+			</button>
+		</div>
+	</nav>
+}
 
 <router-outlet />
 

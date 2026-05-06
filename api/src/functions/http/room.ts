@@ -9,6 +9,7 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		hostId: player.id,
 		game: body.game,
 		players: [player],
+		kickedPlayers: [],
 		phase: 'waiting',
 		lastUpdate: new Date(),
 	};
@@ -32,6 +33,7 @@ const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, not
 	if (room == null) throw new Error('Room not found');
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 	if (room.players.some(p => p.id === player.id)) throw new Error('Already in this room');
+	if (room.kickedPlayers?.includes(player.id)) throw new Error('You have been kicked from this room');
 
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max player for this game');
@@ -100,6 +102,7 @@ const roomKickInner: InnerFunction<RoomKickRequest, RoomData> = async (body, not
 	notifier.roomDeletedForPlayer(body.playerId, body.roomId);
 
 	room.players = room.players.filter(p => p.id !== body.playerId);
+	room.kickedPlayers = [...(room.kickedPlayers ?? []), body.playerId];
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);
 	return room;

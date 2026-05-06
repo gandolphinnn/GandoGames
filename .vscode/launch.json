@@ -1,20 +1,32 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "ng serve",
-      "type": "chrome",
-      "request": "launch",
-      "preLaunchTask": "npm: start",
-      "url": "http://localhost:1212/"
-    },
-    {
-      "name": "ng test",
-      "type": "chrome",
-      "request": "launch",
-      "preLaunchTask": "npm: test",
-      "url": "http://localhost:9876/debug.html"
-    }
-  ]
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug API",
+			"type": "node",
+			"request": "attach",
+			"port": 9229,
+			"preLaunchTask": "func: host start",
+			"outFiles": [
+				"${workspaceFolder}/api/dist/**/*.js"
+			],
+			"sourceMaps": true,
+			"restart": true
+		},
+		{
+			"name": "ng serve",
+			"type": "chrome",
+			"request": "launch",
+			"preLaunchTask": "npm: start",
+			"url": "http://localhost:1212/"
+		},
+		{
+			"name": "ng test",
+			"type": "chrome",
+			"request": "launch",
+			"preLaunchTask": "npm: test",
+			"url": "http://localhost:9876/debug.html"
+		}
+	]
 }

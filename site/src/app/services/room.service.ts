@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { GameState, GameType, RoomData } from '@gandogames/common/api';
 import { AuthService } from './auth.service';
 import { BackendService } from './backend.service';
@@ -11,6 +11,12 @@ export class RoomService {
 	private readonly signalR = inject(SignalRService);
 
 	public readonly rooms = signal<RoomData[]>([]);
+
+	public readonly myRoom = computed(() => {
+		const userId = this.auth.user()?.player.id;
+		if (!userId) return null;
+		return this.rooms().find(r => r.phase !== 'ended' && r.players.some(p => p.id === userId)) ?? null;
+	});
 
 	private get ticket(): string {
 		return this.auth.user()!.sessionTicket;

@@ -10,6 +10,7 @@ export interface RoomData {
 	hostId: string;
 	game: GameType;
 	players: GamePlayer[];
+	kickedPlayers: string[];
 	phase: 'waiting' | 'playing' | 'ended';
 	lastUpdate: Date;
 }

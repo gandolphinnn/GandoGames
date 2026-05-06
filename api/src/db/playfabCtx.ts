@@ -3,7 +3,10 @@ import { MorraGameState } from "@gandogames/common/morra";
 import { PankovGameState } from "@gandogames/common/pankov";
 import { pfPromise, PlayFabServer } from "..";
 
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
+
 export interface PlayFabEntityHooks<T> {
+	onParse?(value: T | null): T | null;
 	beforeUpsert?(id: string, value: T): void | Promise<void>;
 }
 
@@ -15,15 +18,15 @@ class PlayFabEntity<T> {
 	) {
 	}
 	
-	private parse(raw: string | undefined) {
-		return this.OnDeserialized(raw ? JSON.parse(raw) as T : null);
+	private parse(raw: string | undefined): T | null {
+		const deserialized = raw ? JSON.parse(raw, (_key, value) => {
+			if (typeof value === 'string' && DATE_REGEX.test(value))
+				return new Date(value);
+			return value;
+		}) as T : null;
+		return this.hooks.onParse ? this.hooks.onParse(deserialized) : deserialized;
 	}
 
-	protected OnDeserialized(value: T | null): T | null {
-		// can be overridden to do some processing after deserialization
-		return value;
-	}
-	
 	private hasInit = false;
 	/** Init the entity shared group ensuring it exists */
 	private async init(): Promise<void> {
@@ -96,7 +99,9 @@ class PlayFabEntity<T> {
 }
 
 export class PlayfabCtx {
-	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', { beforeUpsert: (id, value) => { value.lastUpdate = new Date() } });
+	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', {
+		beforeUpsert: (_id, value) => { value.lastUpdate = new Date() }
+	});
 
 	public static readonly game: Record<GameType, PlayFabEntity<GameState>> = {
 		'morra': new PlayFabEntity<MorraGameState>('MORRA_GAMES_INDEX'),

@@ -1,0 +1,9 @@
+<span class="player-chip-name">{{ data.name }}</span>
+<span class="player-chip-lives">
+	@for (i of livesRange; track i) {
+		<i class="fa-solid fa-circle life" [class.life-full]="i < data.lives"></i>
+	}
+</span>
+@if (data.statusText) {
+	<span class="player-chip-status">{{ data.statusText }}</span>
+}

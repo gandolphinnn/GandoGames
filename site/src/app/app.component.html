@@ -1,6 +1,21 @@
 <header class="site-header">
-	<a routerLink="/" class="nav-link title">GandoGames</a>
-	<nav class="site-nav">
+	<div class="site-header-start">
+		<a routerLink="/" class="nav-link title">GandoGames</a>
+	</div>
+
+	<div class="site-header-center">
+		@if (myRoom()) {
+			<button class="my-room-card" (click)="goToMyRoom()">
+				<i class="fa-solid fa-circle-dot"></i>
+				{{ myRoomGameName() }}
+				@if (myRoom()!.phase === 'playing') {
+					<span class="my-room-badge">LIVE</span>
+				}
+			</button>
+		}
+	</div>
+
+	<nav class="site-nav site-header-end">
 		<a routerLink="/about" class="nav-link">About</a>
 		@if (isAdmin()) {
 			<a routerLink="/test/palette" class="nav-link">Palette</a>
@@ -17,7 +32,27 @@
 				<i class="fa-solid fa-moon"></i>
 			}
 		</button>
+		@if (isLoggedIn()) {
+			<span class="online-count">
+				<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
+				<div class="online-tooltip">
+					@for (name of onlineUsers(); track name) {
+						<span class="online-tooltip-name">{{ name }}</span>
+					} @empty {
+						<span class="online-tooltip-empty">No one online</span>
+					}
+				</div>
+			</span>
+		}
 	</nav>
 </header>
 
 <router-outlet />
+
+<div class="toast-container">
+	@for (toast of toastService.toasts(); track toast.id) {
+		<div class="toast toast-{{ toast.type }}" (click)="toastService.dismiss(toast.id)">
+			{{ toast.message }}
+		</div>
+	}
+</div>

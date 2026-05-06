@@ -1,80 +1,57 @@
-import { app, output, HttpMethod, HttpRequest, HttpResponseInit, InvocationContext, Timer } from '@azure/functions';
-import { BaseRequest, GamePlayer, RoomData, SignalREventType } from '@gandogames/common/api';
+import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput } from '@azure/functions';
+import { BaseRequest, GamePlayer } from '@gandogames/common/api';
 import { PlayFab, PlayFabAdmin, PlayFabClient, PlayFabServer } from 'playfab-sdk';
+import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';
+
+export { PlayFabAdmin, PlayFabClient, PlayFabServer };
+export { PlayfabCtx } from './db/playfabCtx';
+export * from './types';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
 PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 
-export { PlayFabAdmin, PlayFabClient, PlayFabServer };
-export { PlayfabCtx } from './db/playfabCtx';
+export const signalRInput = input.generic({
+	type: 'signalRConnectionInfo',
+	name: 'connectionInfo',
+	hubName: 'gameHub',
+	connectionStringSetting: 'AzureSignalRConnectionString',
+	userId: '{query.userId}',
+});
 
-//#region SignalR
-const signalROutput = output.generic({
+export const signalROutput = output.generic({
 	type: 'signalR',
 	name: 'signalRMessages',
 	hubName: 'gameHub',
 	connectionStringSetting: 'AzureSignalRConnectionString',
 });
 
-export type SignalRMessage =
-	| { target: SignalREventType; arguments: unknown[]; }
-	| { target: SignalREventType; arguments: unknown[]; userId: string; }
-	| { target: SignalREventType; arguments: unknown[]; groupName: string }
-	| { action: 'add' | 'remove'; userId: string; groupName: string };
-//#endregion SignalR
-
-//#region Shared types
-export class InnerFunctionNotifier {
-	/** The HTTP status code for an error response when no FunctionError is thrown. Default is 500. */
-	errorCode = 500;
-	/** The error message for an error response when no FunctionError is thrown. Default is the caught exception message. */
-	errorMessage?: string;
-
-	/** SignalR messages to broadcast after a successful response. */
-	private signalR: SignalRMessage[] = [];
-
-	//#region SignalR methods
-	addToGroup(userId: string, groupName: string) {
-		this.signalR.push({ action: 'add', userId, groupName: `room-${groupName}`});
-	}
-	removeFromGroup(userId: string, groupName: string) {
-		this.signalR.push({ action: 'remove', userId, groupName: `room-${groupName}`});
-	}
-	roomUpsert(room: RoomData) {
-		this.signalR.push({ target: 'roomUpsert', arguments: [room] });
-	}
-	roomDeleted(roomId: string) {
-		this.signalR.push({ target: 'roomDeleted', arguments: [roomId] });
-	}
-	roomDeletedForPlayer(userId: string, roomId: string) {
-		this.signalR.push({ target: 'roomDeleted', arguments: [roomId], userId });
-	}
-	gameStateUpdated(roomId: string, state: unknown) {
-		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], groupName: `room-${roomId}` });
-	}
-	gameStateUpdatedForPlayer(userId: string, roomId: string, state: unknown) {
-		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], userId });
-	}
-	//#endregion SignalR methods
-
-	prepareContext(context: InvocationContext) {
-		if (this.signalR.length) context.extraOutputs.set(signalROutput, this.signalR);
-	}
-};
-//#endregion Shared types
-
-//#region Non authorized
-export type InnerPublicFunction<TReq, TRes> = (body: TReq, notifier: InnerFunctionNotifier) => Promise<TRes>;
-
-export function registerPublicFunction<TReq, TRes>(
+export function registerBaseFunction(
 	name: string,
 	route: string,
-	innerPublicFunction: InnerPublicFunction<TReq, TRes>,
+	innerHandler: HttpHandler,
+	extraInputs?: FunctionInput[],
 ) {
 	app.http(name, {
 		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
+		extraInputs: extraInputs,
+		extraOutputs: [signalROutput],
+		handler: innerHandler,
+	});
+}
+
+export function registerPublicFunction<TReq, TRes>(
+	name: string,
+	route: string,
+	innerPublicFunction: InnerPublicFunction<TReq, TRes>,
+	extraInputs?: FunctionInput[],
+) {
+	app.http(name, {
+		methods: ['POST'],
+		authLevel: 'anonymous',
+		route: route,
+		extraInputs: extraInputs,
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
@@ -94,20 +71,18 @@ export function registerPublicFunction<TReq, TRes>(
 		},
 	});
 }
-//#endregion Non authorized
-
-//#region Authorized
-export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, notifier: InnerFunctionNotifier, player: GamePlayer) => Promise<TRes>;
 
 export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
 	route: string,
 	innerFunction: InnerFunction<TReq, TRes>,
+	extraInputs?: FunctionInput[],
 ) {
 	app.http(name, {
 		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
+		extraInputs: extraInputs,
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
@@ -128,26 +103,24 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 		},
 	});
 }
-//#endregion Authorized
-
-//#region Time
-export type InnerTimeFunction = (timer: Timer, context: InvocationContext) => Promise<void>;
 
 export function registerTimeFunction(
 	name: string,
 	cron: string,
 	runOnStartup: boolean,
 	innerTimeFunction: InnerTimeFunction,
+	extraInputs?: FunctionInput[],
 ) {
 	app.timer(name, {
 		schedule: cron,
 		runOnStartup: runOnStartup,
 		useMonitor: !runOnStartup,
+		extraInputs: extraInputs,
 		extraOutputs: [signalROutput],
 		handler: async (timer: Timer, context: InvocationContext): Promise<void> => {
 			const notifier = new InnerFunctionNotifier();
 			try {
-				await innerTimeFunction(timer, context);
+				await innerTimeFunction(timer, notifier);
 				notifier.prepareContext(context);
 			} catch (err) {
 				console.error(err);
@@ -155,9 +128,7 @@ export function registerTimeFunction(
 		},
 	});
 }
-//#endregion Time
 
-//#region PlayFab
 export async function authenticateSession(request: BaseRequest, notifier: InnerFunctionNotifier): Promise<GamePlayer> {
 	const { errorCode, errorMessage } = notifier;
 	notifier.errorCode = 401;
@@ -181,4 +152,3 @@ export function pfPromise<T extends PlayFabModule.IPlayFabResultCommon>(
 		});
 	});
 }
-//#endregion PlayFab

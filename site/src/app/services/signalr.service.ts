@@ -1,4 +1,4 @@
-import { effect, inject, Injectable } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { GameState, NegotiateResponse, RoomData, SignalREvent } from '@gandogames/common/api';
@@ -15,6 +15,9 @@ export class SignalRService {
 	public get connectionStatus() {
 		return this.connection?.state;
 	}
+
+	public readonly onlineUsers = signal<string[]>([]);
+	public readonly onlineCount = computed(() => this.onlineUsers().length);
 
 	public readonly events = {
 		roomUpsert: new Subject<RoomData>(),
@@ -35,7 +38,7 @@ export class SignalRService {
 		if (this.negotiateCache && now < this.negotiateCache.expiresAt) return this.negotiateCache.response;
 		const user = this.auth.user();
 		if (!user) throw new Error('Not authenticated');
-		const res = await this.backend.post<NegotiateResponse>(`/negotiate?userId=${encodeURIComponent(user.player.id)}`, { sessionTicket: user.sessionTicket });
+		const res = await this.backend.post<NegotiateResponse>(`/signalr/negotiate?userId=${encodeURIComponent(user.player.id)}`, { sessionTicket: user.sessionTicket });
 		if (!res.url || !res.accessToken) throw new Error('SignalR negotiate failed');
 		this.negotiateCache = { response: res, expiresAt: now + 30_000 };
 		return res;
@@ -61,8 +64,17 @@ export class SignalRService {
 			this.connection.on('roomUpsert', (room) => this.events.roomUpsert.next(room));
 			this.connection.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
 			this.connection.on('gameStateUpdated', (roomId: string, state: GameState) => this.events.gameStateUpdated.next({ roomId, state }));
+			this.connection.on('onlineCountUpdated', (names: string[]) => this.onlineUsers.set(names));
 
+			// Re-negotiate after start so the broadcast arrives while the WS is open.
+			// Also fires on reconnect so presence is restored after network drops.
+			const refreshPresence = () => {
+				this.negotiateCache = undefined;
+				void this.getNegotiateResponse().catch(() => {});
+			};
 			await this.connection.start();
+			this.connection.onreconnected(refreshPresence);
+			refreshPresence();
 		} catch (err) {
 			console.error('SignalR connection failed:', err);
 			this.connection = undefined;
@@ -71,6 +83,7 @@ export class SignalRService {
 
 	private async disconnect(): Promise<void> {
 		this.negotiateCache = undefined;
+		this.onlineUsers.set([]);
 		await this.connection?.stop();
 		this.connection = undefined;
 	}

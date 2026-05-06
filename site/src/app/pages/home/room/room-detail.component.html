@@ -1,8 +1,5 @@
-@if (gameComponentType()) {
-	<ng-container
-		[ngComponentOutlet]="gameComponentType()!"
-		[ngComponentOutletInputs]="{ roomId: roomId() }">
-	</ng-container>
+@if (room()?.phase === 'playing') {
+	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" />
 } @else {
 
 	<div class="room-detail">
@@ -48,7 +45,7 @@
 							@if (canJoin()) {
 								<p class="status-msg">This room is open. Join to play.</p>
 								<button class="btn-primary" [disabled]="loading()" (click)="join()">
-									{{ loading() ? 'Joining…' : 'Join' }}
+									{{ loading() ? 'Joining…' : joinLabel() }}
 								</button>
 							} @else {
 								<p class="status-msg">This room is full.</p>

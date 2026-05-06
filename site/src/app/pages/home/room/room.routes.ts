@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 
-export const PLAY_ROUTES: Routes = [
+export const ROOM_ROUTES: Routes = [
 	{
 		path: '',
-		loadComponent: () => import('./rooms.component').then((m) => m.RoomsComponent),
+		loadComponent: () => import('./room-list.component').then((m) => m.RoomListComponent),
 	},
 	{
 		path: ':roomId',

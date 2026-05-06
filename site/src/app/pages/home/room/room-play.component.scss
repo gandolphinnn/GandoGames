@@ -1,0 +1,44 @@
+@use 'styles/variables' as *;
+
+// ── Shell layout ───────────────────────────────────────────────────────────────
+
+.game-shell {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	padding: $s4;
+	max-width: 600px;
+	margin: 0 auto;
+
+	@media (min-width: $bp-sm) {
+		gap: $s6;
+		padding: $s6;
+	}
+}
+
+// ── Header ─────────────────────────────────────────────────────────────────────
+
+.game-header {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.game-back {
+	background: none;
+	border: none;
+	color: $text-muted;
+	font-size: $text-sm;
+	cursor: pointer;
+	padding: 0;
+	min-height: 44px;
+	transition: color $transition;
+
+	&:hover { color: $accent; }
+}
+
+.game-title {
+	font-size: $text-xl;
+	font-weight: 700;
+}

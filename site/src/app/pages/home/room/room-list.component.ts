@@ -5,12 +5,12 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
 
 @Component({
-	selector: 'gg-rooms',
+	selector: 'gg-room-list',
 	imports: [],
-	templateUrl: './rooms.component.html',
-	styleUrl: './rooms.component.scss',
+	templateUrl: './room-list.component.html',
+	styleUrl: './room-list.component.scss',
 })
-export class RoomsComponent implements OnInit {
+export class RoomListComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
@@ -18,6 +18,7 @@ export class RoomsComponent implements OnInit {
 	public readonly allGames = GAME_REGISTRY;
 	public readonly activeGames = signal<string[]>([]);
 	public readonly rooms = this.roomService.rooms;
+	public readonly myRoom = this.roomService.myRoom;
 	public readonly loading = signal(false);
 	public readonly error = signal('');
 

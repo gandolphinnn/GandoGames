@@ -1,4 +1,5 @@
 export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RollValue } from '@gandogames/common/pankov';
+export { formatValue } from '@gandogames/common/pankov';
 
 export const INITIAL_LIVES = 8;
 export const MIN_PLAYERS = 2;
@@ -18,13 +19,4 @@ export function getRank(value: number): number {
 
 export function rollToValue(d1: number, d2: number): number {
 	return Math.max(d1, d2) * 10 + Math.min(d1, d2);
-}
-
-/** Display name of a roll value. */
-export function formatValue(value: number): string {
-	if (value === 21) return 'Pankov!';
-	const high = Math.floor(value / 10);
-	const low = value % 10;
-	if (high === low) return `Pair of ${high}s`;
-	return `${high}-${low}`;
 }

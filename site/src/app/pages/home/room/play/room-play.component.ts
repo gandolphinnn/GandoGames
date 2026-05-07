@@ -1,23 +1,25 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { GameState, GameType } from '@gandogames/common/api';
+import { GameState, GameType, RoomHistoryEntry } from '@gandogames/common/api';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
-import { GAME_COMPONENT_REGISTRY } from '../../../game-component-registry';
+import { GAME_COMPONENT_REGISTRY } from '../../../../game-component-registry';
+import { GameHistoryComponent } from '../history/game-history.component';
 
 @Component({
 	selector: 'gg-room-play',
 	standalone: true,
-	imports: [],
+	imports: [GameHistoryComponent],
 	templateUrl: './room-play.component.html',
 	styleUrl: './room-play.component.scss',
 })
 export class RoomPlayComponent implements OnInit, AfterViewInit {
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
+	public readonly history = input<RoomHistoryEntry[]>([]);
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
@@ -68,6 +70,10 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => this.backToLobby());
 
+		outputToObservable(instance.playAgain)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => void this.resetRoom());
+
 		this.gameRef.set(ref);
 	}
 
@@ -104,6 +110,18 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 
 	protected backToLobby(): void {
 		void this.router.navigate(['/play']);
+	}
+
+	private async resetRoom(): Promise<void> {
+		try {
+			await this.backend.post('/rooms/reset', {
+				sessionTicket: this.sessionTicket,
+				roomId: this.roomId(),
+			});
+			void this.router.navigate(['/play', this.roomId()]);
+		} catch (err) {
+			this.error.set((err as Error).message);
+		}
 	}
 
 	private get sessionTicket(): string {

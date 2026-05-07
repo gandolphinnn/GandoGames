@@ -1,7 +1,5 @@
 @use 'styles/variables' as *;
 
-$bp-nav: 768px;
-
 .site-header {
 	display: flex;
 	align-items: center;
@@ -32,7 +30,7 @@ $bp-nav: 768px;
 	align-items: center;
 	gap: $s4;
 
-	@media (min-width: $bp-nav) { display: flex; }
+	@media (min-width: $bp-sm) { display: flex; }
 }
 
 .hamburger {
@@ -54,7 +52,7 @@ $bp-nav: 768px;
 		background: $hover-overlay;
 	}
 
-	@media (min-width: $bp-nav) { display: none; }
+	@media (min-width: $bp-sm) { display: none; }
 }
 
 .mobile-menu-backdrop {
@@ -63,7 +61,7 @@ $bp-nav: 768px;
 	z-index: 400;
 	background: rgba(0, 0, 0, 0.4);
 
-	@media (min-width: $bp-nav) { display: none; }
+	@media (min-width: $bp-sm) { display: none; }
 }
 
 .mobile-menu {
@@ -81,7 +79,7 @@ $bp-nav: 768px;
 	border-left: 1px solid $border;
 	box-shadow: $shadow-card;
 
-	@media (min-width: $bp-nav) { display: none; }
+	@media (min-width: $bp-sm) { display: none; }
 }
 
 .mobile-menu-header {
@@ -125,7 +123,7 @@ $bp-nav: 768px;
 .title-short { display: inline; }
 .title-full  { display: none; }
 
-@media (min-width: $bp-nav) {
+@media (min-width: $bp-sm) {
 	.title-short { display: none; }
 	.title-full  { display: inline; }
 }

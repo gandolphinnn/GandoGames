@@ -1,5 +1,5 @@
 import { GamePlayer } from '@gandogames/common/api';
-import { PankovGameState, RollValue } from '@gandogames/common/pankov';
+import { describePankovState, PankovGameState, RollValue } from '@gandogames/common/pankov';
 import { Game } from './game';
 
 const INITIAL_LIVES = 8;
@@ -47,6 +47,10 @@ export class PankovGame extends Game<PankovGameState> {
 			currentRoll: currentPlayer?.id === playerId ? this.state.currentRoll : null,
 			previousActualRoll: null,
 		};
+	}
+
+	public override describe(state: PankovGameState): string {
+		return describePankovState(state);
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): PankovGameState {

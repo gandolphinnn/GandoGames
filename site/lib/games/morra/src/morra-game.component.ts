@@ -19,6 +19,7 @@ export class MorraGameComponent implements GameComponent<MorraGameState> {
 	public readonly myPlayFabId = input.required<string | null>();
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
 	public readonly back = output<void>();
+	public readonly playAgain = output<void>();
 
 	protected readonly HANDS = HANDS;
 	protected readonly HAND_LABEL = HAND_LABEL;

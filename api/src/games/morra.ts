@@ -1,5 +1,5 @@
 import { GamePlayer } from '@gandogames/common/api';
-import { Hand, MorraGameState, MorraPlayer, MorraRoundResult } from '@gandogames/common/morra';
+import { describeMorraState, Hand, MorraGameState, MorraPlayer, MorraRoundResult } from '@gandogames/common/morra';
 import { Game } from './game';
 
 const HANDS: Hand[] = ['rock', 'paper', 'scissors'];
@@ -37,6 +37,10 @@ export class MorraGame extends Game<MorraGameState> {
 			return rest as MorraPlayer;
 		});
 		return { ...this.state, players };
+	}
+
+	public override describe(state: MorraGameState): string {
+		return describeMorraState(state);
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): MorraGameState {

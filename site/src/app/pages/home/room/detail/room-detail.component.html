@@ -1,5 +1,5 @@
 @if (room()?.phase === 'playing') {
-	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" />
+	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" [history]="room()!.history ?? []" />
 } @else {
 
 	<div class="room-detail">

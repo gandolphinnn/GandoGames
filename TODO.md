@@ -1,8 +1,6 @@
 - Room details graphic enhancement, with the ability to add a bot to a game
 - AI bot mutation logic: higly tested code, with random number generation based on an initial seed.
 - Game rules customization in the room lobby or in the room creation (tbd)
-- Game state history
-	On the right sight of the screen (on mobile is a togglable modal), show a list of every game state changes available to the user
 - Statistics
 - Chat
 	A slide-in panel docked to the right side of the screen (on mobile: a toggle button opens a full-width drawer).

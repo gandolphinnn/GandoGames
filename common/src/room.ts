@@ -5,6 +5,11 @@ export interface RoomBaseRequest extends BaseRequest {
 	roomId: string;
 }
 
+export interface RoomHistoryEntry {
+	description: string;
+	timestamp: Date;
+}
+
 export interface RoomData {
 	id: string;
 	hostId: string;
@@ -12,6 +17,7 @@ export interface RoomData {
 	players: GamePlayer[];
 	kickedPlayers: string[];
 	phase: 'waiting' | 'playing' | 'ended';
+	history: RoomHistoryEntry[];
 	lastUpdate: Date;
 }
 

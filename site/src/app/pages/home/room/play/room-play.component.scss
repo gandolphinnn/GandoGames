@@ -1,15 +1,26 @@
 @use 'styles/variables' as *;
 
-// ── Shell layout ───────────────────────────────────────────────────────────────
+// ── Shell layout ──────────────────────────────────────────────────────────────
+
+.game-layout {
+	display: block;
+
+	@media (min-width: $bp-sm) {
+		display: grid;
+		grid-template-columns: 280px 1fr 280px;
+		align-items: flex-start;
+	}
+}
 
 .game-shell {
-	min-height: 100vh;
+	min-width: 0;
 	display: flex;
 	flex-direction: column;
 	gap: $s4;
 	padding: $s4;
 	max-width: 600px;
 	margin: 0 auto;
+	min-height: 100vh;
 
 	@media (min-width: $bp-sm) {
 		gap: $s6;
@@ -34,6 +45,10 @@
 	padding: 0;
 	min-height: 44px;
 	transition: color $transition;
+	display: inline-flex;
+	align-items: center;
+	gap: $s2;
+	font-family: inherit;
 
 	&:hover { color: $accent; }
 }
@@ -42,3 +57,4 @@
 	font-size: $text-xl;
 	font-weight: 700;
 }
+

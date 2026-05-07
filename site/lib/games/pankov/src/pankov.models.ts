@@ -1,5 +1,12 @@
 export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RollValue } from '@gandogames/common/pankov';
-export { formatValue } from '@gandogames/common/pankov';
+
+export function formatValue(value: number): string {
+	if (value === 21) return 'Pankov!';
+	const high = Math.floor(value / 10);
+	const low = value % 10;
+	if (high === low) return `Pair of ${high}s`;
+	return `${high}-${low}`;
+}
 
 export const INITIAL_LIVES = 8;
 export const MIN_PLAYERS = 2;

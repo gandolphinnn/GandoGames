@@ -20,7 +20,7 @@
 
 <ng-template #list>
 	<div class="history-list">
-		@for (entry of entries(); track entry.timestamp.getTime()) {
+		@for (entry of entries(); track $index) {
 			<div class="history-entry">
 				<span class="history-desc">{{ entry.description }}</span>
 				<span class="history-time">{{ entry.timestamp | date:'HH:mm:ss' }}</span>

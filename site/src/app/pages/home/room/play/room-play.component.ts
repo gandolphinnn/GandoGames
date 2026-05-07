@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, input, OnInit, signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { GameState, GameType, RoomHistoryEntry } from '@gandogames/common/api';
@@ -7,12 +7,13 @@ import { AuthService } from '@gandogames/services/auth.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { GAME_COMPONENT_REGISTRY } from '../../../../game-component-registry';
+import { ChatComponent } from '../../../../components/chat/chat.component';
 import { GameHistoryComponent } from '../history/game-history.component';
 
 @Component({
 	selector: 'gg-room-play',
 	standalone: true,
-	imports: [GameHistoryComponent],
+	imports: [GameHistoryComponent, ChatComponent],
 	templateUrl: './room-play.component.html',
 	styleUrl: './room-play.component.scss',
 })
@@ -23,6 +24,8 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
+
+	private readonly gameLeftRef = viewChild<ElementRef<HTMLElement>>('gameLeft');
 
 	private readonly signalR = inject(SignalRService);
 	private readonly backend = inject(BackendService);
@@ -37,6 +40,10 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 	private readonly gameRef = signal<ComponentRef<unknown> | null>(null);
 
 	protected readonly gameTitle = computed(() => GAME_REGISTRY.find(g => g.id === this.gameType())?.name ?? this.gameType());
+
+	private readonly splitRatio = signal(0.5);
+	protected readonly historyFlex = computed(() => `${Math.round(this.splitRatio() * 100)} 1 0`);
+	protected readonly chatFlex    = computed(() => `${100 - Math.round(this.splitRatio() * 100)} 1 0`);
 
 	constructor() {
 		effect(() => {
@@ -106,6 +113,26 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 		} finally {
 			this.loading.set(false);
 		}
+	}
+
+	protected startResize(event: MouseEvent): void {
+		event.preventDefault();
+		const container = this.gameLeftRef()?.nativeElement;
+		if (!container) return;
+		const totalHeight = container.getBoundingClientRect().height;
+		const startY = event.clientY;
+		const startRatio = this.splitRatio();
+
+		const onMove = (e: MouseEvent) => {
+			const delta = e.clientY - startY;
+			this.splitRatio.set(Math.min(0.85, Math.max(0.15, startRatio + delta / totalHeight)));
+		};
+		const onUp = () => {
+			document.removeEventListener('mousemove', onMove);
+			document.removeEventListener('mouseup', onUp);
+		};
+		document.addEventListener('mousemove', onMove);
+		document.addEventListener('mouseup', onUp);
 	}
 
 	protected backToLobby(): void {

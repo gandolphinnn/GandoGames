@@ -30,23 +30,3 @@ export interface MorraActionRequest {
 	hand?: Hand,
 }
 
-const HAND_LABEL: Record<Hand, string> = { rock: 'Rock', paper: 'Paper', scissors: 'Scissors' };
-
-export function describeMorraState(state: MorraGameState): string {
-	switch (state.gamePhase) {
-		case 'picking':
-			return 'Round started — choose your hand';
-		case 'reveal': {
-			if (!state.result) return 'Reveal';
-			if (state.result.isDraw) return 'Draw — no lives lost';
-			const parts = state.players.map(p => {
-				const hand = HAND_LABEL[state.result!.picks[p.id] as Hand] ?? state.result!.picks[p.id];
-				const lost = state.result!.losers.includes(p.id);
-				return `${p.name}: ${hand}${lost ? ' (−1)' : ''}`;
-			});
-			return parts.join(' · ');
-		}
-		case 'game-over':
-			return `Game over — ${state.winnerName ?? '?'} wins!`;
-	}
-}

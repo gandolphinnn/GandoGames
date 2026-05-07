@@ -66,9 +66,21 @@
   padding: 0;
 }
 
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+
 html {
   height: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body {

@@ -1,5 +1,18 @@
 @use 'styles/variables' as *;
 
+// ── Host fills the remaining viewport below the navbar ────────────────────────
+
+:host {
+	display: flex;
+	flex-direction: column;
+
+	@media (min-width: $bp-sm) {
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+	}
+}
+
 // ── Shell layout ──────────────────────────────────────────────────────────────
 
 .game-layout {
@@ -8,7 +21,20 @@
 	@media (min-width: $bp-sm) {
 		display: grid;
 		grid-template-columns: 280px 1fr 280px;
-		align-items: flex-start;
+		align-items: stretch;
+		flex: 1;
+		min-height: 0;
+	}
+}
+
+.game-left {
+	display: contents;
+
+	@media (min-width: $bp-sm) {
+		display: flex;
+		flex-direction: column;
+		border-right: 1px solid $border;
+		overflow: hidden;
 	}
 }
 
@@ -20,11 +46,44 @@
 	padding: $s4;
 	max-width: 600px;
 	margin: 0 auto;
-	min-height: 100vh;
 
 	@media (min-width: $bp-sm) {
 		gap: $s6;
 		padding: $s6;
+		overflow-y: auto;
+	}
+}
+
+// ── Resize handle ─────────────────────────────────────────────────────────────
+
+.resize-handle {
+	display: none;
+
+	@media (min-width: $bp-sm) {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		height: 8px;
+		cursor: ns-resize;
+		border-top: 1px solid $border;
+		border-bottom: 1px solid $border;
+		transition: background $transition;
+		user-select: none;
+
+		&::after {
+			content: '';
+			width: 24px;
+			height: 2px;
+			border-radius: $radius-full;
+			background: $border;
+			transition: background $transition;
+		}
+
+		&:hover {
+			background: $hover-overlay;
+			&::after { background: $text-muted; }
+		}
 	}
 }
 

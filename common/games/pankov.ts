@@ -34,33 +34,3 @@ export interface PankovRoomState extends RoomData {
 	gameState?: PankovGameState,
 }
 
-export function formatValue(value: RollValue): string {
-	if (value === 21) return 'Pankov!';
-	const high = Math.floor(value / 10);
-	const low = value % 10;
-	if (high === low) return `Pair of ${high}s`;
-	return `${high}-${low}`;
-}
-
-export function describePankovState(state: PankovGameState): string {
-	const current = state.players[state.currentPlayerIndex];
-	switch (state.gamePhase) {
-		case 'turn-start':
-			return state.previousDeclaration != null
-				? `${current?.name ?? '?'}'s turn — last claim: ${formatValue(state.previousDeclaration)}`
-				: `${current?.name ?? '?'} goes first`;
-		case 'rolled':
-			return `${current?.name ?? '?'} rolled, choosing a declaration…`;
-		case 'result': {
-			if (!state.revealResult) return 'Round result';
-			const loser = state.players[state.revealResult.loserIndex];
-			const claimed = formatValue(state.revealResult.declared);
-			const actual = formatValue(state.revealResult.actual);
-			return state.revealResult.wasLying
-				? `Liar! Claimed ${claimed}, got ${actual} — ${loser?.name ?? '?'} −1 life`
-				: `Honest! Claimed ${claimed}, got ${actual} — challenger ${loser?.name ?? '?'} −1 life`;
-		}
-		case 'game-over':
-			return `Game over — ${state.winnerName ?? '?'} wins!`;
-	}
-}

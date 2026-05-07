@@ -12,9 +12,11 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		kickedPlayers: [],
 		phase: 'waiting',
 		history: [],
+		chat: [],
 		lastUpdate: new Date(),
 	};
 	await PlayfabCtx.rooms.upsert(roomId, room);
+	notifier.addToGroup(player.id, roomId);
 	notifier.roomUpsert(room);
 	return room;
 };

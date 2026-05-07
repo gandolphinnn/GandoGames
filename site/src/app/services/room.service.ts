@@ -82,6 +82,14 @@ export class RoomService {
 		this.backend.postBeacon('/rooms/leave', { sessionTicket: this.ticket, roomId });
 	}
 
+	public invitePlayer(roomId: string, playerName: string): Promise<void> {
+		return this.backend.post('/rooms/invite', { sessionTicket: this.ticket, roomId, playerName });
+	}
+
+	public addBot(roomId: string): Promise<RoomData> {
+		return this.backend.post<RoomData>('/rooms/add-bot', { sessionTicket: this.ticket, roomId });
+	}
+
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {
 		return this.backend.post<GameState | null>('/game/state', { sessionTicket: this.ticket, game, roomId });
 	}

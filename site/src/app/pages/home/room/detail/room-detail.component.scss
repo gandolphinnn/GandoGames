@@ -65,48 +65,111 @@
 	&:hover { color: $text; border-color: $text-muted; }
 }
 
-// Players strip
-.players-strip {
-	display: flex;
-	gap: $s2;
-	flex-wrap: wrap;
-}
-
-.player-chip {
-	padding: $s2 $s3;
-	background: $bg-card;
-	border: 1px solid $border;
-	border-radius: $radius-full;
-	font-size: $text-sm;
+// Game info row
+.room-info {
 	display: flex;
 	align-items: center;
-	gap: $s2;
-
-	&.host { border-color: $accent; }
-	&.me { font-weight: 600; }
+	gap: $s3;
 }
 
-.badge {
-	font-size: 0.65rem;
-	font-weight: 700;
-	color: $accent;
-	letter-spacing: 0.04em;
-}
-
-.kick-btn {
+.room-game-icon {
+	width: 36px;
+	height: 36px;
+	background: $accent-subtle;
+	border-radius: $radius-md;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 18px;
-	height: 18px;
+	color: $accent;
+	font-size: $text-lg;
+	flex-shrink: 0;
+}
+
+.room-game-name {
+	font-weight: 600;
+	font-size: $text-lg;
+	flex: 1;
+}
+
+.room-player-count {
+	font-size: $text-sm;
+	color: $text-muted;
+	font-variant-numeric: tabular-nums;
+}
+
+// Player card grid
+.player-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: $s3;
+
+	@media (min-width: $bp-sm) {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+.player-card {
+	position: relative;
+	padding: $s4 $s3 $s3;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $s2;
+	transition: border-color $transition, box-shadow $transition;
+
+	&.player-card-host {
+		border-color: $accent;
+		box-shadow: 0 0 0 1px $accent;
+	}
+
+	&.player-card-me {
+		background: $accent-subtle;
+	}
+
+	&.player-card-empty {
+		opacity: 0.35;
+		border-style: dashed;
+		cursor: pointer;
+
+		&:hover {
+			opacity: 0.8;
+			border-color: $accent;
+			background: $accent-subtle;
+
+			.player-card-avatar-empty {
+				background: $accent-subtle;
+				color: $accent;
+			}
+		}
+	}
+}
+
+.player-card-crown {
+	position: absolute;
+	top: $s2;
+	left: $s3;
+	font-size: 0.65rem;
+	color: $accent;
+}
+
+.player-card-kick {
+	position: absolute;
+	top: $s2;
+	right: $s2;
+	width: 22px;
+	height: 22px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	padding: 0;
-	margin-left: $s1;
 	background: transparent;
 	border: 1px solid transparent;
 	border-radius: $radius-full;
 	color: $text-muted;
-	font-size: 0.65rem;
-	line-height: 1;
+	font-size: 0.7rem;
 	cursor: pointer;
 	transition: color $transition, border-color $transition, background $transition;
 
@@ -115,6 +178,73 @@
 		border-color: $color-danger-border;
 		background: $color-danger-bg;
 	}
+}
+
+.player-card-friend {
+	position: absolute;
+	bottom: $s2;
+	right: $s2;
+	width: 26px;
+	height: 26px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-sm;
+	color: $text-muted;
+	font-size: 0.65rem;
+	cursor: pointer;
+	opacity: 0;
+	transform: scale(0.8);
+	transition: opacity $transition, transform $transition, color $transition, border-color $transition, background $transition;
+
+	&:hover {
+		color: $accent;
+		border-color: $accent;
+		background: $accent-subtle;
+	}
+}
+
+.player-card:not(.player-card-empty):hover .player-card-friend {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.player-card-avatar {
+	width: 52px;
+	height: 52px;
+	border-radius: $radius-full;
+	background: hsl(var(--avatar-hue), 60%, 42%);
+	color: #fff;
+	font-size: $text-xl;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+
+	&.player-card-avatar-empty {
+		background: $bg-surface;
+		color: $text-muted;
+		font-size: $text-base;
+	}
+}
+
+.player-card-name {
+	font-size: $text-sm;
+	font-weight: 500;
+	text-align: center;
+	word-break: break-word;
+}
+
+.player-card-you {
+	font-size: 0.7rem;
+	color: $accent;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
 }
 
 // Phase panels

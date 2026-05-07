@@ -24,6 +24,7 @@ export class SignalRService {
 		roomDeleted: new Subject<string>(),
 		gameStateUpdated: new Subject<{ roomId: string; state: GameState }>(),
 		chatMessage: new Subject<{ roomId: string; message: ChatMessage }>(),
+		roomInvite: new Subject<{ roomId: string; game: string }>(),
 	}
 
 	constructor() {
@@ -67,6 +68,7 @@ export class SignalRService {
 			this.connection.on('gameStateUpdated', (roomId: string, state: GameState) => this.events.gameStateUpdated.next({ roomId, state }));
 			this.connection.on('onlineCountUpdated', (names: string[]) => this.onlineUsers.set(names));
 			this.connection.on('chatMessage', (roomId: string, message: ChatMessage) => this.events.chatMessage.next({ roomId, message }));
+			this.connection.on('roomInvite', (roomId: string, game: string) => this.events.roomInvite.next({ roomId, game }));
 
 			// Re-negotiate after start so the broadcast arrives while the WS is open.
 			// Also fires on reconnect so presence is restored after network drops.

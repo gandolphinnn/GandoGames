@@ -23,16 +23,43 @@
 				}
 			</header>
 
-			<div class="players-strip">
-				@for (player of room()!.players; track player.id) {
-					<div class="player-chip" [class.host]="player.id === room()!.hostId" [class.me]="player.id === myId()">
-						{{ player.name }}
-						@if (player.id === room()!.hostId) { <span class="badge">HOST</span> }
-						@if (player.id === myId()) { <span class="badge">YOU</span> }
-						@if (isHost() && player.id !== myId() && room()!.phase === 'waiting') {
-							<button class="kick-btn" (click)="kick(player.id)" title="Kick player"><i class="fa-solid fa-xmark"></i></button>
-						}
-					</div>
+			<div class="room-info">
+				<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
+				<span class="room-game-name">{{ gameInfo()?.name }}</span>
+				<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
+			</div>
+
+			<div class="player-grid">
+				@for (slot of playerSlots(); track $index) {
+					@if (slot) {
+						<div class="player-card"
+							[class.player-card-host]="slot.id === room()!.hostId"
+							[class.player-card-me]="slot.id === myId()"
+							[style.--avatar-hue]="avatarHue(slot.name)">
+							@if (slot.id === room()!.hostId) {
+								<i class="fa-solid fa-crown player-card-crown"></i>
+							}
+							@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
+								<button class="player-card-kick" (click)="kick(slot.id)" title="Kick player">
+									<i class="fa-solid fa-xmark"></i>
+								</button>
+							}
+							<div class="player-card-avatar">{{ slot.name.charAt(0).toUpperCase() }}</div>
+							<span class="player-card-name">{{ slot.name }}</span>
+							@if (slot.id !== myId() && !slot.id.startsWith('bot_')) {
+								<button class="player-card-friend" title="Add friend" (click)="addFriend(slot)">
+									<i class="fa-solid fa-user-plus"></i>
+								</button>
+							}
+						</div>
+					} @else {
+						<div class="player-card player-card-empty" (click)="invite()">
+							<div class="player-card-avatar player-card-avatar-empty">
+								<i class="fa-solid fa-plus"></i>
+							</div>
+							<span class="player-card-name">Empty</span>
+						</div>
+					}
 				}
 			</div>
 
@@ -80,5 +107,16 @@
 		}
 
 	</div>
+
+	@if (showInviteModal() && room()) {
+		<gg-invite-modal
+			[roomId]="roomId()"
+			[gameType]="room()!.game"
+			[roomPlayerNames]="roomPlayerNames()"
+			[isHost]="isHost()"
+			[playerCount]="room()!.players.length"
+			[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
+			(closed)="showInviteModal.set(false)" />
+	}
 
 }

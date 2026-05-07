@@ -37,6 +37,10 @@ export interface RoomKickRequest extends RoomBaseRequest {
 	playerId: string;
 }
 
+export interface RoomInviteRequest extends RoomBaseRequest {
+	playerName: string;
+}
+
 export interface ChatSendRequest extends RoomBaseRequest {
 	text: string;
 }

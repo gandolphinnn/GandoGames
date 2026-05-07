@@ -24,3 +24,10 @@ export function deletePresence(userId: string): string[] {
 	prune(Date.now());
 	return names();
 }
+
+export function getPresenceIdByName(name: string): string | undefined {
+	for (const [id, entry] of presence) {
+		if (entry.name === name) return id;
+	}
+	return undefined;
+}

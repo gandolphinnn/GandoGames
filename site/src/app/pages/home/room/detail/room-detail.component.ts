@@ -1,17 +1,18 @@
 import { Component, computed, DestroyRef, HostListener, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { RoomData } from '@gandogames/common/api';
+import { GamePlayer, RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { InviteModalComponent } from '../invite-modal/invite-modal.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink, RoomPlayComponent],
+	imports: [RouterLink, RoomPlayComponent, InviteModalComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -52,12 +53,30 @@ export class RoomDetailComponent implements OnInit {
 		return r.players.length >= game.minPlayers;
 	});
 
-	@HostListener('window:beforeunload')
+	public readonly gameInfo = computed(() => GAME_REGISTRY.find((g) => g.id === this.room()?.game));
+	public readonly roomPlayerNames = computed(() => this.room()?.players.map(p => p.name) ?? []);
+
+	public readonly playerSlots = computed(() => {
+		const r = this.room();
+		if (!r) return [];
+		const max = GAME_REGISTRY.find((g) => g.id === r.game)?.maxPlayers ?? r.players.length;
+		const slots: (typeof r.players[0] | null)[] = [...r.players];
+		while (slots.length < max) slots.push(null);
+		return slots;
+	});
+
+	public avatarHue(name: string): number {
+		let hash = 0;
+		for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
+		return hash % 360;
+	}
+
+	/* @HostListener('window:beforeunload')
 	public onBeforeUnload(): void {
 		if (!this.hasLeft && this.isInRoom()) {
 			this.roomService.leaveRoomBeacon(this.roomId());
 		}
-	}
+	} */
 
 	public ngOnInit(): void {
 		this.roomId.set(this.route.snapshot.params['roomId']);
@@ -148,5 +167,15 @@ export class RoomDetailComponent implements OnInit {
 		await navigator.clipboard.writeText(window.location.href);
 		this.copied.set(true);
 		setTimeout(() => this.copied.set(false), 2000);
+	}
+
+	public readonly showInviteModal = signal(false);
+
+	public invite(): void {
+		if (this.isInRoom() && this.room()?.phase === 'waiting') this.showInviteModal.set(true);
+	}
+
+	public addFriend(player: GamePlayer): void {
+		this.toast.show(`Friend request sent to ${player.name}`, 'success');
 	}
 }

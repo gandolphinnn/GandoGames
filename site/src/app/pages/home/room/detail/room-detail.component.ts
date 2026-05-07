@@ -52,18 +52,9 @@ export class RoomDetailComponent implements OnInit {
 		return r.players.length >= game.minPlayers;
 	});
 
-	private readonly myOtherRoom = computed(() => {
-		const my = this.roomService.myRoom();
-		return my?.id !== this.roomId() ? my : null;
-	});
-
-	public readonly joinLabel = computed(() =>
-		this.myOtherRoom() ? 'Leave your room and join this one' : 'Join'
-	);
-
 	@HostListener('window:beforeunload')
 	public onBeforeUnload(): void {
-		if (!this.hasLeft && this.isInRoom() && this.room()?.phase === 'waiting') {
+		if (!this.hasLeft && this.isInRoom()) {
 			this.roomService.leaveRoomBeacon(this.roomId());
 		}
 	}
@@ -111,8 +102,6 @@ export class RoomDetailComponent implements OnInit {
 		try {
 			this.loading.set(true);
 			this.error.set('');
-			const other = this.myOtherRoom();
-			if (other) await this.roomService.leaveRoom(other.id);
 			await this.roomService.joinRoom(this.roomId());
 			await this.loadRoom();
 		} catch (e) {

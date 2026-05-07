@@ -115,5 +115,21 @@
 .game-title {
 	font-size: $text-xl;
 	font-weight: 700;
+	flex: 1;
+}
+
+.game-leave {
+	background: transparent;
+	border: 1px solid $color-danger-border;
+	border-radius: $radius-md;
+	color: $color-danger;
+	font-size: $text-sm;
+	cursor: pointer;
+	padding: 0 $s3;
+	min-height: 36px;
+	font-family: inherit;
+	transition: background $transition;
+
+	&:hover { background: $color-danger-bg; }
 }
 

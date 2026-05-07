@@ -12,10 +12,10 @@ export class RoomService {
 
 	public readonly rooms = signal<RoomData[]>([]);
 
-	public readonly myRoom = computed(() => {
+	public readonly myRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
-		if (!userId) return null;
-		return this.rooms().find(r => r.phase !== 'ended' && r.players.some(p => p.id === userId)) ?? null;
+		if (!userId) return [];
+		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
 
 	private get ticket(): string {

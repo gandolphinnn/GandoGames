@@ -7,14 +7,36 @@
 	</div>
 
 	<div class="site-header-center">
-		@if (myRoom()) {
-			<button class="my-room-card" (click)="goToMyRoom()">
-				<i class="fa-solid fa-circle-dot"></i>
-				{{ myRoom()!.id }}
-				@if (myRoom()!.phase === 'playing') {
-					<span class="my-room-badge">LIVE</span>
+		@if (myRooms().length > 0) {
+			<div class="my-rooms-wrap">
+				<button class="my-room-card" (click)="toggleRoomsDropdown()">
+					<i class="fa-solid fa-circle-dot"></i>
+					@if (myRooms().length === 1) {
+						{{ myRooms()[0].id }}
+					} @else {
+						{{ myRooms().length }} Rooms
+					}
+					@if (hasLiveRoom()) {
+						<span class="my-room-badge">LIVE</span>
+					}
+					<i class="fa-solid fa-chevron-down my-room-chevron" [class.open]="roomsDropdownOpen()"></i>
+				</button>
+
+				@if (roomsDropdownOpen()) {
+					<div class="rooms-dropdown-backdrop" (click)="closeRoomsDropdown()"></div>
+					<div class="rooms-dropdown">
+						@for (room of myRooms(); track room.id) {
+							<button class="rooms-dropdown-item" (click)="goToRoom(room.id)">
+								<span class="rooms-dropdown-id">{{ room.id }}</span>
+								<span class="rooms-dropdown-game">{{ gameLabel(room.game) }}</span>
+								@if (room.phase === 'playing') {
+									<span class="my-room-badge">LIVE</span>
+								}
+							</button>
+						}
+					</div>
 				}
-			</button>
+			</div>
 		}
 	</div>
 
@@ -71,6 +93,19 @@
 		<a routerLink="/about" class="nav-link" (click)="closeMenu()">About</a>
 		@if (isAdmin()) {
 			<a routerLink="/test/palette" class="nav-link" (click)="closeMenu()">Palette</a>
+		}
+		@if (myRooms().length > 0) {
+			<div class="mobile-rooms">
+				@for (room of myRooms(); track room.id) {
+					<button class="rooms-dropdown-item" (click)="goToRoom(room.id); closeMenu()">
+						<span class="rooms-dropdown-id">{{ room.id }}</span>
+						<span class="rooms-dropdown-game">{{ gameLabel(room.game) }}</span>
+						@if (room.phase === 'playing') {
+							<span class="my-room-badge">LIVE</span>
+						}
+					</button>
+				}
+			</div>
 		}
 		<div class="mobile-menu-footer">
 			@if (isLoggedIn()) {

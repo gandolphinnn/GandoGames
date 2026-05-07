@@ -1,5 +1,5 @@
 @if (room()?.phase === 'playing') {
-	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" [history]="room()!.history || []" />
+	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" [history]="room()!.history || []" (leaveRoom)="leave()" />
 } @else {
 
 	<div class="room-detail">
@@ -18,6 +18,9 @@
 				<button class="code-btn" (click)="copyCode()">
 					{{ roomId() }} <i [class]="copied() ? 'fa-solid fa-check' : 'fa-regular fa-copy'"></i>
 				</button>
+				@if (isInRoom()) {
+					<button class="btn-danger" (click)="leave()">Leave Room</button>
+				}
 			</header>
 
 			<div class="players-strip">
@@ -45,7 +48,7 @@
 							@if (canJoin()) {
 								<p class="status-msg">This room is open. Join to play.</p>
 								<button class="btn-primary" [disabled]="loading()" (click)="join()">
-									{{ loading() ? 'Joining…' : joinLabel() }}
+									{{ loading() ? 'Joining…' : 'Join' }}
 								</button>
 							} @else {
 								<p class="status-msg">This room is full.</p>
@@ -61,7 +64,6 @@
 									<p class="hint">Need more players to start.</p>
 								}
 							}
-							<button class="btn-danger" (click)="leave()">Leave Room</button>
 						}
 					</div>
 				}

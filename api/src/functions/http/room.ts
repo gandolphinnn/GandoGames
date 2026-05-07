@@ -89,6 +89,9 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, notifi
 	if (room.hostId == player.id) {
 		room.hostId = room.players[0].id;
 	}
+	if (room.phase === 'playing') {
+		room.phase = 'ended';
+	}
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);
 };

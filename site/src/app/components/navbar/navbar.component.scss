@@ -128,6 +128,77 @@
 	.title-full  { display: inline; }
 }
 
+.my-rooms-wrap {
+	position: relative;
+}
+
+.my-room-chevron {
+	font-size: 0.6em;
+	transition: transform $transition;
+
+	&.open { transform: rotate(180deg); }
+}
+
+.rooms-dropdown-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 150;
+}
+
+.rooms-dropdown {
+	position: absolute;
+	top: calc(100% + $s2);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 200;
+	min-width: 180px;
+	padding: $s2;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	box-shadow: $shadow-card;
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+}
+
+.rooms-dropdown-item {
+	display: flex;
+	align-items: center;
+	gap: $s2;
+	padding: $s2 $s3;
+	background: transparent;
+	border: none;
+	border-radius: $radius-sm;
+	cursor: pointer;
+	text-align: left;
+	min-height: 44px;
+	transition: background $transition;
+
+	&:hover { background: $hover-overlay; }
+}
+
+.rooms-dropdown-id {
+	font-size: $text-sm;
+	font-weight: 600;
+	font-family: monospace;
+	color: $text;
+}
+
+.rooms-dropdown-game {
+	font-size: $text-sm;
+	color: $text-muted;
+	flex: 1;
+}
+
+.mobile-rooms {
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+	border-top: 1px solid $border;
+	padding-top: $s2;
+}
+
 .my-room-card {
 	display: inline-flex;
 	align-items: center;

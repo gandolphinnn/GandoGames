@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, firstValueFrom, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ToastService } from './toast.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -9,6 +10,7 @@ import { environment } from '../../environments/environment';
 export class BackendService {
 	private readonly http = inject(HttpClient);
 	private readonly baseUrl = environment.apiBaseUrl;
+	private readonly toast = inject(ToastService);
 
 	public async get<T = any>(url: string) {
 		return await firstValueFrom(
@@ -38,8 +40,9 @@ export class BackendService {
 		});
 	}
 
-	private handleError(err: HttpErrorResponse) {
+	private readonly handleError = (err: HttpErrorResponse) => {
 		const message: string = err.error?.error ?? err.message;
+		this.toast.error(message);
 		return throwError(() => new Error(message));
-	}
+	};
 }

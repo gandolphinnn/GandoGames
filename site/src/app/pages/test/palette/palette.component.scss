@@ -3,7 +3,31 @@
 :host {
 	display: flex;
 	flex: 1;
+	flex-direction: column;
 	overflow: hidden;
+}
+
+.test-panel {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $s4;
+	padding: $s4 $s6;
+	border-bottom: 1px solid var(--border-color);
+	background: var(--bg-surface);
+}
+
+.test-group {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: $s2;
+}
+
+.test-label {
+	font-size: $text-sm;
+	font-weight: 700;
+	color: var(--text-muted);
+	margin-right: $s1;
 }
 
 // ── Split layout ──────────────────────────────────────────────

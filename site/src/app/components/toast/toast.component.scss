@@ -1,0 +1,83 @@
+@use 'styles/variables' as *;
+
+:host {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 1200;
+	display: flex;
+	flex-direction: column;
+	pointer-events: none;
+
+	@media (min-width: $bp-sm) {
+		top: $s4;
+		bottom: auto;
+		left: auto;
+		right: $s4;
+		width: 24rem;
+	}
+}
+
+.toast {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+	padding: $s3 $s4;
+	font-size: $text-sm;
+	font-weight: 500;
+	pointer-events: auto;
+	animation: toast-in 200ms ease;
+	cursor: pointer;
+
+	@media (min-width: $bp-sm) {
+		border-radius: $radius-md;
+		margin-bottom: $s2;
+	}
+
+	&.toast-info    { background: $bg-card;           border: 1px solid $border;               color: $text; }
+	&.toast-success { background: $color-success-bg;  border: 1px solid $color-success-border; color: $color-success; }
+	&.toast-warning { background: $color-warning-bg;  border: 1px solid $color-warning-border; color: $color-warning; }
+	&.toast-error   { background: $color-danger-bg;   border: 1px solid $color-danger-border;  color: $color-danger; }
+}
+
+.toast-message {
+	flex: 1;
+}
+
+.toast-actions {
+	display: flex;
+	gap: $s2;
+	flex-shrink: 0;
+}
+
+.btn-yes,
+.btn-no {
+	display: inline-flex;
+	align-items: center;
+	gap: $s1;
+	padding: $s1 $s3;
+	border: none;
+	border-radius: $radius-sm;
+	font-size: $text-sm;
+	font-weight: 600;
+	cursor: pointer;
+	transition: opacity $transition;
+
+	&:hover { opacity: 0.85; }
+}
+
+.btn-yes {
+	background: $color-success;
+	color: #fff;
+}
+
+.btn-no {
+	background: $color-danger;
+	color: #fff;
+}
+
+@keyframes toast-in {
+	from { opacity: 0; transform: translateY(8px); }
+	to   { opacity: 1; transform: translateY(0); }
+}

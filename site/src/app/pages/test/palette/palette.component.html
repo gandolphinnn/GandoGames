@@ -1,3 +1,15 @@
+<div class="test-panel">
+	<div class="test-group">
+		<span class="test-label">ToastService</span>
+		<button class="btn btn-danger btn-sm" (click)="toast.error('Something went wrong on the server.')">Error</button>
+		<button class="btn btn-success btn-sm" (click)="toast.success('Operation completed successfully.')">Success</button>
+		<button class="btn btn-warning btn-sm" (click)="toast.warning('Proceed with caution.')">Warning</button>
+		<button class="btn btn-info btn-sm" (click)="toast.show('Here is some info.')">Info</button>
+		<button class="btn btn-info btn-sm" (click)="testProgress()">Progress (3s)</button>
+		<button class="btn btn-primary btn-sm" (click)="testYesNo()">Yes / No</button>
+	</div>
+</div>
+
 <div class="palette-split">
 
 	<!-- Light half -->

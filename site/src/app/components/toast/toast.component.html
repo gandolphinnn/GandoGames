@@ -1,0 +1,16 @@
+@for (toast of toastService.toasts(); track toast.id) {
+	<div class="toast toast-{{ toast.type }}" (click)="onToastClick(toast)">
+		<i [class]="getIcon(toast)"></i>
+		<span class="toast-message">{{ toast.message }}</span>
+		@if (toast.yesno) {
+			<div class="toast-actions">
+				<button class="btn-yes" (click)="doYes(toast)">
+					<i class="fa-solid fa-check"></i> Sì
+				</button>
+				<button class="btn-no" (click)="doNo(toast)">
+					<i class="fa fa-times"></i> No
+				</button>
+			</div>
+		}
+	</div>
+}

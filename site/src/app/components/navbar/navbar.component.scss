@@ -1,0 +1,239 @@
+@use 'styles/variables' as *;
+
+$bp-nav: 768px;
+
+.site-header {
+	display: flex;
+	align-items: center;
+	padding: $s4 $s6;
+	border-bottom: 1px solid $border;
+}
+
+.site-header-start,
+.site-header-end {
+	flex: 1;
+	min-width: 0;
+}
+
+.site-header-end {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.site-header-center {
+	flex: 0 0 auto;
+	display: flex;
+	justify-content: center;
+}
+
+.site-nav {
+	display: none;
+	align-items: center;
+	gap: $s4;
+
+	@media (min-width: $bp-nav) { display: flex; }
+}
+
+.hamburger {
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	cursor: pointer;
+	width: 44px;
+	height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $text-base;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text;
+		background: $hover-overlay;
+	}
+
+	@media (min-width: $bp-nav) { display: none; }
+}
+
+.mobile-menu-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 400;
+	background: rgba(0, 0, 0, 0.4);
+
+	@media (min-width: $bp-nav) { display: none; }
+}
+
+.mobile-menu {
+	position: fixed;
+	top: 0;
+	right: 0;
+	height: 100dvh;
+	width: 260px;
+	z-index: 500;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	padding: $s4 $s6;
+	background: $bg-surface;
+	border-left: 1px solid $border;
+	box-shadow: $shadow-card;
+
+	@media (min-width: $bp-nav) { display: none; }
+}
+
+.mobile-menu-header {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: $s2;
+}
+
+.mobile-menu-footer {
+	margin-top: auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	.online-count {
+		flex: 1;
+
+		.online-tooltip {
+			top: auto;
+			bottom: calc(100% + $s2);
+		}
+	}
+}
+
+.nav-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	transition: color $transition;
+
+	&:hover { color: $text; }
+
+	&.title {
+		font-size: $text-xl;
+		font-weight: 700;
+		color: $accent;
+		letter-spacing: -0.02em;
+	}
+}
+
+.title-short { display: inline; }
+.title-full  { display: none; }
+
+@media (min-width: $bp-nav) {
+	.title-short { display: none; }
+	.title-full  { display: inline; }
+}
+
+.my-room-card {
+	display: inline-flex;
+	align-items: center;
+	gap: $s2;
+	height: 36px;
+	padding: 0 $s4;
+	background: $color-success-bg;
+	border: 1px solid $color-success-border;
+	border-radius: $radius-full;
+	color: $color-success;
+	font-size: $text-sm;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background $transition, border-color $transition;
+
+	i { font-size: 0.55em; }
+
+	&:hover {
+		background: rgba(74, 222, 128, 0.2);
+		border-color: $color-success;
+	}
+}
+
+.my-room-badge {
+	font-size: 0.65em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	background: $color-success;
+	color: #fff;
+	border-radius: $radius-sm;
+	padding: 1px 5px;
+}
+
+.online-count {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: $s2;
+	height: 44px;
+	padding: 0 $s3;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	font-size: $text-sm;
+	color: $text-muted;
+	white-space: nowrap;
+	cursor: default;
+
+	i { color: $color-success; font-size: 0.6em; }
+
+	&:hover .online-tooltip {
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
+}
+
+.online-tooltip {
+	position: absolute;
+	top: calc(100% + $s2);
+	right: 0;
+	z-index: 200;
+	min-width: 140px;
+	padding: $s3;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	box-shadow: $shadow-card;
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	opacity: 0;
+	transform: translateY(-4px);
+	pointer-events: none;
+	transition: opacity $transition, transform $transition;
+}
+
+.online-tooltip-name {
+	font-size: $text-sm;
+	color: $text;
+	white-space: nowrap;
+}
+
+.online-tooltip-empty {
+	font-size: $text-sm;
+	color: $text-muted;
+	font-style: italic;
+}
+
+.theme-toggle {
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	cursor: pointer;
+	width: 44px;
+	height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $text-base;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text;
+		background: $hover-overlay;
+	}
+}

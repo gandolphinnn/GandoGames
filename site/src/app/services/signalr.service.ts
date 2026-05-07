@@ -1,7 +1,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { GameState, NegotiateResponse, RoomData, SignalREvent } from '@gandogames/common/api';
+import { ChatMessage, GameState, NegotiateResponse, RoomData, SignalREvent } from '@gandogames/common/api';
 import { AuthService } from './auth.service';
 import { BackendService } from './backend.service';
 
@@ -23,6 +23,7 @@ export class SignalRService {
 		roomUpsert: new Subject<RoomData>(),
 		roomDeleted: new Subject<string>(),
 		gameStateUpdated: new Subject<{ roomId: string; state: GameState }>(),
+		chatMessage: new Subject<{ roomId: string; message: ChatMessage }>(),
 	}
 
 	constructor() {
@@ -65,6 +66,7 @@ export class SignalRService {
 			this.connection.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
 			this.connection.on('gameStateUpdated', (roomId: string, state: GameState) => this.events.gameStateUpdated.next({ roomId, state }));
 			this.connection.on('onlineCountUpdated', (names: string[]) => this.onlineUsers.set(names));
+			this.connection.on('chatMessage', (roomId: string, message: ChatMessage) => this.events.chatMessage.next({ roomId, message }));
 
 			// Re-negotiate after start so the broadcast arrives while the WS is open.
 			// Also fires on reconnect so presence is restored after network drops.

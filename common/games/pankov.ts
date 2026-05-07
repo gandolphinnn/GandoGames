@@ -33,3 +33,4 @@ export interface PankovGameState extends GameState {
 export interface PankovRoomState extends RoomData {
 	gameState?: PankovGameState,
 }
+

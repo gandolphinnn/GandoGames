@@ -11,9 +11,12 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		players: [player],
 		kickedPlayers: [],
 		phase: 'waiting',
+		history: [],
+		chat: [],
 		lastUpdate: new Date(),
 	};
 	await PlayfabCtx.rooms.upsert(roomId, room);
+	notifier.addToGroup(player.id, roomId);
 	notifier.roomUpsert(room);
 	return room;
 };
@@ -90,6 +93,20 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, notifi
 	notifier.roomUpsert(room);
 };
 
+const roomResetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.phase !== 'playing') throw new Error('Game is not in progress');
+
+	room.phase = 'waiting';
+	room.history = [];
+	room.lastUpdate = new Date();
+	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	notifier.roomUpsert(room);
+	return room;
+};
+
 const roomKickInner: InnerFunction<RoomKickRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -113,5 +130,6 @@ registerFunction('room_list', 'rooms/list', roomListInner);
 registerFunction('room_get', 'rooms/get', roomGetInner);
 registerFunction('room_join', 'rooms/join', roomJoinInner);
 registerFunction('room_start', 'rooms/start', roomStartInner);
+registerFunction('room_reset', 'rooms/reset', roomResetInner);
 registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);

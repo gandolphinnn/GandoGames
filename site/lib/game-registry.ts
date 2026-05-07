@@ -1,4 +1,4 @@
-import { InputSignal, OutputEmitterRef, OutputRef } from "@angular/core";
+import { InputSignal, OutputEmitterRef } from "@angular/core";
 import { GameState, GameType } from "@gandogames/common/api";
 
 export interface GameComponent<TState extends GameState = GameState> {
@@ -8,6 +8,7 @@ export interface GameComponent<TState extends GameState = GameState> {
 	myPlayFabId: InputSignal<string | null>;
 	gameAction: OutputEmitterRef<{ action: string; data?: unknown }>;
 	back: OutputEmitterRef<void>;
+	playAgain: OutputEmitterRef<void>;
 }
 
 export interface GameDescriptor {

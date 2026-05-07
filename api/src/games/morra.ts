@@ -1,6 +1,8 @@
-import { GamePlayer } from '@gandogames/common/api';
-import { Hand, MorraGameState, MorraPlayer, MorraRoundResult } from '@gandogames/common/morra';
+import type { GamePlayer } from '@gandogames/common/api';
+import type { Hand, MorraGameState, MorraPlayer, MorraRoundResult } from '@gandogames/common/morra';
 import { Game } from './game';
+
+const HAND_LABEL: Record<Hand, string> = { rock: 'Rock', paper: 'Paper', scissors: 'Scissors' };
 
 const HANDS: Hand[] = ['rock', 'paper', 'scissors'];
 
@@ -37,6 +39,25 @@ export class MorraGame extends Game<MorraGameState> {
 			return rest as MorraPlayer;
 		});
 		return { ...this.state, players };
+	}
+
+	public override describe(state: MorraGameState): string {
+		switch (state.gamePhase) {
+			case 'picking':
+				return 'Round started — choose your hand';
+			case 'reveal': {
+				if (!state.result) return 'Reveal';
+				if (state.result.isDraw) return 'Draw — no lives lost';
+				const parts = state.players.map(p => {
+					const hand = HAND_LABEL[state.result!.picks[p.id] as Hand] ?? state.result!.picks[p.id];
+					const lost = state.result!.losers.includes(p.id);
+					return `${p.name}: ${hand}${lost ? ' (−1)' : ''}`;
+				});
+				return parts.join(' · ');
+			}
+			case 'game-over':
+				return `Game over — ${state.winnerName ?? '?'} wins!`;
+		}
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): MorraGameState {

@@ -1,0 +1,68 @@
+@if (currentRoom()) {
+
+	<!-- ── Desktop panel ──────────────────────────────────────────────────── -->
+	<div class="chat-panel">
+		<div class="chat-header">
+			<i class="fa-solid fa-comments"></i>
+			<span class="chat-header-title">Chat</span>
+		</div>
+		<ng-container *ngTemplateOutlet="body" />
+	</div>
+
+	<!-- ── Mobile FAB ─────────────────────────────────────────────────────── -->
+	<button class="chat-fab" (click)="toggle()" type="button" title="Open chat">
+		<i class="fa-solid fa-comments"></i>
+		@if (unread() > 0) {
+			<span class="chat-badge">{{ unread() }}</span>
+		}
+	</button>
+
+	<!-- ── Mobile drawer ──────────────────────────────────────────────────── -->
+	@if (open()) {
+		<div class="chat-backdrop" (click)="close()"></div>
+		<aside class="chat-drawer">
+			<div class="chat-drawer-header">
+				<i class="fa-solid fa-comments"></i> Room Chat
+				<button class="chat-close" (click)="close()" type="button"><i class="fa-solid fa-xmark"></i></button>
+			</div>
+			<ng-container *ngTemplateOutlet="body" />
+		</aside>
+	}
+
+	<!-- ── Shared message list + input ────────────────────────────────────── -->
+	<ng-template #body>
+		<div class="chat-messages" #messageList>
+			@for (msg of messages(); track msg.playerId + msg.timestamp) {
+				<div class="chat-msg" [class.is-mine]="msg.playerId === myId()">
+					<span class="chat-msg-name">{{ msg.playerName }}</span>
+					<span class="chat-msg-text">{{ msg.text }}</span>
+					<span class="chat-msg-time">{{ msg.timestamp | date:'HH:mm' }}</span>
+				</div>
+			} @empty {
+				<p class="chat-empty">No messages yet.</p>
+			}
+		</div>
+		<div class="chat-input-row">
+			<input
+				class="chat-input"
+				type="text"
+				placeholder="Message…"
+				[ngModel]="text()"
+				(ngModelChange)="text.set($event)"
+				(keydown)="onKeydown($event)"
+				maxlength="500"
+				autocomplete="off"
+			/>
+			<button
+				class="chat-send"
+				type="button"
+				(click)="send()"
+				[disabled]="sending() || !text().trim()"
+				title="Send"
+			>
+				<i class="fa-solid fa-paper-plane"></i>
+			</button>
+		</div>
+	</ng-template>
+
+}

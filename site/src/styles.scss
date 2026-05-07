@@ -66,11 +66,25 @@
   padding: 0;
 }
 
-html, body {
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+
+html {
   height: 100%;
+  overflow: hidden;
 }
 
 body {
+  height: 100%;
   font-family: $font;
   background-color: $bg;
   color: $text;

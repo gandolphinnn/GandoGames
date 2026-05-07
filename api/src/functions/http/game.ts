@@ -20,11 +20,22 @@ const gameActionInner: InnerFunction<GameActionRequest, GameState | null> = asyn
 	const game = Game.Factory(body.game);
 	game.state = savedState as any;
 	game.action(player, body.action, body.data);
-	await PlayfabCtx.game[body.game].upsert(body.roomId, game.state!);
+
+	const description = game.describe(game.state!);
+	const history = room.history ?? [];
+	if (history[0]?.description !== description) {
+		room.history = [{ description, timestamp: new Date() }, ...history];
+	}
+
+	await Promise.all([
+		PlayfabCtx.game[body.game].upsert(body.roomId, game.state!),
+		PlayfabCtx.rooms.upsert(body.roomId, room),
+	]);
 
 	for (const p of room.players) {
 		notifier.gameStateUpdatedForPlayer(p.id, body.roomId, game.getPublicState(p.id));
 	}
+	notifier.roomUpsert(room);
 
 	return game.getPublicState(player.id);
 };

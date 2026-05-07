@@ -29,3 +29,4 @@ export interface MorraActionRequest {
 	action: 'pick' | 'next-round',
 	hand?: Hand,
 }
+

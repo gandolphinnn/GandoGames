@@ -1,5 +1,5 @@
 import { InvocationContext, Timer } from '@azure/functions';
-import { BaseRequest, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/common/api';
+import { BaseRequest, ChatMessage, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/common/api';
 import { signalROutput } from '.';
 
 export type SignalRMessage =
@@ -38,6 +38,9 @@ export class InnerFunctionNotifier {
 	}
 	gameStateUpdatedForPlayer(userId: string, roomId: string, state: GameState) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], userId });
+	}
+	chatMessage(roomId: string, message: ChatMessage) {
+		this.signalR.push({ target: 'chatMessage', arguments: [roomId, message], groupName: `room-${roomId}` });
 	}
 	//#endregion SignalR methods
 

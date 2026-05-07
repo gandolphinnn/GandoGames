@@ -48,8 +48,18 @@ export class RoomService {
 		return this.backend.post<RoomData>('/rooms/create', { sessionTicket: this.ticket, game });
 	}
 
-	public getRoom(roomId: string): Promise<RoomData> {
-		return this.backend.post<RoomData>('/rooms/get', { sessionTicket: this.ticket, roomId });
+	public async getRoom(roomId: string): Promise<RoomData> {
+		const room = await this.backend.post<RoomData>('/rooms/get', { sessionTicket: this.ticket, roomId });
+		this.rooms.update(rooms => {
+			const idx = rooms.findIndex(r => r.id === room.id);
+			if (idx >= 0) { const updated = [...rooms]; updated[idx] = room; return updated; }
+			return [...rooms, room];
+		});
+		return room;
+	}
+
+	public sendChat(roomId: string, text: string): Promise<void> {
+		return this.backend.post('/chat/send', { sessionTicket: this.ticket, roomId, text });
 	}
 
 	public joinRoom(roomId: string): Promise<RoomData> {

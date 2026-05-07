@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { ToastService } from '../../../services/toast.service';
 
 export interface Swatch {
 	name: string;
@@ -21,6 +22,18 @@ export interface Section {
 	styleUrl: './palette.component.scss',
 })
 export class PaletteComponent {
+	public readonly toast = inject(ToastService);
+
+	public testProgress(): void {
+		const id = this.toast.progress('Loading something heavy…');
+		setTimeout(() => this.toast.dismiss(id), 3000);
+	}
+
+	public async testYesNo(): Promise<void> {
+		const confirmed = await this.toast.yesNo('Do you confirm this action?');
+		this.toast.success(confirmed ? 'You clicked Yes' : 'You clicked No');
+	}
+
 	public getValue(swatch: Swatch, theme: string): string {
 		return theme === 'light' ? swatch.values.light : swatch.values.dark;
 	}

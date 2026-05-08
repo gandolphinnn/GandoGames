@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, input, OnInit, signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, input, OnInit, output, signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { GameState, GameType, RoomHistoryEntry } from '@gandogames/common/api';
@@ -21,6 +21,7 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
 	public readonly history = input<RoomHistoryEntry[]>([]);
+	public readonly leaveRoom = output<void>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
@@ -137,6 +138,10 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 
 	protected backToLobby(): void {
 		void this.router.navigate(['/play']);
+	}
+
+	protected onLeaveRoom(): void {
+		this.leaveRoom.emit();
 	}
 
 	private async resetRoom(): Promise<void> {

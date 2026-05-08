@@ -42,6 +42,9 @@ export class InnerFunctionNotifier {
 	chatMessage(roomId: string, message: ChatMessage) {
 		this.signalR.push({ target: 'chatMessage', arguments: [roomId, message], groupName: `room-${roomId}` });
 	}
+	roomInviteForPlayer(userId: string, roomId: string, game: string) {
+		this.signalR.push({ target: 'roomInvite', arguments: [roomId, game], userId });
+	}
 	//#endregion SignalR methods
 
 	prepareContext(context: InvocationContext) {

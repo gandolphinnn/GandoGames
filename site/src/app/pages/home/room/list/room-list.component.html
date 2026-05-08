@@ -24,7 +24,7 @@
 					<i class="fa-solid fa-gamepad empty-icon"></i>
 					<p class="empty-title">No open rooms</p>
 					<p class="empty-subtitle">Create one and invite your friends.</p>
-					<button class="btn-primary" [disabled]="!!myRoom()" [title]="myRoom() ? 'Leave your current room first' : ''" (click)="mode.set('create')">+ New Room</button>
+					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
 				</div>
 			} @else {
 				<ul class="room-list">
@@ -40,7 +40,7 @@
 						</li>
 					}
 				</ul>
-				<button class="btn-primary" [disabled]="!!myRoom()" [title]="myRoom() ? 'Leave your current room first' : ''" (click)="mode.set('create')">+ New Room</button>
+				<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
 			}
 		</div>
 

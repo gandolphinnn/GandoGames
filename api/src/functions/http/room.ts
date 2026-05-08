@@ -1,5 +1,6 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomData, BaseRequest } from '@gandogames/common/api';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, BaseRequest, GamePlayer } from '@gandogames/common/api';
 import { Game, GAMES_CONFIG } from '../../games';
+import { getPresenceIdByName } from '../../presence';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 
 const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, notifier, player) => {
@@ -25,9 +26,15 @@ const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _not
 	return await PlayfabCtx.rooms.list();
 };
 
-const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, _notifier, _player) => {
+const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
+	const idx = room.players.findIndex(p => p.id === player.id);
+	if (idx !== -1 && room.players[idx].icon !== player.icon) {
+		room.players[idx] = { ...room.players[idx], icon: player.icon };
+		await PlayfabCtx.rooms.upsert(body.roomId, room);
+		notifier.roomUpsert(room);
+	}
 	return room;
 };
 
@@ -89,6 +96,9 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, notifi
 	if (room.hostId == player.id) {
 		room.hostId = room.players[0].id;
 	}
+	if (room.phase === 'playing') {
+		room.phase = 'ended';
+	}
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);
 };
@@ -125,6 +135,35 @@ const roomKickInner: InnerFunction<RoomKickRequest, RoomData> = async (body, not
 	return room;
 };
 
+const roomInviteInner: InnerFunction<RoomInviteRequest, void> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('Only the host can invite players');
+	if (room.phase !== 'waiting') throw new Error('Cannot invite after game has started');
+	const gameConfig = GAMES_CONFIG[room.game];
+	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
+	const targetId = getPresenceIdByName(body.playerName);
+	if (!targetId) throw new Error('Player not found or offline');
+	if (room.players.some(p => p.id === targetId)) throw new Error('Player is already in this room');
+	notifier.roomInviteForPlayer(targetId, body.roomId, room.game);
+};
+
+const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('Only the host can add bots');
+	if (room.phase !== 'waiting') throw new Error('Cannot add bots after game has started');
+	const gameConfig = GAMES_CONFIG[room.game];
+	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
+	const botCount = room.players.filter(p => p.id.startsWith('bot_')).length;
+	const bot: GamePlayer = { id: `bot_${Math.random().toString(36).substring(2, 8)}`, name: `Bot ${botCount + 1}` };
+	room.players.push(bot);
+	room.lastUpdate = new Date();
+	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	notifier.roomUpsert(room);
+	return room;
+};
+
 registerFunction('room_create', 'rooms/create', roomCreateInner);
 registerFunction('room_list', 'rooms/list', roomListInner);
 registerFunction('room_get', 'rooms/get', roomGetInner);
@@ -133,3 +172,5 @@ registerFunction('room_start', 'rooms/start', roomStartInner);
 registerFunction('room_reset', 'rooms/reset', roomResetInner);
 registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);
+registerFunction('room_invite', 'rooms/invite', roomInviteInner);
+registerFunction('room_add_bot', 'rooms/add-bot', roomAddBotInner);

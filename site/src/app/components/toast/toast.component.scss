@@ -11,7 +11,7 @@
 	pointer-events: none;
 
 	@media (min-width: $bp-sm) {
-		top: $s4;
+		top: calc($navbar-height + $s4);
 		bottom: auto;
 		left: auto;
 		right: $s4;

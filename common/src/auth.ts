@@ -16,9 +16,10 @@ export interface GuestLoginRequest {
 }
 
 export interface GamePlayer {
-	id: string,
-	name: string,
-	permissions?: Permission[],
+	id: string;
+	name: string;
+	permissions?: Permission[];
+	icon?: string;
 }
 
 export interface AuthResponse {
@@ -29,4 +30,8 @@ export interface AuthResponse {
 /** Base request for logged users */
 export interface BaseRequest {
 	sessionTicket: string;
+}
+
+export interface UpdateIconRequest extends BaseRequest {
+	icon: string;
 }

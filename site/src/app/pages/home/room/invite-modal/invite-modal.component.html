@@ -1,0 +1,69 @@
+<div class="backdrop" (click)="onBackdropClick()"></div>
+
+<div class="modal" (click)="$event.stopPropagation()">
+
+	<header class="modal-header">
+		<h2 class="modal-title">Invite to Room</h2>
+		<button class="modal-close" (click)="closed.emit()" title="Close">
+			<i class="fa-solid fa-xmark"></i>
+		</button>
+	</header>
+
+	<div class="modal-body">
+
+		<section class="invite-section">
+			<h3 class="section-label">Online players</h3>
+			@if (availablePlayers().length === 0) {
+				<p class="empty-msg">No other players online right now.</p>
+			} @else {
+				<ul class="player-list">
+					@for (name of availablePlayers(); track name) {
+						<li class="player-row">
+							<div class="player-row-avatar" [style.--avatar-hue]="avatarHue(name)">
+								{{ name.charAt(0).toUpperCase() }}
+							</div>
+							<span class="player-row-name">{{ name }}</span>
+							<button class="btn-row-action"
+								[disabled]="invitingName() === name || invited().has(name)"
+								[class.btn-row-action-done]="invited().has(name)"
+								(click)="invite(name)">
+								@if (invitingName() === name) {
+									<i class="fa-solid fa-spinner fa-spin"></i>
+								} @else if (invited().has(name)) {
+									<i class="fa-solid fa-check"></i> Sent
+								} @else {
+									Invite
+								}
+							</button>
+						</li>
+					}
+				</ul>
+			}
+		</section>
+
+		@if (canAddBot()) {
+			<section class="invite-section">
+				<h3 class="section-label">Add a bot</h3>
+				<div class="player-row">
+					<div class="player-row-avatar bot-avatar">
+						<i class="fa-solid fa-robot"></i>
+					</div>
+					<span class="player-row-name">Bot player</span>
+					<button class="btn-row-action" [disabled]="addingBot()" (click)="addBot()">
+						@if (addingBot()) {
+							<i class="fa-solid fa-spinner fa-spin"></i>
+						} @else {
+							Add
+						}
+					</button>
+				</div>
+			</section>
+		}
+
+		@if (error()) {
+			<p class="modal-error">{{ error() }}</p>
+		}
+
+	</div>
+
+</div>

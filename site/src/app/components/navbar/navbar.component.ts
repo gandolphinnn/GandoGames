@@ -1,10 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { ThemeService } from '@gandogames/services/theme.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
+import { GameType } from '@gandogames/common/api';
 
 @Component({
 	selector: 'gg-navbar',
@@ -24,20 +26,31 @@ export class NavbarComponent {
 
 	private readonly roomService = inject(RoomService);
 	private readonly router = inject(Router);
-	public readonly myRoom = this.roomService.myRoom;
+	public readonly myRooms = this.roomService.myRooms;
 
 	private readonly signalRService = inject(SignalRService);
 	public readonly onlineCount = this.signalRService.onlineCount;
 	public readonly onlineUsers = this.signalRService.onlineUsers;
 
 	public readonly menuOpen = signal(false);
+	public readonly roomsDropdownOpen = signal(false);
+
 	public toggleMenu(): void { this.menuOpen.update(v => !v); }
 	public closeMenu(): void { this.menuOpen.set(false); }
 
+	public toggleRoomsDropdown(): void { this.roomsDropdownOpen.update(v => !v); }
+	public closeRoomsDropdown(): void { this.roomsDropdownOpen.set(false); }
+
 	public toggleTheme(): void { this.themeService.toggle(); }
 
-	public goToMyRoom(): void {
-		const room = this.myRoom();
-		if (room) void this.router.navigate(['/play', room.id]);
+	public goToRoom(roomId: string): void {
+		void this.router.navigate(['/play', roomId]);
+		this.roomsDropdownOpen.set(false);
 	}
+
+	public gameLabel(game: GameType): string {
+		return GAME_REGISTRY.find(g => g.id === game)?.name ?? game;
+	}
+
+	public hasLiveRoom = computed(() => this.myRooms().some(r => r.phase === 'playing'));
 }

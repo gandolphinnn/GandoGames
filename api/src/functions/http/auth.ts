@@ -1,5 +1,5 @@
-import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, RegisterRequest } from '@gandogames/common/api';
-import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabAdmin, PlayFabClient, registerFunction, registerPublicFunction } from '../..';
+import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, RegisterRequest, UpdateIconRequest } from '@gandogames/common/api';
+import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabAdmin, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {
 	PlayFabId?: string;
@@ -13,18 +13,20 @@ const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParam
 	GetPlayerStatistics: false,
 	GetTitleData: false,
 	GetUserAccountInfo: true,
-	GetUserData: false,
+	GetUserData: true,
+	UserDataKeys: ['icon'],
 	GetUserInventory: false,
 	GetUserReadOnlyData: false,
 	GetUserVirtualCurrency: false,
 };
 
 const CREATOR_ID = '7F29F448E164BF64';
-const toAuthResponse = (response: LoginLike, name: string | undefined): AuthResponse => ({
+const toAuthResponse = (response: LoginLike, name: string | undefined, icon?: string): AuthResponse => ({
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
 		permissions: (response.PlayFabId === CREATOR_ID) ? ['admin'] : [],
+		icon,
 	},
 	sessionTicket: response.SessionTicket!,
 });
@@ -51,7 +53,8 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 			cb => PlayFabClient.UpdateUserTitleDisplayName({ DisplayName: name! }, cb),
 		);
 	}
-	return toAuthResponse(result, name);
+	const icon = result.InfoResultPayload?.UserData?.['icon']?.Value;
+	return toAuthResponse(result, name, icon);
 };
 
 const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, notifier) => {
@@ -61,7 +64,8 @@ const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body,
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password, InfoRequestParameters: infoRequestParameters }, cb),
 	);
-	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username);
+	const icon = result.InfoResultPayload?.UserData?.['icon']?.Value;
+	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, icon);
 };
 
 const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, notifier) => {
@@ -85,7 +89,15 @@ const deleteProfileInner: InnerFunction<BaseRequest, Record<string, never>> = as
 	return {};
 };
 
+const updateIconInner: InnerFunction<UpdateIconRequest, { icon: string }> = async (body, _notifier, player) => {
+	await pfPromise<PlayFabServerModels.UpdateUserDataResult>(
+		cb => PlayFabServer.UpdateUserData({ PlayFabId: player.id, Data: { icon: body.icon } }, cb),
+	);
+	return { icon: body.icon };
+};
+
 registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
 registerPublicFunction('auth_login', 'auth/login', loginInner);
 registerPublicFunction('auth_register', 'auth/register', registerInner);
 registerFunction('auth_deleteProfile', 'auth/delete', deleteProfileInner);
+registerFunction('auth_updateIcon', 'auth/updateIcon', updateIconInner);

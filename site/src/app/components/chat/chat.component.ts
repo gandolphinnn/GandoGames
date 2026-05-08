@@ -1,4 +1,4 @@
-import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -23,7 +23,10 @@ export class ChatComponent {
 	private readonly messageListRef = viewChild<ElementRef<HTMLElement>>('messageList');
 	private shouldScroll = false;
 
-	public readonly currentRoom = this.roomService.myRoom;
+	public readonly roomId = input.required<string>();
+	public readonly currentRoom = computed(() =>
+		this.roomService.rooms().find(r => r.id === this.roomId()) ?? null
+	);
 	public readonly myId = computed(() => this.auth.user()?.player.id ?? '');
 
 	protected readonly open = signal(false);

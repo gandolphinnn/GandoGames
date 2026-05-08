@@ -12,10 +12,10 @@ export class RoomService {
 
 	public readonly rooms = signal<RoomData[]>([]);
 
-	public readonly myRoom = computed(() => {
+	public readonly myRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
-		if (!userId) return null;
-		return this.rooms().find(r => r.phase !== 'ended' && r.players.some(p => p.id === userId)) ?? null;
+		if (!userId) return [];
+		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
 
 	private get ticket(): string {
@@ -80,6 +80,14 @@ export class RoomService {
 
 	public leaveRoomBeacon(roomId: string): void {
 		this.backend.postBeacon('/rooms/leave', { sessionTicket: this.ticket, roomId });
+	}
+
+	public invitePlayer(roomId: string, playerName: string): Promise<void> {
+		return this.backend.post('/rooms/invite', { sessionTicket: this.ticket, roomId, playerName });
+	}
+
+	public addBot(roomId: string): Promise<RoomData> {
+		return this.backend.post<RoomData>('/rooms/add-bot', { sessionTicket: this.ticket, roomId });
 	}
 
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {

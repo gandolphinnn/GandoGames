@@ -1,6 +1,11 @@
 @if (user(); as u) {
 	<div class="profile-page">
 		<div class="profile-card">
+
+			<div class="profile-avatar-wrap">
+				<gg-player-avatar class="profile-avatar" [player]="u.player" />
+			</div>
+
 			<div class="profile-header">
 				<h1 class="profile-title">Profile</h1>
 				@if (u.isGuest) {
@@ -18,6 +23,35 @@
 					<span class="info-value">{{ u.player.name }}</span>
 				</div>
 			</div>
+
+			@if (!u.isGuest) {
+				<div class="icon-picker">
+					<p class="icon-picker-title">Icon</p>
+					@if (icons.length > 0) {
+						<div class="icon-grid">
+							@for (icon of icons; track icon.id) {
+								<button
+									class="icon-btn"
+									[class.selected]="u.player.icon === icon.id"
+									[class.saving]="savingIcon() === icon.id"
+									type="button"
+									[attr.aria-label]="icon.label"
+									[disabled]="savingIcon() !== null"
+									(click)="saveIcon(icon.id)"
+								>
+									@if (savingIcon() === icon.id) {
+										<i class="fa-solid fa-spinner fa-spin"></i>
+									} @else {
+										<i [class]="icon.fa"></i>
+									}
+								</button>
+							}
+						</div>
+					} @else {
+						<p class="icon-picker-empty">No icons available yet.</p>
+					}
+				</div>
+			}
 
 			@if (error()) {
 				<p class="profile-error">{{ error() }}</p>

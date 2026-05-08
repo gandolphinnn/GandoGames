@@ -34,8 +34,7 @@
 					@if (slot) {
 						<div class="player-card"
 							[class.player-card-host]="slot.id === room()!.hostId"
-							[class.player-card-me]="slot.id === myId()"
-							[style.--avatar-hue]="avatarHue(slot.name)">
+							[class.player-card-me]="slot.id === myId()">
 							@if (slot.id === room()!.hostId) {
 								<i class="fa-solid fa-crown player-card-crown"></i>
 							}
@@ -44,7 +43,7 @@
 									<i class="fa-solid fa-xmark"></i>
 								</button>
 							}
-							<div class="player-card-avatar">{{ slot.name.charAt(0).toUpperCase() }}</div>
+							<gg-player-avatar class="player-card-avatar" [player]="slot" />
 							<span class="player-card-name">{{ slot.name }}</span>
 							@if (slot.id !== myId() && !slot.id.startsWith('bot_')) {
 								<button class="player-card-friend" title="Add friend" (click)="addFriend(slot)">
@@ -52,7 +51,7 @@
 								</button>
 							}
 						</div>
-					} @else {
+					} @else if (isInRoom()) {
 						<div class="player-card player-card-empty" (click)="invite()">
 							<div class="player-card-avatar player-card-avatar-empty">
 								<i class="fa-solid fa-plus"></i>
@@ -60,6 +59,14 @@
 							<span class="player-card-name">Empty</span>
 						</div>
 					}
+				}
+				@if (!isInRoom() && canJoin()) {
+					<div class="player-card player-card-join" [class.player-card-join-loading]="loading()" (click)="join()">
+						<div class="player-card-avatar player-card-avatar-empty">
+							<i class="fa-solid fa-arrow-right-to-bracket"></i>
+						</div>
+						<span class="player-card-name">{{ loading() ? 'Joining…' : 'Join Room' }}</span>
+					</div>
 				}
 			</div>
 
@@ -72,12 +79,7 @@
 				@case ('waiting') {
 					<div class="phase-panel">
 						@if (!isInRoom()) {
-							@if (canJoin()) {
-								<p class="status-msg">This room is open. Join to play.</p>
-								<button class="btn-primary" [disabled]="loading()" (click)="join()">
-									{{ loading() ? 'Joining…' : 'Join' }}
-								</button>
-							} @else {
+							@if (!canJoin()) {
 								<p class="status-msg">This room is full.</p>
 							}
 						} @else {

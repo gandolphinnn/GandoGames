@@ -39,6 +39,13 @@ export class AuthService {
 		localStorage.removeItem(STORAGE_KEY);
 	}
 
+	public async updateIcon(icon: string): Promise<void> {
+		const user = this._user();
+		if (!user) return;
+		await this.backend.post<{ icon: string }>('/auth/updateIcon', { sessionTicket: user.sessionTicket, icon });
+		this.setSession({ ...user, player: { ...user.player, icon } });
+	}
+
 	public async deleteAccount(): Promise<void> {
 		const user = this._user();
 		if (!user) return;

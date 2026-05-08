@@ -133,12 +133,17 @@ export async function authenticateSession(request: BaseRequest, notifier: InnerF
 	const { errorCode, errorMessage } = notifier;
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Session expired';
-	const result = await pfPromise<PlayFabServerModels.AuthenticateSessionTicketResult>(
+	const authResult = await pfPromise<PlayFabServerModels.AuthenticateSessionTicketResult>(
 		cb => PlayFabServer.AuthenticateSessionTicket({ SessionTicket: request.sessionTicket }, cb),
 	);
 	notifier.errorCode = errorCode;
 	notifier.errorMessage = errorMessage;
-	return { id: result.UserInfo!.PlayFabId!, name: result.UserInfo!.TitleInfo?.DisplayName || result.UserInfo!.Username || 'Guest' };
+	const id = authResult.UserInfo!.PlayFabId!;
+	const name = authResult.UserInfo!.TitleInfo?.DisplayName || authResult.UserInfo!.Username || 'Guest';
+	const iconResult = await pfPromise<PlayFabServerModels.GetUserDataResult>(
+		cb => PlayFabServer.GetUserData({ PlayFabId: id, Keys: ['icon'] }, cb),
+	);
+	return { id, name, icon: iconResult.Data?.['icon']?.Value };
 }
 
 /** Wraps a PlayFab SDK callback call into a Promise. */

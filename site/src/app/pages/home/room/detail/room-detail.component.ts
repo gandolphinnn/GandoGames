@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { GamePlayer, RoomData } from '@gandogames/common/api';
@@ -7,12 +7,13 @@ import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { InviteModalComponent } from '../invite-modal/invite-modal.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink, RoomPlayComponent, InviteModalComponent],
+	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -65,12 +66,6 @@ export class RoomDetailComponent implements OnInit {
 		return slots;
 	});
 
-	public avatarHue(name: string): number {
-		let hash = 0;
-		for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
-		return hash % 360;
-	}
-
 	/* @HostListener('window:beforeunload')
 	public onBeforeUnload(): void {
 		if (!this.hasLeft && this.isInRoom()) {
@@ -79,8 +74,12 @@ export class RoomDetailComponent implements OnInit {
 	} */
 
 	public ngOnInit(): void {
-		this.roomId.set(this.route.snapshot.params['roomId']);
-		void this.loadRoom();
+		this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+			this.roomId.set(params.get('roomId') ?? '');
+			this.room.set(null);
+			this.error.set('');
+			void this.loadRoom();
+		});
 		this.subscribeToRoomEvents();
 	}
 

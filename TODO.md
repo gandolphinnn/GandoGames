@@ -14,3 +14,9 @@
 - TimeTrigger function that automatically delets inactive guest users every month
 - Queue system if 20 signalR connection are already occupied
 - Online player counter
+
+
+
+- Move the chat button on the right for mobile
+- "Social" page for friend requests, invites, ecc...
+- Player can choose its profile icon from a set of predefined icons and images.

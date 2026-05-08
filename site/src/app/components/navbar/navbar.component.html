@@ -48,6 +48,7 @@
 			}
 			@if (isLoggedIn()) {
 				<a routerLink="/profile" class="nav-link">Profile</a>
+				<a routerLink="/social" class="nav-link">Social</a>
 			} @else {
 				<a routerLink="/login" class="nav-link">Log in</a>
 			}
@@ -87,6 +88,7 @@
 		</div>
 		@if (isLoggedIn()) {
 			<a routerLink="/profile" class="nav-link" (click)="closeMenu()">Profile</a>
+			<a routerLink="/social" class="nav-link" (click)="closeMenu()">Social</a>
 		} @else {
 			<a routerLink="/login" class="nav-link" (click)="closeMenu()">Log in</a>
 		}

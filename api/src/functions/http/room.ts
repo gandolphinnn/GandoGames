@@ -26,9 +26,15 @@ const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _not
 	return await PlayfabCtx.rooms.list();
 };
 
-const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, _notifier, _player) => {
+const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
+	const idx = room.players.findIndex(p => p.id === player.id);
+	if (idx !== -1 && room.players[idx].icon !== player.icon) {
+		room.players[idx] = { ...room.players[idx], icon: player.icon };
+		await PlayfabCtx.rooms.upsert(body.roomId, room);
+		notifier.roomUpsert(room);
+	}
 	return room;
 };
 

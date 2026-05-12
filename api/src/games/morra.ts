@@ -112,7 +112,7 @@ export class MorraGame extends Game<MorraGameState> {
 			state.result = undefined;
 			for (const p of state.players) {
 				p.hasPicked = false;
-				delete p.currentPick;
+				p.currentPick = undefined;
 			}
 		}
 

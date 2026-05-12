@@ -6,7 +6,7 @@ const gameStateInner: InnerFunction<GameBaseRequest, GameState | null> = async (
 	const state = await PlayfabCtx.game[body.game].get(body.roomId);
 	if (!state) return null;
 	const game = Game.Factory(body.game);
-	game.state = state as any;
+	game.state = state;
 	return game.getPublicState(player.id);
 };
 
@@ -18,7 +18,7 @@ const gameActionInner: InnerFunction<GameActionRequest, GameState | null> = asyn
 	if (!savedState || !room) throw new Error('Game not found');
 
 	const game = Game.Factory(body.game);
-	game.state = savedState as any;
+	game.state = savedState;
 	game.action(player, body.action, body.data);
 
 	const description = game.describe(game.state!);

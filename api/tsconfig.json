@@ -8,7 +8,7 @@
 		"esModuleInterop": true,
 		"moduleResolution": "node16",
 		"sourceMap": true,
-		"types": [ "node" ],
+		"types": [ "node", "jest" ],
 		"paths": {
 			"@gandogames/common/api": ["../common/index"],
 			"@gandogames/common/morra": ["../common/games/morra"],

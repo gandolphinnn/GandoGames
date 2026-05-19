@@ -6,7 +6,8 @@
 		"build": "tsc",
 		"watch": "tsc -w",
 		"start": "tsc && func start",
-		"test": "jest"
+		"test": "jest",
+		"fetch-secrets": "func azure functionapp fetch-app-settings GandoGamesApi && node patch-local-settings.js"
 	},
 	"jest": {
 		"preset": "ts-jest",

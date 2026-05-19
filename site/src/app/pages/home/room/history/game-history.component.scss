@@ -1,30 +1,116 @@
 @use 'styles/variables' as *;
 
-:host { display: block; }
+// ── Host: zero-footprint on mobile, flex column on desktop ────────────────────
+
+:host {
+	display: block;
+
+	@media (min-width: $bp-sm) {
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		overflow: hidden;
+	}
+}
+
+// ── Desktop side panel ────────────────────────────────────────────────────────
+
+.history-panel {
+	display: none;
+
+	@media (min-width: $bp-sm) {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		overflow: hidden;
+	}
+}
+
+// ── Mobile FAB ────────────────────────────────────────────────────────────────
 
 .history-fab {
 	position: fixed;
-	bottom: calc(56px + #{$s4} + env(safe-area-inset-bottom, 0px));
-	right: $s4;
+	bottom: $s6;
+	left: $s4;
 	z-index: 300;
-	width: 48px;
-	height: 48px;
+	width: 44px;
+	height: 44px;
 	border-radius: $radius-full;
-	background: var(--bg-surface);
-	border: 1px solid var(--border-color);
-	color: var(--text-muted);
-	font-size: $text-lg;
+	background: $bg-card;
+	border: 1px solid $border;
+	color: $text-muted;
+	font-size: $text-base;
 	cursor: pointer;
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: var(--shadow-card);
+	box-shadow: $shadow-card;
 	transition: color $transition, background $transition;
 
-	&:hover { color: var(--text); }
+	&:hover { color: $text; background: $hover-overlay; }
+
+	@media (min-width: $bp-sm) { display: none; }
+}
+
+// ── Mobile backdrop + drawer ──────────────────────────────────────────────────
+
+.history-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 400;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.history-drawer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100dvh;
+	width: 280px;
+	z-index: 500;
+	display: flex;
+	flex-direction: column;
+	background: $bg-surface;
+	border-left: 1px solid $border;
+	box-shadow: $shadow-card;
+}
+
+// ── Shared: header, list, entries ─────────────────────────────────────────────
+
+.history-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s3 $s4;
+	border-bottom: 1px solid $border;
+	font-size: $text-sm;
+	font-weight: 700;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	flex-shrink: 0;
+}
+
+.history-close {
+	background: transparent;
+	border: none;
+	color: $text-muted;
+	cursor: pointer;
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $text-base;
+	border-radius: $radius-sm;
+	transition: color $transition, background $transition;
+
+	&:hover { color: $text; background: $hover-overlay; }
 }
 
 .history-list {
+	flex: 1;
+	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	padding: $s2;
@@ -36,8 +122,9 @@
 	gap: $s1;
 	padding: $s2 $s3;
 	border-radius: $radius-md;
+	transition: background $transition;
 
-	&:hover { background: var(--hover-overlay); }
+	&:hover { background: $hover-overlay; }
 }
 
 .history-desc {
@@ -47,13 +134,13 @@
 
 .history-time {
 	font-size: $text-sm;
-	color: var(--text-muted);
+	color: $text-muted;
 	font-family: monospace;
 }
 
 .history-empty {
 	padding: $s4 $s3;
 	font-size: $text-sm;
-	color: var(--text-muted);
+	color: $text-muted;
 	font-style: italic;
 }

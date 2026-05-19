@@ -1,3 +1,9 @@
-<gg-navbar />
-<router-outlet />
-<gg-toast />
+@if (device.isMobile()) {
+	<ion-app>
+		<ion-router-outlet />
+	</ion-app>
+} @else {
+	<gg-navbar />
+		<router-outlet />
+	<gg-toast />
+}

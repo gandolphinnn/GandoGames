@@ -18,6 +18,7 @@ import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { DeviceService } from '@gandogames/services/device.service';
 import { ChatComponent } from '../../../../components/chat/chat.component';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { InviteModalComponent } from '../invite-modal/invite-modal.component';
@@ -26,7 +27,7 @@ import { RoomPlayComponent } from '../play/room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	host: { class: 'ion-page' },
+	host: { '[class.ion-page]': 'device.isMobile()' },
 	imports: [
 		RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent,
 		ChatComponent, GameHistoryComponent,
@@ -44,6 +45,7 @@ export class RoomDetailComponent implements OnInit {
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
 	private readonly destroyRef = inject(DestroyRef);
+	protected readonly device = inject(DeviceService);
 
 	private hasLeft = false;
 
@@ -168,7 +170,7 @@ export class RoomDetailComponent implements OnInit {
 		this.hasLeft = true;
 		try {
 			await this.roomService.leaveRoom(this.roomId());
-			this.router.navigate(['/play']);
+			void this.router.navigate(['/play']);
 		} catch (e) {
 			this.hasLeft = false;
 			this.error.set((e as Error).message);

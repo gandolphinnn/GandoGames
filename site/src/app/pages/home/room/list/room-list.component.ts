@@ -10,10 +10,11 @@ import { addCircleOutline, arrowBackOutline, refreshOutline, closeOutline } from
 import { GameType, RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
+import { DeviceService } from '@gandogames/services/device.service';
 
 @Component({
 	selector: 'gg-room-list',
-	host: { class: 'ion-page' },
+	host: { '[class.ion-page]': 'device.isMobile()' },
 	imports: [
 		IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
 		IonList, IonItem, IonLabel, IonNote, IonBadge, IonFab, IonFabButton,
@@ -26,6 +27,7 @@ export class RoomListComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
+	protected readonly device = inject(DeviceService);
 
 	public readonly allGames = GAME_REGISTRY;
 	public readonly activeGames = signal<string[]>([]);
@@ -99,7 +101,7 @@ export class RoomListComponent implements OnInit {
 			this.loading.set(true);
 			this.error.set('');
 			const room = await this.roomService.createRoom(this.createGameId() as GameType);
-			this.router.navigate(['/play', room.id]);
+			void this.router.navigate(['/play', room.id]);
 		} catch (e) {
 			this.error.set((e as Error).message);
 		} finally {
@@ -108,7 +110,7 @@ export class RoomListComponent implements OnInit {
 	}
 
 	public navigateToRoom(room: RoomData): void {
-		this.router.navigate(['/play', room.id]);
+		void this.router.navigate(['/play', room.id]);
 	}
 
 	public setCreateGameId(value: string): void {

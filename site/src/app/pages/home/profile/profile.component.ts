@@ -1,27 +1,52 @@
-import { Component, inject, signal, Signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, computed, inject, signal, Signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import {
+	IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+	IonList, IonItem, IonLabel, IonNote, IonBadge, AlertController,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { sunnyOutline, moonOutline, logOutOutline, trashOutline, logoGithub, informationCircleOutline, colorPaletteOutline } from 'ionicons/icons';
 
 import { PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
 import { AuthService, AuthUser } from '@gandogames/services/auth.service';
+import { ThemeService } from '@gandogames/services/theme.service';
 
 @Component({
 	selector: 'gg-profile',
-	imports: [PlayerAvatarComponent],
+	host: { class: 'ion-page' },
+	imports: [
+		RouterLink, PlayerAvatarComponent,
+		IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+		IonList, IonItem, IonLabel, IonNote, IonBadge,
+	],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })
 export class ProfileComponent {
 	private readonly auth = inject(AuthService);
 	private readonly router = inject(Router);
+	private readonly themeService = inject(ThemeService);
+	private readonly alertCtrl = inject(AlertController);
 
 	public readonly user: Signal<AuthUser | null> = this.auth.user;
-	public readonly confirmingDelete = signal(false);
 	public readonly loading = signal(false);
 	public readonly error = signal<string | null>(null);
 	public readonly savingIcon = signal<string | null>(null);
 
+	public readonly isDark = this.themeService.isDark;
+	public readonly themeLabel = computed(() => this.isDark() ? 'Switch to light mode' : 'Switch to dark mode');
+	public readonly themeIcon = computed(() => this.isDark() ? 'sunny-outline' : 'moon-outline');
+
+	public readonly isAdmin = computed(() => this.auth.user()?.player.permissions?.includes('admin'));
+
 	public readonly icons: PlayerIcon[] = PLAYER_ICONS;
+
+	constructor() {
+		addIcons({ sunnyOutline, moonOutline, logOutOutline, trashOutline, logoGithub, informationCircleOutline, colorPaletteOutline });
+	}
+
+	public toggleTheme(): void { this.themeService.toggle(); }
 
 	public async saveIcon(iconId: string): Promise<void> {
 		if (this.savingIcon() !== null) return;
@@ -38,19 +63,28 @@ export class ProfileComponent {
 
 	public logout(): void {
 		this.auth.logout();
-		this.router.navigate(['/login']);
+		void this.router.navigate(['/login']);
 	}
 
-	public requestDelete(): void {
-		this.confirmingDelete.set(true);
-		this.error.set(null);
+	public async requestDelete(): Promise<void> {
+		const alert = await this.alertCtrl.create({
+			header: 'Delete account',
+			message: 'This will permanently delete your account. This cannot be undone.',
+			cssClass: 'gg-alert',
+			buttons: [
+				{ text: 'Cancel', role: 'cancel' },
+				{
+					text: 'Delete',
+					role: 'confirm',
+					cssClass: 'alert-btn-danger',
+					handler: () => { void this.confirmDelete(); },
+				},
+			],
+		});
+		await alert.present();
 	}
 
-	public cancelDelete(): void {
-		this.confirmingDelete.set(false);
-	}
-
-	public async confirmDelete(): Promise<void> {
+	private async confirmDelete(): Promise<void> {
 		this.loading.set(true);
 		this.error.set(null);
 		try {
@@ -59,7 +93,6 @@ export class ProfileComponent {
 		} catch (err) {
 			this.error.set((err as Error).message ?? 'Failed to delete account');
 			this.loading.set(false);
-			this.confirmingDelete.set(false);
 		}
 	}
 }

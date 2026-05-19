@@ -1,13 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-
-import { NavbarComponent } from './components/navbar/navbar.component';
-import { ToastComponent } from './components/toast/toast.component';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 @Component({
 	selector: 'gg-app',
-	imports: [RouterOutlet, NavbarComponent, ToastComponent],
-	templateUrl: './app.component.html',
-	styleUrl: './app.component.scss',
+	imports: [IonApp, IonRouterOutlet],
+	template: `<ion-app><ion-router-outlet /></ion-app>`,
+	styles: [`ion-app { background: var(--bg); }`],
 })
 export class App {}

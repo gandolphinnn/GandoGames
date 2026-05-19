@@ -1,12 +1,24 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+	IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+	IonList, IonItem, IonLabel, IonNote, IonBadge, IonFab, IonFabButton, IonRefresher, IonRefresherContent,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { addCircleOutline, arrowBackOutline, refreshOutline, closeOutline } from 'ionicons/icons';
+
 import { GameType, RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
 
 @Component({
 	selector: 'gg-room-list',
-	imports: [],
+	host: { class: 'ion-page' },
+	imports: [
+		IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+		IonList, IonItem, IonLabel, IonNote, IonBadge, IonFab, IonFabButton,
+		IonRefresher, IonRefresherContent,
+	],
 	templateUrl: './room-list.component.html',
 	styleUrl: './room-list.component.scss',
 })
@@ -28,8 +40,16 @@ export class RoomListComponent implements OnInit {
 		return this.rooms().filter((r) => active.includes(r.game));
 	});
 
+	constructor() {
+		addIcons({ addCircleOutline, arrowBackOutline, refreshOutline, closeOutline });
+	}
+
 	public gameLabel(id: string): string {
 		return this.allGames.find((g) => g.id === id)?.name ?? id;
+	}
+
+	public gameIcon(id: string): string {
+		return this.allGames.find((g) => g.id === id)?.icon ?? 'fa-solid fa-gamepad';
 	}
 
 	public maxPlayers(id: string): number {
@@ -56,6 +76,11 @@ export class RoomListComponent implements OnInit {
 		} finally {
 			this.loading.set(false);
 		}
+	}
+
+	public async handleRefresh(event: CustomEvent): Promise<void> {
+		await this.fetchRooms();
+		(event.target as HTMLIonRefresherElement).complete();
 	}
 
 	public toggleGame(id: string): void {

@@ -1,22 +1,35 @@
-<div class="rooms-page">
+@if (mode() === 'browse') {
 
-	@if (mode() === 'browse') {
+		<ion-header>
+			<ion-toolbar>
+				<ion-title>Play</ion-title>
+				<ion-buttons slot="end">
+					<ion-button (click)="mode.set('create')">
+						<ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
+					</ion-button>
+				</ion-buttons>
+			</ion-toolbar>
+		</ion-header>
 
-		<div class="filter-bar">
-			@for (game of allGames; track game.id) {
-				<button
-					class="filter-btn"
-					[class.active]="activeGames().includes(game.id)"
-					(click)="toggleGame(game.id)"
-				>
-					<i [class]="game.icon"></i> {{ game.name }}
-				</button>
-			}
-		</div>
+		<ion-content>
+			<ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+				<ion-refresher-content></ion-refresher-content>
+			</ion-refresher>
 
-		<div class="room-list-wrap">
+			<div class="filter-bar">
+				@for (game of allGames; track game.id) {
+					<button
+						class="filter-btn"
+						[class.active]="activeGames().includes(game.id)"
+						(click)="toggleGame(game.id)"
+					>
+						<i [class]="game.icon"></i> {{ game.name }}
+					</button>
+				}
+			</div>
+
 			@if (error()) {
-				<p class="status-msg error-msg">{{ error() }}</p>
+				<ion-note class="error-note">{{ error() }}</ion-note>
 			}
 
 			@if (filteredRooms().length === 0) {
@@ -24,33 +37,57 @@
 					<i class="fa-solid fa-gamepad empty-icon"></i>
 					<p class="empty-title">No open rooms</p>
 					<p class="empty-subtitle">Create one and invite your friends.</p>
-					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
+					<ion-button (click)="mode.set('create')" class="ion-margin-top">
+						<ion-icon slot="start" name="add-circle-outline"></ion-icon>
+						New Room
+					</ion-button>
 				</div>
 			} @else {
-				<ul class="room-list">
+				<ion-list class="room-list">
 					@for (room of filteredRooms(); track room.id) {
-						<li class="room-card" (click)="navigateToRoom(room)">
-							<div class="room-card-info">
-								<span class="room-card-game">{{ gameLabel(room.game) }}</span>
-								<span class="room-card-players-list">{{ playerNames(room) }}</span>
+						<ion-item class="room-item" (click)="navigateToRoom(room)" button detail>
+							<div class="room-game-icon" slot="start">
+								<i [class]="gameIcon(room.game)"></i>
 							</div>
-							<span class="room-card-count">
+							<ion-label>
+								<h2>{{ gameLabel(room.game) }}</h2>
+								<p>{{ playerNames(room) }}</p>
+							</ion-label>
+							<ion-badge slot="end" class="count-badge">
 								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
-							</span>
-						</li>
+							</ion-badge>
+						</ion-item>
 					}
-				</ul>
-				<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
+				</ion-list>
+
+				<ion-fab vertical="bottom" horizontal="end" slot="fixed">
+					<ion-fab-button (click)="mode.set('create')" title="New Room">
+						<ion-icon name="add-circle-outline"></ion-icon>
+					</ion-fab-button>
+				</ion-fab>
 			}
-		</div>
+		</ion-content>
 
 	} @else {
 
-		<div class="create-form">
-			<div class="create-header">
-				<h2 class="form-title">New Room</h2>
-				<p class="form-subtitle">Pick a game to play</p>
-			</div>
+		<ion-header>
+			<ion-toolbar>
+				<ion-buttons slot="start">
+					<ion-button (click)="mode.set('browse')">
+						<ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+					</ion-button>
+				</ion-buttons>
+				<ion-title>New Room</ion-title>
+			</ion-toolbar>
+		</ion-header>
+
+		<ion-content class="ion-padding">
+
+			<p class="create-subtitle">Pick a game to play</p>
+
+			@if (error()) {
+				<ion-note class="error-note">{{ error() }}</ion-note>
+			}
 
 			<div class="game-grid">
 				@for (game of allGames; track game.id) {
@@ -67,22 +104,20 @@
 				}
 			</div>
 
-			@if (error()) {
-				<p class="error-msg">{{ error() }}</p>
-			}
-
-			<div class="form-actions">
-				<button class="btn-secondary" (click)="mode.set('browse')">Cancel</button>
-				<button
-					class="btn-primary"
+			<div class="create-actions">
+				<ion-button
+					expand="block"
 					[disabled]="!createGameId() || loading()"
 					(click)="create()"
 				>
 					{{ loading() ? 'Creating…' : 'Create Room' }}
-				</button>
+				</ion-button>
+				<ion-button expand="block" fill="outline" (click)="mode.set('browse')">
+					Cancel
+				</ion-button>
 			</div>
-		</div>
+
+		</ion-content>
 
 	}
 
-</div>

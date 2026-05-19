@@ -1,85 +1,92 @@
-@if (user(); as u) {
-	<div class="profile-page">
-		<div class="profile-card">
+<ion-header>
+		<ion-toolbar>
+			<ion-title>Profile</ion-title>
+			<ion-buttons slot="end">
+				<ion-button (click)="toggleTheme()" [title]="themeLabel()">
+					<ion-icon slot="icon-only" [name]="themeIcon()"></ion-icon>
+				</ion-button>
+			</ion-buttons>
+		</ion-toolbar>
+	</ion-header>
 
-			<div class="profile-avatar-wrap">
+	<ion-content>
+		@if (user(); as u) {
+
+			<div class="profile-hero">
 				<gg-player-avatar class="profile-avatar" [player]="u.player" />
-			</div>
-
-			<div class="profile-header">
-				<h1 class="profile-title">Profile</h1>
-				@if (u.isGuest) {
-					<span class="profile-badge">Guest</span>
-				}
-			</div>
-
-			<div class="profile-info">
-				<div class="info-row">
-					<span class="info-label">PlayFab ID</span>
-					<span class="info-value">{{ u.player.id }}</span>
-				</div>
-				<div class="info-row">
-					<span class="info-label">Username</span>
-					<span class="info-value">{{ u.player.name }}</span>
+				<div class="profile-hero-info">
+					<h1 class="profile-username">{{ u.player.name }}</h1>
+					@if (u.isGuest) {
+						<ion-badge color="warning" class="guest-badge">Guest</ion-badge>
+					}
 				</div>
 			</div>
+
+			<ion-list class="profile-section">
+				<ion-item>
+					<ion-label>
+						<p>PlayFab ID</p>
+						<h3 class="mono-value">{{ u.player.id }}</h3>
+					</ion-label>
+				</ion-item>
+				<ion-item>
+					<ion-label>
+						<p>Username</p>
+						<h3>{{ u.player.name }}</h3>
+					</ion-label>
+				</ion-item>
+			</ion-list>
 
 			@if (!u.isGuest) {
-				<div class="icon-picker">
-					<p class="icon-picker-title">Icon</p>
-					@if (icons.length > 0) {
-						<div class="icon-grid">
-							@for (icon of icons; track icon.id) {
-								<button
-									class="icon-btn"
-									[class.selected]="u.player.icon === icon.id"
-									[class.saving]="savingIcon() === icon.id"
-									type="button"
-									[attr.aria-label]="icon.label"
-									[disabled]="savingIcon() !== null"
-									(click)="saveIcon(icon.id)"
-								>
-									@if (savingIcon() === icon.id) {
-										<i class="fa-solid fa-spinner fa-spin"></i>
-									} @else {
-										<i [class]="icon.fa"></i>
-									}
-								</button>
+				<div class="section-header">Icon</div>
+				<div class="icon-grid">
+					@for (icon of icons; track icon.id) {
+						<button
+							class="icon-btn"
+							[class.selected]="u.player.icon === icon.id"
+							[class.saving]="savingIcon() === icon.id"
+							type="button"
+							[attr.aria-label]="icon.label"
+							[disabled]="savingIcon() !== null"
+							(click)="saveIcon(icon.id)"
+						>
+							@if (savingIcon() === icon.id) {
+								<i class="fa-solid fa-spinner fa-spin"></i>
+							} @else {
+								<i [class]="icon.fa"></i>
 							}
-						</div>
-					} @else {
-						<p class="icon-picker-empty">No icons available yet.</p>
+						</button>
 					}
 				</div>
 			}
 
 			@if (error()) {
-				<p class="profile-error">{{ error() }}</p>
+				<ion-note class="error-note">{{ error() }}</ion-note>
 			}
 
-			<button class="btn btn-danger" type="button" (click)="logout()">
-				<i class="fa-solid fa-sign-out-alt"></i> Log out
-			</button>
-
-			<div class="danger-zone">
-				<p class="danger-zone-title">Danger zone</p>
-				@if (!confirmingDelete()) {
-					<button class="btn btn-danger-outline" type="button" (click)="requestDelete()">
-						<i class="fa-solid fa-trash"></i> Delete account
-					</button>
-				} @else {
-					<p class="danger-zone-warn">This will permanently delete your account. This cannot be undone.</p>
-					<div class="danger-zone-actions">
-						<button class="btn btn-danger" type="button" [disabled]="loading()" (click)="confirmDelete()">
-							<i class="fa-solid fa-trash"></i> {{ loading() ? 'Deleting…' : 'Yes, delete' }}
-						</button>
-						<button class="btn btn-ghost" type="button" [disabled]="loading()" (click)="cancelDelete()">
-							Cancel
-						</button>
-					</div>
+			<ion-list class="profile-section">
+				<ion-item routerLink="/about" button detail>
+					<ion-icon name="information-circle-outline" slot="start"></ion-icon>
+					<ion-label>About GandoGames</ion-label>
+				</ion-item>
+				@if (isAdmin()) {
+					<ion-item routerLink="/test/palette" button detail>
+						<ion-icon name="color-palette-outline" slot="start"></ion-icon>
+						<ion-label>Design Palette</ion-label>
+					</ion-item>
 				}
-			</div>
+			</ion-list>
 
-		</div>
-	</div>
-}
+			<ion-list class="profile-section">
+				<ion-item button (click)="logout()">
+					<ion-icon name="log-out-outline" slot="start" color="warning"></ion-icon>
+					<ion-label color="warning">Log out</ion-label>
+				</ion-item>
+				<ion-item button (click)="requestDelete()">
+					<ion-icon name="trash-outline" slot="start" color="danger"></ion-icon>
+					<ion-label color="danger">Delete account</ion-label>
+				</ion-item>
+			</ion-list>
+
+		}
+	</ion-content>

@@ -1,135 +1,16 @@
 @use 'styles/variables' as *;
 
-// ── Host fills the remaining viewport below the navbar ────────────────────────
-
 :host {
-	display: flex;
-	flex-direction: column;
-
-	@media (min-width: $bp-sm) {
-		flex: 1;
-		min-height: 0;
-		overflow: hidden;
-	}
-}
-
-// ── Shell layout ──────────────────────────────────────────────────────────────
-
-.game-layout {
 	display: block;
-
-	@media (min-width: $bp-sm) {
-		display: grid;
-		grid-template-columns: 280px 1fr 280px;
-		align-items: stretch;
-		flex: 1;
-		min-height: 0;
-	}
 }
 
-.game-left {
-	display: contents;
-
-	@media (min-width: $bp-sm) {
-		display: flex;
-		flex-direction: column;
-		border-right: 1px solid $border;
-		overflow: hidden;
-	}
+ion-content {
+	--background: var(--bg);
 }
 
-.game-shell {
-	min-width: 0;
+.game-content {
+	height: 100%;
 	display: flex;
 	flex-direction: column;
-	gap: $s4;
-	padding: $s4;
-	max-width: 600px;
-	margin: 0 auto;
-
-	@media (min-width: $bp-sm) {
-		gap: $s6;
-		padding: $s6;
-		overflow-y: auto;
-	}
+	overflow: hidden;
 }
-
-// ── Resize handle ─────────────────────────────────────────────────────────────
-
-.resize-handle {
-	display: none;
-
-	@media (min-width: $bp-sm) {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		height: 8px;
-		cursor: ns-resize;
-		border-top: 1px solid $border;
-		border-bottom: 1px solid $border;
-		transition: background $transition;
-		user-select: none;
-
-		&::after {
-			content: '';
-			width: 24px;
-			height: 2px;
-			border-radius: $radius-full;
-			background: $border;
-			transition: background $transition;
-		}
-
-		&:hover {
-			background: $hover-overlay;
-			&::after { background: $text-muted; }
-		}
-	}
-}
-
-// ── Header ─────────────────────────────────────────────────────────────────────
-
-.game-header {
-	display: flex;
-	align-items: center;
-	gap: $s3;
-}
-
-.game-back {
-	background: none;
-	border: none;
-	color: $text-muted;
-	font-size: $text-sm;
-	cursor: pointer;
-	padding: 0;
-	min-height: 44px;
-	transition: color $transition;
-	display: inline-flex;
-	align-items: center;
-	gap: $s2;
-	font-family: inherit;
-
-	&:hover { color: $accent; }
-}
-
-.game-title {
-	font-size: $text-xl;
-	font-weight: 700;
-	flex: 1;
-}
-
-.game-leave {
-	background: transparent;
-	border: 1px solid $color-danger-border;
-	border-radius: $radius-md;
-	color: $color-danger;
-	font-size: $text-sm;
-	cursor: pointer;
-	padding: 0 $s3;
-	min-height: 36px;
-	font-family: inherit;
-	transition: background $transition;
-
-	&:hover { background: $color-danger-bg; }
-}
-

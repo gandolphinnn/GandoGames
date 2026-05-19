@@ -1,4 +1,11 @@
-import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
+import {
+	IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+	IonList, IonItem, IonLabel, IonAvatar,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { closeOutline, checkmarkOutline, addOutline, sendOutline } from 'ionicons/icons';
+
 import { GameType } from '@gandogames/common/api';
 import { playerNameHue } from '../../../../components/player-avatar/player-name-hue';
 import { RoomService } from '@gandogames/services/room.service';
@@ -6,10 +13,14 @@ import { SignalRService } from '@gandogames/services/signalr.service';
 
 @Component({
 	selector: 'gg-invite-modal',
+	imports: [
+		IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+		IonList, IonItem, IonLabel, IonAvatar,
+	],
 	templateUrl: './invite-modal.component.html',
 	styleUrl: './invite-modal.component.scss',
 })
-export class InviteModalComponent {
+export class InviteModalComponent implements OnInit {
 	private readonly roomService = inject(RoomService);
 	private readonly signalR = inject(SignalRService);
 
@@ -35,12 +46,23 @@ export class InviteModalComponent {
 	public readonly addingBot = signal(false);
 	public readonly error = signal('');
 
-	@HostListener('document:keydown.escape')
-	public onEscape(): void {
-		this.closed.emit();
+	protected readonly isOpen = signal(true);
+
+	constructor() {
+		addIcons({ closeOutline, checkmarkOutline, addOutline, sendOutline });
 	}
 
-	public onBackdropClick(): void {
+	public ngOnInit(): void {
+		this.isOpen.set(true);
+	}
+
+	@HostListener('document:keydown.escape')
+	public onEscape(): void {
+		this.closeModal();
+	}
+
+	public closeModal(): void {
+		this.isOpen.set(false);
 		this.closed.emit();
 	}
 
@@ -62,7 +84,7 @@ export class InviteModalComponent {
 		this.addingBot.set(true);
 		try {
 			await this.roomService.addBot(this.roomId());
-			this.closed.emit();
+			this.closeModal();
 		} catch (e) {
 			this.error.set((e as Error).message);
 		} finally {

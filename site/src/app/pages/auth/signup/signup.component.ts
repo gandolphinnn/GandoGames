@@ -1,13 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+	IonHeader, IonToolbar, IonTitle, IonContent,
+	IonList, IonItem, IonInput, IonInputPasswordToggle,
+	IonButton, IonNote,
+} from '@ionic/angular/standalone';
 
 import { AuthService } from '@gandogames/services/auth.service';
 
 @Component({
 	selector: 'gg-signup',
 	standalone: true,
-	imports: [ReactiveFormsModule, RouterLink],
+	host: { class: 'ion-page' },
+	imports: [
+		ReactiveFormsModule, RouterLink,
+		IonHeader, IonToolbar, IonTitle, IonContent,
+		IonList, IonItem, IonInput, IonInputPasswordToggle,
+		IonButton, IonNote,
+	],
 	templateUrl: './signup.component.html',
 	styleUrl: './signup.component.scss',
 })

@@ -1,160 +1,47 @@
 @use 'styles/variables' as *;
 
-// ── Host: fills its flex slot on desktop ──────────────────────────────────────
-
-:host {
-	@media (min-width: $bp-sm) {
-		display: flex;
-		flex-direction: column;
-		min-height: 0;
-	}
-}
-
-// ── Desktop panel ─────────────────────────────────────────────────────────────
-
-.chat-panel {
-	display: none;
-
-	@media (min-width: $bp-sm) {
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		min-height: 0;
-		overflow: hidden;
-		border-top: 1px solid $border;
-	}
-}
-
-// ── Mobile FAB ────────────────────────────────────────────────────────────────
-
+// FAB button — positioned above the tab bar
 .chat-fab {
 	position: fixed;
-	bottom: $s6;
-	left: calc(#{$s4} + 44px + #{$s2});
+	bottom: calc(56px + #{$s4} + env(safe-area-inset-bottom, 0px));
+	right: calc(#{$s4} + 56px + #{$s2});
 	z-index: 300;
-	width: 44px;
-	height: 44px;
+	width: 48px;
+	height: 48px;
 	border-radius: $radius-full;
-	background: $bg-card;
-	border: 1px solid $border;
-	color: $text-muted;
-	font-size: $text-base;
+	background: var(--bg-surface);
+	border: 1px solid var(--border-color);
+	color: var(--text-muted);
+	font-size: $text-lg;
 	cursor: pointer;
-	display: inline-flex;
+	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: $shadow-card;
+	box-shadow: var(--shadow-card);
 	transition: color $transition, background $transition;
 
-	&:hover { color: $text; background: $hover-overlay; }
-
-	@media (min-width: $bp-sm) { display: none; }
+	&:hover { color: var(--text); }
 }
 
-// ── Mobile backdrop + drawer ──────────────────────────────────────────────────
-
-.chat-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 400;
-	background: rgba(0, 0, 0, 0.4);
-
-	@media (min-width: $bp-sm) { display: none; }
-}
-
-.chat-drawer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 70dvh;
-	z-index: 500;
-	display: flex;
-	flex-direction: column;
-	background: $bg-surface;
-	border-top: 1px solid $border;
-	border-radius: $radius-lg $radius-lg 0 0;
-	box-shadow: $shadow-card;
-
-	@media (min-width: $bp-sm) { display: none; }
-}
-
-// ── Panel header ──────────────────────────────────────────────────────────────
-
-.chat-header {
-	display: flex;
-	align-items: center;
-	gap: $s2;
-	padding: 0 $s3;
-	height: 44px;
-	flex-shrink: 0;
-	color: $text-muted;
-	font-size: $text-sm;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	border-bottom: 1px solid $border;
-}
-
-.chat-header-title { flex: 1; }
-
-.chat-drawer-header {
-	display: flex;
-	align-items: center;
-	gap: $s2;
-	padding: $s3 $s4;
-	border-bottom: 1px solid $border;
-	font-size: $text-sm;
-	font-weight: 700;
-	color: $text-muted;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	flex-shrink: 0;
-}
-
-.chat-close {
-	margin-left: auto;
-	background: transparent;
-	border: none;
-	color: $text-muted;
-	cursor: pointer;
-	width: 28px;
-	height: 28px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	font-size: $text-base;
-	border-radius: $radius-sm;
-	transition: color $transition, background $transition;
-
-	&:hover { color: $text; background: $hover-overlay; }
-}
-
-// ── Unread badge ──────────────────────────────────────────────────────────────
-
-.chat-badge {
-	background: $accent;
-	color: $color-on-accent;
+.chat-fab-badge {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	background: var(--accent);
+	color: #fff;
 	font-size: 0.65rem;
 	font-weight: 700;
 	min-width: 18px;
 	height: 18px;
 	border-radius: $radius-full;
-	display: inline-flex;
+	display: flex;
 	align-items: center;
 	justify-content: center;
 	padding: 0 $s1;
 	line-height: 1;
-
-	.chat-fab & {
-		position: absolute;
-		top: 2px;
-		right: 2px;
-	}
 }
 
-// ── Message list ──────────────────────────────────────────────────────────────
-
+// Modal content styles
 .chat-messages {
 	flex: 1;
 	overflow-y: auto;
@@ -162,9 +49,7 @@
 	flex-direction: column;
 	gap: $s1;
 	padding: $s2 $s3;
-	min-height: 0;
-
-
+	height: 100%;
 }
 
 .chat-msg {
@@ -173,17 +58,14 @@
 	gap: 2px;
 	padding: $s1 $s2;
 	border-radius: $radius-sm;
-	transition: background $transition;
 
-	&:hover { background: $hover-overlay; }
-
-	&.is-mine .chat-msg-name { color: $accent; }
+	&.is-mine .chat-msg-name { color: var(--accent); }
 }
 
 .chat-msg-name {
 	font-size: $text-sm;
 	font-weight: 600;
-	color: $text-muted;
+	color: var(--text-muted);
 	line-height: 1.2;
 }
 
@@ -195,60 +77,58 @@
 
 .chat-msg-time {
 	font-size: 0.7rem;
-	color: $text-muted;
+	color: var(--text-muted);
 	font-family: monospace;
 	align-self: flex-end;
 }
 
 .chat-empty {
 	font-size: $text-sm;
-	color: $text-muted;
+	color: var(--text-muted);
 	font-style: italic;
-	padding: $s3 0;
+	padding: $s3;
 }
-
-// ── Input row ─────────────────────────────────────────────────────────────────
 
 .chat-input-row {
 	display: flex;
 	gap: $s2;
 	padding: $s2 $s3;
-	border-top: 1px solid $border;
-	flex-shrink: 0;
+	align-items: center;
 }
 
 .chat-input {
 	flex: 1;
-	background: $bg-card;
-	border: 1px solid $border;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
 	border-radius: $radius-sm;
-	color: $text;
+	color: var(--text);
 	font-size: $text-sm;
 	font-family: inherit;
 	padding: $s2 $s3;
 	outline: none;
-	transition: border-color $transition;
 	min-width: 0;
+	min-height: 44px;
+	transition: border-color $transition;
 
-	&::placeholder { color: $text-muted; }
-	&:focus { border-color: $accent; }
+	&::placeholder { color: var(--text-muted); }
+	&:focus { border-color: var(--accent); }
 }
 
 .chat-send {
-	background: $accent;
+	background: var(--accent);
 	border: none;
 	border-radius: $radius-sm;
-	color: $color-on-accent;
+	color: #fff;
 	cursor: pointer;
-	width: 36px;
-	height: 36px;
-	display: inline-flex;
+	width: 44px;
+	height: 44px;
+	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-size: $text-sm;
 	flex-shrink: 0;
 	transition: background $transition, opacity $transition;
 
-	&:hover:not(:disabled) { background: $accent-hover; }
+	&:hover:not(:disabled) { background: var(--accent-hover); }
 	&:disabled { opacity: 0.4; cursor: not-allowed; }
 }

@@ -1,36 +1,28 @@
 @use 'styles/variables' as *;
 
-.auth-page {
-	min-height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: $s4;
+ion-content {
+	--background: var(--bg);
 }
 
-.auth-card {
-	background: $bg-card;
-	border: 1px solid $border;
-	border-radius: $radius-lg;
-	padding: $s6;
-	width: 100%;
-	max-width: 400px;
+ion-header ion-toolbar {
+	--background: var(--bg-surface);
+}
+
+.auth-container {
+	max-width: 480px;
+	margin: 0 auto;
+	padding-top: $s8;
 	display: flex;
 	flex-direction: column;
 	gap: $s4;
-
-	@media (min-width: $bp-sm) {
-		padding: $s8;
-	}
 }
 
 .auth-title {
 	font-size: $text-2xl;
 	font-weight: 700;
+	color: var(--text);
 
-	@media (min-width: $bp-sm) {
-		font-size: $text-3xl;
-	}
+	@media (min-width: $bp-sm) { font-size: $text-3xl; }
 }
 
 .auth-subtitle {
@@ -48,66 +40,28 @@
 	font-size: $text-sm;
 }
 
-.auth-form {
-	display: flex;
-	flex-direction: column;
-	gap: $s4;
+.auth-fields {
+	border-radius: $radius-lg;
+	overflow: hidden;
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	margin-bottom: $s2;
+
+	ion-item {
+		--background: var(--bg-card);
+		--border-color: var(--border-color);
+	}
 }
 
-.field {
-	display: flex;
-	flex-direction: column;
-	gap: $s1;
-}
-
-.field-label {
+.field-error {
+	color: $color-danger !important;
 	font-size: $text-sm;
-	color: $text-muted;
+	padding: $s1 $s4;
+	display: block;
 }
 
-.input {
-	padding: $s3 $s4;
-	background: $bg-surface;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	color: $text;
-	font-size: $text-base;
-	outline: none;
-	transition: border-color $transition;
-	min-height: 44px;
-
-	&:focus {
-		border-color: $accent;
-	}
-
-	&::placeholder {
-		color: $text-muted;
-	}
-}
-
-.btn {
-	padding: $s3 $s6;
-	border-radius: $radius-md;
-	font-size: $text-base;
-	font-weight: 600;
-	cursor: pointer;
-	border: none;
-	transition: background $transition, opacity $transition;
-	min-height: 44px;
-
-	&-primary {
-		background: $accent;
-		color: $text;
-
-		&:hover:not([disabled]) {
-			background: $accent-hover;
-		}
-	}
-
-	&[disabled] {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
+.auth-btn {
+	margin-top: $s2;
 }
 
 .auth-footer {
@@ -120,12 +74,20 @@
 	color: $accent;
 	text-decoration: none;
 
-	&:hover {
-		text-decoration: underline;
-	}
+	&:hover { text-decoration: underline; }
 }
 
 .auth-divider {
 	display: flex;
-	justify-content: center;
+	align-items: center;
+	gap: $s3;
+	color: $text-muted;
+	font-size: $text-sm;
+
+	&::before, &::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: var(--border-color);
+	}
 }

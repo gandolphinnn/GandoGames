@@ -1,19 +1,38 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import {
+	IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+	IonBackButton, IonNote,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import {
+	arrowBackOutline, copyOutline, checkmarkOutline, personAddOutline,
+	closeOutline, starOutline, playOutline, personOutline, addOutline,
+	linkOutline,
+} from 'ionicons/icons';
+
 import { GamePlayer, RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { ChatComponent } from '../../../../components/chat/chat.component';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { InviteModalComponent } from '../invite-modal/invite-modal.component';
+import { GameHistoryComponent } from '../history/game-history.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent],
+	host: { class: 'ion-page' },
+	imports: [
+		RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent,
+		ChatComponent, GameHistoryComponent,
+		IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+		IonBackButton, IonNote,
+	],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -66,12 +85,15 @@ export class RoomDetailComponent implements OnInit {
 		return slots;
 	});
 
-	/* @HostListener('window:beforeunload')
-	public onBeforeUnload(): void {
-		if (!this.hasLeft && this.isInRoom()) {
-			this.roomService.leaveRoomBeacon(this.roomId());
-		}
-	} */
+	public readonly showInviteModal = signal(false);
+
+	constructor() {
+		addIcons({
+			arrowBackOutline, copyOutline, checkmarkOutline, personAddOutline,
+			closeOutline, starOutline, playOutline, personOutline, addOutline,
+			linkOutline,
+		});
+	}
 
 	public ngOnInit(): void {
 		this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
@@ -167,8 +189,6 @@ export class RoomDetailComponent implements OnInit {
 		this.copied.set(true);
 		setTimeout(() => this.copied.set(false), 2000);
 	}
-
-	public readonly showInviteModal = signal(false);
 
 	public invite(): void {
 		if (this.isInRoom() && this.room()?.phase === 'waiting') this.showInviteModal.set(true);

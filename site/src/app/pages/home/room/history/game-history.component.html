@@ -1,32 +1,37 @@
-<div class="history-panel">
-	<div class="history-header">History</div>
-	<ng-container *ngTemplateOutlet="list" />
-</div>
-
 <button class="history-fab" (click)="toggle()" title="Game history">
 	<i class="fa-solid fa-clock-rotate-left"></i>
 </button>
 
-@if (open()) {
-	<div class="history-backdrop" (click)="close()"></div>
-	<aside class="history-drawer">
-		<div class="history-header">
-			History
-			<button class="history-close" (click)="close()"><i class="fa-solid fa-xmark"></i></button>
-		</div>
-		<ng-container *ngTemplateOutlet="list" />
-	</aside>
-}
+<ion-modal
+	[isOpen]="open()"
+	(didDismiss)="close()"
+	[breakpoints]="[0, 0.75, 1]"
+	[initialBreakpoint]="0.75"
+	[canDismiss]="true"
+>
+	<ng-template>
+		<ion-header>
+			<ion-toolbar>
+				<ion-title>History</ion-title>
+				<ion-buttons slot="end">
+					<ion-button (click)="close()">
+						<ion-icon slot="icon-only" name="close-outline"></ion-icon>
+					</ion-button>
+				</ion-buttons>
+			</ion-toolbar>
+		</ion-header>
 
-<ng-template #list>
-	<div class="history-list">
-		@for (entry of entries(); track $index) {
-			<div class="history-entry">
-				<span class="history-desc">{{ entry.description }}</span>
-				<span class="history-time">{{ entry.timestamp | date:'HH:mm:ss' }}</span>
+		<ion-content>
+			<div class="history-list">
+				@for (entry of entries(); track $index) {
+					<div class="history-entry">
+						<span class="history-desc">{{ entry.description }}</span>
+						<span class="history-time">{{ entry.timestamp | date:'HH:mm:ss' }}</span>
+					</div>
+				} @empty {
+					<p class="history-empty">No events yet</p>
+				}
 			</div>
-		} @empty {
-			<p class="history-empty">No events yet</p>
-		}
-	</div>
-</ng-template>
+		</ion-content>
+	</ng-template>
+</ion-modal>

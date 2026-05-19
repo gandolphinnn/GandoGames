@@ -1,7 +1,14 @@
 import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import {
+	IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+	IonFooter,
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { chatbubblesOutline, closeOutline, sendOutline } from 'ionicons/icons';
+
 import { ChatMessage } from '@gandogames/common/api';
 import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
@@ -10,7 +17,11 @@ import { SignalRService } from '@gandogames/services/signalr.service';
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [DatePipe, NgTemplateOutlet, FormsModule],
+	imports: [
+		DatePipe, FormsModule,
+		IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
+		IonFooter,
+	],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })
@@ -36,6 +47,8 @@ export class ChatComponent {
 	protected readonly messages = signal<ChatMessage[]>([]);
 
 	constructor() {
+		addIcons({ chatbubblesOutline, closeOutline, sendOutline });
+
 		effect(() => {
 			const room = this.currentRoom();
 			this.messages.set(room?.chat ?? []);

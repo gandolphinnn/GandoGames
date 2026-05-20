@@ -44,9 +44,14 @@ The cost of the split is **template duplication** per component. This is accepte
 public readonly isMobile = signal(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
 ```
 
-Detection is user-agent based, not viewport-based. This means:
-- The result is stable for the lifetime of the session (no signal reactivity needed)
-- Desktop browsers with narrow viewports do not trigger mobile layout
+Detection is user-agent **and** viewport based. The signal is `true` when either condition holds:
+
+```typescript
+mobileRegex.test(navigator.userAgent) || window.innerWidth < 730
+```
+
+- The result is stable for the lifetime of the session (evaluated once at service instantiation, no resize listener needed)
+- The `730px` threshold matches `$bp-sm` in `_variables.scss` — keep them in sync
 - Ionic's `Platform.is('mobile')` was **not** used — it returned `true` on desktop in some configurations
 
 The signal is consumed as `device.isMobile()` in templates and as `this.device.isMobile()` in class methods (e.g. `ProfileComponent.requestDelete()` to decide between `AlertController` and a plain `confirmingDelete` signal).

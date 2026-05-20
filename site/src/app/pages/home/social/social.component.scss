@@ -1,5 +1,7 @@
+@use 'styles/variables' as *;
+
 :host { display: block; }
 
 ion-list {
-	margin-top: 8px;
+	margin-top: $s2;
 }

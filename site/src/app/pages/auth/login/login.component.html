@@ -14,9 +14,10 @@
 			}
 
 			<form [formGroup]="form" (ngSubmit)="submit()">
-				<ion-list class="auth-fields">
-					<ion-item>
+				<div class="auth-fields">
+					<div class="auth-field">
 						<ion-input
+							fill="outline"
 							label="Email"
 							labelPlacement="floating"
 							type="email"
@@ -24,15 +25,16 @@
 							placeholder="you@example.com"
 							autocomplete="email"
 						/>
-					</ion-item>
-					@if (form.controls.email.touched && form.controls.email.hasError('required')) {
-						<ion-note class="field-error">Email is required</ion-note>
-					} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
-						<ion-note class="field-error">Enter a valid email</ion-note>
-					}
+						@if (form.controls.email.touched && form.controls.email.hasError('required')) {
+							<ion-note class="field-error">Email is required</ion-note>
+						} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+							<ion-note class="field-error">Enter a valid email</ion-note>
+						}
+					</div>
 
-					<ion-item>
+					<div class="auth-field">
 						<ion-input
+							fill="outline"
 							label="Password"
 							labelPlacement="floating"
 							type="password"
@@ -42,11 +44,11 @@
 						>
 							<ion-input-password-toggle slot="end" />
 						</ion-input>
-					</ion-item>
-					@if (form.controls.password.touched && form.controls.password.hasError('required')) {
-						<ion-note class="field-error">Password is required</ion-note>
-					}
-				</ion-list>
+						@if (form.controls.password.touched && form.controls.password.hasError('required')) {
+							<ion-note class="field-error">Password is required</ion-note>
+						}
+					</div>
+				</div>
 
 				<ion-button expand="block" type="submit" [disabled]="loading()" class="auth-btn">
 					{{ loading() ? 'Logging in…' : 'Log in' }}

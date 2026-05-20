@@ -211,17 +211,13 @@ ion-item {
   --color: var(--text);
   --border-color: var(--border-color);
   --highlight-color-focused: var(--accent);
-  --padding-start: 0;
-  --inner-padding-end: 0;
 }
 
 ion-input {
   --color: var(--text);
   --placeholder-color: var(--text-muted);
-  --background: var(--bg-card);
   --border-color: var(--border-color);
   --highlight-color-focused: var(--accent);
-  border-radius: 8px;
 }
 
 ion-list {

@@ -1,74 +1,69 @@
-<ion-modal [isOpen]="isOpen()" (didDismiss)="closeModal()" [breakpoints]="[0, 0.8, 1]" [initialBreakpoint]="0.8">
-	<ng-template>
-		<ion-header>
-			<ion-toolbar>
-				<ion-title>Invite to Room</ion-title>
-				<ion-buttons slot="end">
-					<ion-button (click)="closeModal()">
-						<ion-icon slot="icon-only" name="close-outline"></ion-icon>
-					</ion-button>
-				</ion-buttons>
-			</ion-toolbar>
-		</ion-header>
+<div class="backdrop" (click)="onBackdropClick()"></div>
 
-		<ion-content>
-			@if (error()) {
-				<div class="modal-error">{{ error() }}</div>
-			}
+<div class="modal" (click)="$event.stopPropagation()">
 
-			@if (canAddBot()) {
-				<ion-list>
-					<ion-item button (click)="addBot()" [disabled]="addingBot()">
-						<ion-avatar slot="start" class="bot-avatar">
-							<i class="fa-solid fa-robot"></i>
-						</ion-avatar>
-						<ion-label>
-							<h3>Add a bot</h3>
-							<p>Fill an empty slot with a bot player</p>
-						</ion-label>
-						@if (addingBot()) {
-							<ion-icon name="checkmark-outline" slot="end" color="success"></ion-icon>
-						} @else {
-							<ion-icon name="add-outline" slot="end"></ion-icon>
-						}
-					</ion-item>
-				</ion-list>
-			}
+	<header class="modal-header">
+		<h2 class="modal-title">Invite to Room</h2>
+		<button class="modal-close" (click)="closed.emit()" title="Close">
+			<i class="fa-solid fa-xmark"></i>
+		</button>
+	</header>
 
-			<ion-list>
-				<ion-item lines="none" class="section-label">
-					<ion-label color="medium">Online players</ion-label>
-				</ion-item>
-				@if (availablePlayers().length === 0) {
-					<ion-item>
-						<ion-label color="medium">No other players online right now.</ion-label>
-					</ion-item>
-				} @else {
+	<div class="modal-body">
+
+		<section class="invite-section">
+			<h3 class="section-label">Online players</h3>
+			@if (availablePlayers().length === 0) {
+				<p class="empty-msg">No other players online right now.</p>
+			} @else {
+				<ul class="player-list">
 					@for (name of availablePlayers(); track name) {
-						<ion-item>
-							<ion-avatar slot="start" class="player-avatar" [style.--avatar-hue]="avatarHue(name)">
+						<li class="player-row">
+							<div class="player-row-avatar" [style.--avatar-hue]="avatarHue(name)">
 								{{ name.charAt(0).toUpperCase() }}
-							</ion-avatar>
-							<ion-label>{{ name }}</ion-label>
-							<ion-button
-								slot="end"
-								[fill]="invited().has(name) ? 'solid' : 'outline'"
-								[color]="invited().has(name) ? 'success' : 'primary'"
+							</div>
+							<span class="player-row-name">{{ name }}</span>
+							<button class="btn-row-action"
 								[disabled]="invitingName() === name || invited().has(name)"
-								(click)="invite(name)"
-							>
+								[class.btn-row-action-done]="invited().has(name)"
+								(click)="invite(name)">
 								@if (invitingName() === name) {
 									<i class="fa-solid fa-spinner fa-spin"></i>
 								} @else if (invited().has(name)) {
-									<ion-icon name="checkmark-outline"></ion-icon>
+									<i class="fa-solid fa-check"></i> Sent
 								} @else {
-									<ion-icon name="send-outline"></ion-icon>
+									Invite
 								}
-							</ion-button>
-						</ion-item>
+							</button>
+						</li>
 					}
-				}
-			</ion-list>
-		</ion-content>
-	</ng-template>
-</ion-modal>
+				</ul>
+			}
+		</section>
+
+		@if (canAddBot()) {
+			<section class="invite-section">
+				<h3 class="section-label">Add a bot</h3>
+				<div class="player-row">
+					<div class="player-row-avatar bot-avatar">
+						<i class="fa-solid fa-robot"></i>
+					</div>
+					<span class="player-row-name">Bot player</span>
+					<button class="btn-row-action" [disabled]="addingBot()" (click)="addBot()">
+						@if (addingBot()) {
+							<i class="fa-solid fa-spinner fa-spin"></i>
+						} @else {
+							Add
+						}
+					</button>
+				</div>
+			</section>
+		}
+
+		@if (error()) {
+			<p class="modal-error">{{ error() }}</p>
+		}
+
+	</div>
+
+</div>

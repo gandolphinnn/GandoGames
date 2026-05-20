@@ -1,57 +1,21 @@
-@if (device.isMobile()) {
+<div class="history-panel">
+	<div class="history-header">History</div>
+	<ng-container *ngTemplateOutlet="list" />
+</div>
 
-	<!-- Mobile: FAB + Ionic bottom-sheet modal -->
-	<button class="history-fab" (click)="toggle()" title="Game history">
-		<i class="fa-solid fa-clock-rotate-left"></i>
-	</button>
+<button class="history-fab" (click)="toggle()" title="Game history">
+	<i class="fa-solid fa-clock-rotate-left"></i>
+</button>
 
-	<ion-modal
-		[isOpen]="open()"
-		(didDismiss)="close()"
-		[breakpoints]="[0, 0.75, 1]"
-		[initialBreakpoint]="0.75"
-		[canDismiss]="true"
-	>
-		<ng-template>
-			<ion-header>
-				<ion-toolbar>
-					<ion-title>History</ion-title>
-					<ion-buttons slot="end">
-						<ion-button (click)="close()">
-							<ion-icon slot="icon-only" name="close-outline"></ion-icon>
-						</ion-button>
-					</ion-buttons>
-				</ion-toolbar>
-			</ion-header>
-			<ion-content>
-				<ng-container *ngTemplateOutlet="list" />
-			</ion-content>
-		</ng-template>
-	</ion-modal>
-
-} @else {
-
-	<!-- Desktop: original design — always-visible side panel + FAB drawer -->
-	<div class="history-panel">
-		<div class="history-header">History</div>
+@if (open()) {
+	<div class="history-backdrop" (click)="close()"></div>
+	<aside class="history-drawer">
+		<div class="history-header">
+			History
+			<button class="history-close" (click)="close()"><i class="fa-solid fa-xmark"></i></button>
+		</div>
 		<ng-container *ngTemplateOutlet="list" />
-	</div>
-
-	<button class="history-fab" (click)="toggle()" title="Game history">
-		<i class="fa-solid fa-clock-rotate-left"></i>
-	</button>
-
-	@if (open()) {
-		<div class="history-backdrop" (click)="close()"></div>
-		<aside class="history-drawer">
-			<div class="history-header">
-				History
-				<button class="history-close" (click)="close()"><i class="fa-solid fa-xmark"></i></button>
-			</div>
-			<ng-container *ngTemplateOutlet="list" />
-		</aside>
-	}
-
+	</aside>
 }
 
 <ng-template #list>

@@ -1,11 +1,17 @@
 @use 'styles/variables' as *;
 
+.rooms-page {
+	padding: $s6;
+	max-width: 720px;
+	margin: 0 auto;
+}
+
 // ── Filter bar ──────────────────────────────────────────────
 .filter-bar {
 	display: flex;
 	gap: $s2;
 	flex-wrap: wrap;
-	padding: $s4;
+	margin-bottom: $s6;
 }
 
 .filter-btn {
@@ -14,66 +20,79 @@
 	gap: $s2;
 	padding: $s2 $s4;
 	border-radius: $radius-full;
-	border: 1px solid var(--border-color);
+	border: 1px solid $border;
 	background: transparent;
-	color: var(--text-muted);
+	color: $text-muted;
 	font-size: $text-sm;
 	cursor: pointer;
 	transition: background $transition, color $transition, border-color $transition;
 	min-height: 44px;
 
-	&:hover { color: var(--text); border-color: var(--text-muted); }
+	&:hover { color: $text; border-color: $text-muted; }
 
 	&.active {
-		background: var(--accent);
-		border-color: var(--accent);
-		color: #fff;
+		background: $accent;
+		border-color: $accent;
+		color: $color-on-accent;
 	}
 }
 
 // ── Room list ────────────────────────────────────────────────
+.room-list-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+}
+
+.status-msg { color: $text-muted; font-size: $text-sm; }
+.error-msg  { color: $color-danger; font-size: $text-sm; }
+
 .room-list {
-	background: transparent;
+	list-style: none;
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+}
 
-	ion-item.room-item {
-		--background: var(--bg-card);
-		--border-radius: #{$radius-md};
-		--padding-start: #{$s4};
-		--inner-padding-end: #{$s4};
-		margin: 0 $s4 $s3;
-		border-radius: $radius-md;
-		border: 1px solid var(--border-color);
+.room-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $s4 $s6;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	cursor: pointer;
+	transition: border-color $transition, background $transition;
+	min-height: 44px;
 
-		h2 { font-weight: 600; color: var(--text); }
-		p  { font-size: $text-sm; color: var(--text-muted); }
+	&:hover {
+		border-color: $accent;
+		background: $accent-tint;
 	}
 }
 
-.room-game-icon {
-	width: 44px;
-	height: 44px;
+.room-card-info {
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 1.5rem;
-	color: var(--accent);
-	background: var(--accent-subtle);
-	border-radius: $radius-md;
-	margin-right: $s4;
+	flex-direction: column;
+	gap: $s1;
 }
 
-.count-badge {
-	--background: var(--accent-muted);
-	--color: var(--accent);
-	font-size: $text-sm;
-	font-weight: 700;
+.room-card-game {
+	font-weight: 600;
+	font-size: $text-base;
 }
 
-.error-note {
-	color: $color-danger;
+.room-card-players-list {
 	font-size: $text-sm;
-	padding: $s3 $s4;
-	display: block;
+	color: $text-muted;
+}
+
+.room-card-count {
+	font-size: $text-sm;
+	color: $accent;
+	font-weight: 600;
+	white-space: nowrap;
 }
 
 // ── Empty state ──────────────────────────────────────────────
@@ -82,39 +101,87 @@
 	flex-direction: column;
 	align-items: flex-start;
 	gap: $s3;
-	padding: $s8 $s4;
+	padding: $s8 0;
 }
 
 .empty-icon {
 	font-size: 2.5rem;
 	line-height: 1;
-	color: var(--text-muted);
 }
 
 .empty-title {
 	font-size: $text-xl;
 	font-weight: 700;
-	color: var(--text);
+	color: $text;
 }
 
 .empty-subtitle {
 	font-size: $text-sm;
-	color: var(--text-muted);
+	color: $text-muted;
 	margin-top: -$s2;
 }
 
-// ── Create form ──────────────────────────────────────────────
-.create-subtitle {
+// ── Shared buttons ───────────────────────────────────────────
+.btn-primary {
+	padding: $s3 $s6;
+	background: $accent;
+	color: $color-on-accent;
+	border: none;
+	border-radius: $radius-md;
 	font-size: $text-base;
-	color: var(--text-muted);
-	margin-bottom: $s6;
+	font-weight: 600;
+	cursor: pointer;
+	align-self: flex-start;
+	min-height: 44px;
+	transition: background $transition;
+
+	&:hover:not(:disabled) { background: $accent-hover; }
+	&:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
+.btn-secondary {
+	padding: $s3 $s6;
+	background: transparent;
+	color: $text-muted;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	cursor: pointer;
+	min-height: 44px;
+	transition: color $transition, border-color $transition;
+
+	&:hover { color: $text; border-color: $text-muted; }
+}
+
+// ── Create form ──────────────────────────────────────────────
+.create-form {
+	display: flex;
+	flex-direction: column;
+	gap: $s6;
+}
+
+.create-header {
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+}
+
+.form-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.form-subtitle {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+// ── Game selection cards ─────────────────────────────────────
 .game-grid {
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: $s4;
-	margin-bottom: $s6;
 
 	@media (min-width: $bp-sm) {
 		grid-template-columns: repeat(2, 1fr);
@@ -127,25 +194,23 @@
 	align-items: flex-start;
 	gap: $s3;
 	padding: $s6;
-	background: var(--bg-card);
-	border: 2px solid var(--border-color);
+	background: $bg-card;
+	border: 2px solid $border;
 	border-radius: $radius-lg;
 	cursor: pointer;
 	text-align: left;
 	transition: border-color $transition, background $transition, transform $transition, box-shadow $transition;
-	color: var(--text);
-	width: 100%;
 
 	&:hover {
-		border-color: var(--accent-emphasis);
+		border-color: $accent-emphasis;
 		transform: translateY(-2px);
-		box-shadow: var(--shadow-hover);
+		box-shadow: $shadow-hover;
 	}
 
 	&.selected {
-		border-color: var(--accent);
-		background: var(--accent-subtle);
-		box-shadow: 0 0 0 1px var(--accent), var(--shadow-hover);
+		border-color: $accent;
+		background: $accent-subtle;
+		box-shadow: 0 0 0 1px $accent, $shadow-hover;
 	}
 }
 
@@ -157,23 +222,23 @@
 .game-card-name {
 	font-weight: 700;
 	font-size: $text-xl;
+	color: $text;
 }
 
 .game-card-desc {
 	font-size: $text-sm;
-	color: var(--text-muted);
+	color: $text-muted;
 	line-height: 1.5;
 	flex: 1;
 }
 
 .game-card-players {
 	font-size: $text-sm;
-	color: var(--accent);
+	color: $accent;
 	font-weight: 600;
 }
 
-.create-actions {
+.form-actions {
 	display: flex;
-	flex-direction: column;
 	gap: $s3;
 }

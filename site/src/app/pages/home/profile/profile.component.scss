@@ -1,84 +1,133 @@
 @use 'styles/variables' as *;
 
-:host { display: block; }
+:host {
+	display: flex;
+	flex: 1;
+}
 
-// Hero section at top
-.profile-hero {
+.profile-page {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $s4;
+}
+
+.profile-card {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	width: 100%;
+	max-width: 400px;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: $s3;
-	padding: $s8 $s4 $s6;
-	border-bottom: 1px solid var(--border-color);
-	background: var(--bg-card);
-}
+	gap: $s6;
 
-gg-player-avatar.profile-avatar {
-	width: 80px;
-	height: 80px;
-	font-size: $text-3xl;
-	border-radius: $radius-full;
-}
-
-.profile-hero-info {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: $s2;
-}
-
-.profile-username {
-	font-size: $text-2xl;
-	font-weight: 700;
-}
-
-.guest-badge {
-	font-size: $text-sm;
-}
-
-// Section list
-.profile-section {
-	margin: $s4 0 0;
-
-	ion-item {
-		--background: var(--bg-card);
-		--border-color: var(--border-color);
-
-		h3 { font-weight: 600; }
-		p  { font-size: $text-sm; color: var(--text-muted); }
+	@media (min-width: $bp-sm) {
+		padding: $s8;
 	}
 }
 
-.mono-value {
+.profile-avatar-wrap {
+	display: flex;
+	justify-content: center;
+}
+
+gg-player-avatar.profile-avatar {
+	width: 72px;
+	height: 72px;
+	font-size: $text-2xl;
+}
+
+.profile-header {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+}
+
+.profile-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+
+	@media (min-width: $bp-sm) {
+		font-size: $text-3xl;
+	}
+}
+
+.profile-badge {
+	padding: $s1 $s3;
+	background: $color-warning-bg;
+	border: 1px solid $color-warning-border;
+	border-radius: $radius-md;
+	color: $color-warning;
+	font-size: $text-sm;
+	font-weight: 600;
+}
+
+.profile-info {
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+}
+
+.info-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: $s4;
+	padding: $s3 0;
+	border-bottom: 1px solid $border;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.info-label {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.info-value {
+	font-size: $text-sm;
 	font-family: monospace;
-	font-size: $text-sm !important;
 	word-break: break-all;
 }
 
-.section-header {
-	padding: $s4 $s4 $s2;
-	font-size: $text-sm;
-	font-weight: 600;
-	color: var(--text-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
+.icon-picker {
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
 }
 
-// Icon picker
+.icon-picker-title {
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.icon-picker-empty {
+	font-size: $text-sm;
+	color: $text-muted;
+	font-style: italic;
+}
+
 .icon-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
 	gap: $s2;
-	padding: $s2 $s4 $s4;
 }
 
 .icon-btn {
 	width: 52px;
 	height: 52px;
 	border-radius: $radius-full;
-	border: 2px solid var(--border-color);
+	border: 2px solid $border;
 	background: transparent;
-	color: var(--text);
+	color: $text;
 	font-size: $text-lg;
 	cursor: pointer;
 	display: flex;
@@ -87,24 +136,105 @@ gg-player-avatar.profile-avatar {
 	transition: border-color $transition, background $transition, color $transition;
 
 	&:hover:not(:disabled) {
-		border-color: var(--accent);
-		background: var(--accent-tint);
-		color: var(--accent);
+		border-color: $accent;
+		background: $accent-tint;
+		color: $accent;
 	}
 
 	&.selected {
-		border-color: var(--accent);
-		background: var(--accent-subtle);
-		color: var(--accent);
+		border-color: $accent;
+		background: $accent-subtle;
+		color: $accent;
 	}
 
-	&.saving { opacity: 0.7; }
-	&:disabled { cursor: not-allowed; }
+	&.saving {
+		opacity: 0.7;
+	}
+
+	&:disabled {
+		cursor: not-allowed;
+	}
 }
 
-.error-note {
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition;
+	min-height: 44px;
+
+	&-danger {
+		background: $color-danger-muted;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
+
+		&:hover:not(:disabled) {
+			background: $color-danger-dim;
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+	}
+
+	&-danger-outline {
+		background: transparent;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
+
+		&:hover {
+			background: $color-danger-bg;
+		}
+	}
+
+	&-ghost {
+		background: transparent;
+		color: $text-muted;
+		border: 1px solid $border;
+
+		&:hover:not(:disabled) {
+			background: $hover-overlay;
+		}
+
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+	}
+}
+
+.profile-error {
 	color: $color-danger;
 	font-size: $text-sm;
-	padding: $s2 $s4;
-	display: block;
+}
+
+.danger-zone {
+	display: flex;
+	flex-direction: column;
+	gap: $s3;
+	padding-top: $s4;
+	border-top: 1px solid $color-danger-dim;
+}
+
+.danger-zone-title {
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.danger-zone-warn {
+	font-size: $text-sm;
+	color: $color-danger;
+}
+
+.danger-zone-actions {
+	display: flex;
+	gap: $s3;
+	flex-wrap: wrap;
 }

@@ -1,37 +1,22 @@
-@if (device.isMobile()) {
+<div class="rooms-page">
 
 	@if (mode() === 'browse') {
 
-		<ion-header>
-			<ion-toolbar>
-				<ion-title>Play</ion-title>
-				<ion-buttons slot="end">
-					<ion-button (click)="mode.set('create')">
-						<ion-icon slot="icon-only" name="add-circle-outline"></ion-icon>
-					</ion-button>
-				</ion-buttons>
-			</ion-toolbar>
-		</ion-header>
+		<div class="filter-bar">
+			@for (game of allGames; track game.id) {
+				<button
+					class="filter-btn"
+					[class.active]="activeGames().includes(game.id)"
+					(click)="toggleGame(game.id)"
+				>
+					<i [class]="game.icon"></i> {{ game.name }}
+				</button>
+			}
+		</div>
 
-		<ion-content>
-			<ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-				<ion-refresher-content></ion-refresher-content>
-			</ion-refresher>
-
-			<div class="filter-bar">
-				@for (game of allGames; track game.id) {
-					<button
-						class="filter-btn"
-						[class.active]="activeGames().includes(game.id)"
-						(click)="toggleGame(game.id)"
-					>
-						<i [class]="game.icon"></i> {{ game.name }}
-					</button>
-				}
-			</div>
-
+		<div class="room-list-wrap">
 			@if (error()) {
-				<ion-note class="error-note">{{ error() }}</ion-note>
+				<p class="status-msg error-msg">{{ error() }}</p>
 			}
 
 			@if (filteredRooms().length === 0) {
@@ -39,57 +24,33 @@
 					<i class="fa-solid fa-gamepad empty-icon"></i>
 					<p class="empty-title">No open rooms</p>
 					<p class="empty-subtitle">Create one and invite your friends.</p>
-					<ion-button (click)="mode.set('create')" class="ion-margin-top">
-						<ion-icon slot="start" name="add-circle-outline"></ion-icon>
-						New Room
-					</ion-button>
+					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
 				</div>
 			} @else {
-				<ion-list class="room-list">
+				<ul class="room-list">
 					@for (room of filteredRooms(); track room.id) {
-						<ion-item class="room-item" (click)="navigateToRoom(room)" button detail>
-							<div class="room-game-icon" slot="start">
-								<i [class]="gameIcon(room.game)"></i>
+						<li class="room-card" (click)="navigateToRoom(room)">
+							<div class="room-card-info">
+								<span class="room-card-game">{{ gameLabel(room.game) }}</span>
+								<span class="room-card-players-list">{{ playerNames(room) }}</span>
 							</div>
-							<ion-label>
-								<h2>{{ gameLabel(room.game) }}</h2>
-								<p>{{ playerNames(room) }}</p>
-							</ion-label>
-							<ion-badge slot="end" class="count-badge">
+							<span class="room-card-count">
 								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
-							</ion-badge>
-						</ion-item>
+							</span>
+						</li>
 					}
-				</ion-list>
-
-				<ion-fab vertical="bottom" horizontal="end" slot="fixed">
-					<ion-fab-button (click)="mode.set('create')" title="New Room">
-						<ion-icon name="add-circle-outline"></ion-icon>
-					</ion-fab-button>
-				</ion-fab>
+				</ul>
+				<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
 			}
-		</ion-content>
+		</div>
 
 	} @else {
 
-		<ion-header>
-			<ion-toolbar>
-				<ion-buttons slot="start">
-					<ion-button (click)="mode.set('browse')">
-						<ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
-					</ion-button>
-				</ion-buttons>
-				<ion-title>New Room</ion-title>
-			</ion-toolbar>
-		</ion-header>
-
-		<ion-content class="ion-padding">
-
-			<p class="create-subtitle">Pick a game to play</p>
-
-			@if (error()) {
-				<ion-note class="error-note">{{ error() }}</ion-note>
-			}
+		<div class="create-form">
+			<div class="create-header">
+				<h2 class="form-title">New Room</h2>
+				<p class="form-subtitle">Pick a game to play</p>
+			</div>
 
 			<div class="game-grid">
 				@for (game of allGames; track game.id) {
@@ -106,112 +67,22 @@
 				}
 			</div>
 
-			<div class="create-actions">
-				<ion-button
-					expand="block"
+			@if (error()) {
+				<p class="error-msg">{{ error() }}</p>
+			}
+
+			<div class="form-actions">
+				<button class="btn-secondary" (click)="mode.set('browse')">Cancel</button>
+				<button
+					class="btn-primary"
 					[disabled]="!createGameId() || loading()"
 					(click)="create()"
 				>
 					{{ loading() ? 'Creating…' : 'Create Room' }}
-				</ion-button>
-				<ion-button expand="block" fill="outline" (click)="mode.set('browse')">
-					Cancel
-				</ion-button>
+				</button>
 			</div>
-
-		</ion-content>
+		</div>
 
 	}
 
-} @else {
-
-	<div class="rooms-page">
-
-		@if (mode() === 'browse') {
-
-			<div class="filter-bar">
-				@for (game of allGames; track game.id) {
-					<button
-						class="filter-btn"
-						[class.active]="activeGames().includes(game.id)"
-						(click)="toggleGame(game.id)"
-					>
-						<i [class]="game.icon"></i> {{ game.name }}
-					</button>
-				}
-			</div>
-
-			<div class="room-list-wrap">
-				@if (error()) {
-					<p class="status-msg error-msg">{{ error() }}</p>
-				}
-
-				@if (filteredRooms().length === 0) {
-					<div class="empty-state">
-						<i class="fa-solid fa-gamepad empty-icon"></i>
-						<p class="empty-title">No open rooms</p>
-						<p class="empty-subtitle">Create one and invite your friends.</p>
-						<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
-					</div>
-				} @else {
-					<ul class="room-list">
-						@for (room of filteredRooms(); track room.id) {
-							<li class="room-card" (click)="navigateToRoom(room)">
-								<div class="room-card-info">
-									<span class="room-card-game">{{ gameLabel(room.game) }}</span>
-									<span class="room-card-players-list">{{ playerNames(room) }}</span>
-								</div>
-								<span class="room-card-count">
-									{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
-								</span>
-							</li>
-						}
-					</ul>
-					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
-				}
-			</div>
-
-		} @else {
-
-			<div class="create-form">
-				<div class="create-header">
-					<h2 class="form-title">New Room</h2>
-					<p class="form-subtitle">Pick a game to play</p>
-				</div>
-
-				<div class="game-grid">
-					@for (game of allGames; track game.id) {
-						<button
-							class="game-card"
-							[class.selected]="createGameId() === game.id"
-							(click)="setCreateGameId(game.id)"
-						>
-							<i [class]="'game-card-icon fa-fw ' + game.icon"></i>
-							<span class="game-card-name">{{ game.name }}</span>
-							<span class="game-card-desc">{{ game.description }}</span>
-							<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>
-						</button>
-					}
-				</div>
-
-				@if (error()) {
-					<p class="error-msg">{{ error() }}</p>
-				}
-
-				<div class="form-actions">
-					<button class="btn-secondary" (click)="mode.set('browse')">Cancel</button>
-					<button
-						class="btn-primary"
-						[disabled]="!createGameId() || loading()"
-						(click)="create()"
-					>
-						{{ loading() ? 'Creating…' : 'Create Room' }}
-					</button>
-				</div>
-			</div>
-
-		}
-
-	</div>
-
-}
+</div>

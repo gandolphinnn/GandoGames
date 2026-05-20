@@ -36,9 +36,22 @@ Run from `api/`:
 ```bash
 npm run build     # tsc compile
 func start        # local Functions host on :7071
+npm test          # Jest unit tests (game logic, utilities)
 ```
 
-No test runner is configured — do not generate spec files or add test dependencies.
+Run from `site/`:
+```bash
+npm test          # Karma/Jasmine unit tests (services)
+npm run test:e2e  # Playwright E2E tests (starts ng serve automatically)
+```
+
+## Tests
+
+**API (Jest):** `api/src/games/*.spec.ts` for game logic; `api/src/index.spec.ts` for `pfPromise` and `InnerFunctionNotifier`. Config in `api/package.json` (jest) + `api/tsconfig.spec.json`.
+
+**Site (Karma/Jasmine):** `site/src/app/services/*.spec.ts` for Angular services. Config via `angular.json` + `tsconfig.spec.json`. Run with `ng test`.
+
+**E2E (Playwright):** `site/e2e/*.spec.ts`. All API calls are route-intercepted — no live backend needed. Config in `site/playwright.config.ts`. Install browsers once with `npx playwright install chromium` from `site/`.
 
 ## Site (Angular)
 

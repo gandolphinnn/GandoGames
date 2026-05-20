@@ -1,3 +1,6 @@
+- Improved login page:
+	login with other means (google, facebook, apple...)
+	alert guest login that many functionalities are not available and that the profile could be deleted
 - Room participation rework:
 	a user will be able to join and start multiple rooms
 	redo the room chip to be a dropdown button with all the rooms you are in

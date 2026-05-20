@@ -53,6 +53,16 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 			cb => PlayFabClient.UpdateUserTitleDisplayName({ DisplayName: name! }, cb),
 		);
 	}
+	if (result.NewlyCreated) {
+		const registryData = await pfPromise<PlayFabServerModels.GetTitleDataResult>(
+			cb => PlayFabServer.GetTitleInternalData({ Keys: ['guest_player_ids'] }, cb),
+		);
+		const guestIds: string[] = JSON.parse(registryData.Data?.['guest_player_ids'] ?? '[]');
+		guestIds.push(result.PlayFabId!);
+		await pfPromise<PlayFabServerModels.SetTitleDataResult>(
+			cb => PlayFabServer.SetTitleInternalData({ Key: 'guest_player_ids', Value: JSON.stringify(guestIds) }, cb),
+		);
+	}
 	const icon = result.InfoResultPayload?.UserData?.['icon']?.Value;
 	return toAuthResponse(result, name, icon);
 };

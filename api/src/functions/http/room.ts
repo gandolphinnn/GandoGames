@@ -46,7 +46,7 @@ const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, not
 	if (room.kickedPlayers?.includes(player.id)) throw new Error('You have been kicked from this room');
 
 	const gameConfig = GAMES_CONFIG[room.game];
-	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max player for this game');
+	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max players for this game');
 
 	room.players.push(player);
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
@@ -58,12 +58,12 @@ const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, not
 const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
-	if (room.hostId != player.id) throw new Error('You are not the host of this room');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 
 	const gameConfig = GAMES_CONFIG[room.game];
-	if (room.players.length > gameConfig.maxPlayers) throw new Error('Max player for this game');
-	if (room.players.length < gameConfig.minPlayers) throw new Error('Not enought player for this game');
+	if (room.players.length > gameConfig.maxPlayers) throw new Error('Max players for this game');
+	if (room.players.length < gameConfig.minPlayers) throw new Error('Not enough players for this game');
 
 	room.phase = 'playing';
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
@@ -86,14 +86,14 @@ const roomLeaveInner: InnerFunction<RoomBaseRequest, void> = async (body, notifi
 
 	notifier.removeFromGroup(player.id, body.roomId);
 
-	if (room.players.length == 1) {
+	if (room.players.length === 1) {
 		await PlayfabCtx.rooms.delete(body.roomId);
 		notifier.roomDeleted(body.roomId);
 		return;
 	}
 
-	room.players = room.players.filter(p => p.id != player.id);
-	if (room.hostId == player.id) {
+	room.players = room.players.filter(p => p.id !== player.id);
+	if (room.hostId === player.id) {
 		room.hostId = room.players[0].id;
 	}
 	if (room.phase === 'playing') {

@@ -22,18 +22,20 @@ export class RoomService {
 		return this.auth.user()!.sessionTicket;
 	}
 
-	constructor() {
-		this.signalR.events.roomUpsert.subscribe((room) => {
-			this.rooms.update((rooms) => {
-				const idx = rooms.findIndex((r) => r.id === room.id);
-				if (idx >= 0) {
-					const updated = [...rooms];
-					updated[idx] = room;
-					return updated;
-				}
-				return [...rooms, room];
-			});
+	private upsertIntoCache(room: RoomData): void {
+		this.rooms.update(rooms => {
+			const idx = rooms.findIndex(r => r.id === room.id);
+			if (idx >= 0) {
+				const updated = [...rooms];
+				updated[idx] = room;
+				return updated;
+			}
+			return [...rooms, room];
 		});
+	}
+
+	constructor() {
+		this.signalR.events.roomUpsert.subscribe(room => this.upsertIntoCache(room));
 		this.signalR.events.roomDeleted.subscribe((roomId) => {
 			this.rooms.update((rooms) => rooms.filter((r) => r.id !== roomId));
 		});
@@ -50,11 +52,7 @@ export class RoomService {
 
 	public async getRoom(roomId: string): Promise<RoomData> {
 		const room = await this.backend.post<RoomData>('/rooms/get', { sessionTicket: this.ticket, roomId });
-		this.rooms.update(rooms => {
-			const idx = rooms.findIndex(r => r.id === room.id);
-			if (idx >= 0) { const updated = [...rooms]; updated[idx] = room; return updated; }
-			return [...rooms, room];
-		});
+		this.upsertIntoCache(room);
 		return room;
 	}
 

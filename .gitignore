@@ -1,47 +1,33 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Dependencies
+node_modules
 
-# Compiled output
-/site/dist
-/site/tmp
-/site/out-tsc
-/site/bazel-out
-/api/dist
+# Build outputs
+dist
+tmp
 
-# Azure Functions
-/api/local.settings.json
-/api/node_modules
+# Angular cache
+*/.angular/cache
 
-# Node
-/site/node_modules
+# Azure Functions secrets
+local.settings.json
+
+# Test artifacts
+coverage
+test-results
+playwright-report
+
+# Logs
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
+# IDEs
 .idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# Visual Studio Code
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-.history/*
-
-# Miscellaneous
-/site/.angular/cache
-.sass-cache/
-/site/connect.lock
-/site/coverage
-/libpeerconnection.log
-testem.log
-/site/typings
-/site/test-results
+.history/
 
 # System files
 .DS_Store

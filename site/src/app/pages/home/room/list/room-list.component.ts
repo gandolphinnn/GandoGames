@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GameType, RoomData } from '@gandogames/common/api';
+import { RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
 
@@ -73,7 +73,7 @@ export class RoomListComponent implements OnInit {
 		try {
 			this.loading.set(true);
 			this.error.set('');
-			const room = await this.roomService.createRoom(this.createGameId() as GameType);
+			const room = await this.roomService.createRoom(this.createGameId() as any);
 			this.router.navigate(['/play', room.id]);
 		} catch (e) {
 			this.error.set((e as Error).message);

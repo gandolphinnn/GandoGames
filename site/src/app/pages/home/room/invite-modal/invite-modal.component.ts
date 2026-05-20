@@ -1,6 +1,5 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
 import { GameType } from '@gandogames/common/api';
-import { playerNameHue } from '../../../../components/player-avatar/player-name-hue';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 
@@ -49,7 +48,7 @@ export class InviteModalComponent {
 		this.invitingName.set(name);
 		try {
 			await this.roomService.invitePlayer(this.roomId(), name);
-			this.invited.update(s => new Set([...s, name]));
+			this.invited.update(s => { const ns = new Set(s); ns.add(name); return ns; });
 		} catch (e) {
 			this.error.set((e as Error).message);
 		} finally {
@@ -70,5 +69,9 @@ export class InviteModalComponent {
 		}
 	}
 
-	public readonly avatarHue = playerNameHue;
+	public avatarHue(name: string): number {
+		let hash = 0;
+		for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
+		return hash % 360;
+	}
 }

@@ -4,6 +4,7 @@
 	"scripts": {
 		"start-api": "npm --prefix api start",
 		"start-site": "npm --prefix site start",
+		"fetch-secrets": "npm --prefix api run fetch-secrets",
 		"publish": "git checkout master && git merge develop --no-edit -X theirs && git push origin master && git checkout develop"
 	}
 }

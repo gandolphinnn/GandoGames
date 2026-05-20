@@ -5,8 +5,9 @@
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"start": "if exist dist rd /s /q dist && tsc && func start",
-		"test": "jest"
+		"start": "tsc && func start",
+		"test": "jest",
+		"fetch-secrets": "func azure functionapp fetch-app-settings GandoGamesApi && node patch-local-settings.js"
 	},
 	"jest": {
 		"preset": "ts-jest",

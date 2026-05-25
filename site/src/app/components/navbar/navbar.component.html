@@ -1,8 +1,7 @@
 <header class="site-header">
 	<div class="site-header-start">
-		<a routerLink="/" class="nav-link title">
-			<span class="title-full">GandoGames</span>
-			<span class="title-short">GG</span>
+		<a routerLink="/" class="nav-logo">
+			<img src="icons/favicon.png" alt="GandoGames" class="logo-img" />
 		</a>
 	</div>
 
@@ -59,18 +58,6 @@
 					<i class="fa-solid fa-moon"></i>
 				}
 			</button>
-			@if (isLoggedIn()) {
-				<span class="online-count">
-					<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
-					<div class="online-tooltip">
-						@for (name of onlineUsers(); track name) {
-							<span class="online-tooltip-name">{{ name }}</span>
-						} @empty {
-							<span class="online-tooltip-empty">No one online</span>
-						}
-					</div>
-				</span>
-			}
 		</nav>
 		<button class="hamburger" (click)="toggleMenu()" title="Open menu">
 			<i class="fa-solid fa-bars"></i>
@@ -110,18 +97,6 @@
 			</div>
 		}
 		<div class="mobile-menu-footer">
-			@if (isLoggedIn()) {
-				<span class="online-count">
-					<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
-					<div class="online-tooltip">
-						@for (name of onlineUsers(); track name) {
-							<span class="online-tooltip-name">{{ name }}</span>
-						} @empty {
-							<span class="online-tooltip-empty">No one online</span>
-						}
-					</div>
-				</span>
-			}
 			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
 				@if (isDark()) {
 					<i class="fa-solid fa-sun"></i>

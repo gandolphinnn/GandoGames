@@ -106,27 +106,10 @@
 // ── Buttons ────────────────────────────────────────────────────────────────────
 
 .btn {
-	padding: $s3 $s6;
 	border-radius: $radius-md;
-	font-size: $text-base;
 	font-weight: 600;
-	cursor: pointer;
-	border: none;
-	transition: background $transition, opacity $transition;
 	min-height: 44px;
 
-	&-primary {
-		background: $accent;
-		color: $color-on-accent;
-		&:hover { background: $accent-hover; }
-	}
-
-	&-danger {
-		background: $color-danger-muted;
-		color: $color-danger;
-		border: 1px solid $color-danger-border;
-		&:hover { background: $color-danger-dim; }
-	}
-
+	&:disabled,
 	&[disabled] { opacity: 0.4; cursor: not-allowed; }
 }

@@ -5,7 +5,6 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
 import { ThemeService } from '@gandogames/services/theme.service';
 import { RoomService } from '@gandogames/services/room.service';
-import { SignalRService } from '@gandogames/services/signalr.service';
 import { GameType } from '@gandogames/common/api';
 
 @Component({
@@ -27,10 +26,6 @@ export class NavbarComponent {
 	private readonly roomService = inject(RoomService);
 	private readonly router = inject(Router);
 	public readonly myRooms = this.roomService.myRooms;
-
-	private readonly signalRService = inject(SignalRService);
-	public readonly onlineCount = this.signalRService.onlineCount;
-	public readonly onlineUsers = this.signalRService.onlineUsers;
 
 	public readonly menuOpen = signal(false);
 	public readonly roomsDropdownOpen = signal(false);

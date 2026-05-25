@@ -54,5 +54,5 @@ const cleanerPlayersInner: InnerTimeFunction = async (_timer, _context) => {
 	);
 };
 
-registerTimeFunction('cleaner_rooms', '0 */20 * * * *', false, cleanerRoomsInner);
-registerTimeFunction('cleaner_players', '0 0 3 * * *', true, cleanerPlayersInner);
+//registerTimeFunction('cleaner_rooms', '0 */20 * * * *', false, cleanerRoomsInner);
+//registerTimeFunction('cleaner_players', '0 0 3 * * *', true, cleanerPlayersInner);

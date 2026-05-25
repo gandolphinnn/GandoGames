@@ -6,8 +6,7 @@
 		"rootDir": "..",
 		"paths": {
 			"@gandogames/common/api": ["../common/index"],
-			"@gandogames/common/morra": ["../common/games/morra"],
-			"@gandogames/common/pankov": ["../common/games/pankov"],
+			"@gandogames/common/*": ["../common/games/*"],
 			"@gandogames/lib/*": ["./lib/*"],
 			"@gandogames/services/*": ["./src/app/services/*"],
 		},

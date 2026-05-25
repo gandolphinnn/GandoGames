@@ -42,22 +42,12 @@
 	<div class="site-header-end">
 		<nav class="site-nav">
 			<a routerLink="/about" class="nav-link">About</a>
-			@if (isAdmin()) {
-				<a routerLink="/test/palette" class="nav-link">Palette</a>
-			}
 			@if (isLoggedIn()) {
-				<a routerLink="/profile" class="nav-link">Profile</a>
 				<a routerLink="/social" class="nav-link">Social</a>
+				<a routerLink="/profile" class="nav-link">Profile</a>
 			} @else {
 				<a routerLink="/login" class="nav-link">Log in</a>
 			}
-			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
-				@if (isDark()) {
-					<i class="fa-solid fa-sun"></i>
-				} @else {
-					<i class="fa-solid fa-moon"></i>
-				}
-			</button>
 		</nav>
 		<button class="hamburger" (click)="toggleMenu()" title="Open menu">
 			<i class="fa-solid fa-bars"></i>
@@ -80,9 +70,6 @@
 			<a routerLink="/login" class="nav-link" (click)="closeMenu()">Log in</a>
 		}
 		<a routerLink="/about" class="nav-link" (click)="closeMenu()">About</a>
-		@if (isAdmin()) {
-			<a routerLink="/test/palette" class="nav-link" (click)="closeMenu()">Palette</a>
-		}
 		@if (myRooms().length > 0) {
 			<div class="mobile-rooms">
 				@for (room of myRooms(); track room.id) {
@@ -96,14 +83,5 @@
 				}
 			</div>
 		}
-		<div class="mobile-menu-footer">
-			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
-				@if (isDark()) {
-					<i class="fa-solid fa-sun"></i>
-				} @else {
-					<i class="fa-solid fa-moon"></i>
-				}
-			</button>
-		</div>
 	</nav>
 }

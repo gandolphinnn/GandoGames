@@ -6,239 +6,201 @@
 	margin: 0 auto;
 }
 
-// ── Filter bar ──────────────────────────────────────────────
-.filter-bar {
-	display: flex;
-	gap: $s2;
-	flex-wrap: wrap;
-	margin-bottom: $s6;
+.filter {
+	&-bar {
+		display: flex; gap: $s2; flex-wrap: wrap; margin-bottom: $s6;
+	}
+
+	&-btn {
+		display: flex;
+		align-items: center;
+		gap: $s2;
+		padding: $s2 $s4;
+		border-radius: $radius-full;
+		border: 1px solid $border;
+		background: transparent;
+		color: $text-muted;
+		font-size: $text-sm;
+		cursor: pointer;
+		transition: background $transition, color $transition, border-color $transition;
+		min-height: 44px;
+
+		&:hover {
+			color: $text; border-color: $text-muted;
+		}
+		&.active {
+			background: $accent; border-color: $accent; color: $color-on-accent;
+		}
+	}
 }
 
-.filter-btn {
-	display: flex;
-	align-items: center;
-	gap: $s2;
-	padding: $s2 $s4;
-	border-radius: $radius-full;
-	border: 1px solid $border;
-	background: transparent;
-	color: $text-muted;
-	font-size: $text-sm;
-	cursor: pointer;
-	transition: background $transition, color $transition, border-color $transition;
-	min-height: 44px;
+.status-msg {
+	color: $text-muted; font-size: $text-sm;
+}
+.error-msg {
+	color: $color-danger; font-size: $text-sm;
+}
 
-	&:hover { color: $text; border-color: $text-muted; }
+.room {
+	&-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
 
-	&.active {
+		&-wrap {
+			display: flex; flex-direction: column; gap: $s4;
+		}
+	}
+
+	&-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: $s4 $s6;
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		cursor: pointer;
+		transition: border-color $transition, background $transition;
+		min-height: 44px;
+
+		&:hover {
+			border-color: $accent; background: $accent-tint;
+		}
+
+		&-info {
+			display: flex; flex-direction: column; gap: $s1;
+		}
+		&-game {
+			font-weight: 600; font-size: $text-base;
+		}
+		&-players-list {
+			font-size: $text-sm; color: $text-muted;
+		}
+		&-count {
+			font-size: $text-sm; color: $accent; font-weight: 600; white-space: nowrap;
+		}
+	}
+}
+
+.empty {
+	&-state {
+		display: flex; flex-direction: column; align-items: flex-start; gap: $s3; padding: $s8 0;
+	}
+	&-icon {
+		font-size: 2.5rem; line-height: 1;
+	}
+	&-title {
+		font-size: $text-xl; font-weight: 700; color: $text;
+	}
+	&-subtitle {
+		font-size: $text-sm; color: $text-muted; margin-top: -$s2;
+	}
+}
+
+.btn {
+	&-primary {
+		padding: $s3 $s6;
 		background: $accent;
-		border-color: $accent;
 		color: $color-on-accent;
+		border: none;
+		border-radius: $radius-md;
+		font-size: $text-base;
+		font-weight: 600;
+		cursor: pointer;
+		align-self: flex-start;
+		min-height: 44px;
+		transition: background $transition;
+
+		&:hover:not(:disabled) {
+			background: $accent-hover;
+		}
+		&:disabled {
+			opacity: 0.5; cursor: not-allowed;
+		}
+	}
+
+	&-secondary {
+		padding: $s3 $s6;
+		background: transparent;
+		color: $text-muted;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		font-size: $text-base;
+		cursor: pointer;
+		min-height: 44px;
+		transition: color $transition, border-color $transition;
+
+		&:hover {
+			color: $text; border-color: $text-muted;
+		}
 	}
 }
 
-// ── Room list ────────────────────────────────────────────────
-.room-list-wrap {
-	display: flex;
-	flex-direction: column;
-	gap: $s4;
-}
-
-.status-msg { color: $text-muted; font-size: $text-sm; }
-.error-msg  { color: $color-danger; font-size: $text-sm; }
-
-.room-list {
-	list-style: none;
-	display: flex;
-	flex-direction: column;
-	gap: $s3;
-}
-
-.room-card {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: $s4 $s6;
-	background: $bg-card;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	cursor: pointer;
-	transition: border-color $transition, background $transition;
-	min-height: 44px;
-
-	&:hover {
-		border-color: $accent;
-		background: $accent-tint;
+.create {
+	&-form {
+		display: flex; flex-direction: column; gap: $s6;
+	}
+	&-header {
+		display: flex; flex-direction: column; gap: $s1;
 	}
 }
 
-.room-card-info {
-	display: flex;
-	flex-direction: column;
-	gap: $s1;
-}
-
-.room-card-game {
-	font-weight: 600;
-	font-size: $text-base;
-}
-
-.room-card-players-list {
-	font-size: $text-sm;
-	color: $text-muted;
-}
-
-.room-card-count {
-	font-size: $text-sm;
-	color: $accent;
-	font-weight: 600;
-	white-space: nowrap;
-}
-
-// ── Empty state ──────────────────────────────────────────────
-.empty-state {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: $s3;
-	padding: $s8 0;
-}
-
-.empty-icon {
-	font-size: 2.5rem;
-	line-height: 1;
-}
-
-.empty-title {
-	font-size: $text-xl;
-	font-weight: 700;
-	color: $text;
-}
-
-.empty-subtitle {
-	font-size: $text-sm;
-	color: $text-muted;
-	margin-top: -$s2;
-}
-
-// ── Shared buttons ───────────────────────────────────────────
-.btn-primary {
-	padding: $s3 $s6;
-	background: $accent;
-	color: $color-on-accent;
-	border: none;
-	border-radius: $radius-md;
-	font-size: $text-base;
-	font-weight: 600;
-	cursor: pointer;
-	align-self: flex-start;
-	min-height: 44px;
-	transition: background $transition;
-
-	&:hover:not(:disabled) { background: $accent-hover; }
-	&:disabled { opacity: 0.5; cursor: not-allowed; }
-}
-
-.btn-secondary {
-	padding: $s3 $s6;
-	background: transparent;
-	color: $text-muted;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	font-size: $text-base;
-	cursor: pointer;
-	min-height: 44px;
-	transition: color $transition, border-color $transition;
-
-	&:hover { color: $text; border-color: $text-muted; }
-}
-
-// ── Create form ──────────────────────────────────────────────
-.create-form {
-	display: flex;
-	flex-direction: column;
-	gap: $s6;
-}
-
-.create-header {
-	display: flex;
-	flex-direction: column;
-	gap: $s1;
-}
-
-.form-title {
-	font-size: $text-2xl;
-	font-weight: 700;
-	letter-spacing: -0.02em;
-}
-
-.form-subtitle {
-	font-size: $text-sm;
-	color: $text-muted;
-}
-
-// ── Game selection cards ─────────────────────────────────────
-.game-grid {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: $s4;
-
-	@media (min-width: $bp-sm) {
-		grid-template-columns: repeat(2, 1fr);
+.form {
+	&-title {
+		font-size: $text-2xl; font-weight: 700; letter-spacing: -0.02em;
+	}
+	&-subtitle {
+		font-size: $text-sm; color: $text-muted;
+	}
+	&-actions {
+		display: flex; gap: $s3;
 	}
 }
 
-.game-card {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: $s3;
-	padding: $s6;
-	background: $bg-card;
-	border: 2px solid $border;
-	border-radius: $radius-lg;
-	cursor: pointer;
-	text-align: left;
-	transition: border-color $transition, background $transition, transform $transition, box-shadow $transition;
+.game {
+	&-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: $s4;
 
-	&:hover {
-		border-color: $accent-emphasis;
-		transform: translateY(-2px);
-		box-shadow: $shadow-hover;
+		@media (min-width: $bp-sm) {
+			grid-template-columns: repeat(2, 1fr);
+		}
 	}
 
-	&.selected {
-		border-color: $accent;
-		background: $accent-subtle;
-		box-shadow: 0 0 0 1px $accent, $shadow-hover;
+	&-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: $s3;
+		padding: $s6;
+		background: $bg-card;
+		border: 2px solid $border;
+		border-radius: $radius-lg;
+		cursor: pointer;
+		text-align: left;
+		transition: border-color $transition, background $transition, transform $transition, box-shadow $transition;
+
+		&:hover {
+			border-color: $accent-emphasis; transform: translateY(-2px); box-shadow: $shadow-hover;
+		}
+		&.selected {
+			border-color: $accent; background: $accent-subtle; box-shadow: 0 0 0 1px $accent, $shadow-hover;
+		}
+
+		&-icon {
+			font-size: 2.25rem; line-height: 1;
+		}
+		&-name {
+			font-weight: 700; font-size: $text-xl; color: $text;
+		}
+		&-desc {
+			font-size: $text-sm; color: $text-muted; line-height: 1.5; flex: 1;
+		}
+		&-players {
+			font-size: $text-sm; color: $accent; font-weight: 600;
+		}
 	}
-}
-
-.game-card-icon {
-	font-size: 2.25rem;
-	line-height: 1;
-}
-
-.game-card-name {
-	font-weight: 700;
-	font-size: $text-xl;
-	color: $text;
-}
-
-.game-card-desc {
-	font-size: $text-sm;
-	color: $text-muted;
-	line-height: 1.5;
-	flex: 1;
-}
-
-.game-card-players {
-	font-size: $text-sm;
-	color: $accent;
-	font-weight: 600;
-}
-
-.form-actions {
-	display: flex;
-	gap: $s3;
 }

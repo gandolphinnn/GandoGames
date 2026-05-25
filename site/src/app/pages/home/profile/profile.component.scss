@@ -5,33 +5,71 @@
 	flex: 1;
 }
 
-.profile-page {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: $s4;
-}
-
-.profile-card {
-	background: $bg-card;
-	border: 1px solid $border;
-	border-radius: $radius-lg;
-	padding: $s6;
-	width: 100%;
-	max-width: 400px;
-	display: flex;
-	flex-direction: column;
-	gap: $s6;
-
-	@media (min-width: $bp-sm) {
-		padding: $s8;
+.profile {
+	&-page {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: $s4;
 	}
-}
 
-.profile-avatar-wrap {
-	display: flex;
-	justify-content: center;
+	&-card {
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-lg;
+		padding: $s6;
+		width: 100%;
+		max-width: 400px;
+		display: flex;
+		flex-direction: column;
+		gap: $s6;
+
+		@media (min-width: $bp-sm) {
+			padding: $s8;
+		}
+	}
+
+	&-avatar-wrap {
+		display: flex;
+		justify-content: center;
+	}
+
+	&-header {
+		display: flex;
+		align-items: center;
+		gap: $s3;
+	}
+
+	&-title {
+		font-size: $text-2xl;
+		font-weight: 700;
+
+		@media (min-width: $bp-sm) {
+			font-size: $text-3xl;
+		}
+	}
+
+	&-badge {
+		padding: $s1 $s3;
+		background: $color-warning-bg;
+		border: 1px solid $color-warning-border;
+		border-radius: $radius-md;
+		color: $color-warning;
+		font-size: $text-sm;
+		font-weight: 600;
+	}
+
+	&-info {
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
+	}
+
+	&-error {
+		color: $color-danger;
+		font-size: $text-sm;
+	}
 }
 
 gg-player-avatar.profile-avatar {
@@ -40,119 +78,102 @@ gg-player-avatar.profile-avatar {
 	font-size: $text-2xl;
 }
 
-.profile-header {
-	display: flex;
-	align-items: center;
-	gap: $s3;
-}
+.info {
+	&-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: $s4;
+		padding: $s3 0;
+		border-bottom: 1px solid $border;
 
-.profile-title {
-	font-size: $text-2xl;
-	font-weight: 700;
+		&:last-child {
+			border-bottom: none;
+		}
+	}
 
-	@media (min-width: $bp-sm) {
-		font-size: $text-3xl;
+	&-label {
+		font-size: $text-sm; color: $text-muted;
+	}
+
+	&-value {
+		font-size: $text-sm;
+		font-family: monospace;
+		word-break: break-all;
 	}
 }
 
-.profile-badge {
-	padding: $s1 $s3;
-	background: $color-warning-bg;
-	border: 1px solid $color-warning-border;
-	border-radius: $radius-md;
-	color: $color-warning;
-	font-size: $text-sm;
-	font-weight: 600;
-}
-
-.profile-info {
-	display: flex;
-	flex-direction: column;
-	gap: $s3;
-}
-
-.info-row {
-	display: flex;
-	justify-content: space-between;
+.theme-btn {
+	display: inline-flex;
 	align-items: center;
-	gap: $s4;
-	padding: $s3 0;
-	border-bottom: 1px solid $border;
-
-	&:last-child {
-		border-bottom: none;
-	}
-}
-
-.info-label {
-	font-size: $text-sm;
-	color: $text-muted;
-}
-
-.info-value {
-	font-size: $text-sm;
-	font-family: monospace;
-	word-break: break-all;
-}
-
-.icon-picker {
-	display: flex;
-	flex-direction: column;
-	gap: $s3;
-}
-
-.icon-picker-title {
-	font-size: $text-sm;
-	font-weight: 600;
-	color: $text-muted;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-}
-
-.icon-picker-empty {
-	font-size: $text-sm;
-	color: $text-muted;
-	font-style: italic;
-}
-
-.icon-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
 	gap: $s2;
+	padding: $s1 $s3;
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	font-size: $text-sm;
+	cursor: pointer;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text; background: $hover-overlay;
+	}
 }
 
-.icon-btn {
-	width: 52px;
-	height: 52px;
-	border-radius: $radius-full;
-	border: 2px solid $border;
-	background: transparent;
-	color: $text;
-	font-size: $text-lg;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: border-color $transition, background $transition, color $transition;
+.icon {
+	&-picker {
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
 
-	&:hover:not(:disabled) {
-		border-color: $accent;
-		background: $accent-tint;
-		color: $accent;
+		&-title {
+			font-size: $text-sm;
+			font-weight: 600;
+			color: $text-muted;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		&-empty {
+			font-size: $text-sm;
+			color: $text-muted;
+			font-style: italic;
+		}
 	}
 
-	&.selected {
-		border-color: $accent;
-		background: $accent-subtle;
-		color: $accent;
+	&-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+		gap: $s2;
 	}
 
-	&.saving {
-		opacity: 0.7;
-	}
+	&-btn {
+		width: 52px;
+		height: 52px;
+		border-radius: $radius-full;
+		border: 2px solid $border;
+		background: transparent;
+		color: $text;
+		font-size: $text-lg;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: border-color $transition, background $transition, color $transition;
 
-	&:disabled {
-		cursor: not-allowed;
+		&:hover:not(:disabled) {
+			border-color: $accent; background: $accent-tint; color: $accent;
+		}
+		&.selected {
+			border-color: $accent; background: $accent-subtle; color: $accent;
+		}
+		&.saving {
+			opacity: 0.7;
+		}
+		&:disabled {
+			cursor: not-allowed;
+		}
 	}
 }
 
@@ -174,10 +195,8 @@ gg-player-avatar.profile-avatar {
 		&:hover:not(:disabled) {
 			background: $color-danger-dim;
 		}
-
 		&:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
+			opacity: 0.5; cursor: not-allowed;
 		}
 	}
 
@@ -199,17 +218,10 @@ gg-player-avatar.profile-avatar {
 		&:hover:not(:disabled) {
 			background: $hover-overlay;
 		}
-
 		&:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
+			opacity: 0.5; cursor: not-allowed;
 		}
 	}
-}
-
-.profile-error {
-	color: $color-danger;
-	font-size: $text-sm;
 }
 
 .danger-zone {
@@ -218,23 +230,20 @@ gg-player-avatar.profile-avatar {
 	gap: $s3;
 	padding-top: $s4;
 	border-top: 1px solid $color-danger-dim;
-}
 
-.danger-zone-title {
-	font-size: $text-sm;
-	font-weight: 600;
-	color: $text-muted;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-}
+	&-title {
+		font-size: $text-sm;
+		font-weight: 600;
+		color: $text-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
 
-.danger-zone-warn {
-	font-size: $text-sm;
-	color: $color-danger;
-}
+	&-warn {
+		font-size: $text-sm; color: $color-danger;
+	}
 
-.danger-zone-actions {
-	display: flex;
-	gap: $s3;
-	flex-wrap: wrap;
+	&-actions {
+		display: flex; gap: $s3; flex-wrap: wrap;
+	}
 }

@@ -3,26 +3,26 @@
 .site-header {
 	display: flex;
 	align-items: center;
-	padding: $s4 $s6;
+	height: 40px;
+	padding: 0 $s6;
 	border-bottom: 1px solid $border;
-}
 
-.site-header-start,
-.site-header-end {
-	flex: 1;
-	min-width: 0;
-}
+	&-start,
+	&-end {
+		flex: 1; min-width: 0;
+	}
 
-.site-header-end {
-	display: flex;
-	align-items: center;
-	justify-content: flex-end;
-}
+	&-end {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
 
-.site-header-center {
-	flex: 0 0 auto;
-	display: flex;
-	justify-content: center;
+	&-center {
+		flex: 0 0 auto;
+		display: flex;
+		justify-content: center;
+	}
 }
 
 .site-nav {
@@ -30,7 +30,9 @@
 	align-items: center;
 	gap: $s4;
 
-	@media (min-width: $bp-sm) { display: flex; }
+	@media (min-width: $bp-sm) {
+		display: flex;
+	}
 }
 
 .hamburger {
@@ -39,29 +41,21 @@
 	border-radius: $radius-md;
 	color: $text-muted;
 	cursor: pointer;
-	width: 44px;
-	height: 44px;
+	width: 32px;
+	height: 32px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	font-size: $text-base;
+	font-size: $text-sm;
 	transition: color $transition, background $transition, border-color $transition;
 
 	&:hover {
-		color: $text;
-		background: $hover-overlay;
+		color: $text; background: $hover-overlay;
 	}
 
-	@media (min-width: $bp-sm) { display: none; }
-}
-
-.mobile-menu-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 400;
-	background: rgba(0, 0, 0, 0.4);
-
-	@media (min-width: $bp-sm) { display: none; }
+	@media (min-width: $bp-sm) {
+		display: none;
+	}
 }
 
 .mobile-menu {
@@ -79,19 +73,26 @@
 	border-left: 1px solid $border;
 	box-shadow: $shadow-card;
 
-	@media (min-width: $bp-sm) { display: none; }
-}
+	@media (min-width: $bp-sm) {
+		display: none;
+	}
 
-.mobile-menu-header {
-	display: flex;
-	justify-content: flex-end;
-	margin-bottom: $s2;
-}
+	&-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 400;
+		background: rgba(0, 0, 0, 0.4);
 
-.mobile-menu-footer {
-	margin-top: auto;
-	display: flex;
-	justify-content: flex-end;
+		@media (min-width: $bp-sm) {
+			display: none;
+		}
+	}
+
+	&-header {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: $s2;
+	}
 }
 
 .nav-link {
@@ -100,8 +101,9 @@
 	font-size: $text-sm;
 	transition: color $transition;
 
-	&:hover { color: $text; }
-
+	&:hover {
+		color: $text;
+	}
 }
 
 .nav-logo {
@@ -119,17 +121,49 @@
 	position: relative;
 }
 
-.my-room-chevron {
-	font-size: 0.6em;
-	transition: transform $transition;
+.my-room {
+	&-card {
+		display: inline-flex;
+		align-items: center;
+		gap: $s2;
+		height: 36px;
+		padding: 0 $s4;
+		background: $color-success-bg;
+		border: 1px solid $color-success-border;
+		border-radius: $radius-full;
+		color: $color-success;
+		font-size: $text-sm;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background $transition, border-color $transition;
 
-	&.open { transform: rotate(180deg); }
-}
+		i {
+			font-size: 0.55em;
+		}
 
-.rooms-dropdown-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 150;
+		&:hover {
+			background: rgba(74, 222, 128, 0.2); border-color: $color-success;
+		}
+	}
+
+	&-chevron {
+		font-size: 0.6em;
+		transition: transform $transition;
+
+		&.open {
+			transform: rotate(180deg);
+		}
+	}
+
+	&-badge {
+		font-size: 0.65em;
+		font-weight: 700;
+		letter-spacing: 0.05em;
+		background: $color-success;
+		color: #fff;
+		border-radius: $radius-sm;
+		padding: 1px 5px;
+	}
 }
 
 .rooms-dropdown {
@@ -147,35 +181,43 @@
 	display: flex;
 	flex-direction: column;
 	gap: $s1;
-}
 
-.rooms-dropdown-item {
-	display: flex;
-	align-items: center;
-	gap: $s2;
-	padding: $s2 $s3;
-	background: transparent;
-	border: none;
-	border-radius: $radius-sm;
-	cursor: pointer;
-	text-align: left;
-	min-height: 44px;
-	transition: background $transition;
+	&-backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: 150;
+	}
 
-	&:hover { background: $hover-overlay; }
-}
+	&-item {
+		display: flex;
+		align-items: center;
+		gap: $s2;
+		padding: $s2 $s3;
+		background: transparent;
+		border: none;
+		border-radius: $radius-sm;
+		cursor: pointer;
+		text-align: left;
+		min-height: 44px;
+		transition: background $transition;
 
-.rooms-dropdown-id {
-	font-size: $text-sm;
-	font-weight: 600;
-	font-family: monospace;
-	color: $text;
-}
+		&:hover {
+			background: $hover-overlay;
+		}
+	}
 
-.rooms-dropdown-game {
-	font-size: $text-sm;
-	color: $text-muted;
-	flex: 1;
+	&-id {
+		font-size: $text-sm;
+		font-weight: 600;
+		font-family: monospace;
+		color: $text;
+	}
+
+	&-game {
+		font-size: $text-sm;
+		color: $text-muted;
+		flex: 1;
+	}
 }
 
 .mobile-rooms {
@@ -184,57 +226,4 @@
 	gap: $s1;
 	border-top: 1px solid $border;
 	padding-top: $s2;
-}
-
-.my-room-card {
-	display: inline-flex;
-	align-items: center;
-	gap: $s2;
-	height: 36px;
-	padding: 0 $s4;
-	background: $color-success-bg;
-	border: 1px solid $color-success-border;
-	border-radius: $radius-full;
-	color: $color-success;
-	font-size: $text-sm;
-	font-weight: 500;
-	cursor: pointer;
-	transition: background $transition, border-color $transition;
-
-	i { font-size: 0.55em; }
-
-	&:hover {
-		background: rgba(74, 222, 128, 0.2);
-		border-color: $color-success;
-	}
-}
-
-.my-room-badge {
-	font-size: 0.65em;
-	font-weight: 700;
-	letter-spacing: 0.05em;
-	background: $color-success;
-	color: #fff;
-	border-radius: $radius-sm;
-	padding: 1px 5px;
-}
-
-.theme-toggle {
-	background: transparent;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	color: $text-muted;
-	cursor: pointer;
-	width: 44px;
-	height: 44px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	font-size: $text-base;
-	transition: color $transition, background $transition, border-color $transition;
-
-	&:hover {
-		color: $text;
-		background: $hover-overlay;
-	}
 }

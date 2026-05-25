@@ -29,58 +29,54 @@
 	flex-direction: column;
 	max-height: calc(100dvh - $s8);
 	overflow: hidden;
-}
 
-// Header
-.modal-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: $s4 $s6;
-	border-bottom: 1px solid $border;
-	flex-shrink: 0;
-}
+	&-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: $s4 $s6;
+		border-bottom: 1px solid $border;
+		flex-shrink: 0;
+	}
 
-.modal-title {
-	font-size: $text-lg;
-	font-weight: 600;
-}
+	&-title {
+		font-size: $text-lg; font-weight: 600;
+	}
 
-.modal-close {
-	width: 32px;
-	height: 32px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	background: transparent;
-	border: 1px solid transparent;
-	border-radius: $radius-sm;
-	color: $text-muted;
-	font-size: $text-base;
-	cursor: pointer;
-	transition: color $transition, border-color $transition, background $transition;
+	&-close {
+		width: 32px;
+		height: 32px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: $radius-sm;
+		color: $text-muted;
+		font-size: $text-base;
+		cursor: pointer;
+		transition: color $transition, border-color $transition, background $transition;
 
-	&:hover {
-		color: $text;
-		border-color: $border;
-		background: $hover-overlay;
+		&:hover {
+			color: $text; border-color: $border; background: $hover-overlay;
+		}
+	}
+
+	&-body {
+		padding: $s4 $s6 $s6;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: $s6;
+	}
+
+	&-error {
+		font-size: $text-sm; color: $color-danger;
 	}
 }
 
-// Body
-.modal-body {
-	padding: $s4 $s6 $s6;
-	overflow-y: auto;
-	display: flex;
-	flex-direction: column;
-	gap: $s6;
-}
-
-// Sections
 .invite-section {
-	display: flex;
-	flex-direction: column;
-	gap: $s3;
+	display: flex; flex-direction: column; gap: $s3;
 }
 
 .section-label {
@@ -92,54 +88,47 @@
 }
 
 .empty-msg {
-	font-size: $text-sm;
-	color: $text-muted;
+	font-size: $text-sm; color: $text-muted;
 }
 
-// Player rows
-.player-list {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	display: flex;
-	flex-direction: column;
-	gap: $s2;
-}
-
-.player-row {
-	display: flex;
-	align-items: center;
-	gap: $s3;
-}
-
-.player-row-avatar {
-	width: 36px;
-	height: 36px;
-	border-radius: $radius-full;
-	background: hsl(var(--avatar-hue), 60%, 42%);
-	color: #fff;
-	font-size: $text-sm;
-	font-weight: 700;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-
-	&.bot-avatar {
-		background: $accent-subtle;
-		color: $accent;
-		font-size: $text-base;
+.player {
+	&-list {
+		list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: $s2;
 	}
-}
 
-.player-row-name {
-	flex: 1;
-	font-size: $text-sm;
-	font-weight: 500;
-	min-width: 0;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	&-row {
+		display: flex;
+		align-items: center;
+		gap: $s3;
+
+		&-avatar {
+			width: 36px;
+			height: 36px;
+			border-radius: $radius-full;
+			background: hsl(var(--avatar-hue), 60%, 42%);
+			color: #fff;
+			font-size: $text-sm;
+			font-weight: 700;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+
+			&.bot-avatar {
+				background: $accent-subtle; color: $accent; font-size: $text-base;
+			}
+		}
+
+		&-name {
+			flex: 1;
+			font-size: $text-sm;
+			font-weight: 500;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
 }
 
 .btn-row-action {
@@ -160,18 +149,14 @@
 	flex-shrink: 0;
 	transition: background $transition, opacity $transition;
 
-	&:hover:not(:disabled) { background: $accent-hover; }
-
-	&:disabled { opacity: 0.5; cursor: not-allowed; }
-
-	&.btn-row-action-done {
-		background: $color-success-bg;
-		color: $color-success;
-		border: 1px solid $color-success-border;
+	&:hover:not(:disabled) {
+		background: $accent-hover;
 	}
-}
+	&:disabled {
+		opacity: 0.5; cursor: not-allowed;
+	}
 
-.modal-error {
-	font-size: $text-sm;
-	color: $color-danger;
+	&-done {
+		background: $color-success-bg; color: $color-success; border: 1px solid $color-success-border;
+	}
 }

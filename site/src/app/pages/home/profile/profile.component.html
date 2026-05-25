@@ -18,6 +18,16 @@
 					<span class="info-label">Username</span>
 					<span class="info-value">{{ u.player.name }}</span>
 				</div>
+				<div class="info-row">
+					<span class="info-label">Appearance</span>
+					<button class="theme-btn" (click)="toggleTheme()">
+						@if (isDark()) {
+							<i class="fa-solid fa-moon"></i> Dark
+						} @else {
+							<i class="fa-solid fa-sun"></i> Light
+						}
+					</button>
+				</div>
 			</div>
 
 			@if (!u.isGuest) {

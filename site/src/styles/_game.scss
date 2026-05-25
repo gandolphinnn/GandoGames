@@ -2,12 +2,21 @@
 
 // ── Loading ────────────────────────────────────────────────────────────────────
 
-.game-loading {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: $text-muted;
+.game {
+	&-loading {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: $text-muted;
+	}
+
+	&-panel {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 }
 
 // ── Players strip ──────────────────────────────────────────────────────────────
@@ -17,16 +26,9 @@
 	gap: $s2;
 	flex-wrap: wrap;
 
-	@media (min-width: $bp-sm) { gap: $s3; }
-}
-
-// ── Game panel wrapper ─────────────────────────────────────────────────────────
-
-.game-panel {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	@media (min-width: $bp-sm) {
+		gap: $s3;
+	}
 }
 
 // ── Panel ──────────────────────────────────────────────────────────────────────
@@ -43,34 +45,30 @@
 	align-items: flex-start;
 
 	@media (min-width: $bp-sm) {
-		padding: $s8;
-		gap: $s6;
+		padding: $s8; gap: $s6;
 	}
 
 	&-centered {
-		align-items: center;
-		text-align: center;
+		align-items: center; text-align: center;
 	}
-}
 
-.panel-eyebrow {
-	font-size: $text-sm;
-	color: $text-muted;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-}
+	&-eyebrow {
+		font-size: $text-sm; color: $text-muted; text-transform: uppercase; letter-spacing: 0.08em;
+	}
 
-.panel-title {
-	font-size: $text-2xl;
-	font-weight: 700;
-	line-height: 1.1;
+	&-title {
+		font-size: $text-2xl;
+		font-weight: 700;
+		line-height: 1.1;
 
-	@media (min-width: $bp-sm) { font-size: $text-3xl; }
-}
+		@media (min-width: $bp-sm) {
+			font-size: $text-3xl;
+		}
+	}
 
-.panel-subtitle {
-	font-size: $text-base;
-	color: $text-muted;
+	&-subtitle {
+		font-size: $text-base; color: $text-muted;
+	}
 }
 
 // ── Waiting animation ──────────────────────────────────────────────────────────
@@ -83,50 +81,38 @@
 }
 
 @keyframes pulse {
-	0%, 100% { opacity: 0.4; }
-	50% { opacity: 1; }
+	0%, 100% {
+		opacity: 0.4;
+	}
+	50% {
+		opacity: 1;
+	}
 }
 
 // ── Game over ──────────────────────────────────────────────────────────────────
 
-.winner-name { color: $accent; }
+.winner-name {
+	color: $accent;
+}
 
 // ── Misc ───────────────────────────────────────────────────────────────────────
 
 .action-error {
-	font-size: $text-sm;
-	color: $color-danger;
+	font-size: $text-sm; color: $color-danger;
 }
-
 .hint {
-	font-size: $text-sm;
-	color: $text-muted;
+	font-size: $text-sm; color: $text-muted;
 }
 
 // ── Buttons ────────────────────────────────────────────────────────────────────
 
 .btn {
-	padding: $s3 $s6;
 	border-radius: $radius-md;
-	font-size: $text-base;
 	font-weight: 600;
-	cursor: pointer;
-	border: none;
-	transition: background $transition, opacity $transition;
 	min-height: 44px;
 
-	&-primary {
-		background: $accent;
-		color: $color-on-accent;
-		&:hover { background: $accent-hover; }
+	&:disabled,
+	&[disabled] {
+		opacity: 0.4; cursor: not-allowed;
 	}
-
-	&-danger {
-		background: $color-danger-muted;
-		color: $color-danger;
-		border: 1px solid $color-danger-border;
-		&:hover { background: $color-danger-dim; }
-	}
-
-	&[disabled] { opacity: 0.4; cursor: not-allowed; }
 }

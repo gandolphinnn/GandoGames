@@ -31,53 +31,63 @@
 	cursor: pointer;
 
 	@media (min-width: $bp-sm) {
-		border-radius: $radius-md;
-		margin-bottom: $s2;
+		border-radius: $radius-md; margin-bottom: $s2;
 	}
 
-	&.toast-info    { background: $bg-card;           border: 1px solid $border;               color: $text; }
-	&.toast-success { background: $color-success-bg;  border: 1px solid $color-success-border; color: $color-success; }
-	&.toast-warning { background: $color-warning-bg;  border: 1px solid $color-warning-border; color: $color-warning; }
-	&.toast-error   { background: $color-danger-bg;   border: 1px solid $color-danger-border;  color: $color-danger; }
+	&-info {
+		background: $bg-card;          border: 1px solid $border;               color: $text;
+	}
+	&-success {
+		background: $color-success-bg; border: 1px solid $color-success-border; color: $color-success;
+	}
+	&-warning {
+		background: $color-warning-bg; border: 1px solid $color-warning-border; color: $color-warning;
+	}
+	&-error {
+		background: $color-danger-bg;  border: 1px solid $color-danger-border;  color: $color-danger;
+	}
+
+	&-message {
+		flex: 1;
+	}
+
+	&-actions {
+		display: flex; gap: $s2; flex-shrink: 0;
+	}
 }
 
-.toast-message {
-	flex: 1;
-}
+.btn {
+	&-yes,
+	&-no {
+		display: inline-flex;
+		align-items: center;
+		gap: $s1;
+		padding: $s1 $s3;
+		border: none;
+		border-radius: $radius-sm;
+		font-size: $text-sm;
+		font-weight: 600;
+		cursor: pointer;
+		transition: opacity $transition;
 
-.toast-actions {
-	display: flex;
-	gap: $s2;
-	flex-shrink: 0;
-}
+		&:hover {
+			opacity: 0.85;
+		}
+	}
 
-.btn-yes,
-.btn-no {
-	display: inline-flex;
-	align-items: center;
-	gap: $s1;
-	padding: $s1 $s3;
-	border: none;
-	border-radius: $radius-sm;
-	font-size: $text-sm;
-	font-weight: 600;
-	cursor: pointer;
-	transition: opacity $transition;
-
-	&:hover { opacity: 0.85; }
-}
-
-.btn-yes {
-	background: $color-success;
-	color: #fff;
-}
-
-.btn-no {
-	background: $color-danger;
-	color: #fff;
+	&-yes {
+		background: $color-success; color: #fff;
+	}
+	&-no {
+		background: $color-danger;  color: #fff;
+	}
 }
 
 @keyframes toast-in {
-	from { opacity: 0; transform: translateY(8px); }
-	to   { opacity: 1; transform: translateY(0); }
+	from {
+		opacity: 0; transform: translateY(8px);
+	}
+	to {
+		opacity: 1; transform: translateY(0);
+	}
 }

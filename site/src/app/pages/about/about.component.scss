@@ -14,7 +14,9 @@
 		letter-spacing: -0.03em;
 	}
 
-	p { color: $text-muted; line-height: 1.6; }
+	p {
+		color: $text-muted; line-height: 1.6;
+	}
 }
 
 .github-link {
@@ -25,5 +27,7 @@
 	align-items: center;
 	min-height: 44px;
 
-	&:hover { color: $accent-hover; }
+	&:hover {
+		color: $accent-hover;
+	}
 }

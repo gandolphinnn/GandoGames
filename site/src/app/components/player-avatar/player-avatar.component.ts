@@ -1,7 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 import { GamePlayer } from '@gandogames/common/api';
 import { PLAYER_ICONS } from '@gandogames/lib/player-icons';
-import { playerNameHue } from './player-name-hue';
 
 @Component({
 	selector: 'gg-player-avatar',
@@ -18,7 +17,12 @@ import { playerNameHue } from './player-name-hue';
 export class PlayerAvatarComponent {
 	public readonly player = input.required<GamePlayer>();
 
-	public readonly bg = computed(() => `hsl(${playerNameHue(this.player().name)}, 60%, 42%)`);
+	public readonly bg = computed(() => {
+		const name = this.player().name;
+		let hash = 0;
+		for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
+		return `hsl(${hash % 360}, 60%, 42%)`;
+	});
 
 	public readonly iconFaClass = computed(() =>
 		PLAYER_ICONS.find((icon) => icon.id === this.player().icon)?.fa ?? ''

@@ -1,110 +1,249 @@
 @use 'styles/variables' as *;
 
-:host { display: block; }
-
-// Hero section at top
-.profile-hero {
+:host {
 	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: $s3;
-	padding: $s8 $s4 $s6;
-	border-bottom: 1px solid var(--border-color);
-	background: var(--bg-card);
+	flex: 1;
+}
+
+.profile {
+	&-page {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: $s4;
+	}
+
+	&-card {
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-lg;
+		padding: $s6;
+		width: 100%;
+		max-width: 400px;
+		display: flex;
+		flex-direction: column;
+		gap: $s6;
+
+		@media (min-width: $bp-sm) {
+			padding: $s8;
+		}
+	}
+
+	&-avatar-wrap {
+		display: flex;
+		justify-content: center;
+	}
+
+	&-header {
+		display: flex;
+		align-items: center;
+		gap: $s3;
+	}
+
+	&-title {
+		font-size: $text-2xl;
+		font-weight: 700;
+
+		@media (min-width: $bp-sm) {
+			font-size: $text-3xl;
+		}
+	}
+
+	&-badge {
+		padding: $s1 $s3;
+		background: $color-warning-bg;
+		border: 1px solid $color-warning-border;
+		border-radius: $radius-md;
+		color: $color-warning;
+		font-size: $text-sm;
+		font-weight: 600;
+	}
+
+	&-info {
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
+	}
+
+	&-error {
+		color: $color-danger;
+		font-size: $text-sm;
+	}
 }
 
 gg-player-avatar.profile-avatar {
-	width: 80px;
-	height: 80px;
-	font-size: $text-3xl;
-	border-radius: $radius-full;
+	width: 72px;
+	height: 72px;
+	font-size: $text-2xl;
 }
 
-.profile-hero-info {
+.info {
+	&-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: $s4;
+		padding: $s3 0;
+		border-bottom: 1px solid $border;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	&-label {
+		font-size: $text-sm; color: $text-muted;
+	}
+
+	&-value {
+		font-size: $text-sm;
+		font-family: monospace;
+		word-break: break-all;
+	}
+}
+
+.theme-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: $s2;
+	padding: $s1 $s3;
+	background: transparent;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	color: $text-muted;
+	font-size: $text-sm;
+	cursor: pointer;
+	transition: color $transition, background $transition, border-color $transition;
+
+	&:hover {
+		color: $text; background: $hover-overlay;
+	}
+}
+
+.icon {
+	&-picker {
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
+
+		&-title {
+			font-size: $text-sm;
+			font-weight: 600;
+			color: $text-muted;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		&-empty {
+			font-size: $text-sm;
+			color: $text-muted;
+			font-style: italic;
+		}
+	}
+
+	&-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+		gap: $s2;
+	}
+
+	&-btn {
+		width: 52px;
+		height: 52px;
+		border-radius: $radius-full;
+		border: 2px solid $border;
+		background: transparent;
+		color: $text;
+		font-size: $text-lg;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: border-color $transition, background $transition, color $transition;
+
+		&:hover:not(:disabled) {
+			border-color: $accent; background: $accent-tint; color: $accent;
+		}
+		&.selected {
+			border-color: $accent; background: $accent-subtle; color: $accent;
+		}
+		&.saving {
+			opacity: 0.7;
+		}
+		&:disabled {
+			cursor: not-allowed;
+		}
+	}
+}
+
+.btn {
+	padding: $s3 $s6;
+	border-radius: $radius-md;
+	font-size: $text-base;
+	font-weight: 600;
+	cursor: pointer;
+	border: none;
+	transition: background $transition;
+	min-height: 44px;
+
+	&-danger {
+		background: $color-danger-muted;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
+
+		&:hover:not(:disabled) {
+			background: $color-danger-dim;
+		}
+		&:disabled {
+			opacity: 0.5; cursor: not-allowed;
+		}
+	}
+
+	&-danger-outline {
+		background: transparent;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
+
+		&:hover {
+			background: $color-danger-bg;
+		}
+	}
+
+	&-ghost {
+		background: transparent;
+		color: $text-muted;
+		border: 1px solid $border;
+
+		&:hover:not(:disabled) {
+			background: $hover-overlay;
+		}
+		&:disabled {
+			opacity: 0.5; cursor: not-allowed;
+		}
+	}
+}
+
+.danger-zone {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: $s2;
-}
+	gap: $s3;
+	padding-top: $s4;
+	border-top: 1px solid $color-danger-dim;
 
-.profile-username {
-	font-size: $text-2xl;
-	font-weight: 700;
-}
-
-.guest-badge {
-	font-size: $text-sm;
-}
-
-// Section list
-.profile-section {
-	margin: $s4 0 0;
-
-	ion-item {
-		--background: var(--bg-card);
-		--border-color: var(--border-color);
-
-		h3 { font-weight: 600; }
-		p  { font-size: $text-sm; color: var(--text-muted); }
-	}
-}
-
-.mono-value {
-	font-family: monospace;
-	font-size: $text-sm !important;
-	word-break: break-all;
-}
-
-.section-header {
-	padding: $s4 $s4 $s2;
-	font-size: $text-sm;
-	font-weight: 600;
-	color: var(--text-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-}
-
-// Icon picker
-.icon-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-	gap: $s2;
-	padding: $s2 $s4 $s4;
-}
-
-.icon-btn {
-	width: 52px;
-	height: 52px;
-	border-radius: $radius-full;
-	border: 2px solid var(--border-color);
-	background: transparent;
-	color: var(--text);
-	font-size: $text-lg;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	transition: border-color $transition, background $transition, color $transition;
-
-	&:hover:not(:disabled) {
-		border-color: var(--accent);
-		background: var(--accent-tint);
-		color: var(--accent);
+	&-title {
+		font-size: $text-sm;
+		font-weight: 600;
+		color: $text-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
 	}
 
-	&.selected {
-		border-color: var(--accent);
-		background: var(--accent-subtle);
-		color: var(--accent);
+	&-warn {
+		font-size: $text-sm; color: $color-danger;
 	}
 
-	&.saving { opacity: 0.7; }
-	&:disabled { cursor: not-allowed; }
-}
-
-.error-note {
-	color: $color-danger;
-	font-size: $text-sm;
-	padding: $s2 $s4;
-	display: block;
+	&-actions {
+		display: flex; gap: $s3; flex-wrap: wrap;
+	}
 }

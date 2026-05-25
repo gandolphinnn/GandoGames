@@ -1,5 +1,70 @@
-:host { display: block; }
+@use 'styles/variables' as *;
 
-ion-list {
-	margin-top: 8px;
+:host {
+	display: flex;
+	flex: 1;
+}
+
+.social {
+	&-page {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		padding: $s4;
+	}
+
+	&-content {
+		width: 100%;
+		max-width: 600px;
+		display: flex;
+		flex-direction: column;
+		gap: $s6;
+	}
+
+	&-title {
+		font-size: $text-2xl;
+		font-weight: 700;
+
+		@media (min-width: $bp-sm) {
+			font-size: $text-3xl;
+		}
+	}
+
+	&-section {
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-lg;
+		padding: $s4;
+		display: flex;
+		flex-direction: column;
+		gap: $s4;
+
+		@media (min-width: $bp-sm) {
+			padding: $s6;
+		}
+	}
+}
+
+.section-title {
+	font-size: $text-lg;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: $s2;
+	color: $text-muted;
+}
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $s2;
+	padding: $s6 $s4;
+
+	&-icon {
+		font-size: $text-2xl; color: $text-muted; opacity: 0.4;
+	}
+	&-text {
+		font-size: $text-sm; color: $text-muted;
+	}
 }

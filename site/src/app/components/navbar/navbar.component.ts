@@ -3,9 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { AuthService } from '@gandogames/services/auth.service';
-import { ThemeService } from '@gandogames/services/theme.service';
 import { RoomService } from '@gandogames/services/room.service';
-import { SignalRService } from '@gandogames/services/signalr.service';
 import { GameType } from '@gandogames/common/api';
 
 @Component({
@@ -18,19 +16,10 @@ import { GameType } from '@gandogames/common/api';
 export class NavbarComponent {
 	private readonly authService = inject(AuthService);
 	public readonly isLoggedIn = this.authService.isLoggedIn;
-	public readonly isAdmin = computed(() => this.authService.user()?.player.permissions?.includes('admin'));
-
-	private readonly themeService = inject(ThemeService);
-	public readonly isDark = this.themeService.isDark;
-	public readonly themeLabel = computed(() => this.isDark() ? 'Switch to light mode' : 'Switch to dark mode');
 
 	private readonly roomService = inject(RoomService);
 	private readonly router = inject(Router);
 	public readonly myRooms = this.roomService.myRooms;
-
-	private readonly signalRService = inject(SignalRService);
-	public readonly onlineCount = this.signalRService.onlineCount;
-	public readonly onlineUsers = this.signalRService.onlineUsers;
 
 	public readonly menuOpen = signal(false);
 	public readonly roomsDropdownOpen = signal(false);
@@ -40,8 +29,6 @@ export class NavbarComponent {
 
 	public toggleRoomsDropdown(): void { this.roomsDropdownOpen.update(v => !v); }
 	public closeRoomsDropdown(): void { this.roomsDropdownOpen.set(false); }
-
-	public toggleTheme(): void { this.themeService.toggle(); }
 
 	public goToRoom(roomId: string): void {
 		void this.router.navigate(['/play', roomId]);

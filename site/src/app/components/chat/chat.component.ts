@@ -2,26 +2,15 @@ import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-	IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon,
-	IonFooter,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { closeOutline } from 'ionicons/icons';
-
 import { ChatMessage } from '@gandogames/common/api';
 import { AuthService } from '@gandogames/services/auth.service';
-import { DeviceService } from '@gandogames/services/device.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [
-		DatePipe, NgTemplateOutlet, FormsModule,
-		IonModal, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton, IonIcon, IonFooter,
-	],
+	imports: [DatePipe, NgTemplateOutlet, FormsModule],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })
@@ -30,7 +19,6 @@ export class ChatComponent {
 	private readonly signalR = inject(SignalRService);
 	private readonly auth = inject(AuthService);
 	private readonly destroyRef = inject(DestroyRef);
-	protected readonly device = inject(DeviceService);
 
 	private readonly messageListRef = viewChild<ElementRef<HTMLElement>>('messageList');
 	private shouldScroll = false;
@@ -48,8 +36,6 @@ export class ChatComponent {
 	protected readonly messages = signal<ChatMessage[]>([]);
 
 	constructor() {
-		addIcons({ closeOutline });
-
 		effect(() => {
 			const room = this.currentRoom();
 			this.messages.set(room?.chat ?? []);

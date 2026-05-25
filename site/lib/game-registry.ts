@@ -37,4 +37,12 @@ export const GAME_REGISTRY: GameDescriptor[] = [
 		minPlayers: 2,
 		maxPlayers: 6,
 	},
+	{
+		id: 'poker',
+		name: 'Poker',
+		icon: 'fa-solid fa-heart',
+		description: 'Texas Hold\'em — bet, bluff, and outlast everyone at the table.',
+		minPlayers: 2,
+		maxPlayers: 8,
+	},
 ];

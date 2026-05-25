@@ -1,29 +1,33 @@
 @use 'styles/variables' as *;
 
-:host { display: block; }
-
-.about-container {
-	max-width: 560px;
+.about-main {
+	padding: $s8 $s6;
+	max-width: 640px;
 	margin: 0 auto;
-	padding-top: $s6;
 	display: flex;
 	flex-direction: column;
 	gap: $s4;
+
+	h1 {
+		font-size: $text-3xl;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+	}
+
+	p {
+		color: $text-muted; line-height: 1.6;
+	}
 }
 
-.about-title {
-	font-size: $text-3xl;
-	font-weight: 700;
-	letter-spacing: -0.03em;
-}
+.github-link {
+	color: $accent;
+	text-decoration: none;
+	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 
-.about-desc {
-	color: var(--text-muted);
-	line-height: 1.6;
-}
-
-.about-tech {
-	color: var(--text-muted);
-	font-size: $text-sm;
-	line-height: 1.6;
+	&:hover {
+		color: $accent-hover;
+	}
 }

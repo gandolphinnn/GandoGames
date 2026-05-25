@@ -1,8 +1,7 @@
 <header class="site-header">
 	<div class="site-header-start">
-		<a routerLink="/" class="nav-link title">
-			<span class="title-full">GandoGames</span>
-			<span class="title-short">GG</span>
+		<a routerLink="/" class="nav-logo">
+			<img src="icons/favicon.png" alt="GandoGames" class="logo-img" />
 		</a>
 	</div>
 
@@ -43,33 +42,11 @@
 	<div class="site-header-end">
 		<nav class="site-nav">
 			<a routerLink="/about" class="nav-link">About</a>
-			@if (isAdmin()) {
-				<a routerLink="/test/palette" class="nav-link">Palette</a>
-			}
 			@if (isLoggedIn()) {
-				<a routerLink="/profile" class="nav-link">Profile</a>
 				<a routerLink="/social" class="nav-link">Social</a>
+				<a routerLink="/profile" class="nav-link">Profile</a>
 			} @else {
 				<a routerLink="/login" class="nav-link">Log in</a>
-			}
-			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
-				@if (isDark()) {
-					<i class="fa-solid fa-sun"></i>
-				} @else {
-					<i class="fa-solid fa-moon"></i>
-				}
-			</button>
-			@if (isLoggedIn()) {
-				<span class="online-count">
-					<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
-					<div class="online-tooltip">
-						@for (name of onlineUsers(); track name) {
-							<span class="online-tooltip-name">{{ name }}</span>
-						} @empty {
-							<span class="online-tooltip-empty">No one online</span>
-						}
-					</div>
-				</span>
 			}
 		</nav>
 		<button class="hamburger" (click)="toggleMenu()" title="Open menu">
@@ -93,9 +70,6 @@
 			<a routerLink="/login" class="nav-link" (click)="closeMenu()">Log in</a>
 		}
 		<a routerLink="/about" class="nav-link" (click)="closeMenu()">About</a>
-		@if (isAdmin()) {
-			<a routerLink="/test/palette" class="nav-link" (click)="closeMenu()">Palette</a>
-		}
 		@if (myRooms().length > 0) {
 			<div class="mobile-rooms">
 				@for (room of myRooms(); track room.id) {
@@ -109,26 +83,5 @@
 				}
 			</div>
 		}
-		<div class="mobile-menu-footer">
-			@if (isLoggedIn()) {
-				<span class="online-count">
-					<i class="fa-solid fa-circle-dot"></i> {{ onlineCount() }}
-					<div class="online-tooltip">
-						@for (name of onlineUsers(); track name) {
-							<span class="online-tooltip-name">{{ name }}</span>
-						} @empty {
-							<span class="online-tooltip-empty">No one online</span>
-						}
-					</div>
-				</span>
-			}
-			<button class="theme-toggle" (click)="toggleTheme()" [title]="themeLabel()">
-				@if (isDark()) {
-					<i class="fa-solid fa-sun"></i>
-				} @else {
-					<i class="fa-solid fa-moon"></i>
-				}
-			</button>
-		</div>
 	</nav>
 }

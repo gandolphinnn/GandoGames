@@ -1,66 +1,42 @@
-<ion-header>
-		<ion-toolbar>
-			<ion-title>GandoGames</ion-title>
-		</ion-toolbar>
-	</ion-header>
+<div class="auth-page">
+	<div class="auth-card">
+		<h1 class="auth-title">Welcome back</h1>
+		<p class="auth-subtitle">Log in to GandoGames</p>
 
-	<ion-content class="ion-padding">
-		<div class="auth-container">
-			<h1 class="auth-title">Welcome back</h1>
-			<p class="auth-subtitle">Log in to your account</p>
+		@if (error()) {
+			<div class="auth-error">{{ error() }}</div>
+		}
 
-			@if (error()) {
-				<div class="auth-error">{{ error() }}</div>
-			}
+		<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+			<div class="field">
+				<label class="field-label" for="email">Email</label>
+				<input id="email" class="input" type="email" formControlName="email"
+					placeholder="you@example.com" autocomplete="email" />
+				@if (form.controls.email.touched && form.controls.email.hasError('required')) {
+					<span class="field-error">Email is required</span>
+				} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+					<span class="field-error">Enter a valid email</span>
+				}
+			</div>
+			<div class="field">
+				<label class="field-label" for="password">Password</label>
+				<input id="password" class="input" type="password" formControlName="password"
+					placeholder="••••••••" autocomplete="current-password" />
+				@if (form.controls.password.touched && form.controls.password.hasError('required')) {
+					<span class="field-error">Password is required</span>
+				}
+			</div>
+			<button class="btn btn-primary" type="submit" [disabled]="loading()">
+				{{ loading() ? 'Logging in…' : 'Log in' }}
+			</button>
+		</form>
 
-			<form [formGroup]="form" (ngSubmit)="submit()">
-				<ion-list class="auth-fields">
-					<ion-item>
-						<ion-input
-							label="Email"
-							labelPlacement="floating"
-							type="email"
-							formControlName="email"
-							placeholder="you@example.com"
-							autocomplete="email"
-						/>
-					</ion-item>
-					@if (form.controls.email.touched && form.controls.email.hasError('required')) {
-						<ion-note class="field-error">Email is required</ion-note>
-					} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
-						<ion-note class="field-error">Enter a valid email</ion-note>
-					}
+		<p class="auth-footer">No account? <a class="auth-link" routerLink="/signup">Sign up</a></p>
 
-					<ion-item>
-						<ion-input
-							label="Password"
-							labelPlacement="floating"
-							type="password"
-							formControlName="password"
-							placeholder="••••••••"
-							autocomplete="current-password"
-						>
-							<ion-input-password-toggle slot="end" />
-						</ion-input>
-					</ion-item>
-					@if (form.controls.password.touched && form.controls.password.hasError('required')) {
-						<ion-note class="field-error">Password is required</ion-note>
-					}
-				</ion-list>
+		<div class="auth-divider"><span>or</span></div>
 
-				<ion-button expand="block" type="submit" [disabled]="loading()" class="auth-btn">
-					{{ loading() ? 'Logging in…' : 'Log in' }}
-				</ion-button>
-			</form>
-
-			<p class="auth-footer">
-				No account? <a class="auth-link" routerLink="/signup">Sign up</a>
-			</p>
-
-			<div class="auth-divider"><span>or</span></div>
-
-			<ion-button expand="block" fill="outline" [disabled]="loading()" (click)="continueAsGuest()">
-				Continue as guest
-			</ion-button>
-		</div>
-	</ion-content>
+		<button class="btn btn-secondary" type="button" [disabled]="loading()" (click)="continueAsGuest()">
+			Continue as guest
+		</button>
+	</div>
+</div>

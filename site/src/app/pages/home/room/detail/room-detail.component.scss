@@ -1,208 +1,248 @@
 @use 'styles/variables' as *;
 
-:host { display: block; }
-
-.status-center {
+:host {
 	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: $s4;
-	padding: $s8 $s4;
-}
-
-.status-msg  { color: var(--text-muted); font-size: $text-sm; }
-.error-msg   { color: $color-danger; font-size: $text-sm; }
-.error-note  { color: $color-danger; font-size: $text-sm; padding: $s2 $s4; display: block; }
-.hint-msg    { font-size: $text-sm; color: var(--text-muted); }
-
-// Room info summary bar
-.room-info-row {
-	display: flex;
-	align-items: center;
-	gap: $s3;
-	padding: $s4;
-	background: var(--bg-card);
-	border-bottom: 1px solid var(--border-color);
-}
-
-.game-icon-lg {
-	width: 40px;
-	height: 40px;
-	background: var(--accent-subtle);
-	border-radius: $radius-md;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: var(--accent);
-	font-size: $text-xl;
-	flex-shrink: 0;
-}
-
-.room-code {
-	display: flex;
-	align-items: center;
-	gap: $s2;
 	flex: 1;
-	font-family: monospace;
-	font-size: $text-sm;
-	color: var(--text-muted);
-	cursor: pointer;
-	padding: $s2 $s3;
-	border-radius: $radius-sm;
-	border: 1px solid transparent;
-	transition: border-color $transition, color $transition;
-
-	&:hover {
-		border-color: var(--border-color);
-		color: var(--text);
-	}
-
-	ion-icon { font-size: 0.9rem; }
-}
-
-.player-count-badge {
-	font-size: $text-sm;
-	color: var(--accent);
-	font-weight: 700;
-	background: var(--accent-muted);
-	padding: $s1 $s3;
-	border-radius: $radius-full;
-	white-space: nowrap;
-}
-
-// Player grid
-.player-grid {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: $s3;
-	padding: $s4;
-
-	@media (min-width: $bp-sm) {
-		grid-template-columns: repeat(3, 1fr);
-	}
-}
-
-.player-card {
-	position: relative;
-	padding: $s4 $s3 $s3;
-	background: var(--bg-card);
-	border: 1px solid var(--border-color);
-	border-radius: $radius-lg;
-	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: $s2;
-	transition: border-color $transition, box-shadow $transition;
+	min-height: 0;
+}
 
-	&.is-host {
-		border-color: var(--accent);
-		box-shadow: 0 0 0 1px var(--accent);
+.room {
+	&-detail {
+		padding: $s6;
+		max-width: 720px;
+		margin: 0 auto;
+		display: flex;
+		flex-direction: column;
+		gap: $s6;
 	}
 
-	&.is-me {
-		background: var(--accent-subtle);
+	&-not-found {
+		display: flex; flex-direction: column; gap: $s4;
 	}
 
-	&.player-empty {
-		opacity: 0.4;
-		border-style: dashed;
-		cursor: pointer;
+	&-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: $s3;
+	}
 
-		&:hover {
-			opacity: 0.8;
-			border-color: var(--accent);
-			background: var(--accent-subtle);
+	&-info {
+		display: flex; align-items: center; gap: $s3;
+	}
+
+	&-game {
+		&-icon {
+			width: 36px;
+			height: 36px;
+			background: $accent-subtle;
+			border-radius: $radius-md;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			color: $accent;
+			font-size: $text-lg;
+			flex-shrink: 0;
+		}
+
+		&-name {
+			font-weight: 600; font-size: $text-lg; flex: 1;
 		}
 	}
 
-	&.player-join {
-		border-style: dashed;
-		border-color: var(--accent);
-		background: var(--accent-subtle);
-		cursor: pointer;
-
-		&:hover:not(.loading) {
-			background: var(--accent-muted);
-		}
-
-		&.loading { opacity: 0.6; cursor: not-allowed; }
+	&-player-count {
+		font-size: $text-sm; color: $text-muted; font-variant-numeric: tabular-nums;
 	}
 }
 
-.crown-icon {
-	position: absolute;
-	top: $s2;
-	left: $s3;
-	font-size: 0.65rem;
-	color: var(--accent);
+.status-msg {
+	color: $text-muted; font-size: $text-sm;
+}
+.error-msg {
+	color: $color-danger; font-size: $text-sm;
 }
 
-.kick-btn {
-	position: absolute;
-	top: $s2;
-	right: $s2;
-	width: 26px;
-	height: 26px;
-	display: flex;
+.back-link {
+	color: $text-muted;
+	text-decoration: none;
+	font-size: $text-sm;
+	min-height: 44px;
+	display: inline-flex;
 	align-items: center;
-	justify-content: center;
-	padding: 0;
-	background: transparent;
-	border: 1px solid transparent;
-	border-radius: $radius-full;
-	color: var(--text-muted);
-	font-size: 0.75rem;
-	cursor: pointer;
-	transition: color $transition, border-color $transition, background $transition;
+	transition: color $transition;
 
 	&:hover {
-		color: $color-danger;
-		border-color: $color-danger-border;
-		background: $color-danger-bg;
+		color: $text;
 	}
 }
 
-.friend-btn {
-	position: absolute;
-	bottom: $s2;
-	right: $s2;
-	width: 26px;
-	height: 26px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0;
-	background: transparent;
-	border: 1px solid transparent;
+.code-btn {
+	padding: $s2 $s3;
+	background: $bg-surface;
+	border: 1px solid $border;
 	border-radius: $radius-sm;
-	color: var(--text-muted);
-	font-size: 0.7rem;
+	color: $text-muted;
+	font-size: $text-sm;
 	cursor: pointer;
-	opacity: 0;
-	transition: opacity $transition, color $transition, border-color $transition, background $transition;
+	min-height: 44px;
+	font-family: monospace;
+	transition: color $transition, border-color $transition;
 
 	&:hover {
-		color: var(--accent);
-		border-color: var(--accent);
-		background: var(--accent-subtle);
+		color: $text; border-color: $text-muted;
 	}
 }
 
-.player-card:not(.player-empty):hover .friend-btn { opacity: 1; }
+.player {
+	&-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: $s3;
 
-.player-avatar {
-	width: 52px;
-	height: 52px;
-	border-radius: $radius-full;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
+		@media (min-width: $bp-sm) {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
 
-.empty-avatar {
-	background: var(--bg-surface);
-	color: var(--text-muted);
-	font-size: $text-base;
+	&-card {
+		position: relative;
+		padding: $s4 $s3 $s3;
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-lg;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: $s2;
+		transition: border-color $transition, box-shadow $transition;
+
+		&-host {
+			border-color: $accent; box-shadow: 0 0 0 1px $accent;
+		}
+		&-me {
+			background: $accent-subtle;
+		}
+
+		&-empty {
+			opacity: 0.35;
+			border-style: dashed;
+			cursor: pointer;
+
+			&:hover {
+				opacity: 0.8;
+				border-color: $accent;
+				background: $accent-subtle;
+
+				.player-card-avatar-empty {
+					background: $accent-subtle; color: $accent;
+				}
+			}
+		}
+
+		&-join {
+			border-style: dashed;
+			border-color: $accent;
+			background: $accent-subtle;
+			cursor: pointer;
+			transition: border-color $transition, background $transition, opacity $transition;
+
+			.player-card-avatar-empty {
+				background: $accent-subtle; color: $accent;
+			}
+
+			&:hover:not(&-loading) {
+				background: color-mix(in srgb, $accent 15%, transparent);
+				border-color: $accent-hover;
+			}
+
+			&-loading {
+				opacity: 0.6; cursor: not-allowed;
+			}
+		}
+
+		&-crown {
+			position: absolute; top: $s2; left: $s3; font-size: 0.65rem; color: $accent;
+		}
+
+		&-kick {
+			position: absolute;
+			top: $s2;
+			right: $s2;
+			width: 22px;
+			height: 22px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+			background: transparent;
+			border: 1px solid transparent;
+			border-radius: $radius-full;
+			color: $text-muted;
+			font-size: 0.7rem;
+			cursor: pointer;
+			transition: color $transition, border-color $transition, background $transition;
+
+			&:hover {
+				color: $color-danger; border-color: $color-danger-border; background: $color-danger-bg;
+			}
+		}
+
+		&-friend {
+			position: absolute;
+			bottom: $s2;
+			right: $s2;
+			width: 26px;
+			height: 26px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0;
+			background: transparent;
+			border: 1px solid transparent;
+			border-radius: $radius-sm;
+			color: $text-muted;
+			font-size: 0.65rem;
+			cursor: pointer;
+			opacity: 0;
+			transform: scale(0.8);
+			transition: opacity $transition, transform $transition, color $transition, border-color $transition, background $transition;
+
+			&:hover {
+				color: $accent; border-color: $accent; background: $accent-subtle;
+			}
+
+			.player-card:not(.player-card-empty):hover & {
+				opacity: 1; transform: scale(1);
+			}
+		}
+
+		&-avatar {
+			width: 52px;
+			height: 52px;
+			border-radius: $radius-full;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+
+			&-empty {
+				background: $bg-surface; color: $text-muted; font-size: $text-base;
+			}
+		}
+
+		&-name {
+			font-size: $text-sm; font-weight: 500; text-align: center; word-break: break-word;
+		}
+		&-you {
+			font-size: 0.7rem; color: $accent; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+		}
+	}
+
+	&-name {
+		font-weight: 600;
+	}
 }
 
 gg-player-avatar {
@@ -211,29 +251,148 @@ gg-player-avatar {
 	font-size: $text-xl;
 }
 
-.player-name {
-	font-size: $text-sm;
-	font-weight: 500;
-	text-align: center;
-	word-break: break-word;
+.phase-panel {
+	display: flex; flex-direction: column; gap: $s4;
+}
+.hint {
+	font-size: $text-sm; color: $text-muted;
 }
 
-// Phase panel
-.phase-panel {
-	display: flex;
-	flex-direction: column;
-	gap: $s4;
+.btn {
+	&-primary {
+		padding: $s3 $s6;
+		background: $accent;
+		color: $color-on-accent;
+		border: none;
+		border-radius: $radius-md;
+		font-size: $text-base;
+		font-weight: 600;
+		cursor: pointer;
+		align-self: flex-start;
+		min-height: 44px;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		transition: background $transition;
+
+		&:hover:not(:disabled) {
+			background: $accent-hover;
+		}
+		&:disabled {
+			opacity: 0.5; cursor: not-allowed;
+		}
+	}
+
+	&-secondary {
+		padding: $s3 $s6;
+		background: transparent;
+		color: $text-muted;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		font-size: $text-base;
+		cursor: pointer;
+		min-height: 44px;
+		text-decoration: none;
+		display: inline-flex;
+		align-items: center;
+		transition: color $transition;
+
+		&:hover {
+			color: $text;
+		}
+	}
+
+	&-danger {
+		padding: $s3 $s6;
+		background: transparent;
+		color: $color-danger;
+		border: 1px solid $color-danger-border;
+		border-radius: $radius-md;
+		font-size: $text-base;
+		cursor: pointer;
+		align-self: flex-start;
+		min-height: 44px;
+		transition: background $transition;
+
+		&:hover {
+			background: $color-danger-bg;
+		}
+	}
+}
+
+.morra {
+	&-game {
+		display: flex; flex-direction: column; gap: $s4;
+	}
+
+	&-players {
+		display: grid;
+		gap: $s4;
+
+		@media (min-width: $bp-sm) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	&-player {
+		padding: $s4;
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
+
+		&-header {
+			display: flex; align-items: center; justify-content: space-between;
+		}
+	}
+}
+
+.lives {
+	color: $color-danger; font-weight: 600;
+}
+
+.hand {
+	&-buttons {
+		display: flex; gap: $s2; flex-wrap: wrap;
+	}
+
+	&-btn {
+		padding: $s2 $s4;
+		background: $bg-surface;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		color: $text;
+		font-size: $text-sm;
+		cursor: pointer;
+		min-height: 44px;
+		text-transform: capitalize;
+		transition: border-color $transition, background $transition;
+
+		&:hover {
+			border-color: $accent; background: $accent-subtle;
+		}
+	}
+}
+
+.pick-status {
+	font-size: $text-sm;
+	font-weight: 500;
+
+	&.picked {
+		color: $color-success;
+	}
+	&.waiting {
+		color: $text-muted;
+	}
 }
 
 .game-over {
-	display: flex;
-	flex-direction: column;
 	align-items: flex-start;
-	gap: $s4;
+	gap: $s6;
 
 	h2 {
-		font-size: $text-3xl;
-		font-weight: 700;
-		letter-spacing: -0.03em;
+		font-size: $text-3xl; font-weight: 700; letter-spacing: -0.03em;
 	}
 }

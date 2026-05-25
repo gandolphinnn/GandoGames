@@ -10,25 +10,27 @@ export interface Toast {
 	resolve?: (result: boolean) => void;
 }
 
+const DEFAULT_DURATION = 4000;
+
 @Injectable({ providedIn: 'root' })
 export class ToastService {
 	private nextId = 0;
 	private readonly _toasts = signal<Toast[]>([]);
 	public readonly toasts = this._toasts.asReadonly();
 
-	public show(message: string, type: ToastType = 'info', duration = 4000): void {
+	public show(message: string, type: ToastType = 'info', duration = DEFAULT_DURATION): void {
 		this.add({ message, type }, duration);
 	}
 
-	public error(message: string | Error): void {
-		this.add({ message: message instanceof Error ? message.message : message, type: 'error' }, 0);
+	public error(message: string | Error, duration = DEFAULT_DURATION): void {
+		this.add({ message: message instanceof Error ? message.message : message, type: 'error' }, duration);
 	}
 
-	public success(message: string, duration = 5000): void {
+	public success(message: string, duration = DEFAULT_DURATION): void {
 		this.add({ message, type: 'success' }, duration);
 	}
 
-	public warning(message: string, duration = 5000): void {
+	public warning(message: string, duration = DEFAULT_DURATION): void {
 		this.add({ message, type: 'warning' }, duration);
 	}
 

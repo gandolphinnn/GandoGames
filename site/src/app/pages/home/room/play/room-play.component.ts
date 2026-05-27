@@ -3,7 +3,7 @@ import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-inter
 import { Router } from '@angular/router';
 import { GameState, GameType } from '@gandogames/common/api';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { AuthService } from '@gandogames/services/auth.service';
+import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { GAME_COMPONENT_REGISTRY } from '../../../../game-component-registry';
@@ -26,7 +26,7 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 
 	private readonly signalR = inject(SignalRService);
 	private readonly backend = inject(BackendService);
-	private readonly auth = inject(AuthService);
+	private readonly auth = inject(UserService);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 

@@ -7,17 +7,13 @@
 			</div>
 
 			<div class="profile-header">
-				<h1 class="profile-title">Profile</h1>
+				<h1 class="profile-title">{{ u.player.name }}</h1>
 				@if (u.isGuest) {
 					<span class="profile-badge">Guest</span>
 				}
 			</div>
 
 			<div class="profile-info">
-				<div class="info-row">
-					<span class="info-label">Username</span>
-					<span class="info-value">{{ u.player.name }}</span>
-				</div>
 				<div class="info-row">
 					<span class="info-label">Appearance</span>
 					<button class="theme-btn" (click)="toggleTheme()">
@@ -33,35 +29,27 @@
 			@if (!u.isGuest) {
 				<div class="icon-picker">
 					<p class="icon-picker-title">Icon</p>
-					@if (icons.length > 0) {
-						<div class="icon-grid">
-							@for (icon of icons; track icon.id) {
-								<button
-									class="icon-btn"
-									[class.selected]="u.player.icon === icon.id"
-									[class.saving]="savingIcon() === icon.id"
-									type="button"
-									[attr.aria-label]="icon.label"
-									[disabled]="savingIcon() !== null"
-									(click)="saveIcon(icon.id)"
-								>
-									@if (savingIcon() === icon.id) {
-										<i class="fa-solid fa-spinner fa-spin"></i>
-									} @else {
-										<i [class]="icon.fa"></i>
-									}
-								</button>
-							}
-						</div>
-					} @else {
-						<p class="icon-picker-empty">No icons available yet.</p>
-					}
+					<div class="icon-grid">
+						@for (icon of icons; track icon.id) {
+							<button
+								class="icon-btn"
+								[class.selected]="u.player.icon === icon.id"
+								type="button"
+								[attr.aria-label]="icon.label"
+								(click)="setIcon(icon.id)"
+							>
+								<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
+							</button>
+						}
+					</div>
 				</div>
 			}
 
-			@if (error()) {
-				<p class="profile-error">{{ error() }}</p>
-			}
+			<ion-select (ionChange)="setLanguage($event.detail.value)">
+				@for (lang of languages; track lang) {
+					<ion-select-option [value]="lang.value">{{ lang.text }}</ion-select-option>
+				}
+			</ion-select>
 
 			<ion-button color="danger" expand="block" type="button" (click)="logout()">
 				<i class="fa-solid fa-sign-out-alt" slot="start"></i> Log out

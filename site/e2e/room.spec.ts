@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 
 const MOCK_AUTH = {
 	sessionTicket: 'e2e-session-ticket',
-	player: { id: 'e2e-player', name: 'E2EPlayer', permissions: [] },
+	player: { id: 'e2e-player', name: 'E2EPlayer' },
 };
 
 const MOCK_ROOM = {
@@ -86,8 +86,8 @@ test.describe('Two-player lobby (multiplayer context)', () => {
 		const page1 = await ctx1.newPage();
 		const page2 = await ctx2.newPage();
 
-		const auth1 = { ...MOCK_AUTH, player: { id: 'p1', name: 'Alice', permissions: [] }, isGuest: false };
-		const auth2 = { ...MOCK_AUTH, sessionTicket: 'ticket-2', player: { id: 'p2', name: 'Bob', permissions: [] }, isGuest: false };
+		const auth1 = { ...MOCK_AUTH, player: { id: 'p1', name: 'Alice' }, isGuest: false };
+		const auth2 = { ...MOCK_AUTH, sessionTicket: 'ticket-2', player: { id: 'p2', name: 'Bob' }, isGuest: false };
 		const room = { ...MOCK_ROOM, players: [auth1.player, auth2.player] };
 
 		for (const [p, auth] of [[page1, auth1], [page2, auth2]] as const) {

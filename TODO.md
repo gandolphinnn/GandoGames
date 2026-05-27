@@ -18,6 +18,9 @@
 - Queue system if 20 signalR connection are already occupied
 - Online player counter
 
+- Room filters in the queryparams (games dropdown combo, players range, flags...)
+- Guest login with custom displayName
+- Ability to change display name
 
 
 - Move the chat button on the right for mobile

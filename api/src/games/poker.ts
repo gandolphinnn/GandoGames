@@ -108,8 +108,7 @@ export class PokerGame extends Game<PokerGameState> {
 			lastUpdate: new Date(),
 			gamePhase: 'pre-flop',
 			players: players.map(p => ({
-				id: p.id,
-				name: p.name,
+				...p,
 				chips: STARTING_CHIPS,
 				cards: [],
 				streetBet: 0,

@@ -5,7 +5,11 @@
 	align-items: center;
 	justify-content: center;
 	border-radius: $radius-full;
-	color: #fff;
+	color: #fff; // default for dark theme
+
+	&.avatar-theme-light {
+		color: #111;
+	}
 	font-weight: 700;
 	flex-shrink: 0;
 	user-select: none;

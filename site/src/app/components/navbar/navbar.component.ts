@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { AuthService } from '@gandogames/services/auth.service';
+import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { GameType } from '@gandogames/common/api';
 
@@ -14,8 +14,8 @@ import { GameType } from '@gandogames/common/api';
 	imports: [RouterLink],
 })
 export class NavbarComponent {
-	private readonly authService = inject(AuthService);
-	public readonly isLoggedIn = this.authService.isLoggedIn;
+	private readonly userService = inject(UserService);
+	public readonly isLoggedIn = this.userService.isLoggedIn;
 
 	private readonly roomService = inject(RoomService);
 	private readonly router = inject(Router);

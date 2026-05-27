@@ -1,20 +1,19 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { GamePlayer, RoomData } from '@gandogames/common/api';
+import { RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { AuthService } from '@gandogames/services/auth.service';
+import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
 import { IonButton } from '@ionic/angular/standalone';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
-import { InviteModalComponent } from '../invite-modal/invite-modal.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent, IonButton],
+	imports: [RouterLink, RoomPlayComponent, PlayerAvatarComponent, IonButton],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -22,7 +21,7 @@ export class RoomDetailComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
-	private readonly auth = inject(AuthService);
+	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
 	private readonly destroyRef = inject(DestroyRef);
@@ -169,13 +168,4 @@ export class RoomDetailComponent implements OnInit {
 		setTimeout(() => this.copied.set(false), 2000);
 	}
 
-	public readonly showInviteModal = signal(false);
-
-	public invite(): void {
-		if (this.isInRoom() && this.room()?.phase === 'waiting') this.showInviteModal.set(true);
-	}
-
-	public addFriend(player: GamePlayer): void {
-		this.toast.show(`Friend request sent to ${player.name}`, 'success');
-	}
 }

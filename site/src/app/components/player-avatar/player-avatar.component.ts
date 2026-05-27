@@ -1,30 +1,31 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { GamePlayer } from '@gandogames/common/api';
 import { PLAYER_ICONS } from '@gandogames/lib/player-icons';
+import { UserService } from '@gandogames/services/user.service';
 
 @Component({
 	selector: 'gg-player-avatar',
-	template: `
-		@if (player().icon) {
-			<i [class]="iconFaClass()"></i>
-		} @else {
-			{{ player().name.charAt(0).toUpperCase() }}
-		}
-	`,
+	template: `<i [class]="iconFaClass()"></i>`,
 	styleUrl: './player-avatar.component.scss',
-	host: { '[style.background]': 'bg()' },
+	host: {
+		'[class.avatar-theme-light]': 'isLightTheme()',
+		'[style.background]': 'bg()',
+	},
 })
 export class PlayerAvatarComponent {
+	private readonly userService = inject(UserService);
+	public readonly isLightTheme = computed(() => !this.userService.isDarkTheme());
+	
 	public readonly player = input.required<GamePlayer>();
 
-	public readonly bg = computed(() => {
-		const name = this.player().name;
-		let hash = 0;
-		for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) & 0xffff;
-		return `hsl(${hash % 360}, 60%, 42%)`;
-	});
-
 	public readonly iconFaClass = computed(() =>
-		PLAYER_ICONS.find((icon) => icon.id === this.player().icon)?.fa ?? ''
+		PLAYER_ICONS.find(p => p.id === (this.player().icon ?? 'profile'))?.class ?? ''
 	);
+
+	public readonly bg = computed(() => {
+		const id = this.player().id;
+		let hash = 0;
+		for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffff;
+		return `hsl(${hash % 360}, 38%, 62%)`;
+	});
 }

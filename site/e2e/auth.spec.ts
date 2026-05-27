@@ -2,7 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 
 const MOCK_AUTH = {
 	sessionTicket: 'e2e-session-ticket',
-	player: { id: 'e2e-player', name: 'E2EGuest', permissions: [] },
+	player: { id: 'e2e-player', name: 'E2EGuest' },
 };
 
 async function mockApiDefaults(page: Page): Promise<void> {

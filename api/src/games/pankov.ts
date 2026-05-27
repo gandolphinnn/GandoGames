@@ -38,7 +38,7 @@ export class PankovGame extends Game<PankovGameState> {
 		this.state = {
 			lastUpdate: new Date(),
 			gamePhase: 'turn-start',
-			players: players.map(p => ({ id: p.id, name: p.name, lives: INITIAL_LIVES })),
+			players: players.map(p => ({ ...p, lives: INITIAL_LIVES })),
 			currentPlayerIndex: 0,
 			previousPlayerIndex: null,
 			previousDeclaration: null,

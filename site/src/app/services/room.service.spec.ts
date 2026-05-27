@@ -3,16 +3,20 @@ import { signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 import { RoomService } from './room.service';
 import { BackendService } from './backend.service';
-import { AuthService, AuthUser } from './auth.service';
+import { AuthUser, UserService } from './user.service';
 import { SignalRService } from './signalr.service';
-import type { RoomData } from '@gandogames/common/api';
+import type { GamePlayer, RoomData } from '@gandogames/common/api';
+
+function makePlayer(id: string, name: string): GamePlayer {
+	return { id, name, icon: 'profile', theme: 'dark', language: 'en' };
+}
 
 function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 	return {
 		id: 'room-1',
 		hostId: 'player-1',
 		game: 'pankov',
-		players: [{ id: 'player-1', name: 'Alice' }],
+		players: [makePlayer('player-1', 'Alice')],
 		kickedPlayers: [],
 		phase: 'waiting',
 		chat: [],
@@ -23,7 +27,7 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 
 const MOCK_USER: AuthUser = {
 	sessionTicket: 'ticket-abc',
-	player: { id: 'player-1', name: 'Alice', permissions: [] },
+	player: makePlayer('player-1', 'Alice'),
 	isGuest: false,
 };
 
@@ -42,7 +46,6 @@ describe('RoomService', () => {
 		const mockAuth = {
 			user: userSignal.asReadonly(),
 			isLoggedIn: computed(() => userSignal() !== null),
-			permissions: computed(() => userSignal()?.player.permissions ?? []),
 		};
 
 		const mockSignalR = {
@@ -56,7 +59,7 @@ describe('RoomService', () => {
 			providers: [
 				RoomService,
 				{ provide: BackendService, useValue: backendSpy },
-				{ provide: AuthService, useValue: mockAuth },
+				{ provide: UserService, useValue: mockAuth },
 				{ provide: SignalRService, useValue: mockSignalR },
 			],
 		});
@@ -75,9 +78,9 @@ describe('RoomService', () => {
 
 	describe('myRooms (computed)', () => {
 		it('returns only rooms where current player is a participant and phase is not ended', () => {
-			const mine = makeRoom({ id: 'r1', phase: 'waiting', players: [{ id: 'player-1', name: 'Alice' }] });
-			const other = makeRoom({ id: 'r2', phase: 'waiting', players: [{ id: 'player-2', name: 'Bob' }] });
-			const ended = makeRoom({ id: 'r3', phase: 'ended', players: [{ id: 'player-1', name: 'Alice' }] });
+			const mine = makeRoom({ id: 'r1', phase: 'waiting', players: [makePlayer('player-1', 'Alice')] });
+			const other = makeRoom({ id: 'r2', phase: 'waiting', players: [makePlayer('player-2', 'Bob')] });
+			const ended = makeRoom({ id: 'r3', phase: 'ended', players: [makePlayer('player-1', 'Alice')] });
 			service.rooms.set([mine, other, ended]);
 
 			const result = service.myRooms();
@@ -86,7 +89,7 @@ describe('RoomService', () => {
 		});
 
 		it('returns empty array when no rooms match', () => {
-			service.rooms.set([makeRoom({ players: [{ id: 'other', name: 'X' }] })]);
+			service.rooms.set([makeRoom({ players: [makePlayer('other', 'X')] })]);
 			expect(service.myRooms()).toHaveSize(0);
 		});
 	});
@@ -127,8 +130,8 @@ describe('RoomService', () => {
 		});
 
 		it('fetches room and updates existing entry in rooms signal', async () => {
-			const original = makeRoom({ players: [{ id: 'player-1', name: 'Alice' }] });
-			const updated = makeRoom({ players: [{ id: 'player-1', name: 'Alice' }, { id: 'player-2', name: 'Bob' }] });
+			const original = makeRoom({ players: [makePlayer('player-1', 'Alice')] });
+			const updated = makeRoom({ players: [makePlayer('player-1', 'Alice'), makePlayer('player-2', 'Bob')] });
 			service.rooms.set([original]);
 			backendSpy.post.and.returnValue(Promise.resolve(updated));
 			await service.getRoom('room-1');

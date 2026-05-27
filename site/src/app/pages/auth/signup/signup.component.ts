@@ -3,7 +3,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
 
-import { AuthService } from '@gandogames/services/auth.service';
+import { UserService } from '@gandogames/services/user.service';
 
 @Component({
 	selector: 'gg-signup',
@@ -13,7 +13,7 @@ import { AuthService } from '@gandogames/services/auth.service';
 	styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
-	private readonly auth = inject(AuthService);
+	private readonly auth = inject(UserService);
 	private readonly router = inject(Router);
 	private readonly route = inject(ActivatedRoute);
 

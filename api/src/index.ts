@@ -1,5 +1,5 @@
 import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput } from '@azure/functions';
-import { BaseRequest, GamePlayer } from '@gandogames/common/api';
+import { BaseRequest, GamePlayer, IconType, LangCode, Theme } from '@gandogames/common/api';
 import { PlayFab, PlayFabAdmin, PlayFabClient, PlayFabServer } from 'playfab-sdk';
 import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';
 
@@ -140,10 +140,17 @@ export async function authenticateSession(request: BaseRequest, notifier: InnerF
 	notifier.errorMessage = errorMessage;
 	const id = authResult.UserInfo!.PlayFabId!;
 	const name = authResult.UserInfo!.TitleInfo?.DisplayName || authResult.UserInfo!.Username || 'Guest';
-	const iconResult = await pfPromise<PlayFabServerModels.GetUserDataResult>(
-		cb => PlayFabServer.GetUserData({ PlayFabId: id, Keys: ['icon'] }, cb),
+	const profileResult = await pfPromise<PlayFabServerModels.GetUserDataResult>(
+		cb => PlayFabServer.GetUserData({ PlayFabId: id, Keys: ['icon', 'theme', 'language'] }, cb),
 	);
-	return { id, name, icon: iconResult.Data?.['icon']?.Value };
+	const data = profileResult.Data;
+	return {
+		id,
+		name,
+		icon: (data?.['icon']?.Value as IconType) ?? 'profile',
+		theme: (data?.['theme']?.Value as Theme) ?? 'dark',
+		language: (data?.['language']?.Value as LangCode) ?? 'en',
+	};
 }
 
 /** Wraps a PlayFab SDK callback call into a Promise. */

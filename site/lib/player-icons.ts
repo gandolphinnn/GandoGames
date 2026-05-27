@@ -1,13 +1,20 @@
+import { IconType } from "@gandogames/common/api";
+
 export interface PlayerIcon {
-	id: string;
+	id: IconType;
 	label: string;
-	fa: string;
+	class: string;
 }
 
 export const PLAYER_ICONS: PlayerIcon[] = [
-	{ id: 'start', label: 'Start', fa: 'fa-solid fa-star' },
-	{ id: 'clover', label: 'Clover', fa: 'fa-solid fa-clover' },
-	{ id: 'dice', label: 'Dice', fa: 'fa-solid fa-dice' },
-	{ id: 'paw', label: 'Paw', fa: 'fa-solid fa-paw' },
-	{ id: 'atom', label: 'Atom', fa: 'fa-solid fa-atom' },
+	{ id: 'profile', label: 'Profile', class: 'fas fa-user' },
+	{ id: 'luck',    label: 'Clover',  class: 'fas fa-clover' },
+	{ id: 'hat',     label: 'Cowboy',  class: 'fas fa-hat-cowboy' },
+	{ id: 'paw',     label: 'Paw',     class: 'fas fa-paw' },
+	{ id: 'pizza',   label: 'Pizza',   class: 'fas fa-pizza-slice' },
+];
+
+export const LANGUAGES = [
+	{ value: 'en', text: 'English' },
+	{ value: 'it', text: 'Italiano' },
 ];

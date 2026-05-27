@@ -45,14 +45,9 @@
 							}
 							<gg-player-avatar class="player-card-avatar" [player]="slot" />
 							<span class="player-card-name">{{ slot.name }}</span>
-							@if (slot.id !== myId() && !slot.id.startsWith('bot_')) {
-								<button class="player-card-friend" title="Add friend" (click)="addFriend(slot)">
-									<i class="fa-solid fa-user-plus"></i>
-								</button>
-							}
 						</div>
 					} @else if (isInRoom()) {
-						<div class="player-card player-card-empty" (click)="invite()">
+						<div class="player-card player-card-empty">
 							<div class="player-card-avatar player-card-avatar-empty">
 								<i class="fa-solid fa-plus"></i>
 							</div>
@@ -110,15 +105,5 @@
 
 	</div>
 
-	@if (showInviteModal() && room()) {
-		<gg-invite-modal
-			[roomId]="roomId()"
-			[gameType]="room()!.game"
-			[roomPlayerNames]="roomPlayerNames()"
-			[isHost]="isHost()"
-			[playerCount]="room()!.players.length"
-			[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
-			(closed)="showInviteModal.set(false)" />
-	}
 
 }

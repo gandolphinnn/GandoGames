@@ -36,7 +36,6 @@
 							"node_modules/@ionic/angular/css/normalize.css",
 							"node_modules/@ionic/angular/css/structure.css",
 							"node_modules/@ionic/angular/css/typography.css",
-							"node_modules/bootstrap/dist/css/bootstrap.min.css",
 							"node_modules/@fortawesome/fontawesome-free/css/all.min.css",
 							"src/styles.scss"
 						],
@@ -115,7 +114,6 @@
 							"node_modules/@ionic/angular/css/normalize.css",
 							"node_modules/@ionic/angular/css/structure.css",
 							"node_modules/@ionic/angular/css/typography.css",
-							"node_modules/bootstrap/dist/css/bootstrap.min.css",
 							"node_modules/@fortawesome/fontawesome-free/css/all.min.css",
 							"src/styles.scss"
 						],

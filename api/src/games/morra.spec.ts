@@ -152,38 +152,6 @@ describe('MorraGame', () => {
 		});
 	});
 
-	describe('describe', () => {
-		it('returns picking message in picking phase', () => {
-			expect(game.describe(game.state!)).toBe('Round started — choose your hand');
-		});
-
-		it('returns draw message in reveal phase when drawn', () => {
-			game.action(p1, 'pick', { hand: 'scissors' });
-			game.action(p2, 'pick', { hand: 'scissors' });
-			expect(game.describe(game.state!)).toBe('Draw — no lives lost');
-		});
-
-		it('includes pick labels and loser marker in reveal phase', () => {
-			game.action(p1, 'pick', { hand: 'rock' });
-			game.action(p2, 'pick', { hand: 'scissors' });
-			const msg = game.describe(game.state!);
-			expect(msg).toContain('Rock');
-			expect(msg).toContain('Scissors');
-			expect(msg).toContain('−1');
-		});
-
-		it('returns winner name in game-over phase', () => {
-			for (let i = 0; i < 3; i++) {
-				game.action(p1, 'pick', { hand: 'rock' });
-				game.action(p2, 'pick', { hand: 'scissors' });
-				game.action(p1, 'next-round', {});
-			}
-			const msg = game.describe(game.state!);
-			expect(msg).toContain('Alice');
-			expect(msg).toContain('wins');
-		});
-	});
-
 	it('ignores unknown action without changing phase', () => {
 		const phase = game.state!.gamePhase;
 		game.action(p1, 'fly', {});

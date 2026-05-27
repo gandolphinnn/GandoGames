@@ -9,8 +9,8 @@
 
 		<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
 			<div class="field">
-				<label class="field-label" for="username">Username</label>
-				<input id="username" class="input" type="text" formControlName="username"
+				<label class="field-label">Username</label>
+				<ion-input fill="outline" type="text" formControlName="username"
 					placeholder="YourName" autocomplete="username" />
 				@if (form.controls.username.touched && form.controls.username.hasError('required')) {
 					<span class="field-error">Username is required</span>
@@ -21,8 +21,8 @@
 				}
 			</div>
 			<div class="field">
-				<label class="field-label" for="email">Email</label>
-				<input id="email" class="input" type="email" formControlName="email"
+				<label class="field-label">Email</label>
+				<ion-input fill="outline" type="email" formControlName="email"
 					placeholder="you@example.com" autocomplete="email" />
 				@if (form.controls.email.touched && form.controls.email.hasError('required')) {
 					<span class="field-error">Email is required</span>
@@ -31,8 +31,8 @@
 				}
 			</div>
 			<div class="field">
-				<label class="field-label" for="password">Password</label>
-				<input id="password" class="input" type="password" formControlName="password"
+				<label class="field-label">Password</label>
+				<ion-input fill="outline" type="password" formControlName="password"
 					placeholder="••••••••" autocomplete="new-password" />
 				@if (form.controls.password.touched && form.controls.password.hasError('required')) {
 					<span class="field-error">Password is required</span>
@@ -40,9 +40,9 @@
 					<span class="field-error">At least 6 characters</span>
 				}
 			</div>
-			<button class="btn btn-primary" type="submit" [disabled]="loading()">
+			<ion-button type="submit" expand="block" [disabled]="loading()">
 				{{ loading() ? 'Creating account…' : 'Create account' }}
-			</button>
+			</ion-button>
 		</form>
 
 		<p class="auth-footer">Already have an account? <a class="auth-link" routerLink="/login">Log in</a></p>

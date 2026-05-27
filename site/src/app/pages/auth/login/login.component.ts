@@ -1,13 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { IonButton, IonInput } from '@ionic/angular/standalone';
 
 import { AuthService } from '@gandogames/services/auth.service';
 
 @Component({
 	selector: 'gg-login',
 	standalone: true,
-	imports: [ReactiveFormsModule, RouterLink],
+	imports: [ReactiveFormsModule, RouterLink, IonButton, IonInput],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
 })

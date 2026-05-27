@@ -12,7 +12,6 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		players: [player],
 		kickedPlayers: [],
 		phase: 'waiting',
-		history: [],
 		chat: [],
 		lastUpdate: new Date(),
 	};
@@ -110,7 +109,6 @@ const roomResetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, no
 	if (room.phase !== 'playing') throw new Error('Game is not in progress');
 
 	room.phase = 'waiting';
-	room.history = [];
 	room.lastUpdate = new Date();
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);

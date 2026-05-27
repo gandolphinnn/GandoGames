@@ -104,15 +104,3 @@
 	font-size: $text-sm; color: $text-muted;
 }
 
-// ── Buttons ────────────────────────────────────────────────────────────────────
-
-.btn {
-	border-radius: $radius-md;
-	font-weight: 600;
-	min-height: 44px;
-
-	&:disabled,
-	&[disabled] {
-		opacity: 0.4; cursor: not-allowed;
-	}
-}

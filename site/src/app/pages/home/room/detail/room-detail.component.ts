@@ -7,13 +7,14 @@ import { AuthService } from '@gandogames/services/auth.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { IonButton } from '@ionic/angular/standalone';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { InviteModalComponent } from '../invite-modal/invite-modal.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 
 @Component({
 	selector: 'gg-room-detail',
-	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent],
+	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent, IonButton],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })

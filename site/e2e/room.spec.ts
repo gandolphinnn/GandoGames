@@ -12,7 +12,6 @@ const MOCK_ROOM = {
 	players: [{ id: 'e2e-player', name: 'E2EPlayer' }],
 	kickedPlayers: [],
 	phase: 'waiting',
-	history: [],
 	chat: [],
 	lastUpdate: new Date().toISOString(),
 };

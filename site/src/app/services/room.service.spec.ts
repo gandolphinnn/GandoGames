@@ -15,7 +15,6 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 		players: [{ id: 'player-1', name: 'Alice' }],
 		kickedPlayers: [],
 		phase: 'waiting',
-		history: [],
 		chat: [],
 		lastUpdate: new Date(),
 		...overrides,

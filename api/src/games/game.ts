@@ -28,7 +28,6 @@ export abstract class Game<TState extends GameState> {
 	public abstract initialize(players: GamePlayer[]): void;
 	public abstract getPublicState(requestingPlayerId: string): TState;
 	public abstract action(player: GamePlayer, action: string, data: any): TState;
-	public abstract describe(state: TState): string;
 
 	public static Factory: (type: GameType) => Game<GameState> = (_type) => {
 		throw new Error('Game.Factory not wired — import from api/src/games');

@@ -1,6 +1,7 @@
 import { Component, inject, signal, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { IonButton } from '@ionic/angular/standalone';
 import { PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
 import { AuthService, AuthUser } from '@gandogames/services/auth.service';
@@ -8,7 +9,7 @@ import { ThemeService } from '@gandogames/services/theme.service';
 
 @Component({
 	selector: 'gg-profile',
-	imports: [PlayerAvatarComponent],
+	imports: [PlayerAvatarComponent, IonButton],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })

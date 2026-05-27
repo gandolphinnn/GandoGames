@@ -212,31 +212,4 @@ describe('PankovGame', () => {
 		});
 	});
 
-	describe('describe', () => {
-		it('returns "goes first" for first turn with no previous declaration', () => {
-			expect(game.describe(game.state!)).toContain('goes first');
-		});
-
-		it('includes previous claim in turn-start after a declaration', () => {
-			rollTo(game, p1, 31);
-			game.action(p1, 'declare', { declaration: 31 as RollValue });
-			expect(game.describe(game.state!)).toContain('3-1'); // formatValue(31) = "3-1"
-		});
-
-		it('returns "rolled" message in rolled phase', () => {
-			rollTo(game, p1, 31);
-			expect(game.describe(game.state!)).toContain('rolled');
-		});
-
-		it('returns game-over message with winner name', () => {
-			rollTo(game, p1, 31);
-			game.action(p1, 'declare', { declaration: 21 as RollValue });
-			game.action(p2, 'challenge', {});
-			game.state!.players[0].lives = 0;
-			game.action(p1, 'continue', {});
-			const msg = game.describe(game.state!);
-			expect(msg).toContain('Bob');
-			expect(msg).toContain('wins');
-		});
-	});
 });

@@ -98,3 +98,83 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+// ── Ionic integration ─────────────────────────────────────────────────────────
+
+:root, [data-theme="dark"] {
+  --ion-color-primary-rgb: 200, 130, 30;
+}
+
+[data-theme="light"] {
+  --ion-color-primary-rgb: 139, 90, 43;
+}
+
+:root, [data-theme="dark"], [data-theme="light"] {
+  --ion-color-primary: var(--accent);
+  --ion-color-primary-contrast: #fff;
+  --ion-color-primary-shade: var(--accent-hover);
+  --ion-color-primary-tint: var(--accent-subtle);
+
+  --ion-color-danger: #e62323;
+  --ion-color-danger-rgb: 230, 35, 35;
+  --ion-color-danger-contrast: #fff;
+  --ion-color-danger-shade: #c01c1c;
+  --ion-color-danger-tint: rgba(230, 35, 35, 0.12);
+
+  --ion-background-color: var(--bg);
+  --ion-text-color: var(--text);
+  --ion-font-family: #{$font};
+}
+
+ion-button {
+  --box-shadow: none;
+  --border-radius: 10px;
+  --padding-start: 1.5rem;
+  --padding-end: 1.5rem;
+
+  &::part(native) {
+    text-transform: none;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: inherit;
+    min-height: 44px;
+  }
+
+  &[fill="outline"] {
+    --border-width: 1px;
+    --border-color: var(--border-color);
+    --color: var(--text-muted);
+  }
+
+  &[fill="clear"] {
+    --color: var(--text-muted);
+  }
+
+  &[color="danger"] {
+    --background: rgba(248, 113, 113, 0.15);
+    --color: #e62323;
+    --border-width: 1px;
+    --border-color: rgba(248, 113, 113, 0.3);
+  }
+
+  &[fill="outline"][color="danger"] {
+    --background: transparent;
+  }
+}
+
+ion-input[fill="outline"] {
+  --background: var(--bg-surface);
+  --color: var(--text);
+  --placeholder-color: var(--text-muted);
+  --border-color: var(--border-color);
+  --highlight-color-focused: var(--accent);
+  --border-radius: 10px;
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+
+  &::part(native) {
+    min-height: 44px;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+}

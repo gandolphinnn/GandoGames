@@ -258,67 +258,6 @@ gg-player-avatar {
 	font-size: $text-sm; color: $text-muted;
 }
 
-.btn {
-	&-primary {
-		padding: $s3 $s6;
-		background: $accent;
-		color: $color-on-accent;
-		border: none;
-		border-radius: $radius-md;
-		font-size: $text-base;
-		font-weight: 600;
-		cursor: pointer;
-		align-self: flex-start;
-		min-height: 44px;
-		text-decoration: none;
-		display: inline-flex;
-		align-items: center;
-		transition: background $transition;
-
-		&:hover:not(:disabled) {
-			background: $accent-hover;
-		}
-		&:disabled {
-			opacity: 0.5; cursor: not-allowed;
-		}
-	}
-
-	&-secondary {
-		padding: $s3 $s6;
-		background: transparent;
-		color: $text-muted;
-		border: 1px solid $border;
-		border-radius: $radius-md;
-		font-size: $text-base;
-		cursor: pointer;
-		min-height: 44px;
-		text-decoration: none;
-		display: inline-flex;
-		align-items: center;
-		transition: color $transition;
-
-		&:hover {
-			color: $text;
-		}
-	}
-
-	&-danger {
-		padding: $s3 $s6;
-		background: transparent;
-		color: $color-danger;
-		border: 1px solid $color-danger-border;
-		border-radius: $radius-md;
-		font-size: $text-base;
-		cursor: pointer;
-		align-self: flex-start;
-		min-height: 44px;
-		transition: background $transition;
-
-		&:hover {
-			background: $color-danger-bg;
-		}
-	}
-}
 
 .morra {
 	&-game {

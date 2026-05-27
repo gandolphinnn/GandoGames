@@ -27,14 +27,10 @@
 						}
 						<div class="action-row">
 							@if (canRoll()) {
-								<button class="btn btn-primary" [disabled]="loading()" (click)="roll()">
-									Roll dice
-								</button>
+								<ion-button [disabled]="loading()" (click)="roll()">Roll dice</ion-button>
 							}
 							@if (gs.previousDeclaration !== null) {
-								<button class="btn btn-danger" [disabled]="loading()" (click)="challenge()">
-									Challenge!
-								</button>
+								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="challenge()">Challenge!</ion-button>
 							}
 						</div>
 						@if (error()) { <p class="action-error">{{ error() }}</p> }
@@ -110,9 +106,7 @@
 							Honest! {{ players[r.loserIndex]?.name }} loses −1 life
 						</p>
 					}
-					<button class="btn btn-primary" [disabled]="loading()" (click)="continueGame()">
-						Continue
-					</button>
+					<ion-button [disabled]="loading()" (click)="continueGame()">Continue</ion-button>
 				</div>
 			}
 
@@ -120,7 +114,7 @@
 				<div class="panel panel-centered">
 					<p class="panel-eyebrow">Winner</p>
 					<h2 class="panel-title winner-name">{{ gameState()!.winnerName }}</h2>
-					<button class="btn btn-primary" (click)="playAgain.emit()">Play Again</button>
+					<ion-button (click)="playAgain.emit()">Play Again</ion-button>
 				</div>
 			}
 

@@ -63,25 +63,25 @@
 				<p class="profile-error">{{ error() }}</p>
 			}
 
-			<button class="btn btn-danger" type="button" (click)="logout()">
-				<i class="fa-solid fa-sign-out-alt"></i> Log out
-			</button>
+			<ion-button color="danger" expand="block" type="button" (click)="logout()">
+				<i class="fa-solid fa-sign-out-alt" slot="start"></i> Log out
+			</ion-button>
 
 			<div class="danger-zone">
 				<p class="danger-zone-title">Danger zone</p>
 				@if (!confirmingDelete()) {
-					<button class="btn btn-danger-outline" type="button" (click)="requestDelete()">
-						<i class="fa-solid fa-trash"></i> Delete account
-					</button>
+					<ion-button fill="outline" color="danger" expand="block" type="button" (click)="requestDelete()">
+						<i class="fa-solid fa-trash" slot="start"></i> Delete account
+					</ion-button>
 				} @else {
 					<p class="danger-zone-warn">This will permanently delete your account. This cannot be undone.</p>
 					<div class="danger-zone-actions">
-						<button class="btn btn-danger" type="button" [disabled]="loading()" (click)="confirmDelete()">
-							<i class="fa-solid fa-trash"></i> {{ loading() ? 'Deleting…' : 'Yes, delete' }}
-						</button>
-						<button class="btn btn-ghost" type="button" [disabled]="loading()" (click)="cancelDelete()">
+						<ion-button color="danger" type="button" [disabled]="loading()" (click)="confirmDelete()">
+							<i class="fa-solid fa-trash" slot="start"></i> {{ loading() ? 'Deleting…' : 'Yes, delete' }}
+						</ion-button>
+						<ion-button fill="clear" type="button" [disabled]="loading()" (click)="cancelDelete()">
 							Cancel
-						</button>
+						</ion-button>
 					</div>
 				}
 			</div>

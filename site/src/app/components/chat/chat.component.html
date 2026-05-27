@@ -43,16 +43,17 @@
 			}
 		</div>
 		<div class="chat-input-row">
-			<input
+			<ion-input
 				class="chat-input"
+				fill="outline"
 				type="text"
 				placeholder="Message…"
 				[ngModel]="text()"
 				(ngModelChange)="text.set($event)"
 				(keydown)="onKeydown($event)"
-				maxlength="500"
+				[maxlength]="500"
 				autocomplete="off"
-			/>
+			></ion-input>
 			<button
 				class="chat-send"
 				type="button"

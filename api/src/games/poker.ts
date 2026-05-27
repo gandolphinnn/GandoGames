@@ -137,23 +137,6 @@ export class PokerGame extends Game<PokerGameState> {
 		return { ...this.state, players, deck: [] };
 	}
 
-	public override describe(state: PokerGameState): string {
-		const current = state.players[state.currentPlayerIndex];
-		switch (state.gamePhase) {
-			case 'pre-flop': return `Pre-flop — ${current?.name ?? '?'}'s turn`;
-			case 'flop': return `Flop — ${current?.name ?? '?'}'s turn`;
-			case 'turn': return `Turn — ${current?.name ?? '?'}'s turn`;
-			case 'river': return `River — ${current?.name ?? '?'}'s turn`;
-			case 'showdown': {
-				if (!state.result) return 'Showdown';
-				const names = state.result.winners.map((id: string) => state.players.find((p: PokerPlayer) => p.id === id)?.name ?? id);
-				return `Showdown — ${names.join(' & ')} wins ${state.result.potAmount}`;
-			}
-			case 'game-over': return `Game over — ${state.winnerName ?? '?'} wins!`;
-			default: return '';
-		}
-	}
-
 	public override action(player: GamePlayer, action: string, data: any): PokerGameState {
 		if (!this.state) throw new Error('Game not initialized');
 

@@ -27,12 +27,10 @@
 		<span class="table-pot">Pot: {{ gameState()!.pot }}</span>
 		<div class="community-cards">
 			@for (card of gameState()!.communityCards; track card.rank + card.suit) {
-				<span class="card" [class.card-red]="card.suit === 'hearts' || card.suit === 'diamonds'">
-					{{ formatCard(card) }}
-				</span>
+				<gg-french-card [card]="card" />
 			}
 			@for (ph of communityPlaceholders(); track $index) {
-				<span class="card card-placeholder"></span>
+				<gg-french-card />
 			}
 		</div>
 	</div>
@@ -43,9 +41,7 @@
 			<span class="my-hand-label">Your hand</span>
 			<div class="my-hand-cards">
 				@for (card of me.cards; track card.rank + card.suit) {
-					<span class="card card-hole" [class.card-red]="card.suit === 'hearts' || card.suit === 'diamonds'">
-						{{ formatCard(card) }}
-					</span>
+					<gg-french-card [card]="card" size="lg" />
 				}
 			</div>
 		</div>
@@ -58,16 +54,16 @@
 				<div class="panel">
 					<p class="panel-eyebrow">Your turn — {{ gameState()!.gamePhase }}</p>
 					<div class="action-row">
-						<button class="btn btn-danger" [disabled]="loading()" (click)="fold()">Fold</button>
+						<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">Fold</ion-button>
 						@if (canCheck()) {
-							<button class="btn btn-primary" [disabled]="loading()" (click)="check()">Check</button>
+							<ion-button [disabled]="loading()" (click)="check()">Check</ion-button>
 						} @else {
-							<button class="btn btn-primary" [disabled]="loading()" (click)="call()">Call {{ callAmount() }}</button>
+							<ion-button [disabled]="loading()" (click)="call()">Call {{ callAmount() }}</ion-button>
 						}
 					</div>
 					<div class="raise-row">
-						<input class="raise-input" type="number" [min]="minRaise()" step="50" [value]="raiseAmount()" (input)="updateRaiseAmount($event)">
-						<button class="btn btn-raise" [disabled]="loading()" (click)="raise(raiseAmount())">Raise</button>
+						<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="50" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
+						<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">Raise</ion-button>
 					</div>
 					@if (error()) {
 						<p class="action-error">{{ error() }}</p>
@@ -90,16 +86,14 @@
 							<span class="showdown-name">{{ p.name }}</span>
 							<div class="showdown-cards">
 								@for (card of p.cards; track card.rank + card.suit) {
-									<span class="card card-sm" [class.card-red]="card.suit === 'hearts' || card.suit === 'diamonds'">
-										{{ formatCard(card) }}
-									</span>
+									<gg-french-card [card]="card" size="sm" />
 								}
 							</div>
 							<span class="showdown-rank">{{ gs?.result?.hands?.[p.id] }}</span>
 						</div>
 					}
 				</div>
-				<button class="btn btn-primary" [disabled]="loading()" (click)="nextHand()">Next Hand</button>
+				<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
 				@if (error()) {
 					<p class="action-error">{{ error() }}</p>
 				}
@@ -108,7 +102,7 @@
 			<div class="panel panel-centered">
 				<p class="panel-eyebrow">Winner</p>
 				<h2 class="panel-title winner-name">{{ gameState()!.winnerName }}</h2>
-				<button class="btn btn-primary" (click)="playAgain.emit()">Play Again</button>
+				<ion-button (click)="playAgain.emit()">Play Again</ion-button>
 			</div>
 		}
 

@@ -9,8 +9,8 @@
 
 		<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
 			<div class="field">
-				<label class="field-label" for="email">Email</label>
-				<input id="email" class="input" type="email" formControlName="email"
+				<label class="field-label">Email</label>
+				<ion-input fill="outline" type="email" formControlName="email"
 					placeholder="you@example.com" autocomplete="email" />
 				@if (form.controls.email.touched && form.controls.email.hasError('required')) {
 					<span class="field-error">Email is required</span>
@@ -19,24 +19,24 @@
 				}
 			</div>
 			<div class="field">
-				<label class="field-label" for="password">Password</label>
-				<input id="password" class="input" type="password" formControlName="password"
+				<label class="field-label">Password</label>
+				<ion-input fill="outline" type="password" formControlName="password"
 					placeholder="••••••••" autocomplete="current-password" />
 				@if (form.controls.password.touched && form.controls.password.hasError('required')) {
 					<span class="field-error">Password is required</span>
 				}
 			</div>
-			<button class="btn btn-primary" type="submit" [disabled]="loading()">
+			<ion-button type="submit" expand="block" [disabled]="loading()">
 				{{ loading() ? 'Logging in…' : 'Log in' }}
-			</button>
+			</ion-button>
 		</form>
 
 		<p class="auth-footer">No account? <a class="auth-link" routerLink="/signup">Sign up</a></p>
 
 		<div class="auth-divider"><span>or</span></div>
 
-		<button class="btn btn-secondary" type="button" [disabled]="loading()" (click)="continueAsGuest()">
+		<ion-button fill="outline" expand="block" type="button" [disabled]="loading()" (click)="continueAsGuest()">
 			Continue as guest
-		</button>
+		</ion-button>
 	</div>
 </div>

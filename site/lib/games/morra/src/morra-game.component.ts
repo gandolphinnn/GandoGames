@@ -1,5 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { MorraGameState } from '@gandogames/common/morra';
+import { IonButton } from '@ionic/angular/standalone';
 import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
 import { HAND_LABEL, HANDS, INITIAL_LIVES } from './morra.models';
 import type { Hand } from './morra.models';
@@ -8,7 +9,7 @@ import { GameComponent } from '@gandogames/lib/game-registry';
 @Component({
 	selector: 'gg-morra-game',
 	standalone: true,
-	imports: [PlayerChipComponent],
+	imports: [PlayerChipComponent, IonButton],
 	templateUrl: './morra-game.component.html',
 	styleUrl: './morra-game.component.scss',
 })

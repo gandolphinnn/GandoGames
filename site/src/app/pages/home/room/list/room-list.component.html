@@ -24,7 +24,7 @@
 					<i class="fa-solid fa-gamepad empty-icon"></i>
 					<p class="empty-title">No open rooms</p>
 					<p class="empty-subtitle">Create one and invite your friends.</p>
-					<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
+					<ion-button (click)="mode.set('create')">+ New Room</ion-button>
 				</div>
 			} @else {
 				<ul class="room-list">
@@ -40,7 +40,7 @@
 						</li>
 					}
 				</ul>
-				<button class="btn-primary" (click)="mode.set('create')">+ New Room</button>
+				<ion-button (click)="mode.set('create')">+ New Room</ion-button>
 			}
 		</div>
 
@@ -72,14 +72,13 @@
 			}
 
 			<div class="form-actions">
-				<button class="btn-secondary" (click)="mode.set('browse')">Cancel</button>
-				<button
-					class="btn-primary"
+				<ion-button fill="outline" (click)="mode.set('browse')">Cancel</ion-button>
+				<ion-button
 					[disabled]="!createGameId() || loading()"
 					(click)="create()"
 				>
 					{{ loading() ? 'Creating…' : 'Create Room' }}
-				</button>
+				</ion-button>
 			</div>
 		</div>
 

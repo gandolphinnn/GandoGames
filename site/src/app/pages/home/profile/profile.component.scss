@@ -177,52 +177,6 @@ gg-player-avatar.profile-avatar {
 	}
 }
 
-.btn {
-	padding: $s3 $s6;
-	border-radius: $radius-md;
-	font-size: $text-base;
-	font-weight: 600;
-	cursor: pointer;
-	border: none;
-	transition: background $transition;
-	min-height: 44px;
-
-	&-danger {
-		background: $color-danger-muted;
-		color: $color-danger;
-		border: 1px solid $color-danger-border;
-
-		&:hover:not(:disabled) {
-			background: $color-danger-dim;
-		}
-		&:disabled {
-			opacity: 0.5; cursor: not-allowed;
-		}
-	}
-
-	&-danger-outline {
-		background: transparent;
-		color: $color-danger;
-		border: 1px solid $color-danger-border;
-
-		&:hover {
-			background: $color-danger-bg;
-		}
-	}
-
-	&-ghost {
-		background: transparent;
-		color: $text-muted;
-		border: 1px solid $border;
-
-		&:hover:not(:disabled) {
-			background: $hover-overlay;
-		}
-		&:disabled {
-			opacity: 0.5; cursor: not-allowed;
-		}
-	}
-}
 
 .danger-zone {
 	display: flex;

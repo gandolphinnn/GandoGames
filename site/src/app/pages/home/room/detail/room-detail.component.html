@@ -1,5 +1,5 @@
 @if (room()?.phase === 'playing') {
-	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" [history]="room()!.history || []" (leaveRoom)="leave()" />
+	<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" (leaveRoom)="leave()" />
 } @else {
 
 	<div class="room-detail">
@@ -9,7 +9,7 @@
 		} @else if (!room()) {
 			<div class="room-not-found">
 				<p class="error-msg">Room not found.</p>
-				<a class="btn-secondary" [routerLink]="['/play']"><i class="fa-solid fa-arrow-left"></i> Back</a>
+				<ion-button fill="outline" [routerLink]="['/play']"><i class="fa-solid fa-arrow-left" slot="start"></i> Back</ion-button>
 			</div>
 		} @else {
 
@@ -19,7 +19,7 @@
 					{{ roomId() }} <i [class]="copied() ? 'fa-solid fa-check' : 'fa-regular fa-copy'"></i>
 				</button>
 				@if (isInRoom()) {
-					<button class="btn-danger" (click)="leave()">Leave Room</button>
+					<ion-button fill="outline" color="danger" (click)="leave()">Leave Room</ion-button>
 				}
 			</header>
 
@@ -86,9 +86,9 @@
 							<p class="status-msg">Waiting for players…</p>
 							@if (isHost()) {
 								@if (canStart()) {
-									<button class="btn-primary" [disabled]="loading()" (click)="start()">
+									<ion-button [disabled]="loading()" (click)="start()">
 										{{ loading() ? 'Starting…' : 'Start Game' }}
-									</button>
+									</ion-button>
 								} @else {
 									<p class="hint">Need more players to start.</p>
 								}
@@ -100,7 +100,7 @@
 				@case ('ended') {
 					<div class="phase-panel game-over">
 						<h2>Game Over</h2>
-						<a class="btn-primary" [routerLink]="['/play']">Find another room</a>
+						<ion-button [routerLink]="['/play']">Find another room</ion-button>
 					</div>
 				}
 

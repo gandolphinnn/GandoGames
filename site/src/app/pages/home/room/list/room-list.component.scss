@@ -99,44 +99,6 @@
 	}
 }
 
-.btn {
-	&-primary {
-		padding: $s3 $s6;
-		background: $accent;
-		color: $color-on-accent;
-		border: none;
-		border-radius: $radius-md;
-		font-size: $text-base;
-		font-weight: 600;
-		cursor: pointer;
-		align-self: flex-start;
-		min-height: 44px;
-		transition: background $transition;
-
-		&:hover:not(:disabled) {
-			background: $accent-hover;
-		}
-		&:disabled {
-			opacity: 0.5; cursor: not-allowed;
-		}
-	}
-
-	&-secondary {
-		padding: $s3 $s6;
-		background: transparent;
-		color: $text-muted;
-		border: 1px solid $border;
-		border-radius: $radius-md;
-		font-size: $text-base;
-		cursor: pointer;
-		min-height: 44px;
-		transition: color $transition, border-color $transition;
-
-		&:hover {
-			color: $text; border-color: $text-muted;
-		}
-	}
-}
 
 .create {
 	&-form {

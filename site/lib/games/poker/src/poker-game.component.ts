@@ -1,12 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import type { Card, PokerGameState } from '@gandogames/common/poker';
+import type { PokerGameState } from '@gandogames/common/poker';
+import { IonButton, IonInput } from '@ionic/angular/standalone';
+import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { GameComponent } from '@gandogames/lib/game-registry';
-import { MIN_RAISE, SUIT_SYMBOL } from './poker.models';
+import { MIN_RAISE } from './poker.models';
 
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [],
+	imports: [FrenchCardComponent, IonButton, IonInput],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })
@@ -72,12 +74,8 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		return gs.players.filter(p => !p.folded);
 	});
 
-	protected formatCard(card: Card): string {
-		return `${card.rank}${SUIT_SYMBOL[card.suit]}`;
-	}
-
 	protected updateRaiseAmount(event: Event): void {
-		const val = parseInt((event.target as HTMLInputElement).value, 10);
+		const val = parseInt((event as CustomEvent<{ value: string | null | undefined }>).detail?.value ?? '', 10);
 		if (!isNaN(val) && val > 0) this.raiseAmount.set(val);
 	}
 

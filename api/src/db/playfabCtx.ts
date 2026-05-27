@@ -1,5 +1,4 @@
 import { GameState, GameType, RoomData } from "@gandogames/common/api";
-import { MorraGameState } from "@gandogames/common/morra";
 import { PankovGameState } from "@gandogames/common/pankov";
 import { PokerGameState } from "@gandogames/common/poker";
 import { pfPromise, PlayFabServer } from "..";
@@ -105,7 +104,6 @@ export class PlayfabCtx {
 	});
 
 	public static readonly game: Record<GameType, PlayFabEntity<GameState>> = {
-		'morra': new PlayFabEntity<MorraGameState>('MORRA_GAMES_INDEX'),
 		'pankov': new PlayFabEntity<PankovGameState>('PANKOV_GAMES_INDEX'),
 		'poker': new PlayFabEntity<PokerGameState>('POKER_GAMES_INDEX'),
 	}

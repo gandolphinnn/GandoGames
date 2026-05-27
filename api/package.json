@@ -29,7 +29,6 @@
 		},
 		"moduleNameMapper": {
 			"^@gandogames/common/api$": "<rootDir>/../common/index",
-			"^@gandogames/common/morra$": "<rootDir>/../common/games/morra",
 			"^@gandogames/common/pankov$": "<rootDir>/../common/games/pankov"
 		}
 	},

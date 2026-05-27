@@ -22,14 +22,6 @@ export interface GameDescriptor {
 
 export const GAME_REGISTRY: GameDescriptor[] = [
 	{
-		id: 'morra',
-		name: 'Morra',
-		icon: 'fa-solid fa-hand-fist',
-		description: 'Classic rock paper scissors — pick your hand and outlast your opponent.',
-		minPlayers: 2,
-		maxPlayers: 2,
-	},
-	{
 		id: 'pankov',
 		name: 'Pankov',
 		icon: 'fa-solid fa-dice',
@@ -39,9 +31,9 @@ export const GAME_REGISTRY: GameDescriptor[] = [
 	},
 	{
 		id: 'poker',
-		name: 'Poker',
+		name: 'Texas Hold\'em',
 		icon: 'fa-solid fa-heart',
-		description: 'Texas Hold\'em — bet, bluff, and outlast everyone at the table.',
+		description: 'Bet, bluff, and outlast everyone at the table.',
 		minPlayers: 2,
 		maxPlayers: 8,
 	},

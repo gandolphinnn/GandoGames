@@ -4,10 +4,6 @@ export const GAMES_CONFIG: Record<GameType, {
 	minPlayers: number,
 	maxPlayers: number,
 }> = {
-	'morra': {
-		minPlayers: 2,
-		maxPlayers: 2,
-	},
 	'pankov': {
 		minPlayers: 2,
 		maxPlayers: 6,

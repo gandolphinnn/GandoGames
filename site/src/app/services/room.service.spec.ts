@@ -11,7 +11,7 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 	return {
 		id: 'room-1',
 		hostId: 'player-1',
-		game: 'morra',
+		game: 'pankov',
 		players: [{ id: 'player-1', name: 'Alice' }],
 		kickedPlayers: [],
 		phase: 'waiting',
@@ -95,8 +95,8 @@ describe('RoomService', () => {
 		it('calls POST /rooms/create with game and ticket', async () => {
 			const room = makeRoom();
 			backendSpy.post.and.returnValue(Promise.resolve(room));
-			const result = await service.createRoom('morra');
-			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/create', { sessionTicket: 'ticket-abc', game: 'morra' });
+			const result = await service.createRoom('pankov');
+			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/create', { sessionTicket: 'ticket-abc', game: 'pankov' });
 			expect(result).toEqual(room);
 		});
 	});

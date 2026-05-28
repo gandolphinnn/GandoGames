@@ -26,24 +26,22 @@
 				</div>
 			</div>
 
-			@if (!u.isGuest) {
-				<div class="icon-picker">
-					<p class="icon-picker-title">Icon</p>
-					<div class="icon-grid">
-						@for (icon of icons; track icon.id) {
-							<button
-								class="icon-btn"
-								[class.selected]="u.player.icon === icon.id"
-								type="button"
-								[attr.aria-label]="icon.label"
-								(click)="setIcon(icon.id)"
-							>
-								<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
-							</button>
-						}
-					</div>
+			<div class="icon-picker">
+				<p class="icon-picker-title">Icon</p>
+				<div class="icon-grid">
+					@for (icon of icons; track icon.id) {
+						<button
+							class="icon-btn"
+							[class.selected]="u.player.icon === icon.id"
+							type="button"
+							[attr.aria-label]="icon.label"
+							(click)="setIcon(icon.id)"
+						>
+							<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
+						</button>
+					}
 				</div>
-			}
+			</div>
 
 			<ion-select (ionChange)="setLanguage($event.detail.value)">
 				@for (lang of languages; track lang) {

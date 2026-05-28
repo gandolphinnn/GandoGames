@@ -1,5 +1,5 @@
-import { AuthResponse, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/common/api';
-import { InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerPublicFunction } from '../..';
+import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/common/api';
+import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {
 	PlayFabId?: string;
@@ -94,6 +94,12 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 	return toAuthResponse(result, body.username);
 };
 
+const checkInner: InnerFunction<BaseRequest, AuthResponse> = async (body, _notifier, player) => ({
+	player,
+	sessionTicket: body.sessionTicket,
+});
+
 registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
 registerPublicFunction('auth_login', 'auth/login', loginInner);
 registerPublicFunction('auth_register', 'auth/register', registerInner);
+registerFunction('auth_check', 'auth/check', checkInner);

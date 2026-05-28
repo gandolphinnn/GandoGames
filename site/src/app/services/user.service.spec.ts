@@ -32,13 +32,20 @@ describe('UserService', () => {
 		toastSpy = jasmine.createSpyObj('ToastService', ['warning']);
 	});
 
-	describe('with empty localStorage', () => {
-		let service: UserService;
-		beforeEach(() => { service = createService(); });
-
+	describe('initial state', () => {
 		it('starts with null user and isLoggedIn false', () => {
+			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			const service = createService();
 			expect(service.user()).toBeNull();
 			expect(service.isLoggedIn()).toBeFalse();
+		});
+	});
+
+	describe('auth methods', () => {
+		let service: UserService;
+		beforeEach(() => {
+			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			service = createService();
 		});
 
 		it('login() calls backend and sets user with isGuest false', async () => {
@@ -50,10 +57,11 @@ describe('UserService', () => {
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 
-		it('login() persists session to localStorage', async () => {
+		it('login() persists only the session ticket to localStorage', async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.login('alice@example.com', 'pw');
-			expect(localStorage.getItem('gg_auth')).not.toBeNull();
+			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
+			expect(localStorage.getItem('gg_auth')).toBeNull();
 		});
 
 		it('register() sets user with isGuest false', async () => {
@@ -63,10 +71,11 @@ describe('UserService', () => {
 			expect(service.user()?.isGuest).toBeFalse();
 		});
 
-		it('loginAsGuest() sets user with isGuest true', async () => {
+		it('loginAsGuest() sets user with isGuest true and persists ticket', async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.loginAsGuest();
 			expect(service.user()?.isGuest).toBeTrue();
+			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
 		});
 
 		it('loginAsGuest() creates a guest ID and reuses it across calls', async () => {
@@ -79,16 +88,16 @@ describe('UserService', () => {
 			await service.loginAsGuest();
 			expect(localStorage.getItem('gg_guest_id')).toBe(firstId);
 
-			const [, body] = backendSpy.post.calls.mostRecent().args as [string, any];
-			expect(body.customId).toBe(firstId);
+			const [, body] = backendSpy.post.calls.mostRecent().args as [string, unknown];
+			expect((body as { customId: string }).customId).toBe(firstId);
 		});
 
-		it('logout() clears user signal and removes from localStorage', async () => {
+		it('logout() clears user signal and removes session ticket', async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.login('alice@example.com', 'pw');
 			service.logout();
 			expect(service.user()).toBeNull();
-			expect(localStorage.getItem('gg_auth')).toBeNull();
+			expect(localStorage.getItem('gg_session_ticket')).toBeNull();
 		});
 
 		it('updateProfileData({ icon }) optimistically updates the icon in the session', async () => {
@@ -100,16 +109,45 @@ describe('UserService', () => {
 		});
 	});
 
-	describe('with stored session in localStorage', () => {
-		let service: UserService;
-
-		beforeEach(() => {
-			localStorage.setItem('gg_auth', JSON.stringify({ ...MOCK_RESPONSE, isGuest: false }));
-			service = createService();
+	describe('init() — session restore', () => {
+		it('does not call auth/check when no ticket is stored', async () => {
+			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			const service = createService();
+			await service.init();
+			expect(backendSpy.post).not.toHaveBeenCalled();
+			expect(service.user()).toBeNull();
 		});
 
-		it('loads user from localStorage on construction', () => {
+		it('calls auth/check with stored ticket and sets user on success', async () => {
+			localStorage.setItem('gg_session_ticket', 'ticket-123');
+			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			const service = createService();
+			await service.init();
+			expect(backendSpy.post).toHaveBeenCalledWith('/auth/check', { sessionTicket: 'ticket-123' });
 			expect(service.user()?.sessionTicket).toBe('ticket-123');
+			expect(service.isLoggedIn()).toBeTrue();
+		});
+
+		it('removes the ticket and leaves user null if auth/check fails and no guestId exists', async () => {
+			localStorage.setItem('gg_session_ticket', 'ticket-123');
+			backendSpy.post.and.returnValue(Promise.reject(new Error('Invalid session')));
+			const service = createService();
+			await service.init();
+			expect(service.user()).toBeNull();
+			expect(localStorage.getItem('gg_session_ticket')).toBeNull();
+		});
+
+		it('falls back to guestLogin if auth/check fails but guestId is stored', async () => {
+			localStorage.setItem('gg_session_ticket', 'expired-ticket');
+			localStorage.setItem('gg_guest_id', 'guest-uuid-123');
+			backendSpy.post.and.callFake((url: string) => {
+				if (url === '/auth/check') return Promise.reject(new Error('Expired'));
+				return Promise.resolve(MOCK_RESPONSE);
+			});
+			const service = createService();
+			await service.init();
+			expect(backendSpy.post).toHaveBeenCalledWith('/auth/guestLogin', { customId: 'guest-uuid-123' });
+			expect(service.user()?.isGuest).toBeTrue();
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 	});

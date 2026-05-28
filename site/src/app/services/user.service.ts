@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { AuthResponse, LangCode, ProfileData, ProfileUpdateRequest, Theme } from '@gandogames/common/api';
+import { AuthResponse, GuestLoginRequest, ProfileData, ProfileUpdateRequest, Theme } from '@gandogames/common/api';
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
 import { ToastService } from './toast.service';
@@ -8,46 +8,49 @@ export interface AuthUser extends AuthResponse {
 	isGuest: boolean;
 }
 
-const SESSION_KEY = 'gg_auth';
-const GUEST_ID_KEY = 'gg_guest_id';
-const THEME_KEY = 'gg_theme';
-
+const PROFILE_UPDATE_DEBOUNCE = 1000;
 @Injectable({ providedIn: 'root' })
 export class UserService {
 	private readonly backend = inject(BackendService);
 	private readonly storage = inject(StorageService);
 	private readonly toast = inject(ToastService);
 
-	private readonly _user = signal<AuthUser | null>(this.storage.getJson<AuthUser>(SESSION_KEY));
+	private readonly _user = signal<AuthUser | null>(null);
 	public readonly user = this._user.asReadonly();
 	public readonly isLoggedIn = computed(() => this._user() !== null);
-
-	// Theme derived from the user's session, falling back to localStorage for pre-login
-	public readonly theme = computed<Theme>(() =>
-		this._user()?.player.theme ?? (this.storage.getString(THEME_KEY) === 'light' ? 'light' : 'dark')
-	);
+	
+	public readonly theme = computed(() => this.user()?.player.theme || 'dark');
 	public readonly isDarkTheme = computed(() => this.theme() !== 'light');
 
-	private lastToggle = 0;
-	private loadedTicket: string | null = null;
+	private updateTimer: ReturnType<typeof setTimeout> | null = null;
+	private pendingUpdate: Partial<ProfileData> | null = null;
+	private preUpdateSnapshot: AuthUser | null = null;
 
+	//#region Init
 	constructor() {
-		// Apply theme immediately before effects run to avoid flash
-		this.applyThemeToDom(this.theme());
-
-		effect(() => {
-			this.applyThemeToDom(this.theme());
-			this.storage.setString(THEME_KEY, this.theme());
-		});
-
-		effect(() => {
-			const user = this._user();
-			if (user && !user.isGuest && user.sessionTicket !== this.loadedTicket) {
-				this.loadedTicket = user.sessionTicket;
-				void this.loadProfileFromBackend(user.sessionTicket);
-			}
-		});
+		effect(() => this.applyThemeToDom(this.theme()));
 	}
+
+	public async init(): Promise<void> {
+		try {
+			const ticket = this.storage.getString('sessionTicket');
+			if (!ticket) return; //! If there is not the sesssion ticket, don't log automatically as guest.
+
+			const result = await this.backend.post<AuthResponse>('/auth/check', { sessionTicket: ticket });
+			this.setSession({ ...result, isGuest: false });
+		} catch {
+			this.storage.remove('sessionTicket');
+			const guestId = this.storage.getString('guestId');
+			if (!guestId) return;
+			try {
+				const result = await this.backend.post<AuthResponse>('/auth/guestLogin', { customId: guestId });
+				this.setSession({ ...result, isGuest: true });
+			} catch {
+				this.storage.remove('guestId');
+			}
+		}
+	}
+	//#endregion Init
 
 	//#region Auth
 	public async login(email: string, password: string): Promise<void> {
@@ -61,34 +64,45 @@ export class UserService {
 	}
 
 	public async loginAsGuest(): Promise<void> {
-		const customId = this.getOrCreateGuestId();
-		const result = await this.backend.post<AuthResponse>('/auth/guestLogin', { customId });
+		let customId = this.storage.getString('guestId');
+		if (!customId) {
+			customId = crypto.randomUUID();
+			this.storage.setString('guestId', customId);
+		}
+		const request: GuestLoginRequest = { customId };
+		const result = await this.backend.post<AuthResponse>('/auth/guestLogin', request);
 		this.setSession({ ...result, isGuest: true });
 	}
 
 	public logout(): void {
 		this._user.set(null);
-		this.storage.remove(SESSION_KEY);
+		this.storage.remove('sessionTicket');
 	}
 	//#endregion Auth
 
-	public toggleTheme(): void {
-		const now = Date.now();
-		if (now - this.lastToggle < 500) return;
-		this.lastToggle = now;
-		void this.updateProfileData({ theme: this.isDarkTheme() ? 'light' : 'dark' });
-	}
-
-	public async updateProfileData(data: Partial<ProfileData>): Promise<void> {
+	public updateProfileData(data: Partial<ProfileData>): void {
 		const user = this._user();
 		if (!user) return;
-		this.setSession({ ...user, player: { ...user.player, ...data } });
+		if (!this.pendingUpdate) this.preUpdateSnapshot = user;
+		this.pendingUpdate = { ...this.pendingUpdate, ...data };
+		this._user.set({ ...user, player: { ...user.player, ...data } });
+		if (this.updateTimer !== null) clearTimeout(this.updateTimer);
+		this.updateTimer = setTimeout(() => void this.flushProfileUpdate(), PROFILE_UPDATE_DEBOUNCE);
+	}
+
+	private async flushProfileUpdate(): Promise<void> {
+		this.updateTimer = null;
+		const snapshot = { ... this.preUpdateSnapshot!};
+		const data = { ... this.pendingUpdate!};
+		this.pendingUpdate = null;
+		this.preUpdateSnapshot = null;
 		try {
-			const request = { sessionTicket: user.sessionTicket, ...data } as ProfileUpdateRequest;
+			const request = { sessionTicket: snapshot.sessionTicket, ...data } as ProfileUpdateRequest;
 			const result = await this.backend.post<ProfileData>('/profile/update', request);
-			this.setSession({ ...user, player: { ...user.player, ...result } });
+			const current = this._user();
+			if (current) this._user.set({ ...current, player: { ...current.player, ...result } });
 		} catch (err) {
-			this.setSession(user);
+			this._user.set(snapshot);
 			this.toast.warning('Failed to update profile');
 			console.error('Profile update error:', err);
 		}
@@ -103,16 +117,7 @@ export class UserService {
 
 	private setSession(user: AuthUser): void {
 		this._user.set(user);
-		this.storage.setJson(SESSION_KEY, user);
-	}
-
-	private getOrCreateGuestId(): string {
-		let id = this.storage.getString(GUEST_ID_KEY);
-		if (!id) {
-			id = crypto.randomUUID();
-			this.storage.setString(GUEST_ID_KEY, id);
-		}
-		return id;
+		this.storage.setString('sessionTicket', user.sessionTicket);
 	}
 
 	private applyThemeToDom(theme: Theme): void {
@@ -120,16 +125,6 @@ export class UserService {
 			document.documentElement.setAttribute('data-theme', 'light');
 		} else {
 			document.documentElement.removeAttribute('data-theme');
-		}
-	}
-
-	private async loadProfileFromBackend(sessionTicket: string): Promise<void> {
-		try {
-			const profile = await this.backend.post<ProfileData>('/profile/get', { sessionTicket });
-			const user = this._user();
-			if (user) this.setSession({ ...user, player: { ...user.player, ...profile } });
-		} catch {
-			// keep current values on failure
 		}
 	}
 }

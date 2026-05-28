@@ -30,7 +30,7 @@ export class ProfileComponent {
 	}
 
 	public toggleTheme(): void {
-		this.userService.toggleTheme();
+		void this.userService.updateProfileData({ theme: this.userService.isDarkTheme() ? 'light' : 'dark' });
 	}
 
 	public setIcon(iconId: IconType): void {

@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
@@ -7,7 +7,7 @@ import { RoomService } from '@gandogames/services/room.service';
 @Component({
 	selector: 'gg-room-new',
 	host: { class: 'ion-page' },
-	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonIcon],
+	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonIcon, RouterLink],
 	templateUrl: './room-new.component.html',
 	styleUrl: './room-new.component.scss',
 })
@@ -38,7 +38,4 @@ export class RoomNewComponent {
 		}
 	}
 
-	public cancel(): void {
-		void this.router.navigate(['/play']);
-	}
 }

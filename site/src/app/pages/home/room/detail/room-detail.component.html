@@ -29,18 +29,11 @@
 	} @else {
 		<div class="room-detail">
 
-			@if (!room() && !error()) {
+			@if (!room()) {
 				<p class="status-msg">Loading room…</p>
-			} @else if (!room()) {
-				<div class="room-not-found">
-					<p class="error-msg">Room not found.</p>
-					<ion-button fill="outline" [routerLink]="['/play']">
-						<ion-icon name="arrow-back" slot="start" /> Back
-					</ion-button>
-				</div>
 			} @else {
 				<div class="room-info">
-					<span class="room-game-icon"><ion-icon [name]="gameInfo()?.icon" /></span>
+					<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
 					<span class="room-game-name">{{ gameInfo()?.name }}</span>
 					<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
 				</div>

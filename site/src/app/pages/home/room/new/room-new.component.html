@@ -2,11 +2,11 @@
 	<ion-toolbar>
 		<ion-buttons slot="start">
 			<ion-menu-button />
+			<ion-button [routerLink]="['/play']" fill="clear">
+				<ion-icon name="arrow-back" slot="icon-only" />
+			</ion-button>
 		</ion-buttons>
 		<ion-title>New Room</ion-title>
-		<ion-buttons slot="end">
-			<ion-button fill="clear" (click)="cancel()">Cancel</ion-button>
-		</ion-buttons>
 	</ion-toolbar>
 </ion-header>
 
@@ -20,7 +20,7 @@
 						[class.selected]="selectedGameId() === game.id"
 						(click)="select(game.id)"
 					>
-						<ion-icon class="game-card-icon" [name]="game.icon" />
+						<i [class]="'game-card-icon ' + game.icon"></i>
 						<span class="game-card-name">{{ game.name }}</span>
 						<span class="game-card-desc">{{ game.description }}</span>
 						<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>

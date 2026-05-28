@@ -4,6 +4,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: $s2;
+	padding-inline-start: $s2;
 	text-decoration: none;
 	color: $text;
 	font-weight: 600;
@@ -15,35 +16,6 @@
 	width: auto;
 }
 
-.menu-user {
-	display: flex;
-	align-items: center;
-	gap: $s3;
-	padding: $s4;
-	border-bottom: 1px solid $border;
-	margin-bottom: $s2;
-}
-
-.menu-user-avatar {
-	flex-shrink: 0;
-}
-
-.menu-user-info {
-	display: flex;
-	flex-direction: column;
-	gap: $s1;
-	min-width: 0;
-}
-
-.menu-user-name {
-	font-weight: 600;
-	font-size: $text-sm;
-	color: $text;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
 .menu-user-badge {
 	display: inline-block;
 	font-size: 0.65em;
@@ -53,6 +25,17 @@
 	color: $text-muted;
 	border-radius: $radius-sm;
 	padding: 1px 5px;
+}
+
+.menu-user-chevron {
+	color: $text-muted;
+	font-size: 1rem;
+}
+
+ion-icon[slot="start"],
+gg-player-avatar[slot="start"] {
+	width: 36px;
+	margin-inline-end: $s2;
 }
 
 .menu-section-label {

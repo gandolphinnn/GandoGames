@@ -4,7 +4,6 @@ import { provideRouter } from '@angular/router';
 import { provideIonicAngular } from '@ionic/angular/standalone';
 
 import { routes } from './app.routes';
-import { StorageService } from './services/storage.service';
 import { UserService } from './services/user.service';
 
 export const appConfig: ApplicationConfig = {

@@ -2,8 +2,9 @@ import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import {
-	IonApp, IonContent, IonHeader, IonIcon, IonItem, IonLabel,
-	IonList, IonMenu, IonRouterOutlet, IonTitle, IonToolbar,
+	IonApp, IonButton, IonButtons, IonContent, IonHeader,
+	IonIcon, IonImg, IonItem, IonLabel, IonList, IonMenu,
+	IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar,
 	MenuController,
 } from '@ionic/angular/standalone';
 
@@ -14,13 +15,16 @@ import { RoomService } from '@gandogames/services/room.service';
 import { ToastComponent } from './components/toast/toast.component';
 import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
 
+const ION_COMPONENTS = [
+	IonApp, IonButton, IonButtons, IonContent, IonHeader,
+	IonIcon, IonImg, IonItem, IonLabel, IonList, IonMenu,
+	IonMenuToggle, IonRouterOutlet, IonTitle, IonToolbar,
+];
+
 @Component({
 	selector: 'gg-app',
 	imports: [
-		RouterLink, RouterLinkActive,
-		IonApp, IonMenu, IonHeader, IonToolbar, IonTitle,
-		IonContent, IonList, IonItem, IonLabel, IonIcon,
-		IonRouterOutlet,
+		RouterLink, RouterLinkActive, ...ION_COMPONENTS,
 		ToastComponent, PlayerAvatarComponent,
 	],
 	templateUrl: './app.component.html',

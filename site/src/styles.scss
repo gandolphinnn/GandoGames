@@ -11,7 +11,7 @@
 	--text-muted: #9e8060;
 	--border-color: rgba(180, 110, 40, 0.12);
 	--shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
-	--hover-overlay: rgba(255, 200, 100, 0.06);
+	--hover-overlay: rgba(255, 200, 100, 0.10);
 	--accent-tint: rgba(200, 130, 30, 0.04);
 	--accent-subtle: rgba(200, 130, 30, 0.08);
 	--accent-muted: rgba(200, 130, 30, 0.12);
@@ -31,7 +31,7 @@
 	--text-muted: #9e8060;
 	--border-color: rgba(180, 110, 40, 0.12);
 	--shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
-	--hover-overlay: rgba(255, 200, 100, 0.06);
+	--hover-overlay: rgba(255, 200, 100, 0.10);
 	--accent-tint: rgba(200, 130, 30, 0.04);
 	--accent-subtle: rgba(200, 130, 30, 0.08);
 	--accent-muted: rgba(200, 130, 30, 0.12);
@@ -51,7 +51,7 @@
 	--text-muted: #7c6040;
 	--border-color: rgba(120, 75, 25, 0.18);
 	--shadow-card: 0 4px 32px rgba(80, 40, 10, 0.1);
-	--hover-overlay: rgba(0, 0, 0, 0.05);
+	--hover-overlay: rgba(0, 0, 0, 0.08);
 	--accent-tint: rgba(139, 90, 43, 0.04);
 	--accent-subtle: rgba(139, 90, 43, 0.08);
 	--accent-muted: rgba(139, 90, 43, 0.12);
@@ -157,10 +157,12 @@ body {
 ion-item {
 	--color: var(--text);
 	--background: transparent;
-	--border-color: var(--border-color);
 	--background-hover: var(--hover-overlay);
+	--background-hover-opacity: 1;
 	--background-activated: var(--hover-overlay);
+	--background-activated-opacity: 1;
 	--background-focused: var(--hover-overlay);
+	--background-focused-opacity: 1;
 	--ripple-color: var(--accent);
 }
 

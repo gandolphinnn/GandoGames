@@ -95,8 +95,8 @@ export class RoomDetailComponent implements OnInit {
 			if (room.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
 				void this.router.navigate(['/play']);
 			}
-		} catch (e) {
-			this.error.set((e as Error).message);
+		} catch {
+			void this.router.navigate(['/play']);
 		}
 	}
 

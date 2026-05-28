@@ -1,9 +1,11 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
+import { IonIcon } from '@ionic/angular/standalone';
 import { GameType } from '@gandogames/common/api';
 import { RoomService } from '@gandogames/services/room.service';
 
 @Component({
 	selector: 'gg-invite-modal',
+	imports: [IonIcon],
 	templateUrl: './invite-modal.component.html',
 	styleUrl: './invite-modal.component.scss',
 })

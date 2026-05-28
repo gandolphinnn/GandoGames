@@ -1,34 +1,42 @@
-<div class="create-page">
-	<div class="create-form">
-		<div class="create-header">
-			<h2 class="form-title">New Room</h2>
-			<p class="form-subtitle">Pick a game to play</p>
-		</div>
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>New Room</ion-title>
+		<ion-buttons slot="end">
+			<ion-button fill="clear" (click)="cancel()">Cancel</ion-button>
+		</ion-buttons>
+	</ion-toolbar>
+</ion-header>
 
-		<div class="game-grid">
-			@for (game of allGames; track game.id) {
-				<button
-					class="game-card"
-					[class.selected]="selectedGameId() === game.id"
-					(click)="select(game.id)"
-				>
-					<i [class]="'game-card-icon fa-fw ' + game.icon"></i>
-					<span class="game-card-name">{{ game.name }}</span>
-					<span class="game-card-desc">{{ game.description }}</span>
-					<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>
-				</button>
+<ion-content [fullscreen]="true">
+	<div class="create-page">
+		<div class="create-form">
+			<div class="game-grid">
+				@for (game of allGames; track game.id) {
+					<button
+						class="game-card"
+						[class.selected]="selectedGameId() === game.id"
+						(click)="select(game.id)"
+					>
+						<ion-icon class="game-card-icon" [name]="game.icon" />
+						<span class="game-card-name">{{ game.name }}</span>
+						<span class="game-card-desc">{{ game.description }}</span>
+						<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>
+					</button>
+				}
+			</div>
+
+			@if (error()) {
+				<p class="error-msg">{{ error() }}</p>
 			}
-		</div>
 
-		@if (error()) {
-			<p class="error-msg">{{ error() }}</p>
-		}
-
-		<div class="form-actions">
-			<ion-button fill="outline" (click)="cancel()">Cancel</ion-button>
-			<ion-button [disabled]="!selectedGameId() || loading()" (click)="create()">
-				{{ loading() ? 'Creating…' : 'Create Room' }}
-			</ion-button>
+			<div class="form-actions">
+				<ion-button [disabled]="!selectedGameId() || loading()" (click)="create()">
+					{{ loading() ? 'Creating…' : 'Create Room' }}
+				</ion-button>
+			</div>
 		</div>
 	</div>
-</div>
+</ion-content>

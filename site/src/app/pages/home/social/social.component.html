@@ -1,38 +1,47 @@
-<div class="social-page">
-	<div class="social-content">
-		<h1 class="social-title">Social</h1>
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>Social</ion-title>
+	</ion-toolbar>
+</ion-header>
 
-		<div class="social-section">
-			<h2 class="section-title">
-				<i class="fa-solid fa-user-plus"></i>
-				Friend Requests
-			</h2>
-			<div class="empty-state">
-				<i class="fa-solid fa-inbox empty-state-icon"></i>
-				<p class="empty-state-text">No pending friend requests</p>
+<ion-content [fullscreen]="true">
+	<div class="social-page">
+		<div class="social-content">
+			<div class="social-section">
+				<h2 class="section-title">
+					<ion-icon name="person-add" />
+					Friend Requests
+				</h2>
+				<div class="empty-state">
+					<ion-icon name="file-tray" class="empty-state-icon" />
+					<p class="empty-state-text">No pending friend requests</p>
+				</div>
 			</div>
-		</div>
 
-		<div class="social-section">
-			<h2 class="section-title">
-				<i class="fa-solid fa-envelope"></i>
-				Invites
-			</h2>
-			<div class="empty-state">
-				<i class="fa-solid fa-inbox empty-state-icon"></i>
-				<p class="empty-state-text">No pending invites</p>
+			<div class="social-section">
+				<h2 class="section-title">
+					<ion-icon name="mail" />
+					Invites
+				</h2>
+				<div class="empty-state">
+					<ion-icon name="file-tray" class="empty-state-icon" />
+					<p class="empty-state-text">No pending invites</p>
+				</div>
 			</div>
-		</div>
 
-		<div class="social-section">
-			<h2 class="section-title">
-				<i class="fa-solid fa-users"></i>
-				Friends
-			</h2>
-			<div class="empty-state">
-				<i class="fa-solid fa-user-group empty-state-icon"></i>
-				<p class="empty-state-text">No friends yet</p>
+			<div class="social-section">
+				<h2 class="section-title">
+					<ion-icon name="people" />
+					Friends
+				</h2>
+				<div class="empty-state">
+					<ion-icon name="people" class="empty-state-icon" />
+					<p class="empty-state-text">No friends yet</p>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+</ion-content>

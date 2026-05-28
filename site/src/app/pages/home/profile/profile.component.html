@@ -1,77 +1,88 @@
-@if (user(); as u) {
-	<div class="profile-page">
-		<div class="profile-card">
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>Profile</ion-title>
+	</ion-toolbar>
+</ion-header>
 
-			<div class="profile-avatar-wrap">
-				<gg-player-avatar class="profile-avatar" [player]="u.player" />
-			</div>
+<ion-content [fullscreen]="true">
+	@if (user(); as u) {
+		<div class="profile-page">
+			<div class="profile-card">
 
-			<div class="profile-header">
-				<h1 class="profile-title">{{ u.player.name }}</h1>
-				@if (u.isGuest) {
-					<span class="profile-badge">Guest</span>
-				}
-			</div>
-
-			<div class="profile-info">
-				<div class="info-row">
-					<span class="info-label">Appearance</span>
-					<button class="theme-btn" (click)="toggleTheme()">
-						@if (isDark()) {
-							<i class="fa-solid fa-moon"></i> Dark
-						} @else {
-							<i class="fa-solid fa-sun"></i> Light
-						}
-					</button>
+				<div class="profile-avatar-wrap">
+					<gg-player-avatar class="profile-avatar" [player]="u.player" />
 				</div>
-			</div>
 
-			<div class="icon-picker">
-				<p class="icon-picker-title">Icon</p>
-				<div class="icon-grid">
-					@for (icon of icons; track icon.id) {
-						<button
-							class="icon-btn"
-							[class.selected]="u.player.icon === icon.id"
-							type="button"
-							[attr.aria-label]="icon.label"
-							(click)="setIcon(icon.id)"
-						>
-							<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
-						</button>
+				<div class="profile-header">
+					<h1 class="profile-title">{{ u.player.name }}</h1>
+					@if (u.isGuest) {
+						<span class="profile-badge">Guest</span>
 					}
 				</div>
-			</div>
 
-			<ion-select (ionChange)="setLanguage($event.detail.value)">
-				@for (lang of languages; track lang) {
-					<ion-select-option [value]="lang.value">{{ lang.text }}</ion-select-option>
-				}
-			</ion-select>
-
-			<ion-button color="danger" expand="block" type="button" (click)="logout()">
-				<i class="fa-solid fa-sign-out-alt" slot="start"></i> Log out
-			</ion-button>
-
-			<div class="danger-zone">
-				<p class="danger-zone-title">Danger zone</p>
-				@if (!confirmingDelete()) {
-					<ion-button fill="outline" color="danger" expand="block" type="button" (click)="requestDelete()">
-						<i class="fa-solid fa-trash" slot="start"></i> Delete account
-					</ion-button>
-				} @else {
-					<p class="danger-zone-warn">This will permanently delete your account. This cannot be undone.</p>
-					<div class="danger-zone-actions">
-						<ion-button color="danger" type="button" [disabled]="loading()" (click)="confirmDelete()">
-							<i class="fa-solid fa-trash" slot="start"></i> {{ loading() ? 'Deleting…' : 'Yes, delete' }}
-						</ion-button>
-						<ion-button fill="clear" type="button" [disabled]="loading()" (click)="cancelDelete()">
-							Cancel
-						</ion-button>
+				<div class="profile-info">
+					<div class="info-row">
+						<span class="info-label">Appearance</span>
+						<button class="theme-btn" (click)="toggleTheme()">
+							@if (isDark()) {
+								<ion-icon name="moon" /> Dark
+							} @else {
+								<ion-icon name="sunny" /> Light
+							}
+						</button>
 					</div>
-				}
-			</div>
+				</div>
 
+				<div class="icon-picker">
+					<p class="icon-picker-title">Icon</p>
+					<div class="icon-grid">
+						@for (icon of icons; track icon.id) {
+							<button
+								class="icon-btn"
+								[class.selected]="u.player.icon === icon.id"
+								type="button"
+								[attr.aria-label]="icon.label"
+								(click)="setIcon(icon.id)"
+							>
+								<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
+							</button>
+						}
+					</div>
+				</div>
+
+				<ion-select (ionChange)="setLanguage($event.detail.value)">
+					@for (lang of languages; track lang) {
+						<ion-select-option [value]="lang.value">{{ lang.text }}</ion-select-option>
+					}
+				</ion-select>
+
+				<ion-button color="danger" expand="block" type="button" (click)="logout()">
+					<ion-icon name="log-out" slot="start" /> Log out
+				</ion-button>
+
+				<div class="danger-zone">
+					<p class="danger-zone-title">Danger zone</p>
+					@if (!confirmingDelete()) {
+						<ion-button fill="outline" color="danger" expand="block" type="button" (click)="requestDelete()">
+							<ion-icon name="trash" slot="start" /> Delete account
+						</ion-button>
+					} @else {
+						<p class="danger-zone-warn">This will permanently delete your account. This cannot be undone.</p>
+						<div class="danger-zone-actions">
+							<ion-button color="danger" type="button" [disabled]="loading()" (click)="confirmDelete()">
+								<ion-icon name="trash" slot="start" /> {{ loading() ? 'Deleting…' : 'Yes, delete' }}
+							</ion-button>
+							<ion-button fill="clear" type="button" [disabled]="loading()" (click)="cancelDelete()">
+								Cancel
+							</ion-button>
+						</div>
+					}
+				</div>
+
+			</div>
 		</div>
-	</div>
-}
+	}
+</ion-content>

@@ -1,6 +1,19 @@
-<main class="about-main">
-	<h1>About GandoGames</h1>
-	<p>A small collection of multiplayer party games playable in your browser.</p>
-	<p>Built with Angular, Azure Functions, and PlayFab.</p>
-	<a class="github-link" href="https://github.com/gandolphinnn/GandoGames" target="_blank" rel="noopener">GitHub <i class="fa-solid fa-arrow-right"></i></a>
-</main>
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>About</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+	<main class="about-main">
+		<h1>About GandoGames</h1>
+		<p>A small collection of multiplayer party games playable in your browser.</p>
+		<p>Built with Angular, Azure Functions, and PlayFab.</p>
+		<a class="github-link" href="https://github.com/gandolphinnn/GandoGames" target="_blank" rel="noopener">
+			GitHub <ion-icon name="arrow-forward" />
+		</a>
+	</main>
+</ion-content>

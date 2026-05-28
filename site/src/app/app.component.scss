@@ -1,5 +1,113 @@
-:host {
+@use 'styles/variables' as *;
+
+.menu-brand {
+	display: inline-flex;
+	align-items: center;
+	gap: $s2;
+	text-decoration: none;
+	color: $text;
+	font-weight: 600;
+	font-size: $text-base;
+}
+
+.menu-brand-img {
+	height: 28px;
+	width: auto;
+}
+
+.menu-user {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+	padding: $s4;
+	border-bottom: 1px solid $border;
+	margin-bottom: $s2;
+}
+
+.menu-user-avatar {
+	flex-shrink: 0;
+}
+
+.menu-user-info {
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+	gap: $s1;
+	min-width: 0;
+}
+
+.menu-user-name {
+	font-weight: 600;
+	font-size: $text-sm;
+	color: $text;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.menu-user-badge {
+	display: inline-block;
+	font-size: 0.65em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	background: $color-neutral-subtle;
+	color: $text-muted;
+	border-radius: $radius-sm;
+	padding: 1px 5px;
+}
+
+.menu-section-label {
+	margin: 0;
+	padding: $s3 $s4 $s1;
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.menu-rooms {
+	border-top: 1px solid $border;
+	margin-top: $s2;
+	padding-top: $s1;
+}
+
+.menu-room-item {
+	display: flex;
+	align-items: center;
+	gap: $s2;
+	width: 100%;
+	padding: $s2 $s4;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	text-align: left;
+	min-height: 44px;
+	color: $text;
+	transition: background $transition;
+
+	&:hover {
+		background: $hover-overlay;
+	}
+}
+
+.menu-room-id {
+	font-family: monospace;
+	font-weight: 600;
+	font-size: $text-sm;
+}
+
+.menu-room-game {
+	flex: 1;
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+.menu-room-live {
+	font-size: 0.65em;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	background: $color-success;
+	color: #fff;
+	border-radius: $radius-sm;
+	padding: 1px 5px;
 }

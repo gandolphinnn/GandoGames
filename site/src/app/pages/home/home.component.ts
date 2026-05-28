@@ -1,13 +1,15 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
+import { IonRouterOutlet } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
 
 @Component({
 	selector: 'gg-home',
-	imports: [RouterOutlet],
+	host: { class: 'ion-page' },
+	imports: [IonRouterOutlet],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 })

@@ -2,7 +2,7 @@ import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonInput } from '@ionic/angular/standalone';
+import { IonIcon, IonInput } from '@ionic/angular/standalone';
 import { ChatMessage } from '@gandogames/common/api';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
@@ -11,7 +11,7 @@ import { SignalRService } from '@gandogames/services/signalr.service';
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [DatePipe, NgTemplateOutlet, FormsModule, IonInput],
+	imports: [DatePipe, NgTemplateOutlet, FormsModule, IonIcon, IonInput],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })

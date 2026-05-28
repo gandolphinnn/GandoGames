@@ -13,7 +13,7 @@ export const appConfig: ApplicationConfig = {
 		provideZoneChangeDetection({ eventCoalescing: true }),
 		provideRouter(routes),
 		provideHttpClient(),
-		provideIonicAngular({ mode: 'md' }),
+		provideIonicAngular(),
 		provideAppInitializer(async () => {
 			const user = inject(UserService);
 			await user.init();

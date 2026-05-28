@@ -3,7 +3,7 @@
 	<!-- ── Desktop panel ──────────────────────────────────────────────────── -->
 	<div class="chat-panel">
 		<div class="chat-header">
-			<i class="fa-solid fa-comments"></i>
+			<ion-icon name="chatbubbles" />
 			<span class="chat-header-title">Chat</span>
 		</div>
 		<ng-container *ngTemplateOutlet="body" />
@@ -11,7 +11,7 @@
 
 	<!-- ── Mobile FAB ─────────────────────────────────────────────────────── -->
 	<button class="chat-fab" (click)="toggle()" type="button" title="Open chat">
-		<i class="fa-solid fa-comments"></i>
+		<ion-icon name="chatbubbles" />
 		@if (unread() > 0) {
 			<span class="chat-badge">{{ unread() }}</span>
 		}
@@ -22,8 +22,8 @@
 		<div class="chat-backdrop" (click)="close()"></div>
 		<aside class="chat-drawer">
 			<div class="chat-drawer-header">
-				<i class="fa-solid fa-comments"></i> Room Chat
-				<button class="chat-close" (click)="close()" type="button"><i class="fa-solid fa-xmark"></i></button>
+				<ion-icon name="chatbubbles" /> Room Chat
+				<button class="chat-close" (click)="close()" type="button"><ion-icon name="close" /></button>
 			</div>
 			<ng-container *ngTemplateOutlet="body" />
 		</aside>
@@ -61,7 +61,7 @@
 				[disabled]="sending() || !text().trim()"
 				title="Send"
 			>
-				<i class="fa-solid fa-paper-plane"></i>
+				<ion-icon name="send" />
 			</button>
 		</div>
 	</ng-template>

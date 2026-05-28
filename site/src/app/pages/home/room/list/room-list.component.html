@@ -1,31 +1,42 @@
-<div class="rooms-page">
-	<div class="room-list-wrap">
-		@if (error()) {
-			<p class="status-msg error-msg">{{ error() }}</p>
-		}
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>Play</ion-title>
+	</ion-toolbar>
+</ion-header>
 
-		@if (filteredRooms().length === 0) {
-			<div class="empty-state">
-				<i class="fa-solid fa-gamepad empty-icon"></i>
-				<p class="empty-title">No open rooms</p>
-				<p class="empty-subtitle">Create one and invite your friends.</p>
+<ion-content [fullscreen]="true">
+	<div class="rooms-page">
+		<div class="room-list-wrap">
+			@if (error()) {
+				<p class="status-msg error-msg">{{ error() }}</p>
+			}
+
+			@if (filteredRooms().length === 0) {
+				<div class="empty-state">
+					<ion-icon name="game-controller" class="empty-icon" />
+					<p class="empty-title">No open rooms</p>
+					<p class="empty-subtitle">Create one and invite your friends.</p>
+					<ion-button (click)="goToCreate()">+ New Room</ion-button>
+				</div>
+			} @else {
+				<ul class="room-list">
+					@for (room of filteredRooms(); track room.id) {
+						<li class="room-card" (click)="navigateToRoom(room)">
+							<div class="room-card-info">
+								<span class="room-card-game">{{ gameLabel(room.game) }}</span>
+								<span class="room-card-players-list">{{ playerNames(room) }}</span>
+							</div>
+							<span class="room-card-count">
+								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
+							</span>
+						</li>
+					}
+				</ul>
 				<ion-button (click)="goToCreate()">+ New Room</ion-button>
-			</div>
-		} @else {
-			<ul class="room-list">
-				@for (room of filteredRooms(); track room.id) {
-					<li class="room-card" (click)="navigateToRoom(room)">
-						<div class="room-card-info">
-							<span class="room-card-game">{{ gameLabel(room.game) }}</span>
-							<span class="room-card-players-list">{{ playerNames(room) }}</span>
-						</div>
-						<span class="room-card-count">
-							{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
-						</span>
-					</li>
-				}
-			</ul>
-			<ion-button (click)="goToCreate()">+ New Room</ion-button>
-		}
+			}
+		</div>
 	</div>
-</div>
+</ion-content>

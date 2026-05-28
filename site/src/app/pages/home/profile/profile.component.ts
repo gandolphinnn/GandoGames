@@ -1,7 +1,7 @@
 import { Component, inject, signal, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IonButton, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonSelect, IonSelectOption, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GamePlayer, IconType, LangCode } from '@gandogames/common/api';
 import { LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
@@ -9,7 +9,8 @@ import { AuthUser, UserService } from '@gandogames/services/user.service';
 
 @Component({
 	selector: 'gg-profile',
-	imports: [PlayerAvatarComponent, IonButton, IonSelect, IonSelectOption],
+	host: { class: 'ion-page' },
+	imports: [PlayerAvatarComponent, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonIcon, IonSelect, IonSelectOption],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })

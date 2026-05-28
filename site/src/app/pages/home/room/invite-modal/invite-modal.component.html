@@ -5,7 +5,7 @@
 	<header class="modal-header">
 		<h2 class="modal-title">Invite to Room</h2>
 		<button class="modal-close" (click)="closed.emit()" title="Close">
-			<i class="fa-solid fa-xmark"></i>
+			<ion-icon name="close" />
 		</button>
 	</header>
 
@@ -16,12 +16,12 @@
 				<h3 class="section-label">Add a bot</h3>
 				<div class="player-row">
 					<div class="player-row-avatar bot-avatar">
-						<i class="fa-solid fa-robot"></i>
+						<ion-icon name="hardware-chip" />
 					</div>
 					<span class="player-row-name">Bot player</span>
 					<button class="btn-row-action" [disabled]="addingBot()" (click)="addBot()">
 						@if (addingBot()) {
-							<i class="fa-solid fa-spinner fa-spin"></i>
+							<ion-icon name="sync" class="spin" />
 						} @else {
 							Add
 						}

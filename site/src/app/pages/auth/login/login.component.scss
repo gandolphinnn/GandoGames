@@ -38,15 +38,6 @@
 		font-size: $text-sm; color: $text-muted; margin-top: -$s2;
 	}
 
-	&-error {
-		padding: $s3 $s4;
-		background: $color-danger-bg;
-		border: 1px solid $color-danger-dim;
-		border-radius: $radius-md;
-		color: $color-danger;
-		font-size: $text-sm;
-	}
-
 	&-form {
 		display: flex; flex-direction: column; gap: $s4;
 	}

@@ -2,7 +2,6 @@
 	<ion-header [translucent]="true">
 		<ion-toolbar>
 			<ion-buttons slot="start">
-				<ion-menu-button />
 				<ion-button [routerLink]="['/play']" fill="clear">
 					<ion-icon name="arrow-back" slot="icon-only" />
 				</ion-button>
@@ -14,7 +13,9 @@
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
 					@if (isInRoom()) {
-						<ion-button fill="clear" color="danger" (click)="leave()">Leave</ion-button>
+						<ion-button fill="clear" color="danger" (click)="leave()">
+							<ion-icon name="close"></ion-icon>
+						</ion-button>
 					}
 				</ion-buttons>
 			}
@@ -22,7 +23,7 @@
 	</ion-header>
 }
 
-<ion-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'">
+<gg-refreshable-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'" [onRefresh]="refreshFn()">
 
 	@if (room()?.phase === 'playing') {
 		<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" (leaveRoom)="leave()" />
@@ -74,10 +75,6 @@
 					}
 				</div>
 
-				@if (error()) {
-					<p class="error-msg">{{ error() }}</p>
-				}
-
 				@switch (room()!.phase) {
 					@case ('waiting') {
 						<div class="phase-panel">
@@ -111,4 +108,4 @@
 		</div>
 	}
 
-</ion-content>
+</gg-refreshable-content>

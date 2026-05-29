@@ -43,9 +43,9 @@ export class PaletteComponent {
 		{
 			title: 'Surfaces',
 			swatches: [
-				{ name: '--bg',         cssRef: 'var(--bg)',         values: { dark: '#110c06',  light: '#f5e8d2' } },
-				{ name: '--bg-surface', cssRef: 'var(--bg-surface)', values: { dark: '#1c1408',  light: '#fdf4e3' } },
-				{ name: '--bg-card',    cssRef: 'var(--bg-card)',    values: { dark: '#271c0e',  light: '#ecddbf' } },
+				{ name: '--bg',         cssRef: 'var(--bg)',         values: { dark: '#1e1409',  light: '#f5e8d2' } },
+				{ name: '--bg-surface', cssRef: 'var(--bg-surface)', values: { dark: '#281a0c',  light: '#fdf4e3' } },
+				{ name: '--bg-card',    cssRef: 'var(--bg-card)',    values: { dark: '#362410',  light: '#ecddbf' } },
 			],
 		},
 		{
@@ -69,7 +69,7 @@ export class PaletteComponent {
 		{
 			title: 'Borders & Overlays',
 			swatches: [
-				{ name: '--border-color',         cssRef: 'var(--border-color)',         values: { dark: 'rgba(180,110,40,0.12)',  light: 'rgba(120,75,25,0.18)' } },
+				{ name: '--border-color',         cssRef: 'var(--border-color)',         values: { dark: 'rgba(180,110,40,0.18)',  light: 'rgba(120,75,25,0.18)' } },
 				{ name: '--hover-overlay',        cssRef: 'var(--hover-overlay)',        values: { dark: 'rgba(255,200,100,0.06)', light: 'rgba(0,0,0,0.05)' } },
 				{ name: '--color-neutral-subtle', cssRef: 'var(--color-neutral-subtle)', values: { dark: 'rgba(150,120,80,0.08)',  light: 'rgba(100,80,50,0.08)' } },
 			],
@@ -77,8 +77,8 @@ export class PaletteComponent {
 		{
 			title: 'Shadows',
 			swatches: [
-				{ name: '--shadow-card',  cssRef: '', isShadow: true, values: { dark: '0 4px 32px rgba(0,0,0,0.5)',    light: '0 4px 32px rgba(80,40,10,0.1)' } },
-				{ name: '--shadow-hover', cssRef: '', isShadow: true, values: { dark: '0 8px 24px rgba(0,0,0,0.35)',   light: '0 8px 24px rgba(80,40,10,0.12)' } },
+				{ name: '--shadow-card',  cssRef: '', isShadow: true, values: { dark: '0 4px 32px rgba(0,0,0,0.45)',   light: '0 4px 32px rgba(80,40,10,0.1)' } },
+				{ name: '--shadow-hover', cssRef: '', isShadow: true, values: { dark: '0 8px 24px rgba(0,0,0,0.30)',   light: '0 8px 24px rgba(80,40,10,0.12)' } },
 			],
 		},
 		{

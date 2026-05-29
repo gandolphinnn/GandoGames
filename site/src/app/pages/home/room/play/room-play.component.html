@@ -1,13 +1,24 @@
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-button fill="clear" (click)="backToLobby()">
+				<ion-icon name="arrow-back" slot="icon-only" />
+			</ion-button>
+		</ion-buttons>
+		<ion-title>{{ gameTitle() }}</ion-title>
+		<ion-buttons slot="end">
+			<ion-button fill="clear" color="danger" (click)="onLeaveRoom()">
+				<ion-icon name="close"></ion-icon>
+			</ion-button>
+		</ion-buttons>
+	</ion-toolbar>
+</ion-header>
+
 <div class="game-layout">
-	<div class="game-left" #gameLeft>
+	<div class="game-left">
 		<gg-chat [roomId]="roomId()" />
 	</div>
 	<div class="game-shell">
-		<header class="game-header">
-			<button class="game-back" (click)="backToLobby()"><ion-icon name="arrow-back" /> Back</button>
-			<h1 class="game-title">{{ gameTitle() }}</h1>
-			<button class="game-leave" (click)="onLeaveRoom()">Leave Room</button>
-		</header>
 		<ng-container #gameSlot />
 	</div>
 </div>

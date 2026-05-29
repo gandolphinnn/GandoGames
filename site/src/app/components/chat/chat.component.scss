@@ -9,6 +9,10 @@
 	}
 }
 
+ion-textarea {
+	min-height: unset !important;
+}
+
 .chat {
 	&-panel {
 		display: none;
@@ -197,12 +201,12 @@
 	&-input {
 		flex: 1;
 		min-width: 0;
-		--background: $bg-card;
-		--border-color: $border;
+		--background: #{$bg-card};
+		--border-color: #{$border};
 		--border-radius: #{$radius-sm};
-		--color: $text;
-		--placeholder-color: $text-muted;
-		--highlight-color-focused: $accent;
+		--color: #{$text};
+		--placeholder-color: #{$text-muted};
+		--highlight-color-focused: #{$accent};
 		--padding-start: #{$s3};
 		--padding-end: #{$s3};
 		--padding-top: #{$s2};
@@ -211,11 +215,15 @@
 		&::part(native) {
 			font-size: $text-sm;
 			font-family: inherit;
-			min-height: 36px;
+			min-height: 20px;
+			max-height: 5.5rem;
+			overflow-y: auto;
+			resize: none;
+			line-height: 1.4;
 		}
 
 		&-row {
-			display: flex; gap: $s2; padding: $s2 $s3; border-top: 1px solid $border; flex-shrink: 0;
+			display: flex; align-items: flex-end; gap: $s2; padding: $s2 $s3; border-top: 1px solid $border; flex-shrink: 0;
 		}
 	}
 

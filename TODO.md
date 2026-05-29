@@ -16,5 +16,6 @@
 - Profile page enhancement
 	Ability to change display name
 	Ability to change password
+	Ability to convert a guest user to a logged one
 - Queue system if 20 signalR connection are already occupied
 	really low priority

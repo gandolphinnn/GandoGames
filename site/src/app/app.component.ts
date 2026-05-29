@@ -1,6 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-
 import {
 	IonApp, IonButton, IonButtons, IonContent, IonHeader,
 	IonIcon, IonImg, IonItem, IonLabel, IonList, IonMenu,

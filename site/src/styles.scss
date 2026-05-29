@@ -2,41 +2,41 @@
 
 // === Dark theme — dark walnut ===
 :root {
-	--bg: #110c06;
-	--bg-surface: #1c1408;
-	--bg-card: #271c0e;
+	--bg: #1e1409;
+	--bg-surface: #281a0c;
+	--bg-card: #362410;
 	--accent: #c8821e;
 	--accent-hover: #e0971f;
 	--text: #f2e4c8;
 	--text-muted: #9e8060;
-	--border-color: rgba(180, 110, 40, 0.12);
-	--shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+	--border-color: rgba(180, 110, 40, 0.18);
+	--shadow-card: 0 4px 32px rgba(0, 0, 0, 0.45);
 	--hover-overlay: rgba(255, 200, 100, 0.10);
 	--accent-tint: rgba(200, 130, 30, 0.04);
 	--accent-subtle: rgba(200, 130, 30, 0.08);
 	--accent-muted: rgba(200, 130, 30, 0.12);
 	--accent-emphasis: rgba(200, 130, 30, 0.35);
-	--shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.35);
+	--shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.30);
 	--color-neutral-subtle: rgba(150, 120, 80, 0.08);
 }
 
 // explicit dark override (used by palette page to force dark on a sub-element)
 [data-theme="dark"] {
-	--bg: #110c06;
-	--bg-surface: #1c1408;
-	--bg-card: #271c0e;
+	--bg: #1e1409;
+	--bg-surface: #281a0c;
+	--bg-card: #362410;
 	--accent: #c8821e;
 	--accent-hover: #e0971f;
 	--text: #f2e4c8;
 	--text-muted: #9e8060;
-	--border-color: rgba(180, 110, 40, 0.12);
-	--shadow-card: 0 4px 32px rgba(0, 0, 0, 0.5);
+	--border-color: rgba(180, 110, 40, 0.18);
+	--shadow-card: 0 4px 32px rgba(0, 0, 0, 0.45);
 	--hover-overlay: rgba(255, 200, 100, 0.10);
 	--accent-tint: rgba(200, 130, 30, 0.04);
 	--accent-subtle: rgba(200, 130, 30, 0.08);
 	--accent-muted: rgba(200, 130, 30, 0.12);
 	--accent-emphasis: rgba(200, 130, 30, 0.35);
-	--shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.35);
+	--shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.30);
 	--color-neutral-subtle: rgba(150, 120, 80, 0.08);
 }
 
@@ -126,7 +126,7 @@ body {
 [data-theme="dark"] {
 	--ion-color-primary-rgb: 200, 130, 30;
 	--ion-text-color-rgb: 242, 228, 200;
-	--ion-background-color-rgb: 17, 12, 6;
+	--ion-background-color-rgb: 30, 20, 9;
 }
 
 [data-theme="light"] {

@@ -48,51 +48,5 @@
 			gap: $s6; padding: $s6; overflow-y: auto;
 		}
 	}
-
-	&-header {
-		display: flex;
-		align-items: center;
-		gap: $s3;
-	}
-
-	&-back {
-		background: none;
-		border: none;
-		color: $text-muted;
-		font-size: $text-sm;
-		cursor: pointer;
-		padding: 0;
-		min-height: 44px;
-		transition: color $transition;
-		display: inline-flex;
-		align-items: center;
-		gap: $s2;
-		font-family: inherit;
-
-		&:hover {
-			color: $accent;
-		}
-	}
-
-	&-title {
-		font-size: $text-xl; font-weight: 700; flex: 1;
-	}
-
-	&-leave {
-		background: transparent;
-		border: 1px solid $color-danger-border;
-		border-radius: $radius-md;
-		color: $color-danger;
-		font-size: $text-sm;
-		cursor: pointer;
-		padding: 0 $s3;
-		min-height: 36px;
-		font-family: inherit;
-		transition: background $transition;
-
-		&:hover {
-			background: $color-danger-bg;
-		}
-	}
 }
 

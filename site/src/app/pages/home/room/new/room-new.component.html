@@ -28,10 +28,6 @@
 				}
 			</div>
 
-			@if (error()) {
-				<p class="error-msg">{{ error() }}</p>
-			}
-
 			<div class="form-actions">
 				<ion-button [disabled]="!selectedGameId() || loading()" (click)="create()">
 					{{ loading() ? 'Creating…' : 'Create Room' }}

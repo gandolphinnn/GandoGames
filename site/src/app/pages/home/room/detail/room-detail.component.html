@@ -22,7 +22,7 @@
 	</ion-header>
 }
 
-<ion-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'">
+<gg-refreshable-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'" [onRefresh]="refreshFn()">
 
 	@if (room()?.phase === 'playing') {
 		<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" (leaveRoom)="leave()" />
@@ -74,10 +74,6 @@
 					}
 				</div>
 
-				@if (error()) {
-					<p class="error-msg">{{ error() }}</p>
-				}
-
 				@switch (room()!.phase) {
 					@case ('waiting') {
 						<div class="phase-panel">
@@ -111,4 +107,4 @@
 		</div>
 	}
 
-</ion-content>
+</gg-refreshable-content>

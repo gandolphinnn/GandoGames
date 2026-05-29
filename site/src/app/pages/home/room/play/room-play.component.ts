@@ -7,13 +7,13 @@ import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { GAME_COMPONENT_REGISTRY } from '../../../../game-component-registry';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { ChatComponent } from '../../../../components/chat/chat.component';
 
 @Component({
 	selector: 'gg-room-play',
 	standalone: true,
-	imports: [ChatComponent, IonIcon],
+	imports: [ChatComponent, IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon],
 	templateUrl: './room-play.component.html',
 	styleUrl: './room-play.component.scss',
 })

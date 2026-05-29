@@ -2,14 +2,14 @@ import { test, expect, Page } from '@playwright/test';
 
 const MOCK_AUTH = {
 	sessionTicket: 'e2e-session-ticket',
-	player: { id: 'e2e-player', name: 'E2EPlayer' },
+	player: { id: 'e2e-player', name: 'E2EPlayer', icon: 'profile', theme: 'dark', language: 'en' },
 };
 
 const MOCK_ROOM = {
 	id: 'room-abc',
 	hostId: 'e2e-player',
-	game: 'morra',
-	players: [{ id: 'e2e-player', name: 'E2EPlayer' }],
+	game: 'pankov',
+	players: [{ id: 'e2e-player', name: 'E2EPlayer', icon: 'profile', theme: 'dark', language: 'en' }],
 	kickedPlayers: [],
 	phase: 'waiting',
 	chat: [],
@@ -17,11 +17,12 @@ const MOCK_ROOM = {
 };
 
 async function loginAs(page: Page, rooms: object[] = []): Promise<void> {
-	// Seed auth into localStorage before page load.
-	await page.addInitScript((auth: object) => {
-		localStorage.setItem('gg_auth', JSON.stringify(auth));
-	}, { ...MOCK_AUTH, isGuest: false });
+	// Seed the session ticket so UserService.init() restores the session via auth/check.
+	await page.addInitScript((ticket: string) => {
+		localStorage.setItem('gg_session_ticket', ticket);
+	}, MOCK_AUTH.sessionTicket);
 
+	await page.route('**/api/auth/check', route => route.fulfill({ json: MOCK_AUTH }));
 	await page.route('**/api/rooms/list', route => route.fulfill({ json: rooms }));
 	await page.route('**/api/signalr/negotiate**', route =>
 		route.fulfill({ json: { url: '', accessToken: '' } }),
@@ -86,12 +87,13 @@ test.describe('Two-player lobby (multiplayer context)', () => {
 		const page1 = await ctx1.newPage();
 		const page2 = await ctx2.newPage();
 
-		const auth1 = { ...MOCK_AUTH, player: { id: 'p1', name: 'Alice' }, isGuest: false };
-		const auth2 = { ...MOCK_AUTH, sessionTicket: 'ticket-2', player: { id: 'p2', name: 'Bob' }, isGuest: false };
+		const auth1 = { ...MOCK_AUTH, player: { id: 'p1', name: 'Alice', icon: 'profile', theme: 'dark', language: 'en' }, isGuest: false };
+		const auth2 = { ...MOCK_AUTH, sessionTicket: 'ticket-2', player: { id: 'p2', name: 'Bob', icon: 'profile', theme: 'dark', language: 'en' }, isGuest: false };
 		const room = { ...MOCK_ROOM, players: [auth1.player, auth2.player] };
 
 		for (const [p, auth] of [[page1, auth1], [page2, auth2]] as const) {
-			await p.addInitScript((a: object) => localStorage.setItem('gg_auth', JSON.stringify(a)), auth);
+			await p.addInitScript((ticket: string) => localStorage.setItem('gg_session_ticket', ticket), auth.sessionTicket);
+			await p.route('**/api/auth/check', r => r.fulfill({ json: auth }));
 			await p.route('**/api/rooms/list', r => r.fulfill({ json: [room] }));
 			await p.route('**/api/rooms/get', r => r.fulfill({ json: room }));
 			await p.route('**/api/signalr/negotiate**', r => r.fulfill({ json: { url: '', accessToken: '' } }));

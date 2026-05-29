@@ -106,6 +106,28 @@ describe('InnerFunctionNotifier', () => {
 		}));
 	});
 
+	it('gameStateUpdatedForPlayer queues a user-targeted gameStateUpdated message', () => {
+		notifier.gameStateUpdatedForPlayer('user-3', 'room-7', { lastUpdate: new Date() } as any);
+		notifier.prepareContext(mockCtx as any);
+		const [, messages] = mockCtx.extraOutputs.set.mock.calls[0];
+		expect(messages).toContainEqual(expect.objectContaining({
+			target: 'gameStateUpdated',
+			userId: 'user-3',
+			arguments: ['room-7', expect.anything()],
+		}));
+	});
+
+	it('roomInviteForPlayer queues a user-targeted roomInvite message', () => {
+		notifier.roomInviteForPlayer('user-8', 'room-5', 'pankov');
+		notifier.prepareContext(mockCtx as any);
+		const [, messages] = mockCtx.extraOutputs.set.mock.calls[0];
+		expect(messages).toContainEqual(expect.objectContaining({
+			target: 'roomInvite',
+			userId: 'user-8',
+			arguments: ['room-5', 'pankov'],
+		}));
+	});
+
 	it('accumulates multiple messages and sends them all at once', () => {
 		notifier.roomDeleted('r1');
 		notifier.roomDeleted('r2');

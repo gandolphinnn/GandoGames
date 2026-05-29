@@ -1,4 +1,4 @@
-import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, viewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,7 +21,7 @@ export class ChatComponent {
 	private readonly auth = inject(UserService);
 	private readonly destroyRef = inject(DestroyRef);
 
-	private readonly messageListRef = viewChild<ElementRef<HTMLElement>>('messageList');
+	private readonly messageListRefs = viewChildren<ElementRef<HTMLElement>>('messageList');
 	private shouldScroll = false;
 
 	public readonly roomId = input.required<string>();
@@ -58,8 +58,7 @@ export class ChatComponent {
 		afterRenderEffect(() => {
 			if (!this.shouldScroll) return;
 			this.shouldScroll = false;
-			const el = this.messageListRef()?.nativeElement;
-			if (el) el.scrollTop = el.scrollHeight;
+			this.scrollToBottom();
 		});
 	}
 
@@ -70,6 +69,15 @@ export class ChatComponent {
 
 	protected close(): void { this.open.set(false); }
 
+	private scrollToBottom(): void {
+		for (const ref of this.messageListRefs()) {
+			const el = ref.nativeElement;
+			el.scrollTop = el.scrollHeight;
+		}
+	}
+
+	protected onInputFocus(): void { this.shouldScroll = true; }
+
 	protected async send(): Promise<void> {
 		const text = this.text().trim();
 		const room = this.currentRoom();
@@ -78,6 +86,7 @@ export class ChatComponent {
 		try {
 			await this.roomService.sendChat(room.id, text);
 			this.text.set('');
+			this.shouldScroll = true;
 		} finally {
 			this.sending.set(false);
 		}

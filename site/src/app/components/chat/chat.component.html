@@ -52,6 +52,7 @@
 				[ngModel]="text()"
 				(ngModelChange)="text.set($event)"
 				(keydown)="onKeydown($event)"
+				(ionFocus)="onInputFocus()"
 				[maxlength]="500"
 				autocomplete="off"
 			></ion-textarea>

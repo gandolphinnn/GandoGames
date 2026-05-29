@@ -38,7 +38,7 @@ export class PankovGame extends Game<PankovGameState> {
 		this.state = {
 			lastUpdate: new Date(),
 			gamePhase: 'turn-start',
-			players: players.map(p => ({ id: p.id, name: p.name, lives: INITIAL_LIVES })),
+			players: players.map(p => ({ ...p, lives: INITIAL_LIVES })),
 			currentPlayerIndex: 0,
 			previousPlayerIndex: null,
 			previousDeclaration: null,
@@ -55,29 +55,6 @@ export class PankovGame extends Game<PankovGameState> {
 			currentRoll: currentPlayer?.id === playerId ? this.state.currentRoll : null,
 			previousActualRoll: null,
 		};
-	}
-
-	public override describe(state: PankovGameState): string {
-		const current = state.players[state.currentPlayerIndex];
-		switch (state.gamePhase) {
-			case 'turn-start':
-				return state.previousDeclaration != null
-					? `${current?.name ?? '?'}'s turn — last claim: ${formatValue(state.previousDeclaration)}`
-					: `${current?.name ?? '?'} goes first`;
-			case 'rolled':
-				return `${current?.name ?? '?'} rolled, choosing a declaration…`;
-			case 'result': {
-				if (!state.revealResult) return 'Round result';
-				const loser = state.players[state.revealResult.loserIndex];
-				const claimed = formatValue(state.revealResult.declared);
-				const actual = formatValue(state.revealResult.actual);
-				return state.revealResult.wasLying
-					? `Liar! Claimed ${claimed}, got ${actual} — ${loser?.name ?? '?'} −1 life`
-					: `Honest! Claimed ${claimed}, got ${actual} — challenger ${loser?.name ?? '?'} −1 life`;
-			}
-			case 'game-over':
-				return `Game over — ${state.winnerName ?? '?'} wins!`;
-		}
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): PankovGameState {

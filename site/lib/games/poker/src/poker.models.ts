@@ -2,10 +2,3 @@ export type { PokerPlayer, PokerGameState, PokerRoomState, PokerHandResult, Poke
 
 export const MIN_RAISE = 100;
 export const STARTING_CHIPS = 1000;
-
-export const SUIT_SYMBOL: Record<'spades' | 'hearts' | 'diamonds' | 'clubs', string> = {
-	spades: '♠',
-	hearts: '♥',
-	diamonds: '♦',
-	clubs: '♣',
-};

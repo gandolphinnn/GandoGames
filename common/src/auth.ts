@@ -1,5 +1,13 @@
-export type Permission = 'admin';
+export type Theme = 'dark' | 'light';
+export type LangCode = 'en' | 'it';
+export type IconType = 'profile'| 'luck' | 'hat' | 'paw' | 'pizza';
 
+/** Profile preferences data */
+export interface ProfileData {
+	theme: Theme;
+	icon: IconType;
+	language: LangCode;
+}
 export interface LoginRequest {
 	email: string;
 	password: string;
@@ -15,11 +23,9 @@ export interface GuestLoginRequest {
 	customId: string;
 }
 
-export interface GamePlayer {
+export interface GamePlayer extends ProfileData {
 	id: string;
 	name: string;
-	permissions?: Permission[];
-	icon?: string;
 }
 
 export interface AuthResponse {
@@ -32,6 +38,4 @@ export interface BaseRequest {
 	sessionTicket: string;
 }
 
-export interface UpdateIconRequest extends BaseRequest {
-	icon: string;
-}
+export interface ProfileUpdateRequest extends BaseRequest, Partial<ProfileData> { }

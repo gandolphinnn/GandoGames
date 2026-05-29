@@ -27,18 +27,18 @@ const negotiateHandler: HttpHandler = async (request, context: InvocationContext
 		if (player.id !== request.query.get('userId')) {
 			return { status: 401, jsonBody: { error: 'Unauthorized' } };
 		}
-		if (process.env['AZURE_FUNCTIONS_ENVIRONMENT'] !== 'Development') {
-			const names = upsertPresence(player.id, player.name);
-			const broadcast: SignalRMessage = { target: 'onlineCountUpdated', arguments: [names] };
-			context.extraOutputs.set(signalROutput, [broadcast]);
-		}
+		//if (process.env['AZURE_FUNCTIONS_ENVIRONMENT'] !== 'Development') {
+		//	const names = upsertPresence(player.id, player.name);
+		//	const broadcast: SignalRMessage = { target: 'onlineCountUpdated', arguments: [names] };
+		//	context.extraOutputs.set(signalROutput, [broadcast]);
+		//}
 		return { jsonBody: context.extraInputs.get(signalRInput) };
 	} catch {
 		return { status: 401, jsonBody: { error: 'Unauthorized' } };
 	}
 };
 
-const signalrEventsHandler: HttpHandler = async (request, context: InvocationContext) => {
+/* const signalrEventsHandler: HttpHandler = async (request, context: InvocationContext) => {
 	const body = await request.text();
 	if (!validateSignature(body, request.headers.get('X-ASRS-Signature') ?? '')) {
 		return { status: 401 };
@@ -51,7 +51,7 @@ const signalrEventsHandler: HttpHandler = async (request, context: InvocationCon
 	const broadcast: SignalRMessage = { target: 'onlineCountUpdated', arguments: [onlineNames] };
 	context.extraOutputs.set(signalROutput, [broadcast]);
 	return { status: 200 };
-};
+}; */
 
 registerBaseFunction('signalr_negotiate', 'signalr/negotiate', negotiateHandler, [signalRInput]);
-registerBaseFunction('signalr_events', 'signalr/events', signalrEventsHandler);
+//registerBaseFunction('signalr_events', 'signalr/events', signalrEventsHandler);

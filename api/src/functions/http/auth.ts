@@ -1,5 +1,5 @@
-import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, RegisterRequest, UpdateIconRequest } from '@gandogames/common/api';
-import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabAdmin, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
+import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/common/api';
+import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {
 	PlayFabId?: string;
@@ -14,19 +14,23 @@ const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParam
 	GetTitleData: false,
 	GetUserAccountInfo: true,
 	GetUserData: true,
-	UserDataKeys: ['icon'],
+	UserDataKeys: ['icon', 'theme', 'language'],
 	GetUserInventory: false,
 	GetUserReadOnlyData: false,
 	GetUserVirtualCurrency: false,
 };
 
-const CREATOR_ID = '7F29F448E164BF64';
-const toAuthResponse = (response: LoginLike, name: string | undefined, icon?: string): AuthResponse => ({
+const toAuthResponse = (
+	response: LoginLike,
+	name: string | undefined,
+	userData?: Record<string, PlayFabClientModels.UserDataRecord>,
+): AuthResponse => ({
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
-		permissions: (response.PlayFabId === CREATOR_ID) ? ['admin'] : [],
-		icon,
+		icon: (userData?.['icon']?.Value as IconType) ?? 'profile',
+		theme: (userData?.['theme']?.Value as Theme) ?? 'dark',
+		language: (userData?.['language']?.Value as LangCode) ?? 'en',
 	},
 	sessionTicket: response.SessionTicket!,
 });
@@ -63,8 +67,7 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 			cb => PlayFabServer.SetTitleInternalData({ Key: 'guest_player_ids', Value: JSON.stringify(guestIds) }, cb),
 		);
 	}
-	const icon = result.InfoResultPayload?.UserData?.['icon']?.Value;
-	return toAuthResponse(result, name, icon);
+	return toAuthResponse(result, name, result.InfoResultPayload?.UserData);
 };
 
 const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, notifier) => {
@@ -74,8 +77,7 @@ const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body,
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password, InfoRequestParameters: infoRequestParameters }, cb),
 	);
-	const icon = result.InfoResultPayload?.UserData?.['icon']?.Value;
-	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, icon);
+	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, result.InfoResultPayload?.UserData);
 };
 
 const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, notifier) => {
@@ -92,22 +94,12 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 	return toAuthResponse(result, body.username);
 };
 
-const deleteProfileInner: InnerFunction<BaseRequest, Record<string, never>> = async (_body, _notifier, player) => {
-	await pfPromise<PlayFabAdminModels.DeletePlayerResult>(
-		cb => PlayFabAdmin.DeletePlayer({ PlayFabId: player.id }, cb),
-	);
-	return {};
-};
-
-const updateIconInner: InnerFunction<UpdateIconRequest, { icon: string }> = async (body, _notifier, player) => {
-	await pfPromise<PlayFabServerModels.UpdateUserDataResult>(
-		cb => PlayFabServer.UpdateUserData({ PlayFabId: player.id, Data: { icon: body.icon } }, cb),
-	);
-	return { icon: body.icon };
-};
+const checkInner: InnerFunction<BaseRequest, AuthResponse> = async (body, _notifier, player) => ({
+	player,
+	sessionTicket: body.sessionTicket,
+});
 
 registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
 registerPublicFunction('auth_login', 'auth/login', loginInner);
 registerPublicFunction('auth_register', 'auth/register', registerInner);
-registerFunction('auth_deleteProfile', 'auth/delete', deleteProfileInner);
-registerFunction('auth_updateIcon', 'auth/updateIcon', updateIconInner);
+registerFunction('auth_check', 'auth/check', checkInner);

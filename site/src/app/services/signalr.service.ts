@@ -1,13 +1,13 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { effect, inject, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { ChatMessage, GameState, NegotiateResponse, RoomData, SignalREvent } from '@gandogames/common/api';
-import { AuthService } from './auth.service';
 import { BackendService } from './backend.service';
+import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
-	private readonly auth = inject(AuthService);
+	private readonly userService = inject(UserService);
 	private readonly backend = inject(BackendService);
 	private connection?: HubConnection;
 	private negotiateCache?: { response: NegotiateResponse; expiresAt: number };
@@ -15,9 +15,6 @@ export class SignalRService {
 	public get connectionStatus() {
 		return this.connection?.state;
 	}
-
-	public readonly onlineUsers = signal<string[]>([]);
-	public readonly onlineCount = computed(() => this.onlineUsers().length);
 
 	public readonly events = {
 		roomUpsert: new Subject<RoomData>(),
@@ -29,7 +26,7 @@ export class SignalRService {
 
 	constructor() {
 		effect(() => {
-			const user = this.auth.user();
+			const user = this.userService.user();
 			if (user) void this.connect();
 			else void this.disconnect();
 		});
@@ -38,7 +35,7 @@ export class SignalRService {
 	private async getNegotiateResponse(): Promise<NegotiateResponse> {
 		const now = Date.now();
 		if (this.negotiateCache && now < this.negotiateCache.expiresAt) return this.negotiateCache.response;
-		const user = this.auth.user();
+		const user = this.userService.user();
 		if (!user) throw new Error('Not authenticated');
 		const res = await this.backend.post<NegotiateResponse>(`/signalr/negotiate?userId=${encodeURIComponent(user.player.id)}`, { sessionTicket: user.sessionTicket });
 		if (!res.url || !res.accessToken) throw new Error('SignalR negotiate failed');
@@ -66,7 +63,6 @@ export class SignalRService {
 			this.connection.on('roomUpsert', (room) => this.events.roomUpsert.next(room));
 			this.connection.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
 			this.connection.on('gameStateUpdated', (roomId: string, state: GameState) => this.events.gameStateUpdated.next({ roomId, state }));
-			this.connection.on('onlineCountUpdated', (names: string[]) => this.onlineUsers.set(names));
 			this.connection.on('chatMessage', (roomId: string, message: ChatMessage) => this.events.chatMessage.next({ roomId, message }));
 			this.connection.on('roomInvite', (roomId: string, game: string) => this.events.roomInvite.next({ roomId, game }));
 
@@ -87,7 +83,6 @@ export class SignalRService {
 
 	private async disconnect(): Promise<void> {
 		this.negotiateCache = undefined;
-		this.onlineUsers.set([]);
 		await this.connection?.stop();
 		this.connection = undefined;
 	}

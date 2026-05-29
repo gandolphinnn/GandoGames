@@ -6,7 +6,7 @@ export interface NegotiateResponse {
 	accessToken: string;
 }
 
-export type SignalREventType = 'roomUpsert' | 'roomDeleted' | 'gameStateUpdated' | 'onlineCountUpdated' | 'chatMessage' | 'roomInvite';
+export type SignalREventType = 'roomUpsert' | 'roomDeleted' | 'gameStateUpdated' | 'chatMessage' | 'roomInvite';
 
 export interface SignalREvent {
 	type: SignalREventType;
@@ -28,10 +28,6 @@ export interface GameStateUpdatedEvent extends SignalREvent {
 	state: GameState;
 }
 
-export interface OnlineCountUpdatedEvent extends SignalREvent {
-	type: 'onlineCountUpdated';
-	names: string[];
-}
 
 export interface ChatMessageEvent extends SignalREvent {
 	type: 'chatMessage';

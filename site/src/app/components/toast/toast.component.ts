@@ -1,15 +1,17 @@
 import { Component, inject } from '@angular/core';
+import { IonIcon } from '@ionic/angular/standalone';
 import { Toast, ToastService } from '@gandogames/services/toast.service';
 
 const ICONS: Record<string, string> = {
-	info: 'fa-solid fa-circle-info',
-	success: 'fa-solid fa-circle-check',
-	warning: 'fa-solid fa-triangle-exclamation',
-	error: 'fa-solid fa-circle-exclamation',
+	info: 'information-circle',
+	success: 'checkmark-circle',
+	warning: 'warning',
+	error: 'alert-circle',
 };
 
 @Component({
 	selector: 'gg-toast',
+	imports: [IonIcon],
 	templateUrl: './toast.component.html',
 	styleUrl: './toast.component.scss',
 	standalone: true,
@@ -18,7 +20,7 @@ export class ToastComponent {
 	public readonly toastService = inject(ToastService);
 
 	public getIcon(toast: Toast): string {
-		return toast.yesno ? 'fa-solid fa-circle-question' : (ICONS[toast.type] ?? '');
+		return toast.yesno ? 'help-circle' : (ICONS[toast.type] ?? '');
 	}
 
 	public onToastClick(toast: Toast): void {

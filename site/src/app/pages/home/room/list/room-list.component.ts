@@ -1,12 +1,14 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
 
 @Component({
 	selector: 'gg-room-list',
-	imports: [],
+	host: { class: 'ion-page' },
+	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonIcon],
 	templateUrl: './room-list.component.html',
 	styleUrl: './room-list.component.scss',
 })
@@ -20,8 +22,6 @@ export class RoomListComponent implements OnInit {
 	public readonly rooms = this.roomService.rooms;
 	public readonly loading = signal(false);
 	public readonly error = signal('');
-	public readonly mode = signal<'browse' | 'create'>('browse');
-	public readonly createGameId = signal('');
 
 	public readonly filteredRooms = computed(() => {
 		const active = this.activeGames();
@@ -43,7 +43,6 @@ export class RoomListComponent implements OnInit {
 	public ngOnInit(): void {
 		const paramGameId = this.route.snapshot.params['gameId'] as string | undefined;
 		this.activeGames.set(paramGameId ? [paramGameId] : this.allGames.map((g) => g.id));
-		this.createGameId.set(paramGameId ?? this.allGames[0]?.id ?? '');
 		void this.fetchRooms();
 	}
 
@@ -68,25 +67,11 @@ export class RoomListComponent implements OnInit {
 		}
 	}
 
-	public async create(): Promise<void> {
-		if (!this.createGameId()) return;
-		try {
-			this.loading.set(true);
-			this.error.set('');
-			const room = await this.roomService.createRoom(this.createGameId() as any);
-			this.router.navigate(['/play', room.id]);
-		} catch (e) {
-			this.error.set((e as Error).message);
-		} finally {
-			this.loading.set(false);
-		}
-	}
-
 	public navigateToRoom(room: RoomData): void {
-		this.router.navigate(['/play', room.id]);
+		void this.router.navigate(['/play', room.id]);
 	}
 
-	public setCreateGameId(value: string): void {
-		this.createGameId.set(value);
+	public goToCreate(): void {
+		void this.router.navigate(['/play/new']);
 	}
 }

@@ -1,50 +1,52 @@
-<div class="auth-page">
-	<div class="auth-card">
-		<h1 class="auth-title">Create account</h1>
-		<p class="auth-subtitle">Join GandoGames</p>
+<ion-content [fullscreen]="true">
+	<div class="auth-page">
+		<div class="auth-card">
+			<h1 class="auth-title">Create account</h1>
+			<p class="auth-subtitle">Join GandoGames</p>
 
-		@if (error()) {
-			<div class="auth-error">{{ error() }}</div>
-		}
+			@if (error()) {
+				<div class="auth-error">{{ error() }}</div>
+			}
 
-		<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-			<div class="field">
-				<label class="field-label" for="username">Username</label>
-				<input id="username" class="input" type="text" formControlName="username"
-					placeholder="YourName" autocomplete="username" />
-				@if (form.controls.username.touched && form.controls.username.hasError('required')) {
-					<span class="field-error">Username is required</span>
-				} @else if (form.controls.username.touched && form.controls.username.hasError('minlength')) {
-					<span class="field-error">At least 3 characters</span>
-				} @else if (form.controls.username.touched && form.controls.username.hasError('maxlength')) {
-					<span class="field-error">At most 20 characters</span>
-				}
-			</div>
-			<div class="field">
-				<label class="field-label" for="email">Email</label>
-				<input id="email" class="input" type="email" formControlName="email"
-					placeholder="you@example.com" autocomplete="email" />
-				@if (form.controls.email.touched && form.controls.email.hasError('required')) {
-					<span class="field-error">Email is required</span>
-				} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
-					<span class="field-error">Enter a valid email</span>
-				}
-			</div>
-			<div class="field">
-				<label class="field-label" for="password">Password</label>
-				<input id="password" class="input" type="password" formControlName="password"
-					placeholder="••••••••" autocomplete="new-password" />
-				@if (form.controls.password.touched && form.controls.password.hasError('required')) {
-					<span class="field-error">Password is required</span>
-				} @else if (form.controls.password.touched && form.controls.password.hasError('minlength')) {
-					<span class="field-error">At least 6 characters</span>
-				}
-			</div>
-			<button class="btn btn-primary" type="submit" [disabled]="loading()">
-				{{ loading() ? 'Creating account…' : 'Create account' }}
-			</button>
-		</form>
+			<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+				<div class="field">
+					<label class="field-label">Username</label>
+					<ion-input fill="outline" type="text" formControlName="username"
+						placeholder="YourName" autocomplete="username" />
+					@if (form.controls.username.touched && form.controls.username.hasError('required')) {
+						<span class="field-error">Username is required</span>
+					} @else if (form.controls.username.touched && form.controls.username.hasError('minlength')) {
+						<span class="field-error">At least 3 characters</span>
+					} @else if (form.controls.username.touched && form.controls.username.hasError('maxlength')) {
+						<span class="field-error">At most 20 characters</span>
+					}
+				</div>
+				<div class="field">
+					<label class="field-label">Email</label>
+					<ion-input fill="outline" type="email" formControlName="email"
+						placeholder="you@example.com" autocomplete="email" />
+					@if (form.controls.email.touched && form.controls.email.hasError('required')) {
+						<span class="field-error">Email is required</span>
+					} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+						<span class="field-error">Enter a valid email</span>
+					}
+				</div>
+				<div class="field">
+					<label class="field-label">Password</label>
+					<ion-input fill="outline" type="password" formControlName="password"
+						placeholder="••••••••" autocomplete="new-password" />
+					@if (form.controls.password.touched && form.controls.password.hasError('required')) {
+						<span class="field-error">Password is required</span>
+					} @else if (form.controls.password.touched && form.controls.password.hasError('minlength')) {
+						<span class="field-error">At least 6 characters</span>
+					}
+				</div>
+				<ion-button type="submit" expand="block" [disabled]="loading()">
+					{{ loading() ? 'Creating account…' : 'Create account' }}
+				</ion-button>
+			</form>
 
-		<p class="auth-footer">Already have an account? <a class="auth-link" routerLink="/login">Log in</a></p>
+			<p class="auth-footer">Already have an account? <a class="auth-link" routerLink="/login">Log in</a></p>
+		</div>
 	</div>
-</div>
+</ion-content>

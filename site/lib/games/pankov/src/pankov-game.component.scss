@@ -22,6 +22,8 @@
 	display: flex;
 	gap: $s3;
 	flex-wrap: wrap;
+
+	ion-button { flex: 1; }
 }
 
 // ── Declaration grid ───────────────────────────────────────────────────────────

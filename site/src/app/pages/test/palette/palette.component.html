@@ -7,6 +7,7 @@
 		<button class="btn btn-info btn-sm" (click)="toast.show('Here is some info.')">Info</button>
 		<button class="btn btn-info btn-sm" (click)="testProgress()">Progress (3s)</button>
 		<button class="btn btn-primary btn-sm" (click)="testYesNo()">Yes / No</button>
+		<a href="https://witty-mushroom-027658110-staging.centralus.1.azurestaticapps.net/login?returnUrl=%2Fplay" target="_blank">STAGING</a>
 	</div>
 </div>
 
@@ -29,9 +30,9 @@
 <ng-template #halfContent let-theme>
 	<div class="half-header">
 		@if (theme === 'light') {
-			<i class="fa-solid fa-sun"></i> Light — pine/oak
+			<ion-icon name="sunny" /> Light — pine/oak
 		} @else {
-			<i class="fa-solid fa-moon"></i> Dark — walnut
+			<ion-icon name="moon" /> Dark — walnut
 		}
 	</div>
 

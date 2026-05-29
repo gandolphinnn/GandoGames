@@ -2,22 +2,23 @@ import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IonIcon, IonInput } from '@ionic/angular/standalone';
 import { ChatMessage } from '@gandogames/common/api';
-import { AuthService } from '@gandogames/services/auth.service';
+import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [DatePipe, NgTemplateOutlet, FormsModule],
+	imports: [DatePipe, NgTemplateOutlet, FormsModule, IonIcon, IonInput],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })
 export class ChatComponent {
 	private readonly roomService = inject(RoomService);
 	private readonly signalR = inject(SignalRService);
-	private readonly auth = inject(AuthService);
+	private readonly auth = inject(UserService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	private readonly messageListRef = viewChild<ElementRef<HTMLElement>>('messageList');

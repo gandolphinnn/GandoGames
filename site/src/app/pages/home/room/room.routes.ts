@@ -6,6 +6,10 @@ export const ROOM_ROUTES: Routes = [
 		loadComponent: () => import('./list/room-list.component').then((m) => m.RoomListComponent),
 	},
 	{
+		path: 'new',
+		loadComponent: () => import('./new/room-new.component').then((m) => m.RoomNewComponent),
+	},
+	{
 		path: ':roomId',
 		loadComponent: () => import('./detail/room-detail.component').then((m) => m.RoomDetailComponent),
 	},

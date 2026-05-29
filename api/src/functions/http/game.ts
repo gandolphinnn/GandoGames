@@ -21,12 +21,6 @@ const gameActionInner: InnerFunction<GameActionRequest, GameState | null> = asyn
 	game.state = savedState;
 	game.action(player, body.action, body.data);
 
-	const description = game.describe(game.state!);
-	const history = room.history ?? [];
-	if (history[0]?.description !== description) {
-		room.history = [{ description, timestamp: new Date() }, ...history];
-	}
-
 	await Promise.all([
 		PlayfabCtx.game[body.game].upsert(body.roomId, game.state!),
 		PlayfabCtx.rooms.upsert(body.roomId, room),

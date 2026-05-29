@@ -4,6 +4,7 @@
 	@media (min-width: $bp-sm) {
 		display: flex;
 		flex-direction: column;
+		flex: 1;
 		min-height: 0;
 	}
 }
@@ -18,14 +19,13 @@
 			flex: 1;
 			min-height: 0;
 			overflow: hidden;
-			border-top: 1px solid $border;
 		}
 	}
 
 	&-fab {
 		position: fixed;
 		bottom: $s6;
-		left: calc(#{$s4} + 44px + #{$s2});
+		right: $s4;
 		z-index: 300;
 		width: 44px;
 		height: 44px;
@@ -147,9 +147,9 @@
 		padding: 0 $s1;
 		line-height: 1;
 
-		.chat-fab & {
+		/* .chat-fab & {
 			position: absolute; top: 2px; right: 2px;
-		}
+		} */
 	}
 
 	&-messages {
@@ -196,22 +196,22 @@
 
 	&-input {
 		flex: 1;
-		background: $bg-card;
-		border: 1px solid $border;
-		border-radius: $radius-sm;
-		color: $text;
-		font-size: $text-sm;
-		font-family: inherit;
-		padding: $s2 $s3;
-		outline: none;
-		transition: border-color $transition;
 		min-width: 0;
+		--background: $bg-card;
+		--border-color: $border;
+		--border-radius: #{$radius-sm};
+		--color: $text;
+		--placeholder-color: $text-muted;
+		--highlight-color-focused: $accent;
+		--padding-start: #{$s3};
+		--padding-end: #{$s3};
+		--padding-top: #{$s2};
+		--padding-bottom: #{$s2};
 
-		&::placeholder {
-			color: $text-muted;
-		}
-		&:focus {
-			border-color: $accent;
+		&::part(native) {
+			font-size: $text-sm;
+			font-family: inherit;
+			min-height: 36px;
 		}
 
 		&-row {

@@ -96,35 +96,3 @@
 	}
 }
 
-.resize-handle {
-	display: none;
-
-	@media (min-width: $bp-sm) {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		flex-shrink: 0;
-		height: 8px;
-		cursor: ns-resize;
-		border-top: 1px solid $border;
-		border-bottom: 1px solid $border;
-		transition: background $transition;
-		user-select: none;
-
-		&::after {
-			content: '';
-			width: 24px;
-			height: 2px;
-			border-radius: $radius-full;
-			background: $border;
-			transition: background $transition;
-		}
-
-		&:hover {
-			background: $hover-overlay;
-			&::after {
-				background: $text-muted;
-			}
-		}
-	}
-}

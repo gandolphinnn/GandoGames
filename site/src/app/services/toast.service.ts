@@ -43,6 +43,7 @@ export class ToastService {
 			const id = this.add({ message, type: 'info', yesno: true, resolve }, 0);
 			setTimeout(() => { this.dismiss(id); resolve(false); }, 30000);
 		});
+		// TODO: add a progress bar counting down the 30 seconds until auto-dismissal, to make it more clear to the user that this is a time-sensitive prompt.
 	}
 
 	public dismiss(id: number): void {

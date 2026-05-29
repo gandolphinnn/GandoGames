@@ -1,13 +1,13 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { GameState, GameType, RoomData } from '@gandogames/common/api';
-import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
 	private readonly backend = inject(BackendService);
-	private readonly auth = inject(AuthService);
+	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 
 	public readonly rooms = signal<RoomData[]>([]);

@@ -2,9 +2,9 @@ import { PankovGame } from './pankov';
 import type { GamePlayer } from '@gandogames/common/api';
 import type { RollValue } from '@gandogames/common/pankov';
 
-const p1: GamePlayer = { id: 'p1', name: 'Alice' };
-const p2: GamePlayer = { id: 'p2', name: 'Bob' };
-const p3: GamePlayer = { id: 'p3', name: 'Charlie' };
+const p1: GamePlayer = { id: 'p1', name: 'Alice', icon: 'profile', theme: 'dark', language: 'en' };
+const p2: GamePlayer = { id: 'p2', name: 'Bob', icon: 'profile', theme: 'dark', language: 'en' };
+const p3: GamePlayer = { id: 'p3', name: 'Charlie', icon: 'profile', theme: 'dark', language: 'en' };
 
 // Forces Math.random so Math.ceil(random*6) = d1 then d2, producing rollToValue(d1,d2).
 function rollTo(game: PankovGame, player: GamePlayer, value: number): void {
@@ -212,31 +212,4 @@ describe('PankovGame', () => {
 		});
 	});
 
-	describe('describe', () => {
-		it('returns "goes first" for first turn with no previous declaration', () => {
-			expect(game.describe(game.state!)).toContain('goes first');
-		});
-
-		it('includes previous claim in turn-start after a declaration', () => {
-			rollTo(game, p1, 31);
-			game.action(p1, 'declare', { declaration: 31 as RollValue });
-			expect(game.describe(game.state!)).toContain('3-1'); // formatValue(31) = "3-1"
-		});
-
-		it('returns "rolled" message in rolled phase', () => {
-			rollTo(game, p1, 31);
-			expect(game.describe(game.state!)).toContain('rolled');
-		});
-
-		it('returns game-over message with winner name', () => {
-			rollTo(game, p1, 31);
-			game.action(p1, 'declare', { declaration: 21 as RollValue });
-			game.action(p2, 'challenge', {});
-			game.state!.players[0].lives = 0;
-			game.action(p1, 'continue', {});
-			const msg = game.describe(game.state!);
-			expect(msg).toContain('Bob');
-			expect(msg).toContain('wins');
-		});
-	});
 });

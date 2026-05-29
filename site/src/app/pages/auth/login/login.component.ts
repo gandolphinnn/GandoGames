@@ -1,18 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { IonButton, IonContent, IonInput } from '@ionic/angular/standalone';
 
-import { AuthService } from '@gandogames/services/auth.service';
+import { UserService } from '@gandogames/services/user.service';
 
 @Component({
 	selector: 'gg-login',
-	standalone: true,
-	imports: [ReactiveFormsModule, RouterLink],
+	host: { class: 'ion-page' },
+	imports: [ReactiveFormsModule, RouterLink, IonButton, IonInput, IonContent],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-	private readonly auth = inject(AuthService);
+	private readonly auth = inject(UserService);
 	private readonly router = inject(Router);
 	private readonly route = inject(ActivatedRoute);
 

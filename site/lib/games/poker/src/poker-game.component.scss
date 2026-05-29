@@ -73,28 +73,6 @@
 	gap: $s2;
 }
 
-// ── Cards ──────────────────────────────────────────────────────────────────────
-
-.card {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 36px;
-	height: 52px;
-	background: #fff;
-	color: #1a1a1a;
-	border: 1px solid #ccc;
-	border-radius: $radius-sm;
-	font-size: $text-sm;
-	font-weight: 700;
-	flex-shrink: 0;
-
-	&-red { color: #c00; }
-	&-placeholder { background: $bg-surface; border-style: dashed; border-color: $border; }
-	&-hole { width: 44px; height: 64px; font-size: $text-base; }
-	&-sm { width: 28px; height: 40px; font-size: 0.75rem; }
-}
-
 // ── My hand ───────────────────────────────────────────────────────────────────
 
 .my-hand {
@@ -122,11 +100,7 @@
 	width: 100%;
 }
 
-.action-row .btn {
-	flex: 1;
-	padding: 0 $s4;
-	font-size: $text-base;
-}
+.action-row ion-button { flex: 1; }
 
 .raise-row {
 	display: flex;
@@ -137,34 +111,17 @@
 
 .raise-input {
 	width: 88px;
-	min-height: 44px;
-	padding: 0 $s3;
-	background: $bg-surface;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	color: $text;
-	font-size: $text-base;
-	font-weight: 600;
-	text-align: center;
 
-	&:focus { outline: 2px solid $accent; border-color: transparent; }
+	&::part(native) { text-align: center; font-weight: 600; }
 }
 
-.btn-raise {
+.raise-btn {
 	flex: 1;
-	padding: 0 $s4;
-	min-height: 44px;
-	background: $accent-subtle;
-	border: 1px solid $accent-muted;
-	border-radius: $radius-md;
-	color: $accent;
-	font-size: $text-base;
-	font-weight: 600;
-	cursor: pointer;
-	transition: background $transition;
-
-	&:hover:not([disabled]) { background: $accent-muted; }
-	&:disabled { opacity: 0.4; cursor: not-allowed; }
+	--background: $accent-subtle;
+	--border-color: $accent-muted;
+	--color: $accent;
+	--border-width: 1px;
+	--background-hover: $accent-muted;
 }
 
 // ── Showdown ──────────────────────────────────────────────────────────────────
@@ -209,7 +166,4 @@
 
 @media (min-width: $bp-sm) {
 	.player-card { min-width: 88px; padding: $s3 $s4; }
-	.card { width: 44px; height: 64px; font-size: $text-base; }
-	.card-hole { width: 52px; height: 76px; font-size: $text-lg; }
-	.card-sm { width: 36px; height: 52px; font-size: $text-sm; }
 }

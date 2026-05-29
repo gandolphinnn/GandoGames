@@ -1,0 +1,78 @@
+@use 'styles/variables' as *;
+
+.create-page {
+	padding: $s6;
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+.create {
+	&-form {
+		display: flex; flex-direction: column; gap: $s6;
+	}
+	&-header {
+		display: flex; flex-direction: column; gap: $s1;
+	}
+}
+
+.form {
+	&-title {
+		font-size: $text-2xl; font-weight: 700; letter-spacing: -0.02em;
+	}
+	&-subtitle {
+		font-size: $text-sm; color: $text-muted;
+	}
+	&-actions {
+		display: flex; gap: $s3;
+	}
+}
+
+.error-msg {
+	color: $color-danger; font-size: $text-sm;
+}
+
+.game {
+	&-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: $s4;
+
+		@media (min-width: $bp-sm) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	&-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: $s3;
+		padding: $s6;
+		background: $bg-card;
+		border: 2px solid $border;
+		border-radius: $radius-lg;
+		cursor: pointer;
+		text-align: left;
+		transition: border-color $transition, background $transition, transform $transition, box-shadow $transition;
+
+		&:hover {
+			border-color: $accent-emphasis; transform: translateY(-2px); box-shadow: $shadow-hover;
+		}
+		&.selected {
+			border-color: $accent; background: $accent-subtle; box-shadow: 0 0 0 1px $accent, $shadow-hover;
+		}
+
+		&-icon {
+			font-size: 2.25rem; line-height: 1;
+		}
+		&-name {
+			font-weight: 700; font-size: $text-xl; color: $text;
+		}
+		&-desc {
+			font-size: $text-sm; color: $text-muted; line-height: 1.5; flex: 1;
+		}
+		&-players {
+			font-size: $text-sm; color: $accent; font-weight: 600;
+		}
+	}
+}

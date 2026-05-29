@@ -1,14 +1,14 @@
 @for (toast of toastService.toasts(); track toast.id) {
 	<div class="toast toast-{{ toast.type }}" (click)="onToastClick(toast)">
-		<i [class]="getIcon(toast)"></i>
+		<ion-icon [name]="getIcon(toast)" />
 		<span class="toast-message">{{ toast.message }}</span>
 		@if (toast.yesno) {
 			<div class="toast-actions">
 				<button class="btn-yes" (click)="doYes(toast)">
-					<i class="fa-solid fa-check"></i> Yes
+					<ion-icon name="checkmark" /> Yes
 				</button>
 				<button class="btn-no" (click)="doNo(toast)">
-					<i class="fa fa-times"></i> No
+					<ion-icon name="close" /> No
 				</button>
 			</div>
 		}

@@ -12,7 +12,6 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		players: [player],
 		kickedPlayers: [],
 		phase: 'waiting',
-		history: [],
 		chat: [],
 		lastUpdate: new Date(),
 	};
@@ -110,7 +109,6 @@ const roomResetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, no
 	if (room.phase !== 'playing') throw new Error('Game is not in progress');
 
 	room.phase = 'waiting';
-	room.history = [];
 	room.lastUpdate = new Date();
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);
@@ -156,7 +154,7 @@ const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, n
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
 	const botCount = room.players.filter(p => p.id.startsWith('bot_')).length;
-	const bot: GamePlayer = { id: `bot_${Math.random().toString(36).substring(2, 8)}`, name: `Bot ${botCount + 1}` };
+	const bot: GamePlayer = { id: `bot_${Math.random().toString(36).substring(2, 8)}`, name: `Bot ${botCount + 1}`, icon: 'profile', theme: 'dark', language: 'en' };
 	room.players.push(bot);
 	room.lastUpdate = new Date();
 	await PlayfabCtx.rooms.upsert(body.roomId, room);

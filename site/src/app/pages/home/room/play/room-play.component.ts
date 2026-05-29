@@ -1,26 +1,26 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, output, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { GameState, GameType } from '@gandogames/common/api';
+import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/common/api';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { GAME_COMPONENT_REGISTRY } from '../../../../game-component-registry';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
-import { ChatComponent } from '../../../../components/chat/chat.component';
-
 @Component({
 	selector: 'gg-room-play',
 	standalone: true,
-	imports: [ChatComponent, IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon],
+	imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon],
 	templateUrl: './room-play.component.html',
 	styleUrl: './room-play.component.scss',
 })
 export class RoomPlayComponent implements OnInit, AfterViewInit {
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
+	public readonly isHost = input<boolean>(false);
 	public readonly leaveRoom = output<void>();
+	public readonly closeRoom = output<void>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
@@ -80,11 +80,8 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 
 	private async loadGameState(): Promise<void> {
 		try {
-			const state = await this.backend.post<GameState>('/game/state', {
-				sessionTicket: this.sessionTicket,
-				game: this.gameType(),
-				roomId: this.roomId(),
-			});
+			const request: GameBaseRequest = { sessionTicket: this.sessionTicket, game: this.gameType(), roomId: this.roomId() };
+			const state = await this.backend.post<GameState>('/game/state', request);
 			this.gameState.set(state);
 		} catch {
 			// state arrives via SignalR when the next action occurs
@@ -95,13 +92,8 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 		this.loading.set(true);
 		this.error.set(null);
 		try {
-			await this.backend.post('/game/action', {
-				sessionTicket: this.sessionTicket,
-				game: this.gameType(),
-				roomId: this.roomId(),
-				action,
-				data: data ?? null,
-			});
+			const request: GameActionRequest = { sessionTicket: this.sessionTicket, game: this.gameType(), roomId: this.roomId(), action, data: data ?? null };
+			await this.backend.post<void>('/game/action', request);
 		} catch (err) {
 			this.error.set((err as Error).message);
 		} finally {
@@ -117,12 +109,14 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 		this.leaveRoom.emit();
 	}
 
+	protected onCloseRoom(): void {
+		this.closeRoom.emit();
+	}
+
 	private async resetRoom(): Promise<void> {
 		try {
-			await this.backend.post('/rooms/reset', {
-				sessionTicket: this.sessionTicket,
-				roomId: this.roomId(),
-			});
+			const request: RoomBaseRequest = { sessionTicket: this.sessionTicket, roomId: this.roomId() };
+			await this.backend.post<void>('/rooms/reset', request);
 			void this.router.navigate(['/play', this.roomId()]);
 		} catch (err) {
 			this.error.set((err as Error).message);

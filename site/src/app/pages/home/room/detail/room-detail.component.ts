@@ -11,11 +11,12 @@ import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from 
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
+import { ChatComponent } from '../../../../components/chat/chat.component';
 
 @Component({
 	selector: 'gg-room-detail',
 	host: { class: 'ion-page' },
-	imports: [RouterLink, RoomPlayComponent, PlayerAvatarComponent, IonHeader, IonToolbar, IonButtons, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
+	imports: [RouterLink, RoomPlayComponent, PlayerAvatarComponent, ChatComponent, IonHeader, IonToolbar, IonButtons, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -114,9 +115,11 @@ export class RoomDetailComponent implements OnInit {
 			this.room.set(room);
 		});
 		this.signalR.events.roomDeleted.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((roomId) => {
-			if (roomId === this.roomId()) {
-				void this.router.navigate(['/play']);
+			if (roomId !== this.roomId()) return;
+			if (!this.isHost()) {
+				this.toast.warning('The host has closed the room.');
 			}
+			void this.router.navigate(['/play']);
 		});
 	}
 
@@ -151,6 +154,18 @@ export class RoomDetailComponent implements OnInit {
 
 			await this.roomService.leaveRoom(this.roomId());
 			this.router.navigate(['/play']);
+		} catch (e) {
+			this.toast.error((e as Error).message);
+		}
+	}
+
+	public async closeRoom(): Promise<void> {
+		try {
+			const confirmed = await this.toast.yesNo('Close the room for everyone?');
+			if (!confirmed) return;
+
+			await this.roomService.deleteRoom(this.roomId());
+			void this.router.navigate(['/play']);
 		} catch (e) {
 			this.toast.error((e as Error).message);
 		}

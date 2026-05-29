@@ -81,6 +81,20 @@ All in `src/app/services/`, imported via `@gandogames/services/<name>.service`.
 - `RoomService` — rooms signal, CRUD methods, subscribes to SignalR events for reactive updates
 - `SignalRService` — manages HubConnection lifecycle (auto-connect on auth), exposes `events.roomUpsert`, `events.roomDeleted`, `events.gameStateUpdated` as RxJS Subjects
 
+**BackendService call pattern:** Always specify the return type generic and always declare a typed request variable — never pass an inline object literal as the body. The only exception to `const result = await` is when immediately returning the call result.
+```ts
+// correct
+const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+const result = await this.backend.post<RoomData>('/rooms/get', request);
+
+// correct immediate return
+const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+return this.backend.post<void>('/rooms/leave', request);
+
+// wrong — no type generic, inline body
+await this.backend.post('/rooms/leave', { sessionTicket: this.ticket, roomId });
+```
+
 ### Game packages
 
 Games live in `site/lib/games/<name>/`, each with an `index.ts` as its public API. They are imported via TypeScript path aliases. Each game exports an Angular `Routes` array that the main app lazy-loads.

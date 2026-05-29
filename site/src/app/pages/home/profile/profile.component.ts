@@ -59,7 +59,9 @@ export class ProfileComponent {
 		this.userService.updateProfileData({ language: lang });
 	}
 
-	public logout(): void {
+	public async logout(): Promise<void> {
+		const confirmed = await this.toast.yesNo('Are you sure you want to log out?');
+		if (!confirmed) return;
 		this.userService.logout();
 		void this.router.navigate(['/login']);
 	}

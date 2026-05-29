@@ -7,18 +7,18 @@
 		</ion-buttons>
 		<ion-title>{{ gameTitle() }}</ion-title>
 		<ion-buttons slot="end">
-			<ion-button fill="clear" color="danger" (click)="onLeaveRoom()">
+			@if (isHost()) {
+				<ion-button fill="clear" color="danger" (click)="onCloseRoom()" title="Close room">
+					<ion-icon name="trash" slot="icon-only" />
+				</ion-button>
+			}
+			<ion-button fill="clear" color="danger" (click)="onLeaveRoom()" title="Leave room">
 				<ion-icon name="close"></ion-icon>
 			</ion-button>
 		</ion-buttons>
 	</ion-toolbar>
 </ion-header>
 
-<div class="game-layout">
-	<div class="game-left">
-		<gg-chat [roomId]="roomId()" />
-	</div>
-	<div class="game-shell">
-		<ng-container #gameSlot />
-	</div>
+<div class="game-shell">
+	<ng-container #gameSlot />
 </div>

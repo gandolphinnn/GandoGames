@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { GameState, GameType, RoomData } from '@gandogames/common/api';
+import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest } from '@gandogames/common/api';
 import { UserService } from './user.service';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
@@ -42,57 +42,75 @@ export class RoomService {
 	}
 
 	public async loadRooms(): Promise<void> {
-		const rooms = await this.backend.post<RoomData[]>('/rooms/list', { sessionTicket: this.ticket });
-		return this.rooms.set(rooms);
+		const request: BaseRequest = { sessionTicket: this.ticket };
+		const rooms = await this.backend.post<RoomData[]>('/rooms/list', request);
+		this.rooms.set(rooms);
 	}
 
 	public createRoom(game: GameType): Promise<RoomData> {
-		return this.backend.post<RoomData>('/rooms/create', { sessionTicket: this.ticket, game });
+		const request: RoomCreateRequest = { sessionTicket: this.ticket, game };
+		return this.backend.post<RoomData>('/rooms/create', request);
 	}
 
 	public async getRoom(roomId: string): Promise<RoomData> {
-		const room = await this.backend.post<RoomData>('/rooms/get', { sessionTicket: this.ticket, roomId });
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		const room = await this.backend.post<RoomData>('/rooms/get', request);
 		this.upsertIntoCache(room);
 		return room;
 	}
 
 	public sendChat(roomId: string, text: string): Promise<void> {
-		return this.backend.post('/chat/send', { sessionTicket: this.ticket, roomId, text });
+		const request: ChatSendRequest = { sessionTicket: this.ticket, roomId, text };
+		return this.backend.post<void>('/chat/send', request);
 	}
 
 	public joinRoom(roomId: string): Promise<RoomData> {
-		return this.backend.post<RoomData>('/rooms/join', { sessionTicket: this.ticket, roomId });
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<RoomData>('/rooms/join', request);
 	}
 
 	public startRoom(roomId: string): Promise<RoomData> {
-		return this.backend.post<RoomData>('/rooms/start', { sessionTicket: this.ticket, roomId });
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<RoomData>('/rooms/start', request);
 	}
 
 	public kickPlayer(roomId: string, playerId: string): Promise<void> {
-		return this.backend.post('/rooms/kick', { sessionTicket: this.ticket, roomId, playerId });
+		const request: RoomKickRequest = { sessionTicket: this.ticket, roomId, playerId };
+		return this.backend.post<void>('/rooms/kick', request);
 	}
 
 	public leaveRoom(roomId: string): Promise<void> {
-		return this.backend.post('/rooms/leave', { sessionTicket: this.ticket, roomId });
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<void>('/rooms/leave', request);
+	}
+
+	public deleteRoom(roomId: string): Promise<void> {
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<void>('/rooms/delete', request);
 	}
 
 	public leaveRoomBeacon(roomId: string): void {
-		this.backend.postBeacon('/rooms/leave', { sessionTicket: this.ticket, roomId });
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		this.backend.postBeacon('/rooms/leave', request);
 	}
 
 	public invitePlayer(roomId: string, playerName: string): Promise<void> {
-		return this.backend.post('/rooms/invite', { sessionTicket: this.ticket, roomId, playerName });
+		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, playerName };
+		return this.backend.post<void>('/rooms/invite', request);
 	}
 
 	public addBot(roomId: string): Promise<RoomData> {
-		return this.backend.post<RoomData>('/rooms/add-bot', { sessionTicket: this.ticket, roomId });
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<RoomData>('/rooms/add-bot', request);
 	}
 
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {
-		return this.backend.post<GameState | null>('/game/state', { sessionTicket: this.ticket, game, roomId });
+		const request: GameBaseRequest = { sessionTicket: this.ticket, game, roomId };
+		return this.backend.post<GameState | null>('/game/state', request);
 	}
 
 	public gameAction(game: GameType, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
-		return this.backend.post<GameState | null>('/game/action', { sessionTicket: this.ticket, game, roomId, action, data });
+		const request: GameActionRequest = { sessionTicket: this.ticket, game, roomId, action, data: data ?? null };
+		return this.backend.post<GameState | null>('/game/action', request);
 	}
 }

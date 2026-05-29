@@ -74,6 +74,7 @@ ion-textarea {
 		z-index: 500;
 		display: flex;
 		flex-direction: column;
+		overflow: hidden;
 		background: $bg-surface;
 		border-top: 1px solid $border;
 		border-radius: $radius-lg $radius-lg 0 0;

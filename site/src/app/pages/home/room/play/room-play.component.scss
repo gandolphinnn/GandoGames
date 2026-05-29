@@ -12,30 +12,6 @@
 }
 
 .game {
-	&-layout {
-		display: block;
-
-		@media (min-width: $bp-sm) {
-			display: grid;
-			grid-template-columns: 280px 1fr;
-			align-items: stretch;
-			height: 100%;
-			min-height: 0;
-			overflow: hidden;
-		}
-	}
-
-	&-left {
-		display: contents;
-
-		@media (min-width: $bp-sm) {
-			display: flex;
-			flex-direction: column;
-			border-right: 1px solid $border;
-			overflow: hidden;
-		}
-	}
-
 	&-shell {
 		min-width: 0;
 		display: flex;

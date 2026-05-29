@@ -2,7 +2,7 @@
 	"name": "gandogames-site",
 	"version": "1.0.0",
 	"scripts": {
-		"start": "ng serve",
+		"start": "ng serve --host 0.0.0.0",
 		"build": "ng build",
 		"test": "ng test --no-watch --no-progress --browsers=ChromeHeadless",
 		"test:e2e": "playwright test",

@@ -12,8 +12,13 @@
 					<ion-button fill="clear" (click)="copyCode()" [title]="copied() ? 'Copied!' : 'Copy room link'">
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
-					@if (isInRoom()) {
-						<ion-button fill="clear" color="danger" (click)="leave()">
+					@if (isHost()) {
+						<ion-button fill="clear" color="danger" (click)="closeRoom()" title="Close room">
+							<ion-icon name="trash" slot="icon-only" />
+						</ion-button>
+					}
+					@if (isInRoom() && this.room()!.players.length > 1) {
+						<ion-button fill="clear" color="danger" (click)="leave()" title="Leave room">
 							<ion-icon name="close"></ion-icon>
 						</ion-button>
 					}
@@ -23,89 +28,96 @@
 	</ion-header>
 }
 
-<gg-refreshable-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'" [onRefresh]="refreshFn()">
+<div class="room-layout">
+	@if (isInRoom()) {
+		<div class="room-layout-left">
+			<gg-chat [roomId]="roomId()" />
+		</div>
+	}
+	<gg-refreshable-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'" [onRefresh]="refreshFn()">
 
-	@if (room()?.phase === 'playing') {
-		<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" (leaveRoom)="leave()" />
-	} @else {
-		<div class="room-detail">
+		@if (room()?.phase === 'playing') {
+			<gg-room-play [roomId]="roomId()" [gameType]="room()!.game" [isHost]="isHost()" (leaveRoom)="leave()" (closeRoom)="closeRoom()" />
+		} @else {
+			<div class="room-detail">
 
-			@if (!room()) {
-				<p class="status-msg">Loading room…</p>
-			} @else {
-				<div class="room-info">
-					<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
-					<span class="room-game-name">{{ gameInfo()?.name }}</span>
-					<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
-				</div>
+				@if (!room()) {
+					<p class="status-msg">Loading room…</p>
+				} @else {
+					<div class="room-info">
+						<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
+						<span class="room-game-name">{{ gameInfo()?.name }}</span>
+						<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
+					</div>
 
-				<div class="player-grid">
-					@for (slot of playerSlots(); track $index) {
-						@if (slot) {
-							<div class="player-card"
-								[class.player-card-host]="slot.id === room()!.hostId"
-								[class.player-card-me]="slot.id === myId()">
-								@if (slot.id === room()!.hostId) {
-									<ion-icon name="ribbon" class="player-card-crown" />
-								}
-								@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
-									<button class="player-card-kick" (click)="kick(slot.id)" title="Kick player">
-										<ion-icon name="close" />
-									</button>
-								}
-								<gg-player-avatar class="player-card-avatar" [player]="slot" />
-								<span class="player-card-name">{{ slot.name }}</span>
-							</div>
-						} @else if (isInRoom()) {
-							<div class="player-card player-card-empty">
-								<div class="player-card-avatar player-card-avatar-empty">
-									<ion-icon name="add" />
+					<div class="player-grid">
+						@for (slot of playerSlots(); track $index) {
+							@if (slot) {
+								<div class="player-card"
+									[class.player-card-host]="slot.id === room()!.hostId"
+									[class.player-card-me]="slot.id === myId()">
+									@if (slot.id === room()!.hostId) {
+										<ion-icon name="ribbon" class="player-card-crown" />
+									}
+									@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
+										<button class="player-card-kick" (click)="kick(slot.id)" title="Kick player">
+											<ion-icon name="close" />
+										</button>
+									}
+									<gg-player-avatar class="player-card-avatar" [player]="slot" />
+									<span class="player-card-name">{{ slot.name }}</span>
 								</div>
-								<span class="player-card-name">Empty</span>
+							} @else if (isInRoom()) {
+								<div class="player-card player-card-empty">
+									<div class="player-card-avatar player-card-avatar-empty">
+										<ion-icon name="add" />
+									</div>
+									<span class="player-card-name">Empty</span>
+								</div>
+							}
+						}
+						@if (!isInRoom() && canJoin()) {
+							<div class="player-card player-card-join" [class.player-card-join-loading]="loading()" (click)="join()">
+								<div class="player-card-avatar player-card-avatar-empty">
+									<ion-icon name="enter" />
+								</div>
+								<span class="player-card-name">{{ loading() ? 'Joining…' : 'Join Room' }}</span>
+							</div>
+						}
+					</div>
+
+					@switch (room()!.phase) {
+						@case ('waiting') {
+							<div class="phase-panel">
+								@if (!isInRoom()) {
+									@if (!canJoin()) {
+										<p class="status-msg">This room is full.</p>
+									}
+								} @else {
+									<p class="status-msg">Waiting for players…</p>
+									@if (isHost()) {
+										@if (canStart()) {
+											<ion-button [disabled]="loading()" (click)="start()">
+												{{ loading() ? 'Starting…' : 'Start Game' }}
+											</ion-button>
+										} @else {
+											<p class="hint">Need more players to start.</p>
+										}
+									}
+								}
+							</div>
+						}
+						@case ('ended') {
+							<div class="phase-panel game-over">
+								<h2>Game Over</h2>
+								<ion-button [routerLink]="['/play']">Find another room</ion-button>
 							</div>
 						}
 					}
-					@if (!isInRoom() && canJoin()) {
-						<div class="player-card player-card-join" [class.player-card-join-loading]="loading()" (click)="join()">
-							<div class="player-card-avatar player-card-avatar-empty">
-								<ion-icon name="enter" />
-							</div>
-							<span class="player-card-name">{{ loading() ? 'Joining…' : 'Join Room' }}</span>
-						</div>
-					}
-				</div>
-
-				@switch (room()!.phase) {
-					@case ('waiting') {
-						<div class="phase-panel">
-							@if (!isInRoom()) {
-								@if (!canJoin()) {
-									<p class="status-msg">This room is full.</p>
-								}
-							} @else {
-								<p class="status-msg">Waiting for players…</p>
-								@if (isHost()) {
-									@if (canStart()) {
-										<ion-button [disabled]="loading()" (click)="start()">
-											{{ loading() ? 'Starting…' : 'Start Game' }}
-										</ion-button>
-									} @else {
-										<p class="hint">Need more players to start.</p>
-									}
-								}
-							}
-						</div>
-					}
-					@case ('ended') {
-						<div class="phase-panel game-over">
-							<h2>Game Over</h2>
-							<ion-button [routerLink]="['/play']">Find another room</ion-button>
-						</div>
-					}
 				}
-			}
 
-		</div>
-	}
+			</div>
+		}
 
-</gg-refreshable-content>
+	</gg-refreshable-content>
+</div>

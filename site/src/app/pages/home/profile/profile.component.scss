@@ -1,203 +1,60 @@
 @use 'styles/variables' as *;
 
-:host {
+ion-card-header {
 	display: flex;
-	flex: 1;
 	flex-direction: column;
+	align-items: center;
 }
 
-.profile {
-	&-page {
-		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: $s4;
-	}
-
-	&-card {
-		background: $bg-card;
-		border: 1px solid $border;
-		border-radius: $radius-lg;
-		padding: $s6;
-		width: 100%;
-		max-width: 400px;
-		display: flex;
-		flex-direction: column;
-		gap: $s6;
-
-		@media (min-width: $bp-sm) {
-			padding: $s8;
-		}
-	}
-
-	&-avatar-wrap {
-		display: flex;
-		justify-content: center;
-	}
-
-	&-header {
-		display: flex;
-		align-items: center;
-		gap: $s3;
-	}
-
-	&-title {
-		font-size: $text-2xl;
-		font-weight: 700;
-
-		@media (min-width: $bp-sm) {
-			font-size: $text-3xl;
-		}
-	}
-
-	&-badge {
-		padding: $s1 $s3;
-		background: $color-warning-bg;
-		border: 1px solid $color-warning-border;
-		border-radius: $radius-md;
-		color: $color-warning;
-		font-size: $text-sm;
-		font-weight: 600;
-	}
-
-	&-info {
-		display: flex;
-		flex-direction: column;
-		gap: $s3;
-	}
-
-	&-error {
-		color: $color-danger;
-		font-size: $text-sm;
-	}
+.avatar-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 4px solid $border;
+	border-radius: $radius-full;
+	box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.2);
+	margin-bottom: $s3;
 }
 
 gg-player-avatar.profile-avatar {
-	width: 72px;
-	height: 72px;
-	font-size: $text-2xl;
+	width: 80px;
+	height: 80px;
+	font-size: 2rem;
 }
 
-.info {
-	&-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: $s4;
-		padding: $s3 0;
-		border-bottom: 1px solid $border;
-
-		&:last-child {
-			border-bottom: none;
-		}
-	}
-
-	&-label {
-		font-size: $text-sm; color: $text-muted;
-	}
-
-	&-value {
-		font-size: $text-sm;
-		font-family: monospace;
-		word-break: break-all;
-	}
-}
-
-.theme-btn {
-	display: inline-flex;
-	align-items: center;
+.icon-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
 	gap: $s2;
-	padding: $s1 $s3;
-	background: transparent;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	color: $text-muted;
-	font-size: $text-sm;
+}
+
+.icon-btn {
+	width: 52px;
+	height: 52px;
+	border-radius: $radius-full;
+	border: 2px solid transparent;
+	background: none;
+	padding: 0;
 	cursor: pointer;
-	transition: color $transition, background $transition, border-color $transition;
+	overflow: hidden;
+	transition: border-color $transition, box-shadow $transition;
 
-	&:hover {
-		color: $text; background: $hover-overlay;
-	}
-}
-
-.icon {
-	&-picker {
-		display: flex;
-		flex-direction: column;
-		gap: $s3;
-
-		&-title {
-			font-size: $text-sm;
-			font-weight: 600;
-			color: $text-muted;
-			text-transform: uppercase;
-			letter-spacing: 0.05em;
-		}
-
-		&-empty {
-			font-size: $text-sm;
-			color: $text-muted;
-			font-style: italic;
-		}
-	}
-
-	&-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-		gap: $s2;
-	}
-
-	&-btn {
-		width: 52px;
-		height: 52px;
+	gg-player-avatar {
+		width: 100%;
+		height: 100%;
+		font-size: $text-lg;
 		border-radius: $radius-full;
-		border: 2px solid transparent;
-		background: none;
-		padding: 0;
-		cursor: pointer;
-		overflow: hidden;
-		transition: border-color $transition, box-shadow $transition;
+	}
 
-		gg-player-avatar {
-			width: 100%;
-			height: 100%;
-			font-size: $text-lg;
-			border-radius: $radius-full;
-		}
-
-		&:hover:not(:disabled) {
-			border-color: $accent;
-		}
-		&.selected {
-			border-color: $accent;
-			box-shadow: 0 0 0 3px $accent-tint;
-		}
+	&:hover { border-color: $accent; }
+	&.selected {
+		border-color: $accent;
+		box-shadow: 0 0 0 3px $accent-tint;
 	}
 }
 
-
-.danger-zone {
-	display: flex;
-	flex-direction: column;
-	gap: $s3;
-	padding-top: $s4;
-	border-top: 1px solid $color-danger-dim;
-
-	&-title {
-		font-size: $text-sm;
-		font-weight: 600;
-		color: $text-muted;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	&-warn {
-		font-size: $text-sm; color: $color-danger;
-	}
-
-	&-actions {
-		display: flex; gap: $s3; flex-wrap: wrap;
-	}
+.danger-warn {
+	font-size: $text-sm;
+	color: var(--ion-color-danger);
+	margin-bottom: $s3;
 }

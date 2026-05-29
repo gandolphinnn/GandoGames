@@ -1,7 +1,14 @@
 import { Component, inject, signal, Signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { contrastOutline, languageOutline, logOutOutline, trashOutline } from 'ionicons/icons';
+import {
+	IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader,
+	IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader,
+	IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonRow,
+	IonSelect, IonSelectOption, IonTitle, IonToggle, IonToolbar,
+} from '@ionic/angular/standalone';
 
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonSelect, IonSelectOption, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GamePlayer, IconType, LangCode } from '@gandogames/common/api';
 import { LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
@@ -10,7 +17,14 @@ import { AuthUser, UserService } from '@gandogames/services/user.service';
 @Component({
 	selector: 'gg-profile',
 	host: { class: 'ion-page' },
-	imports: [PlayerAvatarComponent, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonIcon, IonSelect, IonSelectOption],
+	imports: [
+		PlayerAvatarComponent,
+		IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent,
+		IonGrid, IonRow, IonCol,
+		IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent,
+		IonBadge, IonList, IonItem, IonLabel, IonIcon, IonToggle,
+		IonButton, IonSelect, IonSelectOption,
+	],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })
@@ -26,20 +40,24 @@ export class ProfileComponent {
 	public readonly icons: PlayerIcon[] = PLAYER_ICONS;
 	public readonly languages = LANGUAGES;
 
+	constructor() {
+		addIcons({ contrastOutline, languageOutline, logOutOutline, trashOutline });
+	}
+
 	public withIcon(player: GamePlayer, icon: IconType): GamePlayer {
 		return { ...player, icon };
 	}
 
 	public toggleTheme(): void {
-		void this.userService.updateProfileData({ theme: this.userService.isDarkTheme() ? 'light' : 'dark' });
+		this.userService.updateProfileData({ theme: this.userService.isDarkTheme() ? 'light' : 'dark' });
 	}
 
 	public setIcon(iconId: IconType): void {
-		void this.userService.updateProfileData({ icon: iconId });
+		this.userService.updateProfileData({ icon: iconId });
 	}
 
 	public setLanguage(lang: LangCode): void {
-		void this.userService.updateProfileData({ language: lang });
+		this.userService.updateProfileData({ language: lang });
 	}
 
 	public logout(): void {
@@ -60,7 +78,7 @@ export class ProfileComponent {
 		try {
 			await this.userService.deleteAccount();
 			await this.router.navigate(['/login']);
-		} catch (err) {
+		} catch {
 			this.loading.set(false);
 			this.confirmingDelete.set(false);
 		}

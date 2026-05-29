@@ -2,7 +2,6 @@
 	<ion-header [translucent]="true">
 		<ion-toolbar>
 			<ion-buttons slot="start">
-				<ion-menu-button />
 				<ion-button [routerLink]="['/play']" fill="clear">
 					<ion-icon name="arrow-back" slot="icon-only" />
 				</ion-button>
@@ -14,7 +13,9 @@
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
 					@if (isInRoom()) {
-						<ion-button fill="clear" color="danger" (click)="leave()">Leave</ion-button>
+						<ion-button fill="clear" color="danger" (click)="leave()">
+							<ion-icon name="close"></ion-icon>
+						</ion-button>
 					}
 				</ion-buttons>
 			}

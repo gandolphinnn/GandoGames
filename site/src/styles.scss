@@ -152,6 +152,10 @@ body {
 	--ion-background-color: var(--bg);
 	--ion-text-color: var(--text);
 	--ion-font-family: #{$font};
+
+	--ion-toolbar-background: var(--bg-surface);
+	--ion-toolbar-color: var(--text);
+	--ion-toolbar-border-color: var(--border-color);
 }
 
 ion-item {

@@ -7,7 +7,7 @@ import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
-import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
@@ -15,7 +15,7 @@ import { RefreshableContentComponent } from '../../../../components/refreshable-
 @Component({
 	selector: 'gg-room-detail',
 	host: { class: 'ion-page' },
-	imports: [RouterLink, RoomPlayComponent, PlayerAvatarComponent, IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
+	imports: [RouterLink, RoomPlayComponent, PlayerAvatarComponent, IonHeader, IonToolbar, IonButtons, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -27,8 +27,6 @@ export class RoomDetailComponent implements OnInit {
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
 	private readonly destroyRef = inject(DestroyRef);
-
-	private hasLeft = false;
 
 	public readonly roomId = signal('');
 	public readonly room = signal<RoomData | null>(null);
@@ -147,12 +145,13 @@ export class RoomDetailComponent implements OnInit {
 	}
 
 	public async leave(): Promise<void> {
-		this.hasLeft = true;
 		try {
+			const confirmed = await this.toast.yesNo('Are you sure you want to leave the room?');
+			if (!confirmed) return;
+
 			await this.roomService.leaveRoom(this.roomId());
 			this.router.navigate(['/play']);
 		} catch (e) {
-			this.hasLeft = false;
 			this.toast.error((e as Error).message);
 		}
 	}

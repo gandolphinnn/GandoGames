@@ -1,14 +1,16 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoomData } from '@gandogames/common/api';
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
+import { ToastService } from '@gandogames/services/toast.service';
+import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
 
 @Component({
 	selector: 'gg-room-list',
 	host: { class: 'ion-page' },
-	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent, IonButton, IonIcon],
+	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
 	templateUrl: './room-list.component.html',
 	styleUrl: './room-list.component.scss',
 })
@@ -16,17 +18,21 @@ export class RoomListComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
+	private readonly toast = inject(ToastService);
 
 	public readonly allGames = GAME_REGISTRY;
 	public readonly activeGames = signal<string[]>([]);
 	public readonly rooms = this.roomService.rooms;
 	public readonly loading = signal(false);
-	public readonly error = signal('');
 
 	public readonly filteredRooms = computed(() => {
 		const active = this.activeGames();
 		return this.rooms().filter((r) => active.includes(r.game));
 	});
+
+	public readonly refreshFn = async (): Promise<void> => {
+		await this.fetchRooms();
+	};
 
 	public gameLabel(id: string): string {
 		return this.allGames.find((g) => g.id === id)?.name ?? id;
@@ -51,7 +57,7 @@ export class RoomListComponent implements OnInit {
 			this.loading.set(true);
 			await this.roomService.loadRooms();
 		} catch (e) {
-			this.error.set((e as Error).message);
+			this.toast.error((e as Error).message);
 		} finally {
 			this.loading.set(false);
 		}

@@ -7,7 +7,7 @@
 	</ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<gg-refreshable-content [fullscreen]="true" [onRefresh]="refreshFn">
 	<div class="social-page">
 		<div class="social-content">
 			<div class="social-section">
@@ -33,4 +33,4 @@
 			</div>
 		</div>
 	</div>
-</ion-content>
+</gg-refreshable-content>

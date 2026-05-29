@@ -1,7 +1,6 @@
 <ion-header [translucent]="true">
 	<ion-toolbar>
 		<ion-buttons slot="start">
-			<ion-menu-button />
 			<ion-button [routerLink]="['/play']" fill="clear">
 				<ion-icon name="arrow-back" slot="icon-only" />
 			</ion-button>
@@ -27,10 +26,6 @@
 					</button>
 				}
 			</div>
-
-			@if (error()) {
-				<p class="error-msg">{{ error() }}</p>
-			}
 
 			<div class="form-actions">
 				<ion-button [disabled]="!selectedGameId() || loading()" (click)="create()">

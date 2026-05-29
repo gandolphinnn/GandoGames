@@ -7,13 +7,9 @@
 	</ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<gg-refreshable-content [fullscreen]="true" [onRefresh]="refreshFn">
 	<div class="rooms-page">
 		<div class="room-list-wrap">
-			@if (error()) {
-				<p class="status-msg error-msg">{{ error() }}</p>
-			}
-
 			@if (filteredRooms().length === 0) {
 				<div class="empty-state">
 					<ion-icon name="game-controller" class="empty-icon" />
@@ -39,4 +35,4 @@
 			}
 		</div>
 	</div>
-</ion-content>
+</gg-refreshable-content>

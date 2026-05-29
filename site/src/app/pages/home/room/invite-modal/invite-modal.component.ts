@@ -2,6 +2,7 @@ import { Component, computed, HostListener, inject, input, output, signal } from
 import { IonIcon } from '@ionic/angular/standalone';
 import { GameType } from '@gandogames/common/api';
 import { RoomService } from '@gandogames/services/room.service';
+import { ToastService } from '@gandogames/services/toast.service';
 
 @Component({
 	selector: 'gg-invite-modal',
@@ -11,6 +12,7 @@ import { RoomService } from '@gandogames/services/room.service';
 })
 export class InviteModalComponent {
 	private readonly roomService = inject(RoomService);
+	private readonly toast = inject(ToastService);
 
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
@@ -25,7 +27,6 @@ export class InviteModalComponent {
 	);
 
 	public readonly addingBot = signal(false);
-	public readonly error = signal('');
 
 	@HostListener('document:keydown.escape')
 	public onEscape(): void {
@@ -37,13 +38,12 @@ export class InviteModalComponent {
 	}
 
 	public async addBot(): Promise<void> {
-		this.error.set('');
 		this.addingBot.set(true);
 		try {
 			await this.roomService.addBot(this.roomId());
 			this.closed.emit();
 		} catch (e) {
-			this.error.set((e as Error).message);
+			this.toast.error((e as Error).message);
 		} finally {
 			this.addingBot.set(false);
 		}

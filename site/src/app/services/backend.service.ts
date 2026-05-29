@@ -12,7 +12,7 @@ export class BackendService {
 	private readonly baseUrl = environment.apiBaseUrl;
 	private readonly toast = inject(ToastService);
 
-	public async get<T = any>(url: string) {
+	public async get<T>(url: string) {
 		return await firstValueFrom(
 			this.http.get<T>(this.baseUrl + url)
 			.pipe(
@@ -21,7 +21,7 @@ export class BackendService {
 		);
 	}
 
-	public async post<T = any>(url: string, body: any) {
+	public async post<T>(url: string, body: any) {
 		return await firstValueFrom(
 			this.http.post<T>(this.baseUrl + url, body)
 			.pipe(

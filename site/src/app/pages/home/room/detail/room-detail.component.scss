@@ -7,6 +7,37 @@
 	min-height: 0;
 }
 
+.room-layout {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	@media (min-width: $bp-sm) {
+		flex-direction: row;
+	}
+
+	gg-refreshable-content {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	&-left {
+		display: contents;
+
+		@media (min-width: $bp-sm) {
+			display: flex;
+			flex-direction: column;
+			width: 280px;
+			flex-shrink: 0;
+			border-right: 1px solid $border;
+			overflow: hidden;
+		}
+	}
+}
+
 .room {
 	&-detail {
 		padding: $s6;

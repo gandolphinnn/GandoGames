@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { AuthResponse, GuestLoginRequest, ProfileData, ProfileUpdateRequest, Theme } from '@gandogames/common/api';
+import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/common/api';
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
 import { ToastService } from './toast.service';
@@ -36,14 +36,16 @@ export class UserService {
 			const ticket = this.storage.getString('sessionTicket');
 			if (!ticket) return; //! If there is not the sesssion ticket, don't log automatically as guest.
 
-			const result = await this.backend.post<AuthResponse>('/auth/check', { sessionTicket: ticket });
+			const request: BaseRequest = { sessionTicket: ticket };
+			const result = await this.backend.post<AuthResponse>('/auth/check', request);
 			this.setSession({ ...result, isGuest: false });
 		} catch {
 			this.storage.remove('sessionTicket');
 			const guestId = this.storage.getString('guestId');
 			if (!guestId) return;
 			try {
-				const result = await this.backend.post<AuthResponse>('/auth/guestLogin', { customId: guestId });
+				const request: GuestLoginRequest = { customId: guestId };
+				const result = await this.backend.post<AuthResponse>('/auth/guestLogin', request);
 				this.setSession({ ...result, isGuest: true });
 			} catch {
 				this.storage.remove('guestId');
@@ -54,19 +56,23 @@ export class UserService {
 
 	//#region Auth
 	public async login(email: string, password: string): Promise<void> {
-		const result = await this.backend.post<AuthResponse>('/auth/login', { email, password });
+		const request: LoginRequest = { email, password };
+		const result = await this.backend.post<AuthResponse>('/auth/login', request);
 		this.setSession({ ...result, isGuest: false });
 	}
 
 	public async register(email: string, password: string, username: string): Promise<void> {
-		const result = await this.backend.post<AuthResponse>('/auth/register', { email, password, username });
+		const request: RegisterRequest = { email, password, username };
+		const result = await this.backend.post<AuthResponse>('/auth/register', request);
 		this.setSession({ ...result, isGuest: false });
 	}
 
 	public async loginAsGuest(): Promise<void> {
 		let customId = this.storage.getString('guestId');
 		if (!customId) {
-			customId = crypto.randomUUID();
+			customId = typeof crypto.randomUUID === 'function'
+				? crypto.randomUUID()
+				: Array.from({ length: 4 }, () => Math.random().toString(36).slice(2)).join('-');
 			this.storage.setString('guestId', customId);
 		}
 		const request: GuestLoginRequest = { customId };
@@ -97,7 +103,7 @@ export class UserService {
 		this.pendingUpdate = null;
 		this.preUpdateSnapshot = null;
 		try {
-			const request = { sessionTicket: snapshot.sessionTicket, ...data } as ProfileUpdateRequest;
+			const request: ProfileUpdateRequest = { sessionTicket: snapshot.sessionTicket, ...data };
 			const result = await this.backend.post<ProfileData>('/profile/update', request);
 			const current = this._user();
 			if (current) this._user.set({ ...current, player: { ...current.player, ...result } });
@@ -111,7 +117,8 @@ export class UserService {
 	public async deleteAccount(): Promise<void> {
 		const user = this._user();
 		if (!user) return;
-		await this.backend.post('/profile/delete', { sessionTicket: user.sessionTicket });
+		const request: BaseRequest = { sessionTicket: user.sessionTicket };
+		await this.backend.post<void>('/profile/delete', request);
 		this.logout();
 	}
 

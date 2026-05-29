@@ -162,6 +162,15 @@ const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, n
 	return room;
 };
 
+const roomDeleteInner: InnerFunction<RoomBaseRequest, void> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+
+	await PlayfabCtx.rooms.delete(body.roomId);
+	notifier.roomDeleted(body.roomId);
+};
+
 registerFunction('room_create', 'rooms/create', roomCreateInner);
 registerFunction('room_list', 'rooms/list', roomListInner);
 registerFunction('room_get', 'rooms/get', roomGetInner);
@@ -172,3 +181,4 @@ registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);
 registerFunction('room_invite', 'rooms/invite', roomInviteInner);
 registerFunction('room_add_bot', 'rooms/add-bot', roomAddBotInner);
+registerFunction('room_delete', 'rooms/delete', roomDeleteInner);

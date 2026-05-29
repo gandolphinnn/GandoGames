@@ -12,85 +12,75 @@
 	</ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true">
 	@if (user(); as u) {
-		<ion-grid>
-			<ion-row>
-				<ion-col size="12" size-md="6" offset-md="3">
+		<div class="profile-wrap">
+			<ion-card class="profile-card">
 
-					<ion-card>
-						<ion-card-header>
-							<div class="avatar-wrapper">
-								<gg-player-avatar class="profile-avatar" [player]="u.player" />
-							</div>
-							<ion-card-title>{{ u.player.name }}</ion-card-title>
-							@if (u.isGuest) {
-								<ion-badge color="warning">Guest</ion-badge>
+				<div class="profile-top">
+					<div class="avatar-wrapper">
+						<gg-player-avatar class="profile-avatar" [player]="u.player" />
+					</div>
+					<span class="profile-name">{{ u.player.name }}</span>
+					@if (!u.isGuest) {
+						<span class="guest-badge">Guest</span>
+					}
+				</div>
+
+				<div class="settings-list">
+					<div class="setting-row">
+						<div class="setting-label">
+							<ion-icon name="contrast-outline" />
+							<span>Theme</span>
+						</div>
+						<ion-segment [value]="isDark() ? 'dark' : 'light'" (ionChange)="setTheme($event.detail.value!)">
+							<ion-segment-button value="light">
+								<ion-icon name="sunny-outline" />
+							</ion-segment-button>
+							<ion-segment-button value="dark">
+								<ion-icon name="moon-outline" />
+							</ion-segment-button>
+						</ion-segment>
+					</div>
+					<div class="setting-row">
+						<div class="setting-label">
+							<ion-icon name="language-outline" />
+							<span>Language</span>
+						</div>
+						<ion-select [value]="u.player.language" interface="popover" (ionChange)="setLanguage($event.detail.value)">
+							@for (lang of languages; track lang.value) {
+								<ion-select-option [value]="lang.value">{{ lang.text }}</ion-select-option>
 							}
-						</ion-card-header>
-						<ion-card-content>
-							<ion-list>
-								<ion-item>
-									<ion-icon name="contrast-outline" slot="start" />
-									<ion-label>Dark mode</ion-label>
-									<ion-toggle slot="end" [checked]="isDark()" (ionChange)="toggleTheme()" />
-								</ion-item>
-								<ion-item lines="none">
-									<ion-icon name="language-outline" slot="start" />
-									<ion-label>Language</ion-label>
-									<ion-select [value]="u.player.language" interface="popover" (ionChange)="setLanguage($event.detail.value)">
-										@for (lang of languages; track lang.value) {
-											<ion-select-option [value]="lang.value">{{ lang.text }}</ion-select-option>
-										}
-									</ion-select>
-								</ion-item>
-							</ion-list>
-						</ion-card-content>
-					</ion-card>
-
-					<ion-card>
-						<ion-card-header>
-							<ion-card-subtitle>Avatar</ion-card-subtitle>
-						</ion-card-header>
-						<ion-card-content>
-							<div class="icon-grid">
-								@for (icon of icons; track icon.id) {
-									<button
-										class="icon-btn"
-										[class.selected]="u.player.icon === icon.id"
-										type="button"
-										[attr.aria-label]="icon.label"
-										(click)="setIcon(icon.id)"
-									>
-										<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
-									</button>
-								}
-							</div>
-						</ion-card-content>
-					</ion-card>
-
-					<ion-card>
-						<ion-card-content>
-							@if (!confirmingDelete()) {
-								<ion-button fill="outline" color="danger" expand="block" (click)="requestDelete()">
-									<ion-icon name="trash-outline" slot="start" />
-									Delete account
-								</ion-button>
-							} @else {
-								<p class="danger-warn">This will permanently delete your account. This cannot be undone.</p>
-								<ion-button color="danger" expand="block" [disabled]="loading()" (click)="confirmDelete()">
-									<ion-icon name="trash-outline" slot="start" />
-									{{ loading() ? 'Deleting…' : 'Yes, delete my account' }}
-								</ion-button>
-								<ion-button fill="clear" color="medium" expand="block" [disabled]="loading()" (click)="cancelDelete()">
-									Cancel
-								</ion-button>
+						</ion-select>
+					</div>
+					<div class="setting-row setting-row-stacked">
+						<div class="setting-label">
+							<span>Avatar</span>
+						</div>
+						<div class="icon-picker">
+							@for (icon of icons; track icon.id) {
+								<button
+									class="icon-btn"
+									[class.selected]="u.player.icon === icon.id"
+									type="button"
+									[attr.aria-label]="icon.label"
+									(click)="setIcon(icon.id)"
+								>
+									<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
+								</button>
 							}
-						</ion-card-content>
-					</ion-card>
+						</div>
+					</div>
+				</div>
 
-				</ion-col>
-			</ion-row>
-		</ion-grid>
+				<div class="delete-section">
+					<ion-button fill="outline" color="danger" expand="block" [disabled]="loading()" (click)="deleteAccount()">
+						<ion-icon name="trash-outline" slot="start" />
+						{{ loading() ? 'Deleting…' : 'Delete account' }}
+					</ion-button>
+				</div>
+
+			</ion-card>
+		</div>
 	}
 </ion-content>

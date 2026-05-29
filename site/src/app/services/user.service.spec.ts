@@ -89,7 +89,7 @@ describe('UserService', () => {
 			expect(localStorage.getItem('gg_guest_id')).toBe(firstId);
 
 			const [, body] = backendSpy.post.calls.mostRecent().args as [string, unknown];
-			expect((body as { customId: string }).customId).toBe(firstId);
+			expect((body as { customId: string }).customId).toBe(firstId!);
 		});
 
 		it('logout() clears user signal and removes session ticket', async () => {
@@ -142,7 +142,7 @@ describe('UserService', () => {
 			localStorage.setItem('gg_guest_id', 'guest-uuid-123');
 			backendSpy.post.and.callFake((url: string) => {
 				if (url === '/auth/check') return Promise.reject(new Error('Expired'));
-				return Promise.resolve(MOCK_RESPONSE);
+				return Promise.resolve(MOCK_RESPONSE) as Promise<any>;
 			});
 			const service = createService();
 			await service.init();

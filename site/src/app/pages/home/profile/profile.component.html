@@ -22,7 +22,7 @@
 						<gg-player-avatar class="profile-avatar" [player]="u.player" />
 					</div>
 					<span class="profile-name">{{ u.player.name }}</span>
-					@if (!u.isGuest) {
+					@if (u.isGuest) {
 						<span class="guest-badge">Guest</span>
 					}
 				</div>

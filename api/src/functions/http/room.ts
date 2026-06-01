@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, BaseRequest, GamePlayer } from '@gandogames/common/api';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest, GamePlayer } from '@gandogames/common/api';
 import { Game, GAMES_CONFIG } from '../../games';
 import { getPresenceIdByName } from '../../presence';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
@@ -21,8 +21,16 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 	return room;
 };
 
-const roomListInner: InnerFunction<BaseRequest, RoomData[]> = async (_body, _notifier, _player) => {
-	return await PlayfabCtx.rooms.list();
+const roomListInner: InnerFunction<BaseRequest, RoomSummary[]> = async (_body, _notifier, player) => {
+	const rooms = await PlayfabCtx.rooms.list();
+	const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+	return rooms
+		.filter(r =>
+			!r.players.some(p => p.id === player.id) &&
+			!(r.kickedPlayers ?? []).includes(player.id) &&
+			new Date(r.lastUpdate) >= oneHourAgo
+		)
+		.map(({ chat: _c, kickedPlayers: _k, ...summary }) => summary);
 };
 
 const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {

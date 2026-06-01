@@ -1,5 +1,4 @@
 - Friends requests using playfab friends system
-- Online player counter based on last request done
 - Improved login page:
 	login with other means (google, facebook, apple...)
 	alert guest login that many functionalities are not available and that the profile could be deleted
@@ -11,6 +10,8 @@
 	By friends only (DEPENDS ON FRIENDS FEATURE)
 	By players range
 	By flags (like "canAddBot", "canPlayLocally", ecc...) (these flags are just ideas)
+- Online player counter based on last request done
+	Just an idea: i need to verify if its really the best approach.
 - Guest login with custom displayName
 	Still need to decide if i want to implement this
 - Profile page enhancement

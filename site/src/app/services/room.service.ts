@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest } from '@gandogames/common/api';
+import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/common/api';
 import { UserService } from './user.service';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
@@ -10,7 +10,7 @@ export class RoomService {
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 
-	public readonly rooms = signal<RoomData[]>([]);
+	public readonly rooms = signal<RoomSummary[]>([]);
 
 	public readonly myRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
@@ -43,8 +43,8 @@ export class RoomService {
 
 	public async loadRooms(): Promise<void> {
 		const request: BaseRequest = { sessionTicket: this.ticket };
-		const rooms = await this.backend.post<RoomData[]>('/rooms/list', request);
-		this.rooms.set(rooms);
+		const summaries = await this.backend.post<RoomSummary[]>('/rooms/list', request);
+		this.rooms.set(summaries);
 	}
 
 	public createRoom(game: GameType): Promise<RoomData> {

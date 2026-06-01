@@ -25,6 +25,7 @@ export class ChatComponent {
 	private shouldScroll = false;
 
 	public readonly roomId = input.required<string>();
+	public readonly chatHistory = input<ChatMessage[]>([]);
 	public readonly currentRoom = computed(() =>
 		this.roomService.rooms().find(r => r.id === this.roomId()) ?? null
 	);
@@ -37,10 +38,9 @@ export class ChatComponent {
 	protected readonly messages = signal<ChatMessage[]>([]);
 
 	constructor() {
+		effect(() => { this.messages.set(this.chatHistory()); });
 		effect(() => {
-			const room = this.currentRoom();
-			this.messages.set(room?.chat ?? []);
-			if (!room) { this.open.set(false); this.unread.set(0); }
+			if (!this.currentRoom()) { this.open.set(false); this.unread.set(0); }
 		});
 
 		this.signalR.events.chatMessage

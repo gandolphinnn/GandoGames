@@ -170,18 +170,25 @@ ion-textarea {
 	&-msg {
 		display: flex;
 		flex-direction: column;
+		align-self: flex-start;
 		gap: 2px;
 		padding: $s1 $s2;
-		border-radius: $radius-sm;
+		border-radius: $radius-sm $radius-sm $radius-sm 2px;
+		background: $bg-card;
+		max-width: 85%;
 		transition: background $transition;
 
 		&:hover {
 			background: $hover-overlay;
 		}
 		&.is-mine {
-			.chat-msg-name {
-				color: $accent;
-			}
+			align-self: flex-end;
+			align-items: flex-end;
+			background: $accent-muted;
+			border-radius: $radius-sm $radius-sm 2px $radius-sm;
+
+			.chat-msg-name { display: none; }
+			.chat-msg-text { text-align: right; }
 		}
 
 		&-name {
@@ -207,7 +214,9 @@ ion-textarea {
 		--border-radius: #{$radius-sm};
 		--color: #{$text};
 		--placeholder-color: #{$text-muted};
-		--highlight-color-focused: #{$accent};
+		--highlight-color-focused: #{$border};
+		--highlight-color-valid: #{$border};
+		--highlight-height: 1px;
 		--padding-start: #{$s3};
 		--padding-end: #{$s3};
 		--padding-top: #{$s2};

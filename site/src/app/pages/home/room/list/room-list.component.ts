@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoomData } from '@gandogames/common/api';
+import { RoomSummary } from '@gandogames/common/api';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
@@ -42,7 +42,7 @@ export class RoomListComponent implements OnInit {
 		return this.allGames.find((g) => g.id === id)?.maxPlayers ?? 0;
 	}
 
-	public playerNames(room: RoomData): string {
+	public playerNames(room: RoomSummary): string {
 		return room.players.map((p) => p.name).join(', ');
 	}
 
@@ -73,7 +73,7 @@ export class RoomListComponent implements OnInit {
 		}
 	}
 
-	public navigateToRoom(room: RoomData): void {
+	public navigateToRoom(room: RoomSummary): void {
 		void this.router.navigate(['/play', room.id]);
 	}
 

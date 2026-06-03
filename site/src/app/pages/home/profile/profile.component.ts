@@ -33,10 +33,10 @@ export class ProfileComponent {
 	private readonly toast = inject(ToastService);
 
 	public readonly user: Signal<AuthUser | null> = this.userService.user;
-	public readonly loading = signal(false);
+	public readonly deleting = signal(false);
 	public readonly isDark = this.userService.isDarkTheme;
 
-	public readonly icons: PlayerIcon[] = PLAYER_ICONS;
+	public readonly icons: PlayerIcon[] = PLAYER_ICONS.filter(i => !i.reserved);
 	public readonly languages = LANGUAGES;
 
 	constructor() {
@@ -69,12 +69,12 @@ export class ProfileComponent {
 	public async deleteAccount(): Promise<void> {
 		const confirmed = await this.toast.yesNo('This will permanently delete your account. This cannot be undone.');
 		if (!confirmed) return;
-		this.loading.set(true);
+		this.deleting.set(true);
 		try {
 			await this.userService.deleteAccount();
 			await this.router.navigate(['/login']);
-		} catch {
-			this.loading.set(false);
+		} finally {
+			this.deleting.set(false);
 		}
 	}
 }

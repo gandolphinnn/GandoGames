@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest, GamePlayer } from '@gandogames/common/api';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest } from '@gandogames/common/api';
 import { Game, GAMES_CONFIG } from '../../games';
 import { getPresenceIdByName } from '../../presence';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
@@ -25,8 +25,9 @@ const roomListInner: InnerFunction<BaseRequest, RoomSummary[]> = async (_body, _
 	const rooms = await PlayfabCtx.rooms.list();
 	const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 	return rooms
+		// Include the caller's own rooms: the client splits them into the menu's "Active Rooms"
+		// (myRooms) vs the browsable list (browsableRooms). Only hide rooms they were kicked from.
 		.filter(r =>
-			!r.players.some(p => p.id === player.id) &&
 			!(r.kickedPlayers ?? []).includes(player.id) &&
 			new Date(r.lastUpdate) >= oneHourAgo
 		)
@@ -154,22 +155,6 @@ const roomInviteInner: InnerFunction<RoomInviteRequest, void> = async (body, not
 	notifier.roomInviteForPlayer(targetId, body.roomId, room.game);
 };
 
-const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(body.roomId);
-	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('Only the host can add bots');
-	if (room.phase !== 'waiting') throw new Error('Cannot add bots after game has started');
-	const gameConfig = GAMES_CONFIG[room.game];
-	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
-	const botCount = room.players.filter(p => p.id.startsWith('bot_')).length;
-	const bot: GamePlayer = { id: `bot_${Math.random().toString(36).substring(2, 8)}`, name: `Bot ${botCount + 1}`, icon: 'profile', theme: 'dark', language: 'en' };
-	room.players.push(bot);
-	room.lastUpdate = new Date();
-	await PlayfabCtx.rooms.upsert(body.roomId, room);
-	notifier.roomUpsert(room);
-	return room;
-};
-
 const roomDeleteInner: InnerFunction<RoomBaseRequest, void> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -188,5 +173,4 @@ registerFunction('room_reset', 'rooms/reset', roomResetInner);
 registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);
 registerFunction('room_invite', 'rooms/invite', roomInviteInner);
-registerFunction('room_add_bot', 'rooms/add-bot', roomAddBotInner);
 registerFunction('room_delete', 'rooms/delete', roomDeleteInner);

@@ -11,6 +11,7 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { GameType } from '@gandogames/common/api';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
+import { FriendService } from '@gandogames/services/friend.service';
 import { ToastComponent } from './components/toast/toast.component';
 import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
 
@@ -32,12 +33,14 @@ const ION_COMPONENTS = [
 export class App {
 	private readonly userService = inject(UserService);
 	private readonly roomService = inject(RoomService);
+	private readonly friendService = inject(FriendService);
 	private readonly router = inject(Router);
 	private readonly menuCtrl = inject(MenuController);
 
 	public readonly user = this.userService.user;
 	public readonly isLoggedIn = this.userService.isLoggedIn;
 	public readonly myRooms = this.roomService.myRooms;
+	public readonly pendingFriendRequests = this.friendService.pendingCount;
 	public readonly hasLiveRoom = computed(() => this.myRooms().some(r => r.phase === 'playing'));
 
 	public gameLabel(game: GameType): string {

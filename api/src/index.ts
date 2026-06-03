@@ -140,6 +140,7 @@ export async function authenticateSession(request: BaseRequest, notifier: InnerF
 	notifier.errorMessage = errorMessage;
 	const id = authResult.UserInfo!.PlayFabId!;
 	const name = authResult.UserInfo!.TitleInfo?.DisplayName || authResult.UserInfo!.Username || 'Guest';
+	const isGuest = !authResult.UserInfo!.Username;
 	const profileResult = await pfPromise<PlayFabServerModels.GetUserDataResult>(
 		cb => PlayFabServer.GetUserData({ PlayFabId: id, Keys: ['icon', 'theme', 'language'] }, cb),
 	);
@@ -147,6 +148,7 @@ export async function authenticateSession(request: BaseRequest, notifier: InnerF
 	return {
 		id,
 		name,
+		isGuest,
 		icon: (data?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (data?.['theme']?.Value as Theme) ?? 'dark',
 		language: (data?.['language']?.Value as LangCode) ?? 'en',

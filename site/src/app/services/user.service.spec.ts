@@ -7,7 +7,12 @@ import type { AuthResponse } from '@gandogames/common/api';
 
 const MOCK_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
-	player: { id: 'player-1', name: 'Alice', icon: 'profile', theme: 'dark', language: 'en' },
+	player: { id: 'player-1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' },
+};
+
+const MOCK_GUEST_RESPONSE: AuthResponse = {
+	sessionTicket: 'ticket-123',
+	player: { id: 'guest-1', name: 'Guest123456', isGuest: true, icon: 'profile', theme: 'dark', language: 'en' },
 };
 
 describe('UserService', () => {
@@ -72,7 +77,7 @@ describe('UserService', () => {
 		});
 
 		it('loginAsGuest() sets user with isGuest true and persists ticket', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.post.and.returnValue(Promise.resolve(MOCK_GUEST_RESPONSE));
 			await service.loginAsGuest();
 			expect(service.user()?.isGuest).toBeTrue();
 			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
@@ -142,7 +147,7 @@ describe('UserService', () => {
 			localStorage.setItem('gg_guest_id', 'guest-uuid-123');
 			backendSpy.post.and.callFake((url: string) => {
 				if (url === '/auth/check') return Promise.reject(new Error('Expired'));
-				return Promise.resolve(MOCK_RESPONSE) as Promise<any>;
+				return Promise.resolve(MOCK_GUEST_RESPONSE) as Promise<any>;
 			});
 			const service = createService();
 			await service.init();

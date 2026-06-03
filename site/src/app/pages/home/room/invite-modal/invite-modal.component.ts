@@ -1,7 +1,6 @@
-import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
+import { Component, HostListener, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
 import { GameType } from '@gandogames/common/api';
-import { RoomService } from '@gandogames/services/room.service';
 
 @Component({
 	selector: 'gg-invite-modal',
@@ -10,8 +9,6 @@ import { RoomService } from '@gandogames/services/room.service';
 	styleUrl: './invite-modal.component.scss',
 })
 export class InviteModalComponent {
-	private readonly roomService = inject(RoomService);
-
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
 	public readonly isHost = input.required<boolean>();
@@ -20,12 +17,6 @@ export class InviteModalComponent {
 
 	public readonly closed = output<void>();
 
-	public readonly canAddBot = computed(() =>
-		this.isHost() && this.playerCount() < this.maxPlayers()
-	);
-
-	public readonly addingBot = signal(false);
-
 	@HostListener('document:keydown.escape')
 	public onEscape(): void {
 		this.closed.emit();
@@ -33,15 +24,5 @@ export class InviteModalComponent {
 
 	public onBackdropClick(): void {
 		this.closed.emit();
-	}
-
-	public async addBot(): Promise<void> {
-		this.addingBot.set(true);
-		try {
-			await this.roomService.addBot(this.roomId());
-			this.closed.emit();
-		} finally {
-			this.addingBot.set(false);
-		}
 	}
 }

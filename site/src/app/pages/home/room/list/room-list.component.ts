@@ -20,12 +20,12 @@ export class RoomListComponent implements OnInit {
 
 	public readonly allGames = GAME_REGISTRY;
 	public readonly activeGames = signal<string[]>([]);
-	public readonly rooms = this.roomService.rooms;
+	public readonly browsableRooms = this.roomService.browsableRooms;
 	public readonly loading = signal(false);
 
 	public readonly filteredRooms = computed(() => {
 		const active = this.activeGames();
-		return this.rooms().filter((r) => active.includes(r.game));
+		return this.browsableRooms().filter((r) => active.includes(r.game));
 	});
 
 	public readonly refreshFn = async (): Promise<void> => {

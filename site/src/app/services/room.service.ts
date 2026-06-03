@@ -18,6 +18,13 @@ export class RoomService {
 		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
 
+	/** Rooms to show in the browse list (/play): everything except rooms the player is already in —
+	 *  those are surfaced separately in the menu's "Active Rooms" via myRooms. */
+	public readonly browsableRooms = computed(() => {
+		const userId = this.auth.user()?.player.id;
+		return this.rooms().filter(r => !userId || !r.players.some(p => p.id === userId));
+	});
+
 	private get ticket(): string {
 		return this.auth.user()!.sessionTicket;
 	}
@@ -97,11 +104,6 @@ export class RoomService {
 	public invitePlayer(roomId: string, playerName: string): Promise<void> {
 		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, playerName };
 		return this.backend.post<void>('/rooms/invite', request);
-	}
-
-	public addBot(roomId: string): Promise<RoomData> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<RoomData>('/rooms/add-bot', request);
 	}
 
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {

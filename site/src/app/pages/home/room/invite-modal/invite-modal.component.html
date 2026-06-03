@@ -10,26 +10,6 @@
 	</header>
 
 	<div class="modal-body">
-
-		@if (canAddBot()) {
-			<section class="invite-section">
-				<h3 class="section-label">Add a bot</h3>
-				<div class="player-row">
-					<div class="player-row-avatar bot-avatar">
-						<ion-icon name="hardware-chip" />
-					</div>
-					<span class="player-row-name">Bot player</span>
-					<button class="btn-row-action" [disabled]="addingBot()" (click)="addBot()">
-						@if (addingBot()) {
-							<ion-icon name="sync" class="spin" />
-						} @else {
-							Add
-						}
-					</button>
-				</div>
-			</section>
-		}
-
 	</div>
 
 </div>

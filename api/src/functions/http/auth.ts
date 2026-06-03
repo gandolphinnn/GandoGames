@@ -36,8 +36,11 @@ const toAuthResponse = (
 });
 
 const guestUsername = (customId: string): string => {
-	const n = parseInt(customId.replace(/-/g, '').slice(0, 8), 16) % 1_000_000;
-	return `Guest${String(n).padStart(6, '0')}`;
+	let hash = 0;
+	for (let i = 0; i < customId.length; i++) {
+		hash = (hash * 31 + customId.charCodeAt(i)) % 1_000_000;
+	}
+	return `Guest${String(hash).padStart(6, '0')}`;
 };
 
 const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, notifier) => {

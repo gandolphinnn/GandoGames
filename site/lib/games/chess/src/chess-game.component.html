@@ -1,0 +1,97 @@
+@let gs = gameState();
+@if (!gs) {
+	<div class="game-loading">
+		<p>Loading game…</p>
+	</div>
+} @else {
+	<div class="chess-game">
+		<div class="players-strip">
+			@for (p of playerViews(); track p.id) {
+				<div class="player-tag"
+					[class.player-tag-turn]="p.isTurn"
+					[class.player-tag-me]="p.isMe">
+					<span class="player-dot" [class.player-dot-white]="p.color === 'white'"></span>
+					<span class="player-name">{{ p.name }}</span>
+					@if (p.isMe) { <span class="player-you">(you)</span> }
+				</div>
+			}
+		</div>
+
+		<p class="status-bar" [class.status-check]="gs.inCheck && gs.gamePhase === 'playing'">
+			{{ statusText() }}
+		</p>
+
+		<div class="board-wrap">
+			<div class="board">
+				@for (sq of squares(); track sq.index) {
+					<button type="button"
+						class="square"
+						[class.square-light]="sq.light"
+						[class.square-dark]="!sq.light"
+						[class.square-selected]="isSelected(sq.index)"
+						[class.square-last]="isLastMove(sq.index)"
+						[class.square-check]="isCheckedKing(sq.index)"
+						[disabled]="gs.gamePhase !== 'playing'"
+						(click)="onSquareClick(sq.index)">
+						@if (sq.piece) {
+							<span class="piece"
+								[class.piece-white]="sq.piece.color === 'white'"
+								[class.piece-black]="sq.piece.color === 'black'">{{ glyph(sq.piece) }}</span>
+						}
+						@if (legalTargets().has(sq.index)) {
+							<span class="legal-dot" [class.legal-dot-capture]="!!sq.piece"></span>
+						}
+					</button>
+				}
+			</div>
+		</div>
+
+		@if (error()) { <p class="action-error">{{ error() }}</p> }
+
+		@if (gs.gamePhase === 'playing') {
+			@if (opponentDrawOffer()) {
+				<div class="panel panel-centered">
+					<p class="panel-eyebrow">Draw offered</p>
+					<div class="action-row">
+						<ion-button [disabled]="loading()" (click)="acceptDraw()">Accept draw</ion-button>
+						<ion-button fill="outline" [disabled]="loading()" (click)="declineDraw()">Decline</ion-button>
+					</div>
+				</div>
+			} @else {
+				<div class="action-row">
+					<ion-button fill="outline"
+						[disabled]="loading() || myDrawOfferPending()"
+						(click)="offerDraw()">
+						{{ myDrawOfferPending() ? 'Draw offered…' : 'Offer draw' }}
+					</ion-button>
+					<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="resign()">Resign</ion-button>
+				</div>
+			}
+		}
+
+		@if (gs.gamePhase === 'game-over') {
+			<div class="panel panel-centered">
+				<p class="panel-eyebrow">Game over</p>
+				<h2 class="panel-title">{{ resultText() }}</h2>
+				<ion-button (click)="playAgain.emit()">Play Again</ion-button>
+			</div>
+		}
+
+		@if (promotionMove(); as pm) {
+			<div class="promotion-overlay" (click)="cancelPromotion()">
+				<div class="promotion-picker" (click)="$event.stopPropagation()">
+					<p class="promotion-title">Promote to…</p>
+					<div class="promotion-row">
+						@for (choice of PROMOTION_CHOICES; track choice) {
+							<button type="button" class="promotion-btn" (click)="choosePromotion(choice)">
+								<span class="piece"
+									[class.piece-white]="myColor() === 'white'"
+									[class.piece-black]="myColor() === 'black'">{{ glyph({ type: choice }) }}</span>
+							</button>
+						}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+}

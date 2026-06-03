@@ -37,4 +37,12 @@ export const GAME_REGISTRY: GameDescriptor[] = [
 		minPlayers: 2,
 		maxPlayers: 8,
 	},
+	{
+		id: 'chess',
+		name: 'Chess',
+		icon: 'fa-solid fa-chess-king',
+		description: 'The classic duel. Checkmate your opponent\'s king to win.',
+		minPlayers: 2,
+		maxPlayers: 2,
+	},
 ];

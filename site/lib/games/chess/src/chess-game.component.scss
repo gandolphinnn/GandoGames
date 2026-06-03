@@ -1,0 +1,227 @@
+@use 'styles/variables' as *;
+@use 'styles/game' as *;
+
+:host { display: contents; }
+
+.chess-game {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $s3;
+	width: 100%;
+
+	@media (min-width: $bp-sm) {
+		gap: $s4;
+	}
+}
+
+// ── Players strip ────────────────────────────────────────────────────────────────
+
+.player-tag {
+	display: flex;
+	align-items: center;
+	gap: $s2;
+	padding: $s2 $s3;
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-full;
+	font-size: $text-sm;
+
+	&-turn {
+		border-color: $accent;
+		background: $accent-muted;
+	}
+
+	&-me .player-name { font-weight: 700; }
+}
+
+.player-dot {
+	width: 14px;
+	height: 14px;
+	border-radius: $radius-full;
+	background: #111;
+	border: 1px solid $border;
+
+	&-white { background: #f5f5f5; }
+}
+
+.player-you {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
+// ── Status ─────────────────────────────────────────────────────────────────────
+
+.status-bar {
+	font-size: $text-base;
+	font-weight: 600;
+	color: $text;
+	min-height: 1.4em;
+	text-align: center;
+
+	&.status-check { color: $color-danger; }
+}
+
+// ── Board ──────────────────────────────────────────────────────────────────────
+
+.board-wrap {
+	width: 100%;
+	max-width: min(92vw, 560px);
+}
+
+.board {
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	aspect-ratio: 1 / 1;
+	width: 100%;
+	border: 2px solid $border;
+	border-radius: $radius-sm;
+	overflow: hidden;
+}
+
+.square {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border: none;
+	cursor: pointer;
+	transition: background-color $transition;
+
+	&[disabled] { cursor: default; }
+
+	&-light { background: #ebecd0; }
+	&-dark { background: #739552; }
+
+	&-last::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: rgba(255, 214, 0, 0.32);
+		pointer-events: none;
+	}
+
+	&-selected::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: rgba(20, 130, 255, 0.4);
+		pointer-events: none;
+	}
+
+	&-check::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(circle, rgba(230, 35, 35, 0.7) 0%, rgba(230, 35, 35, 0) 72%);
+		pointer-events: none;
+	}
+}
+
+.piece {
+	position: relative;
+	z-index: 1;
+	font-size: clamp(28px, 9vw, 48px);
+	line-height: 1;
+	user-select: none;
+	pointer-events: none;
+
+	&-white {
+		color: #fff;
+		text-shadow: 0 0 1px #000, 1px 1px 1px rgba(0, 0, 0, 0.7);
+	}
+
+	&-black {
+		color: #111;
+		text-shadow: 0 0 1px #000;
+	}
+}
+
+.legal-dot {
+	position: absolute;
+	z-index: 2;
+	width: 28%;
+	height: 28%;
+	border-radius: $radius-full;
+	background: rgba(0, 0, 0, 0.28);
+	pointer-events: none;
+
+	&-capture {
+		width: 88%;
+		height: 88%;
+		background: transparent;
+		border: 6px solid rgba(0, 0, 0, 0.28);
+		box-sizing: border-box;
+	}
+}
+
+// ── Actions ──────────────────────────────────────────────────────────────────────
+
+.action-row {
+	display: flex;
+	gap: $s3;
+	flex-wrap: wrap;
+	width: 100%;
+	max-width: min(92vw, 560px);
+
+	ion-button { flex: 1; }
+}
+
+// ── Promotion picker ──────────────────────────────────────────────────────────────
+
+.promotion-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 50;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.55);
+	padding: $s4;
+}
+
+.promotion-picker {
+	background: $bg-card;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	padding: $s6;
+	display: flex;
+	flex-direction: column;
+	gap: $s4;
+	align-items: center;
+}
+
+.promotion-title {
+	font-size: $text-base;
+	font-weight: 600;
+	color: $text-muted;
+}
+
+.promotion-row {
+	display: flex;
+	gap: $s2;
+
+	@media (min-width: $bp-sm) { gap: $s3; }
+}
+
+.promotion-btn {
+	width: 64px;
+	height: 64px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #739552;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	cursor: pointer;
+	transition: transform $transition, border-color $transition;
+
+	.piece { font-size: 40px; }
+
+	&:hover {
+		border-color: $accent;
+		transform: translateY(-2px);
+	}
+}

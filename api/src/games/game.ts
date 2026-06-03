@@ -12,6 +12,10 @@ export const GAMES_CONFIG: Record<GameType, {
 		minPlayers: 2,
 		maxPlayers: 8,
 	},
+	'chess': {
+		minPlayers: 2,
+		maxPlayers: 2,
+	},
 }
 
 export abstract class Game<TState extends GameState> {

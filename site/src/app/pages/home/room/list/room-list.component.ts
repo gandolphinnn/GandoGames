@@ -4,7 +4,6 @@ import { RoomSummary } from '@gandogames/common/api';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
-import { ToastService } from '@gandogames/services/toast.service';
 import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
 
 @Component({
@@ -18,7 +17,6 @@ export class RoomListComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
-	private readonly toast = inject(ToastService);
 
 	public readonly allGames = GAME_REGISTRY;
 	public readonly activeGames = signal<string[]>([]);
@@ -56,8 +54,6 @@ export class RoomListComponent implements OnInit {
 		try {
 			this.loading.set(true);
 			await this.roomService.loadRooms();
-		} catch (e) {
-			this.toast.error((e as Error).message);
 		} finally {
 			this.loading.set(false);
 		}

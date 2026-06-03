@@ -128,8 +128,6 @@ export class RoomDetailComponent implements OnInit {
 			this.loading.set(true);
 			await this.roomService.joinRoom(this.roomId());
 			await this.loadRoom();
-		} catch (e) {
-			this.toast.error((e as Error).message);
 		} finally {
 			this.loading.set(false);
 		}
@@ -140,43 +138,29 @@ export class RoomDetailComponent implements OnInit {
 			this.loading.set(true);
 			await this.roomService.startRoom(this.roomId());
 			await this.loadRoom();
-		} catch (e) {
-			this.toast.error((e as Error).message);
 		} finally {
 			this.loading.set(false);
 		}
 	}
 
 	public async leave(): Promise<void> {
-		try {
-			const confirmed = await this.toast.yesNo('Are you sure you want to leave the room?');
-			if (!confirmed) return;
+		const confirmed = await this.toast.yesNo('Are you sure you want to leave the room?');
+		if (!confirmed) return;
 
-			await this.roomService.leaveRoom(this.roomId());
-			this.router.navigate(['/play']);
-		} catch (e) {
-			this.toast.error((e as Error).message);
-		}
+		await this.roomService.leaveRoom(this.roomId());
+		this.router.navigate(['/play']);
 	}
 
 	public async closeRoom(): Promise<void> {
-		try {
-			const confirmed = await this.toast.yesNo('Close the room for everyone?');
-			if (!confirmed) return;
+		const confirmed = await this.toast.yesNo('Close the room for everyone?');
+		if (!confirmed) return;
 
-			await this.roomService.deleteRoom(this.roomId());
-			void this.router.navigate(['/play']);
-		} catch (e) {
-			this.toast.error((e as Error).message);
-		}
+		await this.roomService.deleteRoom(this.roomId());
+		void this.router.navigate(['/play']);
 	}
 
 	public async kick(playerId: string): Promise<void> {
-		try {
-			await this.roomService.kickPlayer(this.roomId(), playerId);
-		} catch (e) {
-			this.toast.error((e as Error).message);
-		}
+		await this.roomService.kickPlayer(this.roomId(), playerId);
 	}
 
 	public async copyCode(): Promise<void> {

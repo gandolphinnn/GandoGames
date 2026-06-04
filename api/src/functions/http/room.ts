@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest } from '@gandogames/common/api';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest } from '@gandogames/shared/api';
 import { Game, GAMES_CONFIG } from '../../games';
 import { getPresenceIdByName } from '../../presence';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';

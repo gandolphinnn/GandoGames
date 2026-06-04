@@ -28,8 +28,8 @@
 			]
 		},
 		"moduleNameMapper": {
-			"^@gandogames/common/api$": "<rootDir>/../common/index",
-			"^@gandogames/common/pankov$": "<rootDir>/../common/games/pankov"
+			"^@gandogames/shared/api$": "<rootDir>/../shared/index",
+			"^@gandogames/shared/pankov$": "<rootDir>/../shared/games/pankov"
 		}
 	},
 	"dependencies": {

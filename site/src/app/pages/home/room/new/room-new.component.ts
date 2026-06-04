@@ -15,8 +15,8 @@ export class RoomNewComponent {
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
 
-	public readonly allGames = GAME_REGISTRY;
-	public readonly selectedGameId = signal<string>(GAME_REGISTRY[0]?.id ?? '');
+	public readonly allGames = Object.values(GAME_REGISTRY);
+	public readonly selectedGameId = signal<string>(this.allGames[0]?.id ?? '');
 	public readonly loading = signal(false);
 
 	public select(id: string): void {

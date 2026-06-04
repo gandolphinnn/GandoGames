@@ -1,5 +1,5 @@
-import type { GamePlayer } from '@gandogames/common/api';
-import type { Card, PokerGameState, PokerPlayer, Rank, Suit } from '@gandogames/common/poker';
+import type { GamePlayer } from '@gandogames/shared/api';
+import type { Card, PokerGameState, PokerPlayer, Rank, Suit } from '@gandogames/shared/poker';
 import { Game } from './game';
 
 const STARTING_CHIPS = 1000;

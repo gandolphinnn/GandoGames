@@ -1,6 +1,6 @@
-import { GameState, GameType, RoomData } from "@gandogames/common/api";
-import { PankovGameState } from "@gandogames/common/pankov";
-import { PokerGameState } from "@gandogames/common/poker";
+import { GameState, GameType, RoomData } from "@gandogames/shared/api";
+import { PankovGameState } from "@gandogames/shared/pankov";
+import { PokerGameState } from "@gandogames/shared/poker";
 import { pfPromise, PlayFabServer } from "..";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;

@@ -8,7 +8,7 @@ import {
 } from '@ionic/angular/standalone';
 
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { GameType } from '@gandogames/common/api';
+import { GameType } from '@gandogames/shared/api';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { FriendService } from '@gandogames/services/friend.service';
@@ -44,7 +44,7 @@ export class App {
 	public readonly hasLiveRoom = computed(() => this.myRooms().some(r => r.phase === 'playing'));
 
 	public gameLabel(game: GameType): string {
-		return GAME_REGISTRY.find(g => g.id === game)?.name ?? game;
+		return GAME_REGISTRY[game]?.name ?? game;
 	}
 
 	public async closeMenu(): Promise<void> {

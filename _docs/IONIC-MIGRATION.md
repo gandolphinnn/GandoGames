@@ -2,84 +2,47 @@
 
 ## Why Ionic
 
-GandoGames is a multiplayer party game platform. Players are most likely to use it on their phones at the same table — not at a desktop. A responsive "desktop site that shrinks" is not enough: it still feels like a website, with small tap targets, scroll-based navigation, and no native UI patterns.
+GandoGames is a multiplayer party game platform. Players are most likely to use it on their phones at the same table — not at a desktop. A responsive "desktop site that shrinks" still feels like a website, with small tap targets and no native UI patterns.
 
-Ionic provides a set of components that behave like a native mobile app:
-- **Tab bar** (`ion-tabs`) — bottom navigation, the standard mobile pattern for top-level sections
-- **Bottom sheets** (`ion-modal` with `breakpoints`) — contextual panels that slide up from the bottom instead of fixed side panels or drawers
-- **Pull-to-refresh** (`ion-refresher`) — standard gesture for refreshing a list
-- **Back button** (`ion-back-button`) — hardware-aware, history-integrated navigation
-- **List / item** (`ion-list`, `ion-item`) — touch-friendly, swipe-ready list rows
-- **Touch targets** — all interactive elements meet the 44 × 44 px minimum by default
-
-All of these are things that would have to be built from scratch with plain CSS/HTML, and most would still not feel as polished.
+Ionic provides components that behave like a native mobile app — touch-friendly lists, modals/bottom sheets, pull-to-refresh, a hardware-aware back button, and 44 × 44 px touch targets by default — which would otherwise have to be built from scratch in CSS/HTML.
 
 ---
 
-## Approach: hard split, not progressive enhancement
+## Approach: wholesale adoption, single component tree
 
-Rather than adding responsive overrides on top of the desktop design, this project keeps **two separate component trees**:
+The app uses Ionic **everywhere**, with a single component tree — there is **no** desktop/mobile split and **no** device-detection service. Each component imports only the standalone Ionic pieces its template needs:
 
-```
-device.isMobile()
-  true  → Ionic components (ion-tabs, ion-modal, ion-list, …)
-  false → original Angular design (unchanged from master)
+```typescript
+import { IonHeader, IonToolbar, IonContent, IonButton } from '@ionic/angular/standalone';
 ```
 
-This is enforced at every level: `AppComponent`, `HomeComponent`, and every routed page (`RoomListComponent`, `RoomDetailComponent`, `ProfileComponent`, `SocialComponent`), plus the shared widgets (`ChatComponent`, `GameHistoryComponent`).
+Routed page components carry the `ion-page` class **unconditionally** so Ionic transitions and layout work inside `ion-router-outlet`:
 
-The alternative — one template with `@media` overrides — produces a degraded experience on both platforms: the desktop design gets extra Ionic CSS loaded into it, and the mobile design is constrained by desktop layout assumptions.
+```typescript
+host: { class: 'ion-page' }
+```
 
-The cost of the split is **template duplication** per component. This is accepted because:
-1. The two UX patterns are genuinely different (tab bar vs navbar, bottom sheet vs side panel, etc.)
-2. The logic layer (TypeScript class) is shared — only the template and host binding differ
-3. Adding a new feature means writing it twice, but each version can be optimised for its platform
+Icons come from two sources: `ionicons` (registered per-component with `addIcons({ … })` and rendered via `ion-icon`), and a few Font Awesome classes used in game metadata (`GAME_REGISTRY` icons such as `fa-solid fa-dice`).
 
 ---
 
-## DeviceService
+## Navigation: side menu (not tabs)
 
-```typescript
-// user-agent check, evaluated once at service instantiation
-public readonly isMobile = signal(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
-```
+The root shell (`App`, `gg-app`) is built from `IonApp` + `IonMenu` + `IonRouterOutlet`:
 
-Detection is user-agent **and** viewport based. The signal is `true` when either condition holds:
-
-```typescript
-mobileRegex.test(navigator.userAgent) || window.innerWidth < 730
-```
-
-- The result is stable for the lifetime of the session (evaluated once at service instantiation, no resize listener needed)
-- The `730px` threshold matches `$bp-sm` in `_variables.scss` — keep them in sync
-- Ionic's `Platform.is('mobile')` was **not** used — it returned `true` on desktop in some configurations
-
-The signal is consumed as `device.isMobile()` in templates and as `this.device.isMobile()` in class methods (e.g. `ProfileComponent.requestDelete()` to decide between `AlertController` and a plain `confirmingDelete` signal).
-
----
-
-## Ion-page class
-
-Ionic's CSS requires routed page components to carry the `ion-page` class for transitions and layout to work inside `ion-router-outlet`. This must **not** apply on desktop (it would claim the full viewport and cover the navbar).
-
-All routed child components use a conditional host binding:
-
-```typescript
-host: { '[class.ion-page]': 'device.isMobile()' }
-```
-
-This is the critical difference from an unconditional `host: { class: 'ion-page' }` — the latter was the root cause of the navbar being hidden on desktop.
+- An overlay **side menu** (`<ion-menu menuId="main-menu" contentId="main-content">`) holds top-level navigation (play, profile, social, the caller's live rooms). It is disabled until the user is logged in.
+- `<ion-router-outlet id="main-content">` renders the routed pages.
+- Menu items use `ion-menu-toggle` so the drawer closes on navigation; `MenuController` closes it programmatically (e.g. when jumping to a room).
 
 ---
 
 ## PWA
 
-The web manifest (`public/manifest.webmanifest`) is configured with `"display": "standalone"`, so when installed on Android or iOS the app launches full-screen without browser chrome. Ionic's components are designed for exactly this context. The theme colour and background colour are set to match the dark walnut palette.
+The web manifest (`site/public/manifest.webmanifest`) is configured with `"display": "standalone"`, so when installed on Android or iOS the app launches full-screen without browser chrome. The theme and background colours match the dark walnut palette.
 
 ---
 
-## What is not migrated
+## Notes
 
-- **Login / signup / about pages** — rarely visited, no navigation affordances needed, desktop design works fine as-is
-- **Game components** (Morra, Pankov) — they already take the full viewport when active; no structural Ionic wrapping is needed
-- **Capacitor** — not used. The app is web-only. Capacitor would be needed only if native device APIs (camera, push notifications, etc.) were required
+- **Games** (Pankov, Poker) take the full viewport when active and render inside `RoomPlayComponent`; they use Ionic chrome only for their own controls.
+- **Capacitor** is not used — the app is web-only. Capacitor would be needed only for native device APIs (camera, push notifications, etc.).

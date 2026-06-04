@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoomSummary } from '@gandogames/common/api';
+import { RoomSummary } from '@gandogames/shared/api';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
@@ -18,7 +18,7 @@ export class RoomListComponent implements OnInit {
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
 
-	public readonly allGames = GAME_REGISTRY;
+	public readonly allGames = Object.values(GAME_REGISTRY);
 	public readonly activeGames = signal<string[]>([]);
 	public readonly browsableRooms = this.roomService.browsableRooms;
 	public readonly loading = signal(false);

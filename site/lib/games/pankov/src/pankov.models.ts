@@ -1,4 +1,4 @@
-export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RollValue } from '@gandogames/common/pankov';
+export type { PankovPlayer, PankovGameState, PankovRoomState, RevealResult, RollValue } from '@gandogames/shared/pankov';
 
 export function formatValue(value: number): string {
 	if (value === 21) return 'Pankov!';

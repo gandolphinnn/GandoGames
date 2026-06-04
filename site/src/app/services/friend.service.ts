@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/common/api';
+import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/api';
 import { UserService } from './user.service';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';

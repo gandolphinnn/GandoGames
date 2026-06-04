@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { GamePlayer, RoomData } from '@gandogames/common/api';
+import { GamePlayer, RoomData } from '@gandogames/shared/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
@@ -45,25 +45,28 @@ export class RoomDetailComponent implements OnInit {
 		const r = this.room();
 		if (!r || r.phase !== 'waiting' || this.isInRoom()) return false;
 		if (r.kickedPlayers?.includes(this.myId())) return false;
-		const maxPlayers = GAME_REGISTRY.find((g) => g.id === r.game)?.maxPlayers ?? 0;
+		const maxPlayers = GAME_REGISTRY[r.game]?.maxPlayers ?? 0;
 		return r.players.length < maxPlayers;
 	});
 
 	public readonly canStart = computed(() => {
 		const r = this.room();
 		if (!r || !this.isHost() || r.phase !== 'waiting') return false;
-		const game = GAME_REGISTRY.find((g) => g.id === r.game);
+		const game = GAME_REGISTRY[r.game];
 		if (!game) return false;
 		return r.players.length >= game.minPlayers;
 	});
 
-	public readonly gameInfo = computed(() => GAME_REGISTRY.find((g) => g.id === this.room()?.game));
+	public readonly gameInfo = computed(() => {
+		const g = this.room()?.game;
+		return g ? GAME_REGISTRY[g] : undefined;
+	});
 	public readonly roomPlayerNames = computed(() => this.room()?.players.map(p => p.name) ?? []);
 
 	public readonly playerSlots = computed(() => {
 		const r = this.room();
 		if (!r) return [];
-		const max = GAME_REGISTRY.find((g) => g.id === r.game)?.maxPlayers ?? r.players.length;
+		const max = GAME_REGISTRY[r.game]?.maxPlayers ?? r.players.length;
 		const slots: (typeof r.players[0] | null)[] = [...r.players];
 		while (slots.length < max) slots.push(null);
 		return slots;

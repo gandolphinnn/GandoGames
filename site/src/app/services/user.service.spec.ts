@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
 import { ToastService } from './toast.service';
-import type { AuthResponse } from '@gandogames/common/api';
+import type { AuthResponse } from '@gandogames/shared/api';
 
 const MOCK_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',

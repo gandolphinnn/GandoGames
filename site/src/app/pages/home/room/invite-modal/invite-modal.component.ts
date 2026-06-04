@@ -1,6 +1,6 @@
 import { Component, HostListener, input, output } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { GameType } from '@gandogames/common/api';
+import { GameType } from '@gandogames/shared/api';
 
 @Component({
 	selector: 'gg-invite-modal',

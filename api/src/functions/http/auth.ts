@@ -1,4 +1,4 @@
-import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/common/api';
+import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/shared/api';
 import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {

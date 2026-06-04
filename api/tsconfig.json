@@ -10,8 +10,8 @@
 		"sourceMap": true,
 		"types": [ "node", "jest" ],
 		"paths": {
-			"@gandogames/common/api": ["../common/index"],
-			"@gandogames/common/*": ["../common/games/*"],
+			"@gandogames/shared/api": ["../shared/index"],
+			"@gandogames/shared/*": ["../shared/games/*"],
 		}
 	}
 }

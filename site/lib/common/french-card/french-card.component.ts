@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import type { Card } from '@gandogames/common/poker';
+import type { Card } from '@gandogames/shared/poker';
 
 const SUIT_SYMBOL: Record<string, string> = {
 	spades: '♠',

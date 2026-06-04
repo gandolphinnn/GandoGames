@@ -35,7 +35,8 @@ export interface RoomKickRequest extends RoomBaseRequest {
 }
 
 export interface RoomInviteRequest extends RoomBaseRequest {
-	playerName: string;
+	/** PlayFab id of the friend being invited. */
+	friendId: string;
 }
 
 export interface ChatSendRequest extends RoomBaseRequest {

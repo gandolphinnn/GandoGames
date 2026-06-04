@@ -98,9 +98,9 @@ Host only, while `waiting`.
 Returns `RoomData`. Broadcasts `roomDeleted` to the kicked player and `roomUpsert` to the rest.
 
 ### `POST /rooms/invite`
-Host only, while `waiting`. Targets an online player by name.
+Host only, while `waiting`. Targets a friend by their PlayFab id.
 ```json
-{ "sessionTicket": "string", "roomId": "string", "playerName": "string" }
+{ "sessionTicket": "string", "roomId": "string", "friendId": "string" }
 ```
 Returns `void`. Broadcasts `roomInvite` to the target.
 

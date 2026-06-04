@@ -62,6 +62,7 @@ export class RoomDetailComponent implements OnInit {
 		return g ? GAME_REGISTRY[g] : undefined;
 	});
 	public readonly roomPlayerNames = computed(() => this.room()?.players.map(p => p.name) ?? []);
+	public readonly memberIds = computed(() => this.room()?.players.map(p => p.id) ?? []);
 
 	public readonly playerSlots = computed(() => {
 		const r = this.room();
@@ -165,8 +166,11 @@ export class RoomDetailComponent implements OnInit {
 		void this.router.navigate(['/play']);
 	}
 
-	public async kick(playerId: string): Promise<void> {
-		await this.roomService.kickPlayer(this.roomId(), playerId);
+	public async kick(player: GamePlayer): Promise<void> {
+		const confirmed = await this.toast.yesNo(`Kick ${player.name} from the room?`);
+		if (!confirmed) return;
+
+		await this.roomService.kickPlayer(this.roomId(), player.id);
 	}
 
 	public async copyCode(): Promise<void> {

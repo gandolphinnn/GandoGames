@@ -101,8 +101,8 @@ export class RoomService {
 		this.backend.postBeacon('/rooms/leave', request);
 	}
 
-	public invitePlayer(roomId: string, playerName: string): Promise<void> {
-		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, playerName };
+	public invitePlayer(roomId: string, friendId: string): Promise<void> {
+		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, friendId };
 		return this.backend.post<void>('/rooms/invite', request);
 	}
 

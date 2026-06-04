@@ -60,7 +60,7 @@
 										<ion-icon name="ribbon" class="player-card-crown" title="host" />
 									}
 									@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
-										<button class="player-card-kick" (click)="kick(slot.id)" title="Kick player">
+										<button class="player-card-kick" (click)="kick(slot)" title="Kick player">
 											<ion-icon name="close" />
 										</button>
 									}
@@ -127,6 +127,7 @@
 							[isHost]="isHost()"
 							[playerCount]="room()!.players.length"
 							[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
+							[memberIds]="memberIds()"
 							(closed)="showInviteModal.set(false)" />
 					}
 				}

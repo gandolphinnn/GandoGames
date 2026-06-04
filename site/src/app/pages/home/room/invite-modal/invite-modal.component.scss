@@ -155,3 +155,29 @@
 		background: $color-success-bg; color: $color-success; border: 1px solid $color-success-border;
 	}
 }
+
+.invite-search {
+	width: 100%;
+	padding: $s2 $s3;
+	background: transparent;
+	color: $text;
+	border: 1px solid $border;
+	border-radius: $radius-sm;
+	font-size: $text-sm;
+	transition: border-color $transition;
+
+	&::placeholder {
+		color: $text-muted;
+	}
+
+	&:focus {
+		outline: none;
+		border-color: $accent;
+	}
+}
+
+.player-row-status {
+	flex-shrink: 0;
+	font-size: $text-sm;
+	color: $text-muted;
+}

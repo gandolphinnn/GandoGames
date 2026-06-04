@@ -1,8 +1,7 @@
 import { HttpHandler, InvocationContext } from '@azure/functions';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { BaseRequest } from '@gandogames/shared/api';
-import { authenticateSession, InnerFunctionNotifier, registerBaseFunction, signalRInput, SignalRMessage, signalROutput } from '../..';
-import { deletePresence, upsertPresence } from '../../presence';
+import { authenticateSession, InnerFunctionNotifier, registerBaseFunction, signalRInput } from '../..';
 
 function validateSignature(body: string, signature: string): boolean {
 	const match = (process.env['AzureSignalRConnectionString'] ?? '').match(/AccessKey=([^;]+)/i);

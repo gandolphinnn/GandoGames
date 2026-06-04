@@ -1,6 +1,5 @@
 import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest } from '@gandogames/shared/api';
 import { Game, GAMES_CONFIG } from '../../games';
-import { getPresenceIdByName } from '../../presence';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 
 const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, notifier, player) => {
@@ -132,8 +131,10 @@ const roomKickInner: InnerFunction<RoomKickRequest, RoomData> = async (body, not
 	if (body.playerId === player.id) throw new Error('You cannot kick yourself');
 	if (!room.players.some(p => p.id === body.playerId)) throw new Error('Player not found in this room');
 
+	// The room still exists for the kicked player; the roomUpsert below (carrying them in
+	// kickedPlayers) is what notifies them. Don't also send roomDeleted — that would surface a
+	// misleading "the host has closed the room" toast on top of the "you have been kicked" one.
 	notifier.removeFromGroup(body.playerId, body.roomId);
-	notifier.roomDeletedForPlayer(body.playerId, body.roomId);
 
 	room.players = room.players.filter(p => p.id !== body.playerId);
 	room.kickedPlayers = [...(room.kickedPlayers ?? []), body.playerId];
@@ -149,10 +150,16 @@ const roomInviteInner: InnerFunction<RoomInviteRequest, void> = async (body, not
 	if (room.phase !== 'waiting') throw new Error('Cannot invite after game has started');
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
-	const targetId = getPresenceIdByName(body.playerName);
-	if (!targetId) throw new Error('Player not found or offline');
-	if (room.players.some(p => p.id === targetId)) throw new Error('Player is already in this room');
-	notifier.roomInviteForPlayer(targetId, body.roomId, room.game);
+	if (room.players.some(p => p.id === body.friendId)) throw new Error('Player is already in this room');
+
+	// Inviting a previously-kicked player clears their kick, so they can accept and rejoin.
+	if (room.kickedPlayers?.includes(body.friendId)) {
+		room.kickedPlayers = room.kickedPlayers.filter(id => id !== body.friendId);
+		await PlayfabCtx.rooms.upsert(body.roomId, room);
+		notifier.roomUpsert(room);
+	}
+
+	notifier.roomInviteForPlayer(body.friendId, body.roomId, room.game);
 };
 
 const roomDeleteInner: InnerFunction<RoomBaseRequest, void> = async (body, notifier, player) => {

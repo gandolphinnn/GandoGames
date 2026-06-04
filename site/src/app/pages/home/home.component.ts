@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
 		this.signalR.events.roomInvite
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(async ({ roomId, game }) => {
-				const gameName = GAME_REGISTRY.find(g => g.id === game)?.name ?? game;
+				const gameName = GAME_REGISTRY[game]?.name ?? game;
 				const accepted = await this.toast.yesNo(`You've been invited to a ${gameName} game!`);
 				if (accepted) void this.router.navigate(['/play', roomId]);
 			});

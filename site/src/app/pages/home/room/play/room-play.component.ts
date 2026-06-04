@@ -1,12 +1,11 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, output, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/common/api';
+import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/shared/api';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
-import { GAME_COMPONENT_REGISTRY } from '../../../../game-component-registry';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 @Component({
 	selector: 'gg-room-play',
@@ -37,7 +36,7 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 	private readonly myPlayFabId = computed(() => this.auth.user()?.player.id ?? null);
 	private readonly gameRef = signal<ComponentRef<unknown> | null>(null);
 
-	protected readonly gameTitle = computed(() => GAME_REGISTRY.find(g => g.id === this.gameType())?.name ?? this.gameType());
+	protected readonly gameTitle = computed(() => GAME_REGISTRY[this.gameType()]?.name ?? this.gameType());
 
 	constructor() {
 		effect(() => {
@@ -60,7 +59,7 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 	}
 
 	public ngAfterViewInit(): void {
-		const ref = this.gameSlot.createComponent(GAME_COMPONENT_REGISTRY[this.gameType()]);
+		const ref = this.gameSlot.createComponent(GAME_REGISTRY[this.gameType()].component);
 		const instance = ref.instance as GameComponent;
 
 		outputToObservable(instance.gameAction)

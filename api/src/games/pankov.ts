@@ -1,5 +1,5 @@
-import type { GamePlayer } from '@gandogames/common/api';
-import type { PankovGameState, RollValue } from '@gandogames/common/pankov';
+import type { GamePlayer } from '@gandogames/shared/api';
+import type { PankovGameState, RollValue } from '@gandogames/shared/pankov';
 import { Game } from './game';
 
 function formatValue(value: RollValue): string {

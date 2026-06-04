@@ -1,5 +1,5 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import type { PokerGameState } from '@gandogames/common/poker';
+import type { PokerGameState } from '@gandogames/shared/poker';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { GameComponent } from '@gandogames/lib/game-registry';

@@ -1,54 +1,61 @@
 # Play
 
-## `/play`
+## `/play` — RoomListComponent
 
-Lists rooms for all games. Shows a filter to toggle per-game visibility.  
-Rooms update in real-time via SignalR (`roomUpsert`, `roomDeleted` events).  
-Initial load fetches all rooms via `POST /rooms/list`.
+Lists rooms for all games. Shows a per-game filter to toggle visibility, and separates the caller's own active rooms from the browsable list.
+Rooms update in real-time via SignalR (`roomUpsert`, `roomDeleted`).
+Initial load fetches rooms via `POST /rooms/list`. Creating a room happens on `/play/new` (`RoomNewComponent`).
 
 ---
 
 ## `/play/:roomId` — RoomDetailComponent
 
-Single route, single component for the full room lifecycle. Behaviour varies by `room.phase`.
+A single component for the full room lifecycle. Behaviour varies by `room.phase`.
 
 ### `waiting` — Lobby
 
-- Loads room via `POST /rooms/get` on init.
+- Loads the room via `POST /rooms/get` on init.
 - Updates reactively via `roomUpsert` / `roomDeleted` SignalR events.
-- **Join** — visible if room is `waiting`, user is not already in it, and player count < max.
-- **Start** — visible to host only if room is `waiting` and player count ≥ min.
-- **Leave** — navigates back to `/play` and notifies the API.
-- On any navigation away or tab close, calls `leaveRoom` (beacon fetch with `keepalive: true` on unload).
+- **Join** — visible if the room is `waiting`, the user is not already in it, not kicked, and player count < max.
+- **Start** — host only, visible if `waiting` and player count ≥ min.
+- **Leave** — notifies the API (`/rooms/leave`) and navigates back to `/play`.
+- **Close** — host only; deletes the room for everyone (`/rooms/delete`).
+- **Kick** — host only (`/rooms/kick`).
+- **Invite** — host only; opens the invite modal to invite an online player (`/rooms/invite`).
+- Players can send a friend request to other registered players from the lobby.
 
 ### `playing` — Game
 
-When `phase` changes to `playing`, `RoomDetailComponent` gives the full viewport to the correct game component using `NgComponentOutlet`. The game component to render is resolved from a game-to-component registry keyed by `room.game` (e.g. `'morra'` → `MorraGameComponent`).
+When `phase` is `playing`, `RoomDetailComponent` renders `<gg-room-play>` (`RoomPlayComponent`), which gives the game the full viewport. `RoomPlayComponent` resolves the game component from the `GAME_REGISTRY` entry (keyed by `room.game`) and **dynamically mounts it** via `ViewContainerRef.createComponent` — there is no per-game route.
 
 **Transition triggers:**
-- **Host**: `rooms/start` returns success → `RoomDetailComponent` switches to game view immediately.
-- **Non-host**: `roomUpsert` SignalR event arrives with `phase: 'playing'` → same switch.
+- **Host**: `rooms/start` succeeds → the room signal flips to `playing` → switch.
+- **Non-host**: a `roomUpsert` SignalR event arrives with `phase: 'playing'` → same switch.
 
-There is no URL change. The route stays `/play/:roomId` throughout.
+There is no URL change — the route stays `/play/:roomId` throughout.
 
 ### `ended` — Game over
 
-Handled inside the game component itself (game-over phase). The component shows the result and offers a way back to `/play`.
+Handled inside the game component (game-over UI). It can emit `playAgain` (host → `POST /rooms/reset`, back to the lobby) or `back` (→ `/play`).
 
 ---
 
 ## Game components
 
-Each game package (`site/lib/games/<name>/`) exports a standalone game component (e.g. `MorraGameComponent`). This component:
+Each game package (`site/lib/games/<name>/`) exports a standalone component implementing the `GameComponent` interface (`site/lib/game-registry.ts`). The component is **driven by `RoomPlayComponent`**, not by direct backend access:
 
-- Receives `roomId` as an input (passed by `RoomDetailComponent` via `NgComponentOutlet`).
-- Does **not** poll. All state updates arrive via the `gameStateUpdated` SignalR event, which carries the full updated game state as its payload.
-- Sends player actions via `POST /game/action`.
-- Takes over the full viewport — `RoomDetailComponent` renders nothing else while the game is active.
+- **Inputs** (set by `RoomPlayComponent`): `gameState`, `loading`, `error`, `myPlayFabId`.
+- **Outputs** (handled by `RoomPlayComponent`): `gameAction` → `POST /game/action`, `back` → navigate to `/play`, `playAgain` → `POST /rooms/reset`.
+- Does **not** poll. State arrives via the `gameStateUpdated` SignalR event (plus an initial `POST /game/state`), which `RoomPlayComponent` feeds into the `gameState` input.
+- Takes over the full viewport while active.
 
 ### Backend contract
 
-`/game/state` and `/game/action` are game-agnostic. The backend reads `game` from the request, passes it to `Game.Factory`, and delegates all logic to the concrete class (e.g. `MorraGame`) that extends the abstract `Game` class. The frontend game component only needs to know its own state shape (e.g. `MorraGameState`) and action names.
+`/game/state` and `/game/action` are game-agnostic. The backend reads `game` from the request, passes it to `Game.Factory`, and delegates to the concrete class (e.g. `PankovGame`, `PokerGame`) that extends the abstract `Game`. The frontend game component only needs to know its own state shape (e.g. `PankovGameState`) and action names.
+
+### Registries
+
+- `GAME_REGISTRY` (`site/lib/game-registry.ts`) — a `Record<GameType, GameDescriptor>`; each descriptor holds the metadata (`id`, `name`, `icon`, `description`, `minPlayers`, `maxPlayers`) **and** the `component` to mount.
 
 ---
 
@@ -57,4 +64,4 @@ Each game package (`site/lib/games/<name>/`) exports a standalone game component
 If a player navigates directly to `/play/:roomId` while a game is in progress:
 
 - **Not in the room** → redirect to `/play`.
-- **In the room** → `RoomDetailComponent` loads, detects `phase === 'playing'`, renders the game component. The game component receives its first full state from the next `gameStateUpdated` SignalR event.
+- **In the room** → `RoomDetailComponent` loads, detects `phase === 'playing'`, and mounts the game component, which receives its first state from `POST /game/state` (or the next `gameStateUpdated` event).

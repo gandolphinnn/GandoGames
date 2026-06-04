@@ -1,5 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
-import { PankovGameState } from '@gandogames/common/pankov';
+import { PankovGameState } from '@gandogames/shared/pankov';
 import { IonButton } from '@ionic/angular/standalone';
 import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
 import { formatValue, getRank, INITIAL_LIVES, ROLL_VALUES } from './pankov.models';

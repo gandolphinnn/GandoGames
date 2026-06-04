@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { RefreshableContentComponent } from '../../../components/refreshable-content/refreshable-content.component';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
-import { Friend } from '@gandogames/common/api';
+import { Friend } from '@gandogames/shared/api';
 import { FriendService } from '@gandogames/services/friend.service';
 import { UserService } from '@gandogames/services/user.service';
 import { ToastService } from '@gandogames/services/toast.service';

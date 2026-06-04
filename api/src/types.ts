@@ -1,5 +1,5 @@
 import { InvocationContext, Timer } from '@azure/functions';
-import { BaseRequest, ChatMessage, Friend, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/common/api';
+import { BaseRequest, ChatMessage, Friend, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/shared/api';
 import { signalROutput } from '.';
 
 export type SignalRMessage =

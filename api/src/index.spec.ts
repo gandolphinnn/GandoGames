@@ -1,6 +1,6 @@
 import { pfPromise } from '.';
 import { InnerFunctionNotifier } from './types';
-import type { RoomData } from '@gandogames/common/api';
+import type { RoomData } from '@gandogames/shared/api';
 
 describe('pfPromise', () => {
 	it('resolves with result.data on success', async () => {

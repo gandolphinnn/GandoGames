@@ -19,23 +19,23 @@ Read every file listed below before asking the user anything or generating any c
 - `_docs/API.md` — all API endpoints and shared types
 - `CLAUDE.md` — coding conventions: CSS naming, component prefix `gg-`, mobile-first, visibility modifiers, no test files
 
-**Reference implementation (morra — the canonical game):**
-- `common/games/morra.ts` — shared state/player/action types
+**Reference implementation (pankov — the canonical game):**
+- `shared/games/pankov.ts` — shared state/player/action types
 - `api/src/games/game.ts` — abstract `Game<TState>` class + `GAMES_CONFIG`
-- `api/src/games/morra.ts` — complete `Game` implementation
+- `api/src/games/pankov.ts` — complete `Game` implementation
 - `api/src/games/index.ts` — `Game.Factory` wiring
-- `site/lib/games/morra/src/morra.models.ts` — frontend models + constants
-- `site/lib/games/morra/src/morra-game.component.ts` — game component pattern
-- `site/lib/games/morra/src/morra-game.component.html` — template patterns (`@let`, `@switch`, SignalR-driven state)
-- `site/lib/games/morra/src/morra-game.component.scss` — SCSS conventions
-- `site/lib/games/morra/index.ts` — package export
+- `site/lib/games/pankov/src/pankov.models.ts` — frontend models + constants
+- `site/lib/games/pankov/src/pankov-game.component.ts` — game component pattern (implements `GameComponent`)
+- `site/lib/games/pankov/src/pankov-game.component.html` — template patterns (`@let`, `@switch`, input-signal-driven state)
+- `site/lib/games/pankov/src/pankov-game.component.scss` — SCSS conventions
+- `site/lib/games/pankov/index.ts` — package export
+- `site/lib/common/` — reusable game widgets (dice, french-card, player-chip) to compose from
 
 **Files to modify (read before editing):**
-- `common/src/game.ts` — `GameType` union
-- `common/index.ts` — top-level re-exports
+- `shared/src/game.ts` — `GameType` union
+- `shared/index.ts` — top-level re-exports
 - `site/tsconfig.json` — path aliases
-- `site/lib/game-registry.ts` — `GAME_REGISTRY` array
-- `site/src/app/game-component-registry.ts` — `GAME_COMPONENT_REGISTRY` map
+- `site/lib/game-registry.ts` — `GAME_REGISTRY` (`Record<GameType, GameDescriptor>`, including each game's `component`)
 
 ---
 
@@ -59,15 +59,15 @@ Wait for all answers before continuing.
 
 Use `<name>` for the lowercase game name and `<Name>` for PascalCase.
 
-### 3.1 `common/games/<name>.ts`
+### 3.1 `shared/games/<name>.ts`
 
-Follow `common/games/morra.ts` as the template:
+Follow `shared/games/pankov.ts` as the template:
 - `<Name>Player extends GamePlayer` — add game-specific player fields
 - `<Name>GameState extends GameState` — must include `gamePhase`, `players: <Name>Player[]`, optional `winnerName?: string`, plus any round-result or turn-tracking fields
 - `<Name>RoundResult` (if applicable)
 - `<Name>RoomState extends RoomData`
 
-### 3.2 `common/src/game.ts`
+### 3.2 `shared/src/game.ts`
 
 Add `| '<name>'` to the `GameType` union. Nothing else.
 
@@ -89,27 +89,22 @@ Add `case '<name>': return new <Name>Game();` to `Game.Factory` and `export * fr
 
 ### 3.6 `site/tsconfig.json`
 
-Add to `compilerOptions.paths`:
-```json
-"@gandogames/common/<name>": ["../common/games/<name>"]
-```
-The game component import is covered by the existing `@gandogames/lib/*` wildcard — do not add a redundant entry for it.
+No change needed. `@gandogames/shared/<name>` already resolves through the existing `@gandogames/shared/*` → `../shared/games/*` wildcard, and the game component import through the `@gandogames/lib/*` wildcard. (Both `site/` and `api/` tsconfigs already have these wildcards.)
 
 ### 3.7 `site/lib/games/<name>/src/<name>.models.ts`
 
-Re-export common types + frontend-only constants (display labels, etc.).
+Re-export shared types + frontend-only constants (display labels, etc.).
 
 ### 3.8 `site/lib/games/<name>/src/<name>-game.component.ts`
 
-Standalone Angular component following `morra-game.component.ts` exactly:
+Standalone Angular component following `pankov-game.component.ts` exactly. It implements `GameComponent<<Name>GameState>` (`site/lib/game-registry.ts`) and is **driven by `RoomPlayComponent`** — it injects no services, fetches no state, and does not know the `roomId`:
 - Selector: `gg-<name>-game`
-- `@Input() roomId!: string`
-- Inject: `SignalRService`, `BackendService`, `AuthService`, `Router`, `DestroyRef`
-- `ngOnInit()`: `void this.loadState()` + subscribe to `signalR.events.gameStateUpdated` filtered by `roomId`, using `takeUntilDestroyed(this.destroyRef)`
-- `loadState()`: POST `/game/state` with `{ sessionTicket, game: '<name>', roomId }`; catch silently
-- Action methods: POST `/game/action` with `{ sessionTicket, game: '<name>', roomId, action, data }`
-- `backToLobby()`: `this.router.navigate(['/play'])`
-- Use `public` or `private` on every member; `protected` only for things the template binds to
+- Inputs (signals): `gameState = input.required<<Name>GameState | null>()`, `loading = input.required<boolean>()`, `error = input.required<string | null>()`, `myPlayFabId = input.required<string | null>()`
+- Outputs: `gameAction = output<{ action: string; data?: unknown }>()`, `back = output<void>()`, `playAgain = output<void>()`
+- Action handlers emit, e.g. `this.gameAction.emit({ action: 'roll' })`; `RoomPlayComponent` POSTs `/game/action` and feeds the next state back into `gameState`
+- Derive view state with `computed()` from the `gameState()` input (e.g. `isMyTurn`, current player)
+- Reuse shared widgets from `site/lib/common` where applicable (e.g. `PlayerChipComponent`); if a widget could serve other games, add it there rather than inline
+- Use `public` for the interface inputs/outputs and `private`/`protected` for the rest; `protected` for template-only members
 
 ### 3.9 `site/lib/games/<name>/src/<name>-game.component.html`
 
@@ -121,7 +116,7 @@ Required structure:
 } @else {
   <div class="<name>-game">
     <header class="game-header">
-      <button class="game-back" (click)="backToLobby()">← Back</button>
+      <button class="game-back" (click)="back.emit()">← Back</button>
       <h1 class="game-title"><Display Name></h1>
     </header>
     <!-- players strip -->
@@ -131,7 +126,7 @@ Required structure:
         @case ('game-over') {
           <div class="panel panel-centered">
             <h2>{{ gs.winnerName }}</h2>
-            <button class="btn btn-primary" (click)="backToLobby()">Play Again</button>
+            <button class="btn btn-primary" (click)="playAgain.emit()">Play Again</button>
           </div>
         }
       }
@@ -152,11 +147,7 @@ export { <Name>GameComponent } from './src/<name>-game.component';
 
 ### 3.12 `site/lib/game-registry.ts`
 
-Add a `GameDescriptor` entry to `GAME_REGISTRY` with `id`, `name`, `description`, `minPlayers`, `maxPlayers`.
-
-### 3.13 `site/src/app/game-component-registry.ts`
-
-Import `<Name>GameComponent` from `@gandogames/lib/games/<name>` and add `'<name>': <Name>GameComponent`.
+Add a `GameDescriptor` entry to `GAME_REGISTRY` (keyed by `GameType`) with `id`, `name`, `description`, `minPlayers`, `maxPlayers`, and `component` — import `<Name>GameComponent` from `@gandogames/lib/games/<name>` and set it as the descriptor's `component`.
 
 ---
 

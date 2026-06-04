@@ -9,7 +9,7 @@ import {
 	IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonTitle, IonToolbar,
 } from '@ionic/angular/standalone';
 
-import { GamePlayer, IconType, LangCode } from '@gandogames/common/api';
+import { GamePlayer, IconType, LangCode } from '@gandogames/shared/api';
 import { LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
 import { AuthUser, UserService } from '@gandogames/services/user.service';

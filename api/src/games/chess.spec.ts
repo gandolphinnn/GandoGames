@@ -2,8 +2,8 @@ import { ChessGame, createInitialBoard, generateLegalMoves, isInsufficientMateri
 import type { GamePlayer } from '@gandogames/common/api';
 import type { ChessPiece, PieceColor, PieceType, PromotionPiece } from '@gandogames/common/chess';
 
-const p1: GamePlayer = { id: 'p1', name: 'Alice', icon: 'profile', theme: 'dark', language: 'en' };
-const p2: GamePlayer = { id: 'p2', name: 'Bob', icon: 'profile', theme: 'dark', language: 'en' };
+const p1: GamePlayer = { id: 'p1', name: 'Alice', icon: 'profile', theme: 'dark', language: 'en', isGuest: false };
+const p2: GamePlayer = { id: 'p2', name: 'Bob', icon: 'profile', theme: 'dark', language: 'en', isGuest: false };
 
 /** Algebraic square ('e4') → board index (row*8 + col, row 0 = rank 8). */
 function sq(alg: string): number {

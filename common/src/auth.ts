@@ -1,6 +1,6 @@
 export type Theme = 'dark' | 'light';
 export type LangCode = 'en' | 'it';
-export type IconType = 'profile'| 'luck' | 'hat' | 'paw' | 'pizza';
+export type IconType = 'profile'| 'luck' | 'hat' | 'paw' | 'pizza' | 'bot';
 
 /** Profile preferences data */
 export interface ProfileData {
@@ -26,7 +26,11 @@ export interface GuestLoginRequest {
 export interface GamePlayer extends ProfileData {
 	id: string;
 	name: string;
+	isGuest: boolean;
 }
+
+/** Minimal player shape needed to render an avatar (id drives the colour hash, icon the glyph). */
+export type AvatarPlayer = Pick<GamePlayer, 'id' | 'icon'>;
 
 export interface AuthResponse {
 	player: GamePlayer;

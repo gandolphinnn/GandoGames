@@ -5,7 +5,7 @@ import {
   checkmarkCircle, chevronForward, close, contrastOutline, copy, dice,
   enter, fileTray, gameController, hardwareChip, heart, helpCircle,
   informationCircle, languageOutline, logOut, logOutOutline, mail,
-  moon, people, person, personAdd, ribbon, send, sunny, sync,
+  moon, people, person, personAdd, personCircle, personRemove, ribbon, send, sunny, sync,
   trash, trashOutline, warning,
 } from 'ionicons/icons';
 import { appConfig } from './app/app.config';
@@ -16,7 +16,7 @@ addIcons({
   checkmarkCircle, chevronForward, close, contrastOutline, copy, dice,
   enter, fileTray, gameController, hardwareChip, heart, helpCircle,
   informationCircle, languageOutline, logOut, logOutOutline, mail,
-  moon, people, person, personAdd, ribbon, send, sunny, sync,
+  moon, people, person, personAdd, personCircle, personRemove, ribbon, send, sunny, sync,
   trash, trashOutline, warning,
 });
 

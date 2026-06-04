@@ -112,10 +112,6 @@
 			align-items: center;
 			justify-content: center;
 			flex-shrink: 0;
-
-			&.bot-avatar {
-				background: $accent-subtle; color: $accent; font-size: $text-base;
-			}
 		}
 
 		&-name {

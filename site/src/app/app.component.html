@@ -17,7 +17,7 @@
 				</ion-buttons>
 			</ion-toolbar>
 		</ion-header>
-		<ion-content>
+		<ion-content [scrollY]="false">
 			<ion-menu-toggle auto-hide="false">
 				<ion-list lines="none">
 					@if (user(); as u) {
@@ -39,6 +39,9 @@
 					<ion-item routerDirection="root" routerLink="/social" detail="false" routerLinkActive="selected">
 						<ion-icon name="people" slot="start" />
 						<ion-label>Social</ion-label>
+						@if (pendingFriendRequests() > 0) {
+							<span slot="end" class="menu-badge">{{ pendingFriendRequests() }}</span>
+						}
 					</ion-item>
 					@if (myRooms().length > 0) {
 						<div class="menu-rooms">

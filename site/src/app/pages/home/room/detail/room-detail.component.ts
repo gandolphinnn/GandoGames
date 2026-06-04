@@ -1,14 +1,16 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { RoomData } from '@gandogames/common/api';
+import { GamePlayer, RoomData } from '@gandogames/common/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
+import { FriendService } from '@gandogames/services/friend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
 import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
+import { InviteModalComponent } from '../invite-modal/invite-modal.component';
 import { RoomPlayComponent } from '../play/room-play.component';
 import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
 import { ChatComponent } from '../../../../components/chat/chat.component';
@@ -16,7 +18,7 @@ import { ChatComponent } from '../../../../components/chat/chat.component';
 @Component({
 	selector: 'gg-room-detail',
 	host: { class: 'ion-page' },
-	imports: [RouterLink, RoomPlayComponent, PlayerAvatarComponent, ChatComponent, IonHeader, IonToolbar, IonButtons, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
+	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent, ChatComponent, IonHeader, IonToolbar, IonButtons, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })
@@ -24,6 +26,7 @@ export class RoomDetailComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly roomService = inject(RoomService);
+	private readonly friendService = inject(FriendService);
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
@@ -128,8 +131,6 @@ export class RoomDetailComponent implements OnInit {
 			this.loading.set(true);
 			await this.roomService.joinRoom(this.roomId());
 			await this.loadRoom();
-		} catch (e) {
-			this.toast.error((e as Error).message);
 		} finally {
 			this.loading.set(false);
 		}
@@ -140,49 +141,61 @@ export class RoomDetailComponent implements OnInit {
 			this.loading.set(true);
 			await this.roomService.startRoom(this.roomId());
 			await this.loadRoom();
-		} catch (e) {
-			this.toast.error((e as Error).message);
 		} finally {
 			this.loading.set(false);
 		}
 	}
 
 	public async leave(): Promise<void> {
-		try {
-			const confirmed = await this.toast.yesNo('Are you sure you want to leave the room?');
-			if (!confirmed) return;
+		const confirmed = await this.toast.yesNo('Are you sure you want to leave the room?');
+		if (!confirmed) return;
 
-			await this.roomService.leaveRoom(this.roomId());
-			this.router.navigate(['/play']);
-		} catch (e) {
-			this.toast.error((e as Error).message);
-		}
+		await this.roomService.leaveRoom(this.roomId());
+		this.router.navigate(['/play']);
 	}
 
 	public async closeRoom(): Promise<void> {
-		try {
-			const confirmed = await this.toast.yesNo('Close the room for everyone?');
-			if (!confirmed) return;
+		const confirmed = await this.toast.yesNo('Close the room for everyone?');
+		if (!confirmed) return;
 
-			await this.roomService.deleteRoom(this.roomId());
-			void this.router.navigate(['/play']);
-		} catch (e) {
-			this.toast.error((e as Error).message);
-		}
+		await this.roomService.deleteRoom(this.roomId());
+		void this.router.navigate(['/play']);
 	}
 
 	public async kick(playerId: string): Promise<void> {
-		try {
-			await this.roomService.kickPlayer(this.roomId(), playerId);
-		} catch (e) {
-			this.toast.error((e as Error).message);
-		}
+		await this.roomService.kickPlayer(this.roomId(), playerId);
 	}
 
 	public async copyCode(): Promise<void> {
 		await navigator.clipboard.writeText(window.location.href);
 		this.copied.set(true);
 		setTimeout(() => this.copied.set(false), 2000);
+	}
+
+	public readonly showInviteModal = signal(false);
+
+	public invite(): void {
+		if (this.isInRoom() && this.room()?.phase === 'waiting') this.showInviteModal.set(true);
+	}
+
+	/** Friend requests target registered players only, and never yourself or existing friends/requests. */
+	public canAddFriend(slot: GamePlayer): boolean {
+		if (this.auth.user()?.isGuest) return false;
+		if (slot.id === this.myId() || slot.isGuest) return false;
+		return this.friendService.relationship(slot.id) === 'none';
+	}
+
+	public readonly addingFriendId = signal<string | null>(null);
+
+	public async addFriend(slot: GamePlayer): Promise<void> {
+		if (this.addingFriendId()) return;
+		this.addingFriendId.set(slot.id);
+		try {
+			await this.friendService.sendRequest(slot.id);
+			this.toast.success(`Friend request sent to ${slot.name}`);
+		} finally {
+			this.addingFriendId.set(null);
+		}
 	}
 
 }

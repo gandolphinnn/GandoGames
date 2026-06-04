@@ -64,8 +64,7 @@
 									[class.selected]="u.player.icon === icon.id"
 									type="button"
 									[attr.aria-label]="icon.label"
-									(click)="setIcon(icon.id)"
-								>
+									(click)="setIcon(icon.id)">
 									<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
 								</button>
 							}
@@ -74,9 +73,9 @@
 				</div>
 
 				<div class="delete-section">
-					<ion-button fill="outline" color="danger" expand="block" [disabled]="loading()" (click)="deleteAccount()">
+					<ion-button fill="outline" color="danger" expand="block" [disabled]="deleting()" (click)="deleteAccount()">
 						<ion-icon name="trash-outline" slot="start" />
-						{{ loading() ? 'Deleting…' : 'Delete account' }}
+						{{ 'Delete account' }}
 					</ion-button>
 				</div>
 

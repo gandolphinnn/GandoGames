@@ -12,13 +12,16 @@ export interface ChatMessage {
 	timestamp: Date;
 }
 
-export interface RoomData {
+export interface RoomSummary {
 	id: string;
 	hostId: string;
 	game: GameType;
 	players: GamePlayer[];
-	kickedPlayers: string[];
 	phase: 'waiting' | 'playing' | 'ended';
+}
+
+export interface RoomData extends RoomSummary {
+	kickedPlayers: string[];
 	chat: ChatMessage[];
 	lastUpdate: Date;
 }

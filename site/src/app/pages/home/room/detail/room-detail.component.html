@@ -31,7 +31,7 @@
 <div class="room-layout">
 	@if (isInRoom()) {
 		<div class="room-layout-left">
-			<gg-chat [roomId]="roomId()" />
+			<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
 		</div>
 	}
 	<gg-refreshable-content [fullscreen]="true" [scrollY]="room()?.phase !== 'playing'" [onRefresh]="refreshFn()">
@@ -57,18 +57,23 @@
 									[class.player-card-host]="slot.id === room()!.hostId"
 									[class.player-card-me]="slot.id === myId()">
 									@if (slot.id === room()!.hostId) {
-										<ion-icon name="ribbon" class="player-card-crown" />
+										<ion-icon name="ribbon" class="player-card-crown" title="host" />
 									}
 									@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
 										<button class="player-card-kick" (click)="kick(slot.id)" title="Kick player">
 											<ion-icon name="close" />
 										</button>
 									}
+									@if (canAddFriend(slot)) {
+										<button class="player-card-friend" [disabled]="addingFriendId() === slot.id" (click)="addFriend(slot)" title="Add friend">
+											<ion-icon name="person-add" />
+										</button>
+									}
 									<gg-player-avatar class="player-card-avatar" [player]="slot" />
 									<span class="player-card-name">{{ slot.name }}</span>
 								</div>
 							} @else if (isInRoom()) {
-								<div class="player-card player-card-empty">
+								<div class="player-card player-card-empty" (click)="invite()">
 									<div class="player-card-avatar player-card-avatar-empty">
 										<ion-icon name="add" />
 									</div>
@@ -113,6 +118,16 @@
 								<ion-button [routerLink]="['/play']">Find another room</ion-button>
 							</div>
 						}
+					}
+
+					@if (showInviteModal() && room()) {
+						<gg-invite-modal
+							[roomId]="roomId()"
+							[gameType]="room()!.game"
+							[isHost]="isHost()"
+							[playerCount]="room()!.players.length"
+							[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
+							(closed)="showInviteModal.set(false)" />
 					}
 				}
 

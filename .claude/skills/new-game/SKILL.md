@@ -41,6 +41,26 @@ Read every file listed below before asking the user anything or generating any c
 
 ## Step 2 — Gather requirements
 
+### 2.1 Check for an existing GitHub proposal issue
+
+Before asking the user anything, check whether this game was already proposed via the `/propose` workflow (which opens an issue titled `NEW GAME - <gameName>`). Run:
+
+```bash
+gh issue list --search "NEW GAME - $ARGUMENTS" --state all --json number,title,body,url
+```
+
+Find an issue whose title matches `NEW GAME - $ARGUMENTS` exactly (case-insensitive).
+
+- **If a matching issue exists**, fetch its body and use it as the source of truth for the game. The body follows the `/propose` template with these sections: `## Overview`, `## Players`, `## Setup`, `## Rules`, `## Win Condition`, `## Notes`. Map them onto the requirements below:
+  - **Min / max players** ← `## Players`
+  - **Win condition** ← `## Win Condition`
+  - **Game phases / actions / player state / hidden information / round result** ← derive from `## Setup`, `## Rules`, and `## Notes`
+  - Tell the user you found the issue (print its URL) and present the requirements you derived from it. Only ask the user about the fields the issue does not make clear (typically phases, exact action payloads, hidden information, and round-result shape, since the prose rarely states them in those terms). Confirm before generating any files.
+
+- **If no matching issue exists**, ask the user the questions in 2.2 instead.
+
+### 2.2 Ask the user (only when there is no issue)
+
 Ask the user these questions **before generating any files**. Do not guess or assume defaults.
 
 1. **Min / max players** — How many players can join?

@@ -8,7 +8,7 @@ import { SignalRService } from './signalr.service';
 import type { GamePlayer, RoomData } from '@gandogames/shared/api';
 
 function makePlayer(id: string, name: string): GamePlayer {
-	return { id, name, icon: 'profile', theme: 'dark', language: 'en' };
+	return { id, name, icon: 'profile', theme: 'dark', language: 'en', isGuest: false };
 }
 
 function makeRoom(overrides: Partial<RoomData> = {}): RoomData {

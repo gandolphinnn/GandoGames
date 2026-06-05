@@ -129,7 +129,6 @@ Open http://localhost:1212 — guest login, registration, rooms, games, chat, an
 export const environment = {
   production: false,
   apiBaseUrl: '/api',   // the dev server proxies /api → http://localhost:7071 (site/proxy.conf.json)
-  siteBaseUrl: '',
 };
 ```
 

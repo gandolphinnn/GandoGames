@@ -96,11 +96,6 @@ export class RoomService {
 		return this.backend.post<void>('/rooms/delete', request);
 	}
 
-	public leaveRoomBeacon(roomId: string): void {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		this.backend.postBeacon('/rooms/leave', request);
-	}
-
 	public invitePlayer(roomId: string, friendId: string): Promise<void> {
 		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, friendId };
 		return this.backend.post<void>('/rooms/invite', request);

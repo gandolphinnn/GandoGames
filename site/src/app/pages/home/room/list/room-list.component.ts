@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RoomSummary } from '@gandogames/shared/api';
-import { IonButton, IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
 import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
@@ -9,7 +9,7 @@ import { RefreshableContentComponent } from '../../../../components/refreshable-
 @Component({
 	selector: 'gg-room-list',
 	host: { class: 'ion-page' },
-	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
+	imports: [...ION_IMPORTS, RefreshableContentComponent],
 	templateUrl: './room-list.component.html',
 	styleUrl: './room-list.component.scss',
 })

@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { IonButtons, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { RefreshableContentComponent } from '../../../components/refreshable-content/refreshable-content.component';
 import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
 import { Friend } from '@gandogames/shared/api';
@@ -10,7 +10,7 @@ import { ToastService } from '@gandogames/services/toast.service';
 @Component({
 	selector: 'gg-social',
 	host: { class: 'ion-page' },
-	imports: [IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonIcon, RefreshableContentComponent, PlayerAvatarComponent],
+	imports: [...ION_IMPORTS, RefreshableContentComponent, PlayerAvatarComponent],
 	templateUrl: './social.component.html',
 	styleUrl: './social.component.scss',
 })

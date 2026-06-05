@@ -6,11 +6,11 @@ import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
-import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 @Component({
 	selector: 'gg-room-play',
 	standalone: true,
-	imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon],
+	imports: [...ION_IMPORTS],
 	templateUrl: './room-play.component.html',
 	styleUrl: './room-play.component.scss',
 })

@@ -13,7 +13,7 @@ export interface GameComponent<TState extends GameState = GameState> {
 	playAgain: OutputEmitterRef<void>;
 }
 
-export interface GameDescriptor {
+interface GameDescriptor {
 	id: GameType;
 	name: string;
 	icon: string;

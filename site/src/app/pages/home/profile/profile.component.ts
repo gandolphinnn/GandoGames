@@ -2,12 +2,8 @@ import { Component, inject, signal, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutline, trashOutline } from 'ionicons/icons';
-import {
-	IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader,
-	IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader,
-	IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonRow,
-	IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonTitle, IonToolbar,
-} from '@ionic/angular/standalone';
+import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, } from '@ionic/angular/standalone';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 
 import { GamePlayer, IconType, LangCode } from '@gandogames/shared/api';
 import { LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
@@ -20,9 +16,9 @@ import { ToastService } from '@gandogames/services/toast.service';
 	host: { class: 'ion-page' },
 	imports: [
     PlayerAvatarComponent,
-    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent,
-    IonCard, IonIcon,
-    IonSegment, IonSegmentButton, IonButton, IonSelect, IonSelectOption
+    ...ION_IMPORTS,
+    IonCard,
+    IonSegment, IonSegmentButton, IonSelect, IonSelectOption
 ],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',

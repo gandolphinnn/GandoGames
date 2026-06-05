@@ -8,7 +8,7 @@ import { RoomService } from '@gandogames/services/room.service';
 import { FriendService } from '@gandogames/services/friend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
-import { IonButton, IonButtons, IonHeader, IonIcon, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { PlayerAvatarComponent } from '../../../../components/player-avatar/player-avatar.component';
 import { InviteModalComponent } from '../invite-modal/invite-modal.component';
 import { RoomPlayComponent } from '../play/room-play.component';
@@ -18,7 +18,7 @@ import { ChatComponent } from '../../../../components/chat/chat.component';
 @Component({
 	selector: 'gg-room-detail',
 	host: { class: 'ion-page' },
-	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent, ChatComponent, IonHeader, IonToolbar, IonButtons, IonTitle, IonButton, IonIcon, RefreshableContentComponent],
+	imports: [RouterLink, RoomPlayComponent, InviteModalComponent, PlayerAvatarComponent, ChatComponent, ...ION_IMPORTS, RefreshableContentComponent],
 	templateUrl: './room-detail.component.html',
 	styleUrl: './room-detail.component.scss',
 })

@@ -15,11 +15,16 @@
 				@if (dealerTotal() !== null) { <span class="hand-score">{{ dealerTotal() }}</span> }
 			</p>
 			<div class="card-row">
-				@for (c of gs.dealer.cards; track $index) {
-					<gg-french-card [card]="c" size="lg" />
-				}
-				@if (!gs.dealer.holeRevealed) {
-					<gg-french-card [card]="null" size="lg" />
+				@if (gs.gamePhase === 'betting') {
+					<gg-french-card [faceDown]="true" size="lg" />
+					<gg-french-card [faceDown]="true" size="lg" />
+				} @else {
+					@for (c of gs.dealer.cards; track $index) {
+						<gg-french-card [card]="c" size="lg" />
+					}
+					@if (!gs.dealer.holeRevealed) {
+						<gg-french-card [faceDown]="true" size="lg" />
+					}
 				}
 			</div>
 		</section>
@@ -29,18 +34,24 @@
 			@for (p of gs.players; track p.id) {
 				<div class="player-box"
 					[class.player-box-me]="p.id === myPlayFabId()"
-					[class.player-box-turn]="gs.gamePhase === 'player-turns' && !p.done">
+					[class.player-box-turn]="gs.gamePhase === 'player-turns' && !p.done && p.id === myPlayFabId()">
 					<div class="player-head">
 						<span class="player-name">{{ p.name }}</span>
 						<gg-chip-count [amount]="p.chips" />
 					</div>
-					@if (p.hands.length === 0) {
+					@if (gs.gamePhase === 'betting') {
+						<div class="card-row">
+							<gg-french-card [faceDown]="true" size="md" />
+							<gg-french-card [faceDown]="true" size="md" />
+						</div>
 						<p class="hint">{{ p.hasBet ? 'Ready' : 'Betting…' }}</p>
+					} @else if (p.hands.length === 0) {
+						<p class="hint">Betting…</p>
 					} @else {
 						<div class="hands-row">
 							@for (h of p.hands; track $index) {
 								<div class="hand"
-									[class.hand-active]="gs.gamePhase === 'player-turns' && !p.done && $index === p.activeHandIndex">
+									[class.hand-active]="gs.gamePhase === 'player-turns' && !p.done && p.id === myPlayFabId() && $index === p.activeHandIndex">
 									<div class="card-row">
 										@for (c of h.cards; track $index) {
 											<gg-french-card [card]="c" size="md" />
@@ -111,7 +122,7 @@
 							<p class="hint">Insurance costs half your bet and pays 2:1 if the dealer has blackjack.</p>
 							<div class="action-row">
 								<ion-button [disabled]="loading()" (click)="insurance(true)">Take insurance</ion-button>
-								<ion-button fill="outline" [disabled]="loading()" (click)="insurance(false)">No insurance</ion-button>
+								<ion-button [disabled]="loading()" (click)="insurance(false)">No insurance</ion-button>
 							</div>
 						</div>
 					} @else {
@@ -130,11 +141,10 @@
 								<ion-button [disabled]="loading()" (click)="hit()">Hit</ion-button>
 								<ion-button [disabled]="loading()" (click)="stand()">Stand</ion-button>
 							</div>
-							@if (canDouble() || canSplit() || canSurrender()) {
+							@if (canDouble() || canSplit()) {
 								<div class="action-row">
-									@if (canDouble()) { <ion-button fill="outline" [disabled]="loading()" (click)="double()">Double</ion-button> }
-									@if (canSplit()) { <ion-button fill="outline" [disabled]="loading()" (click)="split()">Split</ion-button> }
-									@if (canSurrender()) { <ion-button fill="outline" color="danger" [disabled]="loading()" (click)="surrender()">Surrender</ion-button> }
+									@if (canDouble()) { <ion-button [disabled]="loading()" (click)="double()">Double</ion-button> }
+									@if (canSplit()) { <ion-button [disabled]="loading()" (click)="split()">Split</ion-button> }
 								</div>
 							}
 							@if (error()) { <p class="action-error">{{ error() }}</p> }

@@ -42,7 +42,6 @@ export function outcomeLabel(outcome: string): string {
 		case 'blackjack': return 'Blackjack!';
 		case 'win': return 'Win';
 		case 'push': return 'Push';
-		case 'surrender': return 'Surrender';
 		case 'lose': return 'Lose';
 		default: return outcome;
 	}

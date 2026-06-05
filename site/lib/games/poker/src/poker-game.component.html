@@ -19,6 +19,12 @@
 				@if (p.folded) {
 					<span class="player-status-tag player-status-folded">Folded</span>
 				}
+				@if (isBettingPhase() && !p.folded && p.id !== myPlayFabId()) {
+					<div class="player-hole-cards">
+						<gg-french-card [faceDown]="true" size="sm" />
+						<gg-french-card [faceDown]="true" size="sm" />
+					</div>
+				}
 			</div>
 		}
 	</div>
@@ -26,11 +32,8 @@
 	<div class="poker-table">
 		<span class="table-pot">Pot: {{ gameState()!.pot }}</span>
 		<div class="community-cards">
-			@for (card of gameState()!.communityCards; track card.rank + card.suit) {
-				<gg-french-card [card]="card" />
-			}
-			@for (ph of communityPlaceholders(); track $index) {
-				<gg-french-card />
+			@for (slot of communitySlots(); track $index) {
+				<gg-french-card [card]="slot" [faceDown]="!slot" />
 			}
 		</div>
 	</div>

@@ -34,7 +34,6 @@ function newHand(bet: number): BlackjackHand {
 		cards: [],
 		bet,
 		doubled: false,
-		surrendered: false,
 		stood: false,
 		busted: false,
 		isBlackjack: false,
@@ -43,7 +42,7 @@ function newHand(bet: number): BlackjackHand {
 }
 
 function handFinalized(h: BlackjackHand): boolean {
-	return h.stood || h.busted || h.surrendered;
+	return h.stood || h.busted;
 }
 
 export class BlackjackGame extends Game<BlackjackGameState> {
@@ -89,7 +88,6 @@ export class BlackjackGame extends Game<BlackjackGameState> {
 			case 'stand': return this.applyStand(player.id);
 			case 'double': return this.applyDouble(player.id);
 			case 'split': return this.applySplit(player.id);
-			case 'surrender': return this.applySurrender(player.id);
 			case 'next-round': return this.applyNextRound();
 			default: return this.state;
 		}
@@ -251,25 +249,13 @@ export class BlackjackGame extends Game<BlackjackGameState> {
 		return state;
 	}
 
-	private applySurrender(playerId: string): BlackjackGameState {
-		const state = this.state!;
-		const ctx = this.actorFor(playerId);
-		if (!ctx) return state;
-		const { p, h } = ctx;
-		// Only as the first decision on the original two-card hand (never after a split).
-		if (h.cards.length !== 2 || p.hands.length !== 1) return state;
-		h.surrendered = true;
-		this.advancePlayer(p);
-		state.lastUpdate = new Date();
-		return state;
-	}
-
 	private applySplit(playerId: string): BlackjackGameState {
 		const state = this.state!;
 		const ctx = this.actorFor(playerId);
 		if (!ctx) return state;
 		const { p, h } = ctx;
 		if (h.cards.length !== 2) return state;
+		// Split allowed on equal value, so K + J (both 10) can be split.
 		if (cardValue(h.cards[0]!.rank) !== cardValue(h.cards[1]!.rank)) return state;
 		if (p.hands.length >= MAX_HANDS || p.chips < h.bet) return state;
 
@@ -304,7 +290,7 @@ export class BlackjackGame extends Game<BlackjackGameState> {
 	private dealerPlayAndResolve(): void {
 		const state = this.state!;
 		state.dealer.holeRevealed = true;
-		const anyLive = state.players.some(p => p.hands.some(h => !h.busted && !h.surrendered));
+		const anyLive = state.players.some(p => p.hands.some(h => !h.busted));
 		if (anyLive && !state.dealerHadBlackjack) {
 			for (;;) {
 				const { total, soft } = handValue(state.dealer.cards);
@@ -327,8 +313,7 @@ export class BlackjackGame extends Game<BlackjackGameState> {
 			for (const h of p.hands) {
 				let outcome: HandOutcome;
 				let returned: number;
-				if (h.surrendered) { outcome = 'surrender'; returned = h.bet / 2; }
-				else if (h.busted) { outcome = 'lose'; returned = 0; }
+				if (h.busted) { outcome = 'lose'; returned = 0; }
 				else if (h.isBlackjack && !dealerBJ) { outcome = 'blackjack'; returned = h.bet * 2.5; }
 				else if (dealerBJ) { outcome = h.isBlackjack ? 'push' : 'lose'; returned = h.isBlackjack ? h.bet : 0; }
 				else {

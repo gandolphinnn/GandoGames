@@ -43,6 +43,12 @@
 	&-folded { color: $text-muted; }
 }
 
+.player-hole-cards {
+	display: flex;
+	gap: $s1;
+	margin-top: $s1;
+}
+
 // ── Table ──────────────────────────────────────────────────────────────────────
 
 .poker-table {

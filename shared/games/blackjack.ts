@@ -6,13 +6,12 @@ export type { Card, Rank, Suit } from "./cards";
 
 export type BlackjackPhase = 'betting' | 'insurance' | 'player-turns' | 'result' | 'game-over';
 
-export type HandOutcome = 'win' | 'lose' | 'push' | 'blackjack' | 'surrender';
+export type HandOutcome = 'win' | 'lose' | 'push' | 'blackjack';
 
 export interface BlackjackHand {
 	cards: Card[],
 	bet: number,
 	doubled: boolean,
-	surrendered: boolean,
 	stood: boolean,
 	busted: boolean,
 	/** Natural 21 on the first two cards of a non-split hand. */

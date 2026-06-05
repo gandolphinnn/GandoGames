@@ -69,12 +69,6 @@ export class BlackjackGameComponent implements GameComponent<BlackjackGameState>
 			&& me.hands.length < MAX_HANDS && me.chips >= h.bet;
 	});
 
-	protected readonly canSurrender = computed(() => {
-		const me = this.me();
-		const h = this.activeHand();
-		return !!me && !!h && h.cards.length === 2 && me.hands.length === 1;
-	});
-
 	protected setBet(amount: number): void {
 		const me = this.me();
 		const max = me?.chips ?? amount;
@@ -94,6 +88,5 @@ export class BlackjackGameComponent implements GameComponent<BlackjackGameState>
 	protected stand(): void { this.gameAction.emit({ action: 'stand' }); }
 	protected double(): void { this.gameAction.emit({ action: 'double' }); }
 	protected split(): void { this.gameAction.emit({ action: 'split' }); }
-	protected surrender(): void { this.gameAction.emit({ action: 'surrender' }); }
 	protected nextRound(): void { this.gameAction.emit({ action: 'next-round' }); }
 }

@@ -5,6 +5,7 @@ import { provideIonicAngular } from '@ionic/angular/standalone';
 
 import { routes } from './app.routes';
 import { UserService } from './services/user.service';
+import { RoomService } from './services/room.service';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
@@ -15,7 +16,10 @@ export const appConfig: ApplicationConfig = {
 		provideIonicAngular(),
 		provideAppInitializer(async () => {
 			const user = inject(UserService);
+			const rooms = inject(RoomService);
 			await user.init();
+			// Populate the "Active Rooms" menu app-wide at startup; don't block bootstrap on it.
+			if (user.user()) void rooms.loadRooms();
 		}),
 	]
 };

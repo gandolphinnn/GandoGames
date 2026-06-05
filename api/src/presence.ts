@@ -1,4 +1,4 @@
-const PRESENCE_TTL_MS = 24 * 60 * 60 * 1000; // failsafe; upstream disconnect removes entries immediately
+/* const PRESENCE_TTL_MS = 24 * 60 * 60 * 1000; // failsafe; upstream disconnect removes entries immediately
 
 const presence = new Map<string, { name: string; ts: number }>();
 
@@ -31,3 +31,4 @@ export function getPresenceIdByName(name: string): string | undefined {
 	}
 	return undefined;
 }
+ */

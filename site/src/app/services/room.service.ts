@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest } from '@gandogames/common/api';
+import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/api';
 import { UserService } from './user.service';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
@@ -10,12 +10,19 @@ export class RoomService {
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 
-	public readonly rooms = signal<RoomData[]>([]);
+	public readonly rooms = signal<RoomSummary[]>([]);
 
 	public readonly myRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
 		if (!userId) return [];
 		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
+	});
+
+	/** Rooms to show in the browse list (/play): everything except rooms the player is already in —
+	 *  those are surfaced separately in the menu's "Active Rooms" via myRooms. */
+	public readonly browsableRooms = computed(() => {
+		const userId = this.auth.user()?.player.id;
+		return this.rooms().filter(r => !userId || !r.players.some(p => p.id === userId));
 	});
 
 	private get ticket(): string {
@@ -43,8 +50,8 @@ export class RoomService {
 
 	public async loadRooms(): Promise<void> {
 		const request: BaseRequest = { sessionTicket: this.ticket };
-		const rooms = await this.backend.post<RoomData[]>('/rooms/list', request);
-		this.rooms.set(rooms);
+		const summaries = await this.backend.post<RoomSummary[]>('/rooms/list', request);
+		this.rooms.set(summaries);
 	}
 
 	public createRoom(game: GameType): Promise<RoomData> {
@@ -89,19 +96,9 @@ export class RoomService {
 		return this.backend.post<void>('/rooms/delete', request);
 	}
 
-	public leaveRoomBeacon(roomId: string): void {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		this.backend.postBeacon('/rooms/leave', request);
-	}
-
-	public invitePlayer(roomId: string, playerName: string): Promise<void> {
-		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, playerName };
+	public invitePlayer(roomId: string, friendId: string): Promise<void> {
+		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, friendId };
 		return this.backend.post<void>('/rooms/invite', request);
-	}
-
-	public addBot(roomId: string): Promise<RoomData> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<RoomData>('/rooms/add-bot', request);
 	}
 
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {

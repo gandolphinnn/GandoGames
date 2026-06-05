@@ -1,4 +1,4 @@
-import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/common/api';
+import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/shared/api';
 import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {
@@ -23,11 +23,13 @@ const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParam
 const toAuthResponse = (
 	response: LoginLike,
 	name: string | undefined,
+	isGuest: boolean,
 	userData?: Record<string, PlayFabClientModels.UserDataRecord>,
 ): AuthResponse => ({
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
+		isGuest,
 		icon: (userData?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (userData?.['theme']?.Value as Theme) ?? 'dark',
 		language: (userData?.['language']?.Value as LangCode) ?? 'en',
@@ -36,8 +38,11 @@ const toAuthResponse = (
 });
 
 const guestUsername = (customId: string): string => {
-	const n = parseInt(customId.replace(/-/g, '').slice(0, 8), 16) % 1_000_000;
-	return `Guest${String(n).padStart(6, '0')}`;
+	let hash = 0;
+	for (let i = 0; i < customId.length; i++) {
+		hash = (hash * 31 + customId.charCodeAt(i)) % 1_000_000;
+	}
+	return `Guest${String(hash).padStart(6, '0')}`;
 };
 
 const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, notifier) => {
@@ -67,7 +72,7 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 			cb => PlayFabServer.SetTitleInternalData({ Key: 'guest_player_ids', Value: JSON.stringify(guestIds) }, cb),
 		);
 	}
-	return toAuthResponse(result, name, result.InfoResultPayload?.UserData);
+	return toAuthResponse(result, name, true, result.InfoResultPayload?.UserData);
 };
 
 const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, notifier) => {
@@ -77,7 +82,7 @@ const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body,
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
 		cb => PlayFabClient.LoginWithEmailAddress({ Email: body.email, Password: body.password, InfoRequestParameters: infoRequestParameters }, cb),
 	);
-	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, result.InfoResultPayload?.UserData);
+	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, false, result.InfoResultPayload?.UserData);
 };
 
 const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, notifier) => {
@@ -91,7 +96,7 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 			RequireBothUsernameAndEmail: true,
 		}, cb),
 	);
-	return toAuthResponse(result, body.username);
+	return toAuthResponse(result, body.username, false);
 };
 
 const checkInner: InnerFunction<BaseRequest, AuthResponse> = async (body, _notifier, player) => ({

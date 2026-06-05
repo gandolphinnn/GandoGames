@@ -1,5 +1,6 @@
-export const environment = {
+import { Environment } from './environment.model';
+
+export const environment: Environment = {
 	production: false,
-	apiBaseUrl: 'http://192.168.1.18:7071/api',
-	siteBaseUrl: 'http://192.168.1.18:1212',
+	apiBaseUrl: '/api',
 };

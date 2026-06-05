@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { IonIcon } from '@ionic/angular/standalone';
-import { ToastService } from '../../../services/toast.service';
+import { ToastService } from '@gandogames/services/toast.service';
 
 export interface Swatch {
 	name: string;
@@ -18,7 +18,7 @@ export interface Section {
 
 @Component({
 	selector: 'gg-palette',
-	imports: [NgTemplateOutlet, IonIcon],
+	imports: [IonIcon, NgTemplateOutlet],
 	templateUrl: './palette.component.html',
 	styleUrl: './palette.component.scss',
 })

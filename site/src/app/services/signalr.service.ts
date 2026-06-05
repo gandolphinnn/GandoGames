@@ -1,7 +1,7 @@
 import { effect, inject, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { ChatMessage, GameState, NegotiateResponse, RoomData, SignalREvent } from '@gandogames/common/api';
+import { ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/api';
 import { BackendService } from './backend.service';
 import { UserService } from './user.service';
 
@@ -21,7 +21,9 @@ export class SignalRService {
 		roomDeleted: new Subject<string>(),
 		gameStateUpdated: new Subject<{ roomId: string; state: GameState }>(),
 		chatMessage: new Subject<{ roomId: string; message: ChatMessage }>(),
-		roomInvite: new Subject<{ roomId: string; game: string }>(),
+		roomInvite: new Subject<{ roomId: string; game: GameType }>(),
+		friendRequest: new Subject<Friend>(),
+		friendsChanged: new Subject<void>(),
 	}
 
 	constructor() {
@@ -60,11 +62,13 @@ export class SignalRService {
 				.configureLogging(LogLevel.Information)
 				.build();
 
-			this.connection.on('roomUpsert', (room) => this.events.roomUpsert.next(room));
-			this.connection.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
-			this.connection.on('gameStateUpdated', (roomId: string, state: GameState) => this.events.gameStateUpdated.next({ roomId, state }));
-			this.connection.on('chatMessage', (roomId: string, message: ChatMessage) => this.events.chatMessage.next({ roomId, message }));
-			this.connection.on('roomInvite', (roomId: string, game: string) => this.events.roomInvite.next({ roomId, game }));
+			this.on('roomUpsert', (room) => this.events.roomUpsert.next(room));
+			this.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
+			this.on('gameStateUpdated', (roomId, state) => this.events.gameStateUpdated.next({ roomId, state }));
+			this.on('chatMessage', (roomId, message) => this.events.chatMessage.next({ roomId, message }));
+			this.on('roomInvite', (roomId, game) => this.events.roomInvite.next({ roomId, game }));
+			this.on('friendRequest', (from) => this.events.friendRequest.next(from));
+			this.on('friendsChanged', () => this.events.friendsChanged.next());
 
 			// Re-negotiate after start so the broadcast arrives while the WS is open.
 			// Also fires on reconnect so presence is restored after network drops.
@@ -79,6 +83,11 @@ export class SignalRService {
 			console.error('SignalR connection failed:', err);
 			this.connection = undefined;
 		}
+	}
+
+	/** Registers a typed server→client event handler; its arguments are checked against `SignalREventArgs`. */
+	private on<T extends SignalREventType>(event: T, handler: SignalREventHandler<T>): void {
+		this.connection?.on(event, handler as (...args: unknown[]) => void);
 	}
 
 	private async disconnect(): Promise<void> {

@@ -1,34 +1,7 @@
-import type { GamePlayer } from '@gandogames/common/api';
-import type { PankovGameState, RollValue } from '@gandogames/common/pankov';
+import type { GamePlayer } from '@gandogames/shared/api';
+import type { PankovGameState, RollValue } from '@gandogames/shared/pankov';
+import { INITIAL_LIVES, ROLL_VALUES, getRank, rollToValue } from '@gandogames/shared/pankov';
 import { Game } from './game';
-
-function formatValue(value: RollValue): string {
-	if (value === 21) return 'Pankov!';
-	const high = Math.floor(value / 10);
-	const low = value % 10;
-	if (high === low) return `Pair of ${high}s`;
-	return `${high}-${low}`;
-}
-
-const INITIAL_LIVES = 8;
-
-const ROLL_VALUES = [
-	31, 32, 41, 42, 43, 51, 52, 53, 54, 61, 62, 63, 64, 65,
-	11, 22, 33, 44, 55, 66,
-	21,
-] as const;
-
-const RANK_MAP = new Map<number, number>(ROLL_VALUES.map((v, i) => [v, i]));
-
-function getRank(value: number): number {
-	return RANK_MAP.get(value) ?? -1;
-}
-
-function rollToValue(d1: number, d2: number): RollValue {
-	const high = Math.max(d1, d2);
-	const low = Math.min(d1, d2);
-	return (high * 10 + low) as RollValue;
-}
 
 export class PankovGame extends Game<PankovGameState> {
 	public override minPlayers = 2;

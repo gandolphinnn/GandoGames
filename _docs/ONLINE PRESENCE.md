@@ -8,7 +8,7 @@ A live count of online players in the app header, with a hover tooltip listing t
 
 **Presence tracking** — on every SignalR negotiate, the API upserts `{ name, ts }` into an in-memory `Map<userId, ...>` and broadcasts the current name array as `onlineCountUpdated` to all connected clients. A 24h TTL purges truly stale entries.
 
-**Disconnect cleanup** — Azure SignalR Service upstream webhooks call `/api/signalr-events` when a client disconnects. The function validates the `X-ASRS-Signature` HMAC, removes the user from the map, and broadcasts the updated list.
+**Disconnect cleanup** — Azure SignalR Service upstream webhooks call `/api/signalr/events` when a client disconnects. The function validates the `X-ASRS-Signature` HMAC, removes the user from the map, and broadcasts the updated list.
 
 **Timing fix** — the initial negotiate fires before the WebSocket is open, so the broadcast is missed. After `connection.start()` the client clears its negotiate cache and re-negotiates so the broadcast arrives while the connection is live. The same re-negotiate fires on `onreconnected` to restore presence after automatic reconnects.
 
@@ -18,7 +18,7 @@ In the SignalR Service resource → **Settings → Upstream**:
 
 | Field | Value |
 |---|---|
-| URL Template | `https://api.gandogames.org/api/signalr-events` |
+| URL Template | `https://api.gandogames.org/api/signalr/events` |
 | Hub pattern | `gameHub` |
 | Category pattern | `connections` |
 | Event pattern | `disconnected` |

@@ -55,6 +55,97 @@
 	color: $text-muted;
 }
 
+.section-count {
+	margin-left: auto;
+	min-width: 22px;
+	height: 22px;
+	padding: 0 $s2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: $accent;
+	color: $color-on-accent;
+	border-radius: $radius-full;
+	font-size: $text-sm;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+.friend-row {
+	display: flex;
+	align-items: center;
+	gap: $s3;
+	padding: $s2 0;
+
+	&-avatar {
+		width: 40px;
+		height: 40px;
+		border-radius: $radius-full;
+		flex-shrink: 0;
+		font-size: $text-lg;
+	}
+
+	&-name {
+		font-weight: 500;
+		word-break: break-word;
+		flex: 1;
+		min-width: 0;
+	}
+
+	&-pending {
+		font-size: $text-sm;
+		color: $text-muted;
+	}
+
+	&-actions {
+		display: flex;
+		gap: $s2;
+		flex-shrink: 0;
+	}
+}
+
+.friend-subheading {
+	margin-top: $s2;
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $text-muted;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.friend-action {
+	width: 44px;
+	height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	border-radius: $radius-sm;
+	border: 1px solid $border;
+	background: $bg-surface;
+	color: $text;
+	font-size: $text-lg;
+	cursor: pointer;
+	transition: color $transition, border-color $transition, background $transition, opacity $transition;
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	&-accept:not(:disabled):hover {
+		color: $color-success;
+		border-color: $color-success-border;
+		background: $color-success-bg;
+	}
+
+	&-danger:not(:disabled):hover {
+		color: $color-danger;
+		border-color: $color-danger-border;
+		background: $color-danger-bg;
+	}
+}
+
 .empty-state {
 	display: flex;
 	flex-direction: column;

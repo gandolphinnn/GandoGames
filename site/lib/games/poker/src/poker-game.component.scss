@@ -30,12 +30,6 @@
 	text-overflow: ellipsis;
 }
 
-.player-chips {
-	font-size: $text-base;
-	font-weight: 700;
-	color: $color-success;
-}
-
 .player-bet {
 	font-size: $text-sm;
 	color: $color-warning;
@@ -47,6 +41,12 @@
 	color: $color-danger;
 
 	&-folded { color: $text-muted; }
+}
+
+.player-hole-cards {
+	display: flex;
+	gap: $s1;
+	margin-top: $s1;
 }
 
 // ── Table ──────────────────────────────────────────────────────────────────────

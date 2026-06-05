@@ -1,4 +1,4 @@
-import { GamePlayer, GameState, GameType } from '@gandogames/common/api';
+import { GamePlayer, GameState, GameType } from '@gandogames/shared/api';
 
 export const GAMES_CONFIG: Record<GameType, {
 	minPlayers: number,
@@ -11,6 +11,10 @@ export const GAMES_CONFIG: Record<GameType, {
 	'poker': {
 		minPlayers: 2,
 		maxPlayers: 8,
+	},
+	'blackjack': {
+		minPlayers: 1,
+		maxPlayers: 7,
 	},
 }
 

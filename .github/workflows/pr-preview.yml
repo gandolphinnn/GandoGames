@@ -1,0 +1,191 @@
+# Per-PR preview environments for PRs targeting `develop`.
+#
+# On open/update: build + unit-test both packages (gate), then publish a disposable
+# environment — an ephemeral Azure Function App for the API and an Azure Static Web Apps
+# preview environment for the site. On close: tear both down.
+#
+# Required repo VARIABLES: AZURE_RESOURCE_GROUP, AZURE_REGION, PREVIEW_STORAGE_ACCOUNT
+# Required repo SECRETS:    PLAYFAB_TITLE_ID, PLAYFAB_SECRET_KEY, AZURE_SIGNALR_CONNECTION_STRING,
+#                           APPLICATIONINSIGHTS_CONNECTION_STRING (optional)
+# Reused secrets: AZUREAPPSERVICE_CLIENTID_*/TENANTID_*/SUBSCRIPTIONID_* (OIDC, from deploy-api.yml),
+#                 AZURE_STATIC_WEB_APPS_API_TOKEN_WITTY_MUSHROOM_027658110
+# The OIDC service principal must have Contributor on AZURE_RESOURCE_GROUP (create/delete apps + config + CORS).
+#
+# Security: uses `pull_request` (not pull_request_target), so the workflow definition is taken from the
+# `develop` base branch — a PR editing this file cannot run its modified version. PR-controlled npm steps
+# run BEFORE `azure/login`, so secrets/OIDC are never exposed to untrusted install/build/test code.
+
+name: PR Preview (Site + API)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [develop]
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+  API_APP_NAME: gandogamesapi-pr${{ github.event.pull_request.number }}
+  SWA_ENVIRONMENT: pr${{ github.event.pull_request.number }}
+
+jobs:
+  api:
+    name: Build, test & deploy API
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write      # OIDC login to Azure
+      contents: read
+      pull-requests: write # post the preview API URL comment
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+
+      # --- PR-controlled steps: NO secrets in env ---
+      - name: Install, build & test (gate)
+        working-directory: api
+        run: |
+          npm ci
+          npm run build
+          npm test
+
+      # --- Trusted deploy steps ---
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E20203DC9E6B4D5F95935629ABB468DB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_18F04B77F74F49E38A1165D6BAF668B4 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C01CC49A3A4C4080AE96918744547685 }}
+
+      - name: Provision ephemeral Function App
+        run: |
+          az functionapp create \
+            --name "$API_APP_NAME" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --consumption-plan-location "${{ vars.AZURE_REGION }}" \
+            --runtime node --runtime-version 22 --functions-version 4 \
+            --storage-account "${{ vars.PREVIEW_STORAGE_ACCOUNT }}" \
+            --os-type Linux \
+            --tags purpose=pr-preview "pr=${{ github.event.pull_request.number }}" \
+            --output none
+
+      - name: Configure app settings & CORS
+        run: |
+          az functionapp config appsettings set \
+            --name "$API_APP_NAME" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --settings \
+              FUNCTIONS_WORKER_RUNTIME=node \
+              AzureFunctionsWebHost__hostId="$API_APP_NAME" \
+              PLAYFAB_TITLE_ID="${{ secrets.PLAYFAB_TITLE_ID }}" \
+              PLAYFAB_SECRET_KEY="${{ secrets.PLAYFAB_SECRET_KEY }}" \
+              AzureSignalRConnectionString="${{ secrets.AZURE_SIGNALR_CONNECTION_STRING }}" \
+              APPLICATIONINSIGHTS_CONNECTION_STRING="${{ secrets.APPLICATIONINSIGHTS_CONNECTION_STRING }}" \
+            --output none
+          az functionapp cors add \
+            --name "$API_APP_NAME" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --allowed-origins '*' \
+            --output none
+
+      - name: Deploy API
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.API_APP_NAME }}
+          package: api
+
+      - name: Comment preview API URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- pr-preview-api -->';
+            const apiUrl = `https://${process.env.API_APP_NAME}.azurewebsites.net/api`;
+            const body = `${marker}\n🔌 **Preview API:** \`${apiUrl}\`\n\n_The preview **site** URL is posted by the Azure Static Web Apps bot below._`;
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+            const { data: comments } = await github.rest.issues.listComments({ owner, repo, issue_number });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
+
+  site:
+    name: Build, test & deploy site
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # SWA bot posts the preview URL comment
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: site/package-lock.json
+
+      # --- PR-controlled steps: NO secrets in env ---
+      - name: Install & test (gate)
+        working-directory: site
+        run: |
+          npm ci
+          npm test
+
+      - name: Inject preview API URL
+        run: |
+          API_URL="https://${API_APP_NAME}.azurewebsites.net/api"
+          sed -i "s|__API_BASE_URL__|${API_URL}|g" site/src/environments/environment.preview.ts
+
+      - name: Build (preview)
+        working-directory: site
+        run: npm run build -- --configuration preview
+
+      - name: Deploy to Static Web Apps preview environment
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WITTY_MUSHROOM_027658110 }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: site/dist/GandoGames/browser
+          skip_app_build: true
+          deployment_environment: ${{ env.SWA_ENVIRONMENT }}
+
+  close:
+    name: Tear down preview environment
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E20203DC9E6B4D5F95935629ABB468DB }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_18F04B77F74F49E38A1165D6BAF668B4 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C01CC49A3A4C4080AE96918744547685 }}
+
+      - name: Delete ephemeral Function App
+        run: |
+          az functionapp delete \
+            --name "$API_APP_NAME" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            || echo "Function App $API_APP_NAME already removed."
+
+      - name: Close Static Web Apps preview environment
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WITTY_MUSHROOM_027658110 }}
+          action: close
+          deployment_environment: ${{ env.SWA_ENVIRONMENT }}

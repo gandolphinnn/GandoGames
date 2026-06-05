@@ -1,5 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/common/api';
+import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/api';
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
 import { ToastService } from './toast.service';
@@ -38,7 +38,7 @@ export class UserService {
 
 			const request: BaseRequest = { sessionTicket: ticket };
 			const result = await this.backend.post<AuthResponse>('/auth/check', request);
-			this.setSession({ ...result, isGuest: false });
+			this.setSession(result);
 		} catch {
 			this.storage.remove('sessionTicket');
 			const guestId = this.storage.getString('guestId');
@@ -46,7 +46,7 @@ export class UserService {
 			try {
 				const request: GuestLoginRequest = { customId: guestId };
 				const result = await this.backend.post<AuthResponse>('/auth/guestLogin', request);
-				this.setSession({ ...result, isGuest: true });
+				this.setSession(result);
 			} catch {
 				this.storage.remove('guestId');
 			}
@@ -58,13 +58,13 @@ export class UserService {
 	public async login(email: string, password: string): Promise<void> {
 		const request: LoginRequest = { email, password };
 		const result = await this.backend.post<AuthResponse>('/auth/login', request);
-		this.setSession({ ...result, isGuest: false });
+		this.setSession(result);
 	}
 
 	public async register(email: string, password: string, username: string): Promise<void> {
 		const request: RegisterRequest = { email, password, username };
 		const result = await this.backend.post<AuthResponse>('/auth/register', request);
-		this.setSession({ ...result, isGuest: false });
+		this.setSession(result);
 	}
 
 	public async loginAsGuest(): Promise<void> {
@@ -77,7 +77,7 @@ export class UserService {
 		}
 		const request: GuestLoginRequest = { customId };
 		const result = await this.backend.post<AuthResponse>('/auth/guestLogin', request);
-		this.setSession({ ...result, isGuest: true });
+		this.setSession(result);
 	}
 
 	public logout(): void {
@@ -122,7 +122,10 @@ export class UserService {
 		this.logout();
 	}
 
-	private setSession(user: AuthUser): void {
+	private setSession(response: AuthResponse): void {
+		// player.isGuest is the server's authoritative guest flag; derive AuthUser.isGuest from it
+		// so the two never diverge (e.g. a guest restored via /auth/check stays a guest).
+		const user: AuthUser = { ...response, isGuest: response.player.isGuest ?? false };
 		this._user.set(user);
 		this.storage.setString('sessionTicket', user.sessionTicket);
 	}

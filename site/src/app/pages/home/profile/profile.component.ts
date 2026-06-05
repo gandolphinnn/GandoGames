@@ -2,28 +2,20 @@ import { Component, inject, signal, Signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutline, trashOutline } from 'ionicons/icons';
-import {
-	IonBadge, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader,
-	IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader,
-	IonIcon, IonItem, IonLabel, IonList, IonMenuButton, IonRow,
-	IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonTitle, IonToolbar,
-} from '@ionic/angular/standalone';
-
-import { GamePlayer, IconType, LangCode } from '@gandogames/common/api';
-import { LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/lib/player-icons';
-import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
+import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, } from '@ionic/angular/standalone';
+import { GamePlayer, IconType, LangCode, LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/shared/api';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { AuthUser, UserService } from '@gandogames/services/user.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { PlayerAvatarComponent } from '@gandogames/components';
 
 @Component({
 	selector: 'gg-profile',
 	host: { class: 'ion-page' },
 	imports: [
-    PlayerAvatarComponent,
-    IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonContent,
-    IonCard, IonIcon,
-    IonSegment, IonSegmentButton, IonButton, IonSelect, IonSelectOption
-],
+		...ION_IMPORTS,
+		IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, PlayerAvatarComponent,
+	],
 	templateUrl: './profile.component.html',
 	styleUrl: './profile.component.scss',
 })
@@ -33,10 +25,10 @@ export class ProfileComponent {
 	private readonly toast = inject(ToastService);
 
 	public readonly user: Signal<AuthUser | null> = this.userService.user;
-	public readonly loading = signal(false);
+	public readonly deleting = signal(false);
 	public readonly isDark = this.userService.isDarkTheme;
 
-	public readonly icons: PlayerIcon[] = PLAYER_ICONS;
+	public readonly icons: PlayerIcon[] = PLAYER_ICONS.filter(i => !i.reserved);
 	public readonly languages = LANGUAGES;
 
 	constructor() {
@@ -69,12 +61,12 @@ export class ProfileComponent {
 	public async deleteAccount(): Promise<void> {
 		const confirmed = await this.toast.yesNo('This will permanently delete your account. This cannot be undone.');
 		if (!confirmed) return;
-		this.loading.set(true);
+		this.deleting.set(true);
 		try {
 			await this.userService.deleteAccount();
 			await this.router.navigate(['/login']);
-		} catch {
-			this.loading.set(false);
+		} finally {
+			this.deleting.set(false);
 		}
 	}
 }

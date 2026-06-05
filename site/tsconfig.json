@@ -5,10 +5,11 @@
 	"compilerOptions": {
 		"rootDir": "..",
 		"paths": {
-			"@gandogames/common/api": ["../common/index"],
-			"@gandogames/common/*": ["../common/games/*"],
+			"@gandogames/shared/api": ["../shared/index"],
+			"@gandogames/shared/*": ["../shared/games/*"],
 			"@gandogames/lib/*": ["./lib/*"],
 			"@gandogames/services/*": ["./src/app/services/*"],
+			"@gandogames/components": ["./src/app/components/index"],
 		},
 		"strict": true,
 		"noImplicitOverride": true,

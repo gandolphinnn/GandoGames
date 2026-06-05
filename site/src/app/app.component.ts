@@ -7,12 +7,12 @@ import {
 	MenuController,
 } from '@ionic/angular/standalone';
 
+import { GameType } from '@gandogames/shared/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { GameType } from '@gandogames/common/api';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
-import { ToastComponent } from './components/toast/toast.component';
-import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
+import { FriendService } from '@gandogames/services/friend.service';
+import { ToastComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 const ION_COMPONENTS = [
 	IonApp, IonButton, IonButtons, IonContent, IonHeader,
@@ -23,8 +23,8 @@ const ION_COMPONENTS = [
 @Component({
 	selector: 'gg-app',
 	imports: [
-		RouterLink, RouterLinkActive, ...ION_COMPONENTS,
-		ToastComponent, PlayerAvatarComponent,
+		...ION_COMPONENTS,
+		PlayerAvatarComponent, RouterLink, RouterLinkActive, ToastComponent,
 	],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss',
@@ -32,16 +32,18 @@ const ION_COMPONENTS = [
 export class App {
 	private readonly userService = inject(UserService);
 	private readonly roomService = inject(RoomService);
+	private readonly friendService = inject(FriendService);
 	private readonly router = inject(Router);
 	private readonly menuCtrl = inject(MenuController);
 
 	public readonly user = this.userService.user;
 	public readonly isLoggedIn = this.userService.isLoggedIn;
 	public readonly myRooms = this.roomService.myRooms;
+	public readonly pendingFriendRequests = this.friendService.pendingCount;
 	public readonly hasLiveRoom = computed(() => this.myRooms().some(r => r.phase === 'playing'));
 
 	public gameLabel(game: GameType): string {
-		return GAME_REGISTRY.find(g => g.id === game)?.name ?? game;
+		return GAME_REGISTRY[game]?.name ?? game;
 	}
 
 	public async closeMenu(): Promise<void> {

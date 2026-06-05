@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonIcon, IonTextarea } from '@ionic/angular/standalone';
-import { ChatMessage } from '@gandogames/common/api';
+import { ChatMessage } from '@gandogames/shared/api';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
@@ -11,7 +11,7 @@ import { SignalRService } from '@gandogames/services/signalr.service';
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [DatePipe, NgTemplateOutlet, FormsModule, IonIcon, IonTextarea],
+	imports: [DatePipe, FormsModule, IonIcon, IonTextarea, NgTemplateOutlet],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })
@@ -25,6 +25,7 @@ export class ChatComponent {
 	private shouldScroll = false;
 
 	public readonly roomId = input.required<string>();
+	public readonly chatHistory = input<ChatMessage[]>([]);
 	public readonly currentRoom = computed(() =>
 		this.roomService.rooms().find(r => r.id === this.roomId()) ?? null
 	);
@@ -37,10 +38,9 @@ export class ChatComponent {
 	protected readonly messages = signal<ChatMessage[]>([]);
 
 	constructor() {
+		effect(() => { this.messages.set(this.chatHistory()); });
 		effect(() => {
-			const room = this.currentRoom();
-			this.messages.set(room?.chat ?? []);
-			if (!room) { this.open.set(false); this.unread.set(0); }
+			if (!this.currentRoom()) { this.open.set(false); this.unread.set(0); }
 		});
 
 		this.signalR.events.chatMessage

@@ -1,0 +1,15 @@
+@use 'styles/variables' as *;
+
+:host {
+	display: inline-flex;
+	align-items: center;
+	gap: $s1;
+	font-weight: 700;
+	color: $color-success;
+	white-space: nowrap;
+}
+
+.chip-glyph {
+	font-size: 0.7em;
+	opacity: 0.75;
+}

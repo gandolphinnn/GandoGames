@@ -16,6 +16,11 @@
 
 	&.card-red { color: #c00; }
 	&.card-placeholder { background: $bg-surface; border-style: dashed; border-color: $border; }
+	&.card-back {
+		background: $accent;
+		border-color: $accent;
+		color: $color-on-accent;
+	}
 	&.card-sm { width: 28px; height: 40px; font-size: 0.75rem; }
 	&.card-lg { width: 44px; height: 64px; font-size: $text-base; }
 }

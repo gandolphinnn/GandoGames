@@ -1,6 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { GamePlayer } from '@gandogames/common/api';
-import { PLAYER_ICONS } from '@gandogames/lib/player-icons';
+import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/api';
 import { UserService } from '@gandogames/services/user.service';
 
 @Component({
@@ -16,7 +15,7 @@ export class PlayerAvatarComponent {
 	private readonly userService = inject(UserService);
 	public readonly isLightTheme = computed(() => !this.userService.isDarkTheme());
 	
-	public readonly player = input.required<GamePlayer>();
+	public readonly player = input.required<AvatarPlayer>();
 
 	public readonly iconFaClass = computed(() =>
 		PLAYER_ICONS.find(p => p.id === (this.player().icon ?? 'profile'))?.class ?? ''

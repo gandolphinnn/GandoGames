@@ -1,4 +1,4 @@
-import { GameActionRequest, GameBaseRequest, GameState } from '@gandogames/common/api';
+import { GameActionRequest, GameBaseRequest, GameState } from '@gandogames/shared/api';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 import { Game } from '../../games';
 

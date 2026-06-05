@@ -1,14 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import type { PokerGameState } from '@gandogames/common/poker';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
+import { type Card, type PokerGameState, MIN_RAISE } from '@gandogames/shared/poker';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
+import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { GameComponent } from '@gandogames/lib/game-registry';
-import { MIN_RAISE } from './poker.models';
 
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [FrenchCardComponent, IonButton, IonInput],
+	imports: [ChipCountComponent, FrenchCardComponent, IonButton, IonInput],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })
@@ -43,6 +43,12 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		return gs.players[gs.currentPlayerIndex] ?? null;
 	});
 
+	/** True during the betting streets — when opponents are holding hidden hole cards. */
+	protected readonly isBettingPhase = computed(() => {
+		const phase = this.gameState()?.gamePhase;
+		return phase === 'pre-flop' || phase === 'flop' || phase === 'turn' || phase === 'river';
+	});
+
 	protected readonly canCheck = computed(() => {
 		const gs = this.gameState();
 		const me = this.myPlayer();
@@ -62,10 +68,10 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		return gs ? gs.currentBet + MIN_RAISE : MIN_RAISE;
 	});
 
-	protected readonly communityPlaceholders = computed((): number[] => {
-		const gs = this.gameState();
-		const count = Math.max(0, 5 - (gs?.communityCards.length ?? 0));
-		return Array.from({ length: count }, () => 0);
+	/** Five community slots: the dealt card, or null while still face down. */
+	protected readonly communitySlots = computed((): (Card | null)[] => {
+		const dealt = this.gameState()?.communityCards ?? [];
+		return Array.from({ length: 5 }, (_, i) => dealt[i] ?? null);
 	});
 
 	protected readonly showdownPlayers = computed(() => {

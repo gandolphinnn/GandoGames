@@ -1,0 +1,16 @@
+import { RoomBaseRequest } from "./room";
+
+export type GameType = 'pankov' | 'poker' | 'blackjack';
+
+export interface GameState {
+	lastUpdate: Date;
+}
+
+export interface GameBaseRequest extends RoomBaseRequest {
+	game: GameType,
+}
+
+export interface GameActionRequest extends GameBaseRequest {
+	action: string,
+	data: any,
+}

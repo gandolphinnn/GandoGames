@@ -9,7 +9,7 @@
 				[class.player-card-folded]="p.folded"
 				[class.player-card-me]="p.id === myPlayFabId()">
 				<span class="player-name">{{ p.name }}</span>
-				<span class="player-chips">{{ p.chips }}</span>
+				<gg-chip-count [amount]="p.chips" />
 				@if (p.streetBet > 0) {
 					<span class="player-bet">+{{ p.streetBet }}</span>
 				}

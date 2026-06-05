@@ -4,7 +4,6 @@
 	"main": "dist/api/src/functions/**/*.js",
 	"scripts": {
 		"build": "tsc",
-		"watch": "tsc -w",
 		"start": "tsc && func start --cors \"*\"",
 		"test": "jest",
 		"fetch-secrets": "func azure functionapp fetch-app-settings GandoGamesApi && node patch-local-settings.js"

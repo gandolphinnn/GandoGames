@@ -1,5 +1,7 @@
 import type { GamePlayer } from '@gandogames/shared/api';
-import type { Card, PokerGameState, PokerPlayer, Rank, Suit } from '@gandogames/shared/poker';
+import type { Card, PokerGameState, PokerPlayer } from '@gandogames/shared/poker';
+import type { Rank } from '@gandogames/shared/cards';
+import { createDeck, shuffle } from './deck';
 import { Game } from './game';
 
 const STARTING_CHIPS = 1000;
@@ -7,27 +9,10 @@ const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
 const MIN_RAISE = BIG_BLIND;
 
-const SUITS: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
-const RANKS: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 const RANK_VALUE: Record<Rank, number> = {
 	'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
 	'8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14,
 };
-
-function createDeck(): Card[] {
-	const deck: Card[] = [];
-	for (const suit of SUITS) for (const rank of RANKS) deck.push({ suit, rank });
-	return deck;
-}
-
-function shuffle<T>(arr: T[]): T[] {
-	const a = [...arr];
-	for (let i = a.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[a[i], a[j]] = [a[j]!, a[i]!];
-	}
-	return a;
-}
 
 function combinations<T>(arr: T[], k: number): T[][] {
 	if (k === 0) return [[]];

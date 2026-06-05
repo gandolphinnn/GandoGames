@@ -1,6 +1,7 @@
 import { GameState, GameType, RoomData } from "@gandogames/shared/api";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
+import { BlackjackGameState } from "@gandogames/shared/blackjack";
 import { pfPromise, PlayFabServer } from "..";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
@@ -106,5 +107,6 @@ export class PlayfabCtx {
 	public static readonly game: Record<GameType, PlayFabEntity<GameState>> = {
 		'pankov': new PlayFabEntity<PankovGameState>('PANKOV_GAMES_INDEX'),
 		'poker': new PlayFabEntity<PokerGameState>('POKER_GAMES_INDEX'),
+		'blackjack': new PlayFabEntity<BlackjackGameState>('BLACKJACK_GAMES_INDEX'),
 	}
 }

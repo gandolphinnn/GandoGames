@@ -1,15 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import type { BlackjackGameState, BlackjackHand, Card } from '@gandogames/shared/blackjack';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
+import { type BlackjackGameState, type BlackjackHand, type Card, BET_STEPS, MAX_HANDS, MIN_BET, cardValue, handLabel, handValue, outcomeLabel } from '@gandogames/shared/blackjack';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { GameComponent } from '@gandogames/lib/game-registry';
-import { BET_STEPS, MAX_HANDS, MIN_BET, cardValue, handLabel, handValue, outcomeLabel } from './blackjack.models';
 
 @Component({
 	selector: 'gg-blackjack-game',
 	standalone: true,
-	imports: [FrenchCardComponent, ChipCountComponent, IonButton, IonInput],
+	imports: [ChipCountComponent, FrenchCardComponent, IonButton, IonInput],
 	templateUrl: './blackjack-game.component.html',
 	styleUrl: './blackjack-game.component.scss',
 })

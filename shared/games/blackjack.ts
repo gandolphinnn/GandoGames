@@ -1,8 +1,14 @@
 import { GamePlayer, GameState, RoomData } from "..";
-import { Card } from "./cards";
+import { Card, Rank } from "./cards";
 
 // Blackjack reuses the standard shared French deck.
 export type { Card, Rank, Suit } from "./cards";
+
+export const MIN_BET = 10;
+export const STARTING_CHIPS = 1000;
+export const MAX_HANDS = 4;
+/** Quick-bet chip denominations offered during the betting phase. */
+export const BET_STEPS = [10, 25, 50, 100, 250];
 
 export type BlackjackPhase = 'betting' | 'insurance' | 'player-turns' | 'result' | 'game-over';
 
@@ -58,4 +64,41 @@ export interface BlackjackGameState extends GameState {
 
 export interface BlackjackRoomState extends RoomData {
 	gameState?: BlackjackGameState,
+}
+
+/** Blackjack value of a single rank (Ace counts as 11; soft-ace handling is in handValue). */
+export function cardValue(rank: Rank): number {
+	if (rank === 'A') return 11;
+	if (rank === 'J' || rank === 'Q' || rank === 'K' || rank === '10') return 10;
+	return parseInt(rank, 10);
+}
+
+/** Best total for a hand and whether it is soft (an ace still counted as 11). */
+export function handValue(cards: Card[]): { total: number; soft: boolean } {
+	let total = 0;
+	let aces = 0;
+	for (const c of cards) {
+		total += cardValue(c.rank);
+		if (c.rank === 'A') aces++;
+	}
+	while (total > 21 && aces > 0) { total -= 10; aces--; }
+	return { total, soft: aces > 0 };
+}
+
+/** Display label for a hand's total (e.g. "Soft 17", "20", "23 • Bust"). */
+export function handLabel(cards: Card[]): string {
+	if (cards.length === 0) return '–';
+	const { total, soft } = handValue(cards);
+	if (total > 21) return `${total} • Bust`;
+	return soft ? `Soft ${total}` : `${total}`;
+}
+
+/** Display label for a resolved hand outcome. */
+export function outcomeLabel(outcome: HandOutcome): string {
+	switch (outcome) {
+		case 'blackjack': return 'Blackjack!';
+		case 'win': return 'Win';
+		case 'push': return 'Push';
+		case 'lose': return 'Lose';
+	}
 }

@@ -8,7 +8,7 @@ import { UserService } from '@gandogames/services/user.service';
 @Component({
 	selector: 'gg-login',
 	host: { class: 'ion-page' },
-	imports: [ReactiveFormsModule, RouterLink, IonButton, IonInput, IonContent],
+	imports: [IonButton, IonContent, IonInput, ReactiveFormsModule, RouterLink],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
 })

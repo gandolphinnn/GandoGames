@@ -9,6 +9,7 @@
 			"@gandogames/shared/*": ["../shared/games/*"],
 			"@gandogames/lib/*": ["./lib/*"],
 			"@gandogames/services/*": ["./src/app/services/*"],
+			"@gandogames/components": ["./src/app/components/index"],
 		},
 		"strict": true,
 		"noImplicitOverride": true,

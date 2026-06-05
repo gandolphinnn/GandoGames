@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, output, signal, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/shared/api';
@@ -6,20 +6,17 @@ import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+
 @Component({
-	selector: 'gg-room-play',
+	selector: 'gg-room-game',
 	standalone: true,
-	imports: [...ION_IMPORTS],
-	templateUrl: './room-play.component.html',
-	styleUrl: './room-play.component.scss',
+	imports: [],
+	templateUrl: './room-game.component.html',
+	styleUrl: './room-game.component.scss',
 })
-export class RoomPlayComponent implements OnInit, AfterViewInit {
+export class RoomGameComponent implements OnInit, AfterViewInit {
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
-	public readonly isHost = input<boolean>(false);
-	public readonly leaveRoom = output<void>();
-	public readonly closeRoom = output<void>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
@@ -35,8 +32,6 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 	private readonly error = signal<string | null>(null);
 	private readonly myPlayFabId = computed(() => this.auth.user()?.player.id ?? null);
 	private readonly gameRef = signal<ComponentRef<unknown> | null>(null);
-
-	protected readonly gameTitle = computed(() => GAME_REGISTRY[this.gameType()]?.name ?? this.gameType());
 
 	constructor() {
 		effect(() => {
@@ -102,14 +97,6 @@ export class RoomPlayComponent implements OnInit, AfterViewInit {
 
 	protected backToLobby(): void {
 		void this.router.navigate(['/play']);
-	}
-
-	protected onLeaveRoom(): void {
-		this.leaveRoom.emit();
-	}
-
-	protected onCloseRoom(): void {
-		this.closeRoom.emit();
 	}
 
 	private async resetRoom(): Promise<void> {

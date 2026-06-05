@@ -1,6 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { AvatarPlayer } from '@gandogames/shared/api';
-import { PLAYER_ICONS } from '@gandogames/lib/player-icons';
+import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/api';
 import { UserService } from '@gandogames/services/user.service';
 
 @Component({

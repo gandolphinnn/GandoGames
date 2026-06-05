@@ -11,7 +11,7 @@ import { SignalRService } from '@gandogames/services/signalr.service';
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [DatePipe, NgTemplateOutlet, FormsModule, IonIcon, IonTextarea],
+	imports: [DatePipe, FormsModule, IonIcon, IonTextarea, NgTemplateOutlet],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })

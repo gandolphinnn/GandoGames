@@ -1,13 +1,12 @@
 import type { GamePlayer } from '@gandogames/shared/api';
 import type { Card, PokerGameState, PokerPlayer } from '@gandogames/shared/poker';
+import { MIN_RAISE, STARTING_CHIPS } from '@gandogames/shared/poker';
 import type { Rank } from '@gandogames/shared/cards';
 import { createDeck, shuffle } from '@gandogames/shared/cards';
 import { Game } from './game';
 
-const STARTING_CHIPS = 1000;
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
-const MIN_RAISE = BIG_BLIND;
 
 const RANK_VALUE: Record<Rank, number> = {
 	'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,

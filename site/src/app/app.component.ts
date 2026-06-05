@@ -7,13 +7,12 @@ import {
 	MenuController,
 } from '@ionic/angular/standalone';
 
-import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { GameType } from '@gandogames/shared/api';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { FriendService } from '@gandogames/services/friend.service';
-import { ToastComponent } from './components/toast/toast.component';
-import { PlayerAvatarComponent } from './components/player-avatar/player-avatar.component';
+import { ToastComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 const ION_COMPONENTS = [
 	IonApp, IonButton, IonButtons, IonContent, IonHeader,
@@ -24,8 +23,8 @@ const ION_COMPONENTS = [
 @Component({
 	selector: 'gg-app',
 	imports: [
-		RouterLink, RouterLinkActive, ...ION_COMPONENTS,
-		ToastComponent, PlayerAvatarComponent,
+		...ION_COMPONENTS,
+		PlayerAvatarComponent, RouterLink, RouterLinkActive, ToastComponent,
 	],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss',

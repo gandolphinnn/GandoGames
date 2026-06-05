@@ -1,15 +1,14 @@
 import { Component, computed, input, output, signal } from '@angular/core';
-import type { Card, PokerGameState } from '@gandogames/shared/poker';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
+import { type Card, type PokerGameState, MIN_RAISE } from '@gandogames/shared/poker';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { GameComponent } from '@gandogames/lib/game-registry';
-import { MIN_RAISE } from './poker.models';
 
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [FrenchCardComponent, ChipCountComponent, IonButton, IonInput],
+	imports: [ChipCountComponent, FrenchCardComponent, IonButton, IonInput],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })

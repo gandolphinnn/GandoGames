@@ -1,33 +1,13 @@
 import type { GamePlayer } from '@gandogames/shared/api';
 import type {
-	BlackjackGameState, BlackjackPlayer, BlackjackHand, HandOutcome, Card,
+	BlackjackGameState, BlackjackPlayer, BlackjackHand, HandOutcome,
 } from '@gandogames/shared/blackjack';
-import type { Rank } from '@gandogames/shared/cards';
+import { MIN_BET, STARTING_CHIPS, MAX_HANDS, cardValue, handValue } from '@gandogames/shared/blackjack';
 import { createDeck, shuffle } from '@gandogames/shared/cards';
 import { Game } from './game';
 
-const STARTING_CHIPS = 1000;
-const MIN_BET = 10;
-const MAX_HANDS = 4;
 /** Dealer hits soft 17 (H17 rule). */
 const HIT_SOFT_17 = true;
-
-function cardValue(rank: Rank): number {
-	if (rank === 'A') return 11;
-	if (rank === 'J' || rank === 'Q' || rank === 'K' || rank === '10') return 10;
-	return parseInt(rank, 10);
-}
-
-function handValue(cards: Card[]): { total: number; soft: boolean } {
-	let total = 0;
-	let aces = 0;
-	for (const c of cards) {
-		total += cardValue(c.rank);
-		if (c.rank === 'A') aces++;
-	}
-	while (total > 21 && aces > 0) { total -= 10; aces--; }
-	return { total, soft: aces > 0 };
-}
 
 function newHand(bet: number): BlackjackHand {
 	return {

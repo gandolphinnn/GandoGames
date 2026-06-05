@@ -16,6 +16,6 @@ export const HOME_ROUTES: Routes = [
 	},
 	{
 		path: 'play',
-		loadChildren: () => import('./room/room.routes').then((m) => m.ROOM_ROUTES),
+		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
 	},
 ];

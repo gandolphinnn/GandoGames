@@ -4,7 +4,7 @@ import { RoomSummary } from '@gandogames/shared/api';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';
-import { RefreshableContentComponent } from '../../../../components/refreshable-content/refreshable-content.component';
+import { RefreshableContentComponent } from '@gandogames/components';
 
 @Component({
 	selector: 'gg-room-list',

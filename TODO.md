@@ -1,3 +1,6 @@
+- Redo the behaviour when a user leave a room and when a game is over
+	Display who won and for what reason (game based win or forfeit)
+	BUG: If a player leaves and just one player remain, that player win the game and remove the room from its list but the room stays open for everyone else to see.
 - Game settings editor:
 	In the room details, add the ability to open a game-specific modal, defined in "site\lib\games\$game_name\src\$to_be_defined_later"
 	This modal will contain every field to change the settings of the game for this room

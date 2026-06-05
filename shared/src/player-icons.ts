@@ -1,4 +1,4 @@
-import { IconType } from "@gandogames/shared/api";
+import { IconType } from "./auth";
 
 export interface PlayerIcon {
 	id: IconType;

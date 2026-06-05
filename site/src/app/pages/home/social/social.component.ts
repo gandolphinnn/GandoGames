@@ -1,16 +1,15 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
-import { RefreshableContentComponent } from '../../../components/refreshable-content/refreshable-content.component';
-import { PlayerAvatarComponent } from '../../../components/player-avatar/player-avatar.component';
 import { Friend } from '@gandogames/shared/api';
+import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { FriendService } from '@gandogames/services/friend.service';
 import { UserService } from '@gandogames/services/user.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { RefreshableContentComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 @Component({
 	selector: 'gg-social',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, RefreshableContentComponent, PlayerAvatarComponent],
+	imports: [...ION_IMPORTS, PlayerAvatarComponent, RefreshableContentComponent],
 	templateUrl: './social.component.html',
 	styleUrl: './social.component.scss',
 })

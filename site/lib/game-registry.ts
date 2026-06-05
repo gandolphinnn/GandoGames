@@ -46,7 +46,7 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 	blackjack: {
 		id: 'blackjack',
 		name: 'Blackjack',
-		icon: 'fa-solid fa-clone',
+		icon: 'fa-solid fa-a',
 		description: 'Beat the dealer to 21 without busting. Hit, stand, split, double down, and bet your chips.',
 		minPlayers: 1,
 		maxPlayers: 7,

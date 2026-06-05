@@ -39,3 +39,6 @@ export interface PokerActionRequest {
 	action: 'fold' | 'check' | 'call' | 'raise' | 'next-hand';
 	amount?: number;
 }
+
+export const STARTING_CHIPS = 1000;
+export const MIN_RAISE = 100;

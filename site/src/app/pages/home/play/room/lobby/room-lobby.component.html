@@ -1,0 +1,94 @@
+<div class="room-detail">
+
+	@if (!room()) {
+		<p class="status-msg">Loading room…</p>
+	} @else {
+		<div class="room-info">
+			<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
+			<span class="room-game-name">{{ gameInfo()?.name }}</span>
+			<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
+		</div>
+
+		<div class="player-grid">
+			@for (slot of playerSlots(); track $index) {
+				@if (slot) {
+					<div class="player-card"
+						[class.player-card-host]="slot.id === room()!.hostId"
+						[class.player-card-me]="slot.id === myId()">
+						@if (slot.id === room()!.hostId) {
+							<ion-icon name="ribbon" class="player-card-crown" title="host" />
+						}
+						@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
+							<button class="player-card-kick" (click)="kick(slot)" title="Kick player">
+								<ion-icon name="close" />
+							</button>
+						}
+						@if (canAddFriend(slot)) {
+							<button class="player-card-friend" [disabled]="addingFriendId() === slot.id" (click)="addFriend(slot)" title="Add friend">
+								<ion-icon name="person-add" />
+							</button>
+						}
+						<gg-player-avatar class="player-card-avatar" [player]="slot" />
+						<span class="player-card-name">{{ slot.name }}</span>
+					</div>
+				} @else if (isInRoom()) {
+					<div class="player-card player-card-empty" (click)="invite()">
+						<div class="player-card-avatar player-card-avatar-empty">
+							<ion-icon name="add" />
+						</div>
+						<span class="player-card-name">Empty</span>
+					</div>
+				}
+			}
+			@if (!isInRoom() && canJoin()) {
+				<div class="player-card player-card-join" [class.player-card-join-loading]="loading()" (click)="join()">
+					<div class="player-card-avatar player-card-avatar-empty">
+						<ion-icon name="enter" />
+					</div>
+					<span class="player-card-name">{{ loading() ? 'Joining…' : 'Join Room' }}</span>
+				</div>
+			}
+		</div>
+
+		@switch (room()!.phase) {
+			@case ('waiting') {
+				<div class="phase-panel">
+					@if (!isInRoom()) {
+						@if (!canJoin()) {
+							<p class="status-msg">This room is full.</p>
+						}
+					} @else {
+						<p class="status-msg">Waiting for players…</p>
+						@if (isHost()) {
+							@if (canStart()) {
+								<ion-button [disabled]="loading()" (click)="start()">
+									{{ loading() ? 'Starting…' : 'Start Game' }}
+								</ion-button>
+							} @else {
+								<p class="hint">Need more players to start.</p>
+							}
+						}
+					}
+				</div>
+			}
+			@case ('ended') {
+				<div class="phase-panel game-over">
+					<h2>Game Over</h2>
+					<ion-button [routerLink]="['/play']">Find another room</ion-button>
+				</div>
+			}
+		}
+
+		@if (showInviteModal() && room()) {
+			<gg-invite-modal
+				[roomId]="roomId()"
+				[gameType]="room()!.game"
+				[isHost]="isHost()"
+				[playerCount]="room()!.players.length"
+				[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
+				[memberIds]="memberIds()"
+				(closed)="showInviteModal.set(false)" />
+		}
+	}
+
+</div>

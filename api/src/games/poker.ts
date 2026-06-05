@@ -1,7 +1,7 @@
 import type { GamePlayer } from '@gandogames/shared/api';
 import type { Card, PokerGameState, PokerPlayer } from '@gandogames/shared/poker';
 import type { Rank } from '@gandogames/shared/cards';
-import { createDeck, shuffle } from './deck';
+import { createDeck, shuffle } from '@gandogames/shared/cards';
 import { Game } from './game';
 
 const STARTING_CHIPS = 1000;

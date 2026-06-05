@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"main": "dist/api/src/functions/**/*.js",
 	"scripts": {
-		"build": "tsc",
-		"start": "tsc && func start --cors \"*\"",
+		"build": "tsc && tsc-alias",
+		"start": "tsc && tsc-alias && func start --cors \"*\"",
 		"test": "jest",
 		"fetch-secrets": "func azure functionapp fetch-app-settings GandoGamesApi && node patch-local-settings.js"
 	},
@@ -28,7 +28,7 @@
 		},
 		"moduleNameMapper": {
 			"^@gandogames/shared/api$": "<rootDir>/../shared/index",
-			"^@gandogames/shared/pankov$": "<rootDir>/../shared/games/pankov"
+			"^@gandogames/shared/(.*)$": "<rootDir>/../shared/games/$1"
 		}
 	},
 	"dependencies": {
@@ -40,6 +40,7 @@
 		"@types/node": "^22.19.17",
 		"jest": "^29.x",
 		"ts-jest": "^29.x",
+		"tsc-alias": "^1.8.17",
 		"typescript": "^5.x"
 	}
 }

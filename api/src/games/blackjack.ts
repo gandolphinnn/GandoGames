@@ -3,7 +3,7 @@ import type {
 	BlackjackGameState, BlackjackPlayer, BlackjackHand, HandOutcome, Card,
 } from '@gandogames/shared/blackjack';
 import type { Rank } from '@gandogames/shared/cards';
-import { createDeck, shuffle } from './deck';
+import { createDeck, shuffle } from '@gandogames/shared/cards';
 import { Game } from './game';
 
 const STARTING_CHIPS = 1000;

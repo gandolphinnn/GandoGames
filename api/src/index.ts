@@ -3,6 +3,7 @@ import { BaseRequest, GamePlayer, IconType, LangCode, Theme } from '@gandogames/
 import { PlayFab, PlayFabAdmin as RealPlayFabAdmin, PlayFabClient as RealPlayFabClient, PlayFabServer as RealPlayFabServer } from 'playfab-sdk';
 import { mockPlayFabAdmin, mockPlayFabClient, mockPlayFabServer } from './db/mockPlayFab';
 import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';
+import { withRoomLock } from './lock';
 
 // MOCK_BACKEND swaps the PlayFab SDK clients for an in-memory simulation so collaborators can
 // run the full API locally with no secrets. Opt-in only: production never sets it, so the real
@@ -84,17 +85,26 @@ export function registerPublicFunction<TReq, TRes>(
 	});
 }
 
+export interface RegisterFunctionOptions {
+	/**
+	 * Skip the automatic per-room lock even when the request carries a roomId. Use for read-only
+	 * handlers — reads can't lose data, so locking them would only add latency and contention.
+	 */
+	skipLock?: boolean;
+	extraInputs?: FunctionInput[];
+}
+
 export function registerFunction<TReq extends BaseRequest, TRes>(
 	name: string,
 	route: string,
 	innerFunction: InnerFunction<TReq, TRes>,
-	extraInputs?: FunctionInput[],
+	options: RegisterFunctionOptions = {},
 ) {
 	app.http(name, {
 		methods: ['POST'],
 		authLevel: 'anonymous',
 		route: route,
-		extraInputs: extraInputs,
+		extraInputs: options.extraInputs,
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
@@ -102,7 +112,15 @@ export function registerFunction<TReq extends BaseRequest, TRes>(
 			try {
 				const body = await request.json().catch(() => undefined) as TReq;
 				const player = await authenticateSession(body, notifier);
-				const result = await innerFunction(body, notifier, player);
+				// Handlers do load → mutate → save against storage with no compare-and-set, so two
+				// concurrent calls on the same room can clobber each other. Any request carrying a
+				// roomId is therefore serialized per room automatically; read-only handlers opt out
+				// via skipLock.
+				const roomId = (body as { roomId?: unknown })?.roomId;
+				const runInner = () => innerFunction(body, notifier, player);
+				const result = !options.skipLock && typeof roomId === 'string' && roomId.length > 0
+					? await withRoomLock(roomId, runInner)
+					: await runInner();
 				notifier.prepareContext(context);
 				toRet.jsonBody = result;
 				toRet.status = 200;

@@ -34,5 +34,7 @@ const gameActionInner: InnerFunction<GameActionRequest, GameState | null> = asyn
 	return game.getPublicState(player.id);
 };
 
-registerFunction('game_state', 'game/state', gameStateInner);
+// game/state is read-only, so it opts out of the per-room lock; game/action mutates and is
+// locked automatically (its request carries a roomId).
+registerFunction('game_state', 'game/state', gameStateInner, { skipLock: true });
 registerFunction('game_action', 'game/action', gameActionInner);

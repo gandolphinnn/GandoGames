@@ -171,9 +171,13 @@ const roomDeleteInner: InnerFunction<RoomBaseRequest, void> = async (body, notif
 	notifier.roomDeleted(body.roomId);
 };
 
+// room/create has no roomId yet and room/list & room/get are read-only, so none take the lock
+// (room/get opts out explicitly). The rest mutate room state and are auto-locked per room (their
+// request carries a roomId) so concurrent calls — e.g. two players joining at once — can't
+// overwrite each other.
 registerFunction('room_create', 'rooms/create', roomCreateInner);
 registerFunction('room_list', 'rooms/list', roomListInner);
-registerFunction('room_get', 'rooms/get', roomGetInner);
+registerFunction('room_get', 'rooms/get', roomGetInner, { skipLock: true });
 registerFunction('room_join', 'rooms/join', roomJoinInner);
 registerFunction('room_start', 'rooms/start', roomStartInner);
 registerFunction('room_reset', 'rooms/reset', roomResetInner);

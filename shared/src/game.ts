@@ -1,6 +1,6 @@
 import { RoomBaseRequest } from "./room";
 
-export type GameType = 'pankov' | 'poker' | 'blackjack';
+export type GameType = 'pankov' | 'poker';
 
 export interface GameState {
 	lastUpdate: Date;

@@ -2,7 +2,6 @@ import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
 import { GameState, GameType } from "@gandogames/shared/api";
 import { PankovGameComponent } from '@gandogames/lib/games/pankov';
 import { PokerGameComponent } from '@gandogames/lib/games/poker';
-import { BlackjackGameComponent } from '@gandogames/lib/games/blackjack';
 
 export interface GameComponent<TState extends GameState = GameState> {
 	gameState: InputSignal<TState | null>;
@@ -42,14 +41,5 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 		minPlayers: 2,
 		maxPlayers: 8,
 		component: PokerGameComponent,
-	},
-	blackjack: {
-		id: 'blackjack',
-		name: 'Blackjack',
-		icon: 'fa-solid fa-a',
-		description: 'Beat the dealer to 21 without busting. Hit, stand, split, double down, and bet your chips.',
-		minPlayers: 1,
-		maxPlayers: 7,
-		component: BlackjackGameComponent,
 	},
 };

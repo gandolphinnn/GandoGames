@@ -1,4 +1,4 @@
-// The standard 52-card French deck, shared by every card game (poker, blackjack, …).
+// The standard 52-card French deck, shared by every card game (e.g. poker).
 // Environment-agnostic: no Node/Angular/browser APIs, so both the API and the site
 // can compile and run it.
 

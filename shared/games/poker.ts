@@ -1,5 +1,5 @@
 import { GamePlayer, GameState, RoomData } from "..";
-import { type Card, type Rank, createDeck, shuffle } from "./common/cards";
+import { type Card, type Rank, cardKey, createDeck, shuffle } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {
 	chips: number;
@@ -67,10 +67,12 @@ export function compareHandRanks(a: HandRank, b: HandRank): number {
 	return 0;
 }
 
+/** All k-card subsets of `arr` — used to find the best 5-card hand among 5–7 cards. */
 function combinations(arr: Card[], k: number): Card[][] {
-	if (k === 0) return [[]];
-	if (arr.length < k) return [];
+	if (k === 0) return [[]];          // exactly one subset of size 0: the empty set
+	if (arr.length < k) return [];     // fewer cards left than needed → no subsets
 	const [first, ...rest] = arr;
+	// Every subset either keeps `first` (then pick k-1 from the rest) or drops it (pick k from the rest).
 	return [
 		...combinations(rest, k - 1).map(c => [first!, ...c]),
 		...combinations(rest, k),
@@ -83,6 +85,7 @@ export function evaluateFiveCard(cards: Card[]): HandRank {
 	const isFlush = cards.every(c => c.suit === cards[0]!.suit);
 	const unique = [...new Set(values)].sort((a, b) => b - a);
 
+	// Wheel straight (A-2-3-4-5): the ace plays low, so it ranks as a five-high straight.
 	const isWheelStraight = unique.length === 5 &&
 		unique[0] === 14 && unique[1] === 5 && unique[2] === 4 && unique[3] === 3 && unique[4] === 2;
 	const isNormalStraight = unique.length === 5 && unique[0]! - unique[4]! === 4;
@@ -157,9 +160,8 @@ export function describeHand(rank: HandRank): string {
  */
 export function estimateWinOdds(hole: Card[], community: Card[], opponents: number, iterations = 2000): number {
 	if (opponents < 1) return 1;
-	const key = (c: Card) => `${c.rank}-${c.suit}`;
-	const used = new Set([...hole, ...community].map(key));
-	const remaining = createDeck().filter(c => !used.has(key(c)));
+	const used = new Set([...hole, ...community].map(cardKey));
+	const remaining = createDeck().filter(c => !used.has(cardKey(c)));
 	const boardNeeded = 5 - community.length;
 	let score = 0;
 	for (let iter = 0; iter < iterations; iter++) {

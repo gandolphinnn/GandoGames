@@ -10,6 +10,11 @@ export interface Card {
 	rank: Rank;
 }
 
+/** Stable string identity for a card — for keying, dedup, or change tracking. */
+export function cardKey(card: Card): string {
+	return `${card.rank}-${card.suit}`;
+}
+
 export const SUITS: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
 export const RANKS: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 

@@ -1,6 +1,6 @@
-import { PankovGame } from './pankov';
 import type { GamePlayer } from '@gandogames/shared/api';
 import type { RollValue } from '@gandogames/shared/pankov';
+import { PankovGame } from './pankov';
 
 const p1: GamePlayer = { id: 'p1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
 const p2: GamePlayer = { id: 'p2', name: 'Bob', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };

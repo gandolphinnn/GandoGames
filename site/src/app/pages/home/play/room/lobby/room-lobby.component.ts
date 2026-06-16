@@ -3,10 +3,10 @@ import { RouterLink } from '@angular/router';
 import { GamePlayer, RoomData } from '@gandogames/shared/api';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
-import { RoomService } from '@gandogames/services/room.service';
-import { UserService } from '@gandogames/services/user.service';
 import { FriendService } from '@gandogames/services/friend.service';
+import { RoomService } from '@gandogames/services/room.service';
 import { ToastService } from '@gandogames/services/toast.service';
+import { UserService } from '@gandogames/services/user.service';
 import { InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 /** Lobby body for a waiting/ended room. Header, chat and layout are owned by RoomComponent. */

@@ -1,5 +1,5 @@
-import { compareHandRanks, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 import type { Card } from '@gandogames/shared/common/cards';
+import { compareHandRanks, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
 

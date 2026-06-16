@@ -1,8 +1,8 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
 import { PankovGameState, formatValue, getRank, INITIAL_LIVES, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
-import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
 import { GameComponent } from '@gandogames/lib/game-registry';
+import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
 
 @Component({
 	selector: 'gg-pankov-game',

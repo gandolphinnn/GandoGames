@@ -1,10 +1,10 @@
 import { Component, computed, effect, input, output, signal, untracked } from '@angular/core';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
-import type { Card } from '@gandogames/shared/common/cards';
+import { type Card, cardKey } from '@gandogames/shared/common/cards';
 import { type PokerGameState, MIN_RAISE, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
-import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
-import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { GameComponent } from '@gandogames/lib/game-registry';
+import { ChipCountComponent } from '@gandogames/lib/common/chips';
+import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 
 @Component({
 	selector: 'gg-poker-game',
@@ -110,7 +110,6 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	private readonly oddsSignature = computed(() => {
 		const inp = this.oddsInputs();
 		if (!inp) return null;
-		const cardKey = (card: Card) => card.rank + card.suit;
 		return `${inp.community.map(cardKey).join()}#${inp.hole.map(cardKey).join()}#${inp.opponents}`;
 	});
 

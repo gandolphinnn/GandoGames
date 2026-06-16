@@ -1,6 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/api';
 import { UserService } from '@gandogames/services/user.service';
+import { hueFromString } from './hue-from-string';
 
 @Component({
 	selector: 'gg-player-avatar',
@@ -21,10 +22,5 @@ export class PlayerAvatarComponent {
 		PLAYER_ICONS.find(p => p.id === (this.player().icon ?? 'profile'))?.class ?? ''
 	);
 
-	public readonly bg = computed(() => {
-		const id = this.player().id;
-		let hash = 0;
-		for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) & 0xffff;
-		return `hsl(${hash % 360}, 38%, 62%)`;
-	});
+	public readonly bg = computed(() => `hsl(${hueFromString(this.player().id)}, 38%, 62%)`);
 }

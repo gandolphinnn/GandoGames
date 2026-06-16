@@ -47,6 +47,16 @@
 					<gg-french-card [card]="card" size="lg" />
 				}
 			</div>
+			@if (myCombo()) {
+				<div class="my-hand-insights">
+					<span class="my-combo">{{ myCombo() }}</span>
+					@if (winPercent() !== null) {
+						<span class="my-odds">Win {{ winPercent() }}%</span>
+					} @else {
+						<span class="my-odds my-odds-pending">Win …</span>
+					}
+				</div>
+			}
 		</div>
 	}
 

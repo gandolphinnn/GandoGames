@@ -92,6 +92,28 @@
 	gap: $s2;
 }
 
+.my-hand-insights {
+	margin-left: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+	text-align: right;
+}
+
+.my-combo {
+	font-size: $text-sm;
+	font-weight: 600;
+}
+
+.my-odds {
+	font-size: $text-sm;
+	font-weight: 700;
+	color: $accent;
+
+	&-pending { color: $text-muted; font-weight: 600; }
+}
+
 // ── Action panel ──────────────────────────────────────────────────────────────
 
 .action-row {

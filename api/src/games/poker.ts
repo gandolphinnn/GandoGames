@@ -1,85 +1,10 @@
 import type { GamePlayer } from '@gandogames/shared/api';
-import { type Card, type Rank, createDeck, shuffle } from '@gandogames/shared/common/cards';
-import { type PokerGameState, MIN_RAISE, STARTING_CHIPS } from '@gandogames/shared/poker';
+import { type Card, createDeck, shuffle } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type HandRank, MIN_RAISE, STARTING_CHIPS, compareHandRanks, describeHand, evaluateHand } from '@gandogames/shared/poker';
 import { Game } from './game';
 
 const SMALL_BLIND = 50;
 const BIG_BLIND = 100;
-
-const RANK_VALUE: Record<Rank, number> = {
-	'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
-	'8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14,
-};
-
-function combinations(arr: Card[], k: number): Card[][] {
-	if (k === 0) return [[]];
-	if (arr.length < k) return [];
-	const [first, ...rest] = arr;
-	return [
-		...combinations(rest, k - 1).map(c => [first!, ...c]),
-		...combinations(rest, k),
-	];
-}
-
-interface HandRank {
-	category: number;
-	tiebreakers: number[];
-	description: string;
-}
-
-function compareHandRanks(a: HandRank, b: HandRank): number {
-	if (a.category !== b.category) return a.category - b.category;
-	for (let i = 0; i < Math.max(a.tiebreakers.length, b.tiebreakers.length); i++) {
-		const diff = (a.tiebreakers[i] ?? 0) - (b.tiebreakers[i] ?? 0);
-		if (diff !== 0) return diff;
-	}
-	return 0;
-}
-
-function evaluateFiveCard(cards: Card[]): HandRank {
-	const values = cards.map(c => RANK_VALUE[c.rank]).sort((a, b) => b - a);
-	const isFlush = cards.every(c => c.suit === cards[0]!.suit);
-	const unique = [...new Set(values)].sort((a, b) => b - a);
-
-	const isWheelStraight = unique.length === 5 &&
-		unique[0] === 14 && unique[1] === 5 && unique[2] === 4 && unique[3] === 3 && unique[4] === 2;
-	const isNormalStraight = unique.length === 5 && unique[0]! - unique[4]! === 4;
-	const isStraight = isNormalStraight || isWheelStraight;
-	const straightValues = isWheelStraight ? [5, 4, 3, 2, 1] : values;
-
-	const freq: Record<number, number> = {};
-	for (const v of values) freq[v] = (freq[v] ?? 0) + 1;
-	const groups = Object.entries(freq)
-		.map(([k, c]) => ({ v: Number(k), c }))
-		.sort((a, b) => b.c - a.c || b.v - a.v);
-	const tiebreakers = groups.flatMap(({ v, c }) => Array<number>(c).fill(v));
-
-	const topCount = groups[0]?.c ?? 1;
-	const secondCount = groups[1]?.c ?? 0;
-
-	if (isFlush && isStraight) {
-		const isRoyal = !isWheelStraight && values[0] === 14;
-		return { category: 8, tiebreakers: straightValues, description: isRoyal ? 'Royal Flush' : 'Straight Flush' };
-	}
-	if (topCount === 4) return { category: 7, tiebreakers, description: 'Four of a Kind' };
-	if (topCount === 3 && secondCount === 2) return { category: 6, tiebreakers, description: 'Full House' };
-	if (isFlush) return { category: 5, tiebreakers: values, description: 'Flush' };
-	if (isStraight) return { category: 4, tiebreakers: straightValues, description: 'Straight' };
-	if (topCount === 3) return { category: 3, tiebreakers, description: 'Three of a Kind' };
-	if (topCount === 2 && secondCount === 2) return { category: 2, tiebreakers, description: 'Two Pair' };
-	if (topCount === 2) return { category: 1, tiebreakers, description: 'One Pair' };
-	return { category: 0, tiebreakers: values, description: 'High Card' };
-}
-
-function evaluateHand(cards: Card[]): HandRank {
-	if (cards.length <= 5) return evaluateFiveCard(cards);
-	let best: HandRank | null = null;
-	for (const combo of combinations(cards, 5)) {
-		const rank = evaluateFiveCard(combo);
-		if (!best || compareHandRanks(rank, best) > 0) best = rank;
-	}
-	return best!;
-}
 
 export class PokerGame extends Game<PokerGameState> {
 	public override minPlayers = 2;
@@ -318,7 +243,7 @@ export class PokerGame extends Game<PokerGameState> {
 			.filter(p => compareHandRanks(ranks.get(p.id)!, bestRank!) === 0)
 			.map(p => p.id);
 		const hands: Record<string, string> = {};
-		for (const [id, r] of ranks) hands[id] = r.description;
+		for (const [id, r] of ranks) hands[id] = describeHand(r);
 		state.result = { winners, hands, potAmount: state.pot };
 		state.gamePhase = 'showdown';
 	}

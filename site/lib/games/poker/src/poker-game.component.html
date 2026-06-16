@@ -91,26 +91,38 @@
 			}
 		} @else if (gameState()!.gamePhase === 'showdown') {
 			@let gs = gameState()!;
-			<div class="panel">
-				<h2 class="panel-title">Showdown</h2>
-				<div class="showdown-rows">
-					@for (p of showdownPlayers(); track p.id) {
-						<div class="showdown-row" [class.showdown-row-winner]="gs.result?.winners?.includes(p.id)">
-							<span class="showdown-name">{{ p.name }}</span>
-							<div class="showdown-cards">
-								@for (card of p.cards; track card.rank + card.suit) {
-									<gg-french-card [card]="card" size="sm" />
-								}
-							</div>
-							<span class="showdown-rank">{{ gs?.result?.hands?.[p.id] }}</span>
-						</div>
+			@if (wonByFold()) {
+				<div class="panel panel-centered">
+					<p class="panel-eyebrow">Hand over</p>
+					<h2 class="panel-title">{{ showdownPlayers()[0]?.name }} wins the pot</h2>
+					<p class="won-by-fold-note">Everyone else folded — no cards shown.</p>
+					<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
+					@if (error()) {
+						<p class="action-error">{{ error() }}</p>
 					}
 				</div>
-				<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
-				@if (error()) {
-					<p class="action-error">{{ error() }}</p>
-				}
-			</div>
+			} @else {
+				<div class="panel">
+					<h2 class="panel-title">Showdown</h2>
+					<div class="showdown-rows">
+						@for (p of showdownPlayers(); track p.id) {
+							<div class="showdown-row" [class.showdown-row-winner]="gs.result?.winners?.includes(p.id)">
+								<span class="showdown-name">{{ p.name }}</span>
+								<div class="showdown-cards">
+									@for (card of p.cards; track card.rank + card.suit) {
+										<gg-french-card [card]="card" size="sm" />
+									}
+								</div>
+								<span class="showdown-rank">{{ gs?.result?.hands?.[p.id] }}</span>
+							</div>
+						}
+					</div>
+					<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
+					@if (error()) {
+						<p class="action-error">{{ error() }}</p>
+					}
+				</div>
+			}
 		} @else if (gameState()!.gamePhase === 'game-over') {
 			<div class="panel panel-centered">
 				<p class="panel-eyebrow">Winner</p>

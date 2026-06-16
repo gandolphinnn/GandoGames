@@ -81,6 +81,12 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		return gs.players.filter(p => !p.folded);
 	});
 
+	/** An uncontested win: everyone else folded, so the lone winner takes the pot without showing. */
+	protected readonly wonByFold = computed(() => {
+		const gs = this.gameState();
+		return gs?.gamePhase === 'showdown' && this.showdownPlayers().length === 1;
+	});
+
 	/** True on the flop/turn/river — community cards are out, so we can show live insights. */
 	private readonly boardRevealed = computed(() => {
 		const phase = this.gameState()?.gamePhase;

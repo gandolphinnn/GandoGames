@@ -146,6 +146,11 @@
 	--background-hover: $accent-muted;
 }
 
+.won-by-fold-note {
+	font-size: $text-sm;
+	color: $text-muted;
+}
+
 // ── Showdown ──────────────────────────────────────────────────────────────────
 
 .showdown-rows {

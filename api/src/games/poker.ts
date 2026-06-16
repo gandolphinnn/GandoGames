@@ -35,9 +35,14 @@ export class PokerGame extends Game<PokerGameState> {
 
 	public override getPublicState(playerId: string): PokerGameState {
 		if (!this.state) throw new Error('Game not initialized');
+		// Hole cards are revealed only at a *contested* showdown (more than one player still in).
+		// An uncontested win — everyone else folded — is taken without showing, so the lone winner's
+		// hand stays hidden. Folded hands are always mucked, even at a real showdown.
+		const contestedShowdown = this.state.gamePhase === 'showdown' &&
+			this.state.players.filter(p => !p.folded).length > 1;
 		const players = this.state.players.map(p => {
 			if (p.id === playerId) return p;
-			if (this.state!.gamePhase === 'showdown') return p;
+			if (contestedShowdown && !p.folded) return p;
 			return { ...p, cards: [] as Card[] };
 		});
 		return { ...this.state, players, deck: [] };

@@ -1,10 +1,11 @@
-import { Component, computed, effect, input, output, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
 import { type Card, cardKey } from '@gandogames/shared/common/cards';
 import { type PokerGameState, MIN_RAISE, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
+import { ToastService } from '@gandogames/services/toast.service';
 
 @Component({
 	selector: 'gg-poker-game',
@@ -21,6 +22,8 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
 	public readonly back = output<void>();
 	public readonly playAgain = output<void>();
+
+	private readonly toast = inject(ToastService);
 
 	protected readonly raiseAmount = signal(MIN_RAISE * 2);
 
@@ -154,4 +157,11 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	protected call(): void { this.gameAction.emit({ action: 'call' }); }
 	protected raise(amount: number): void { this.gameAction.emit({ action: 'raise', data: { amount } }); }
 	protected nextHand(): void { this.gameAction.emit({ action: 'next-hand' }); }
+
+	protected async allIn(): Promise<void> {
+		const me = this.myPlayer();
+		if (!me || me.chips <= 0) return;
+		const confirmed = await this.toast.yesNo(`Go all in with ${me.chips} chips? This bets your entire stack.`);
+		if (confirmed) this.gameAction.emit({ action: 'all-in' });
+	}
 }

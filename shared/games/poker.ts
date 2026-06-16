@@ -34,7 +34,7 @@ export interface PokerRoomState extends RoomData {
 }
 
 export interface PokerActionRequest {
-	action: 'fold' | 'check' | 'call' | 'raise' | 'next-hand';
+	action: 'fold' | 'check' | 'call' | 'raise' | 'all-in' | 'next-hand';
 	amount?: number;
 }
 

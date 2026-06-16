@@ -68,6 +68,47 @@ describe('estimateWinOdds', () => {
 	});
 });
 
+describe('PokerGame all-in', () => {
+	let game: PokerGame;
+	const me = () => game.state!.players.find(p => p.id === 'p1')!;
+
+	beforeEach(() => {
+		// 3 players (avoids the heads-up special case). Dealer=p1, SB=p2 (50), BB=p3 (100),
+		// so UTG p1 is first to act with currentBet=100 and pot=150.
+		game = new PokerGame();
+		game.initialize([player('p1', 'Alice'), player('p2', 'Bob'), player('p3', 'Charlie')]);
+	});
+
+	it('pushes the whole stack in and, when over the bet, raises to that amount', () => {
+		game.action(me(), 'all-in', null);
+		expect(me().chips).toBe(0);
+		expect(me().isAllIn).toBe(true);
+		expect(me().streetBet).toBe(1000);
+		expect(game.state!.currentBet).toBe(1000);
+		expect(game.state!.pot).toBe(1150);
+		expect(game.state!.currentPlayerIndex).toBe(1); // action moved on to the SB
+	});
+
+	it('does NOT lower the current bet on a short all-in below the call amount', () => {
+		me().chips = 30; // short stack — can't cover the 100 bet
+		game.action(me(), 'all-in', null);
+		expect(me().chips).toBe(0);
+		expect(me().isAllIn).toBe(true);
+		expect(me().streetBet).toBe(30);
+		expect(game.state!.currentBet).toBe(100); // unchanged — others still owe 100, not 30
+		expect(game.state!.pot).toBe(180);
+	});
+
+	it('is ignored for a player with no chips', () => {
+		me().chips = 0;
+		const potBefore = game.state!.pot;
+		game.action(me(), 'all-in', null);
+		expect(me().isAllIn).toBe(false);
+		expect(game.state!.pot).toBe(potBefore);
+		expect(game.state!.currentPlayerIndex).toBe(0); // turn did not advance
+	});
+});
+
 describe('PokerGame getPublicState (hole-card visibility)', () => {
 	let game: PokerGame;
 	const p1 = player('p1', 'Alice');

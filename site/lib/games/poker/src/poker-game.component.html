@@ -78,6 +78,7 @@
 						<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="50" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
 						<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">Raise</ion-button>
 					</div>
+					<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">All In ({{ myPlayer()?.chips }})</ion-button>
 					@if (error()) {
 						<p class="action-error">{{ error() }}</p>
 					}

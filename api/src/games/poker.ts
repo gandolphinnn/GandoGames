@@ -62,6 +62,7 @@ export class PokerGame extends Game<PokerGameState> {
 			case 'check': return this.applyCheck(player.id);
 			case 'call': return this.applyCall(player.id);
 			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? MIN_RAISE);
+			case 'all-in': return this.applyAllIn(player.id);
 			default: return this.state;
 		}
 	}
@@ -116,6 +117,29 @@ export class PokerGame extends Game<PokerGameState> {
 		player.hasActed = true;
 		for (const p of state.players) {
 			if (p.id !== playerId && !p.folded && !p.isAllIn) p.hasActed = false;
+		}
+		this.advanceAfterAction();
+		state.lastUpdate = new Date();
+		return state;
+	}
+
+	private applyAllIn(playerId: string): PokerGameState {
+		const state = this.state!;
+		const player = state.players.find(p => p.id === playerId)!;
+		const toPut = player.chips;
+		if (toPut <= 0) return state;
+		player.chips = 0;
+		player.streetBet += toPut;
+		state.pot += toPut;
+		player.isAllIn = true;
+		player.hasActed = true;
+		// Pushing past the current bet is a raise: everyone still in must act again. A short all-in
+		// (stack below the call amount) only matches part of it — it must NOT lower the bet for others.
+		if (player.streetBet > state.currentBet) {
+			state.currentBet = player.streetBet;
+			for (const p of state.players) {
+				if (p.id !== playerId && !p.folded && !p.isAllIn) p.hasActed = false;
+			}
 		}
 		this.advanceAfterAction();
 		state.lastUpdate = new Date();

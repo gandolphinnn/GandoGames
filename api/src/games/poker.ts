@@ -1,8 +1,6 @@
 import type { GamePlayer } from '@gandogames/shared/api';
-import type { Card, PokerGameState, PokerPlayer } from '@gandogames/shared/poker';
-import { MIN_RAISE, STARTING_CHIPS } from '@gandogames/shared/poker';
-import type { Rank } from '@gandogames/shared/cards';
-import { createDeck, shuffle } from '@gandogames/shared/cards';
+import { type Card, type Rank, createDeck, shuffle } from '@gandogames/shared/common/cards';
+import { type PokerGameState, MIN_RAISE, STARTING_CHIPS } from '@gandogames/shared/poker';
 import { Game } from './game';
 
 const SMALL_BLIND = 50;
@@ -13,7 +11,7 @@ const RANK_VALUE: Record<Rank, number> = {
 	'8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14,
 };
 
-function combinations<T>(arr: T[], k: number): T[][] {
+function combinations(arr: Card[], k: number): Card[][] {
 	if (k === 0) return [[]];
 	if (arr.length < k) return [];
 	const [first, ...rest] = arr;

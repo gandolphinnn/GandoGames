@@ -12,6 +12,7 @@
 		"types": [ "node", "jest" ],
 		"paths": {
 			"@gandogames/shared/api": ["../shared/index"],
+			"@gandogames/shared/common": ["../shared/games/common"],
 			"@gandogames/shared/*": ["../shared/games/*"],
 		}
 	}

@@ -1,6 +1,5 @@
 import type { GamePlayer } from '@gandogames/shared/api';
-import type { PankovGameState, RollValue } from '@gandogames/shared/pankov';
-import { INITIAL_LIVES, ROLL_VALUES, getRank, rollToValue } from '@gandogames/shared/pankov';
+import { type PankovGameState, type RollValue, INITIAL_LIVES, ROLL_VALUES, getRank, rollToValue } from '@gandogames/shared/pankov';
 import { Game } from './game';
 
 export class PankovGame extends Game<PankovGameState> {

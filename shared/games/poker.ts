@@ -1,7 +1,5 @@
 import { GamePlayer, GameState, RoomData } from "..";
-import { Card } from "./cards";
-
-export type { Card, Suit, Rank } from "./cards";
+import { Card } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {
 	chips: number;

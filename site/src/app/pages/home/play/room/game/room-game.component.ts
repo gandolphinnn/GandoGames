@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/shared/api';
+import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { BackendService } from '@gandogames/services/backend.service';

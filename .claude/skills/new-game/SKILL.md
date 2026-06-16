@@ -32,7 +32,7 @@ Read every file listed below before asking the user anything or generating any c
 - `site/lib/common/` — reusable game widgets (dice, french-card, player-chip) to compose from
 
 **Files to modify (read before editing):**
-- `shared/src/game.ts` — `GameType` union
+- `shared/dto/game.ts` — `GameType` union
 - `shared/index.ts` — top-level re-exports
 - `site/tsconfig.json` — path aliases
 - `site/lib/game-registry.ts` — `GAME_REGISTRY` (`Record<GameType, GameDescriptor>`, including each game's `component`)
@@ -87,7 +87,7 @@ Follow `shared/games/pankov.ts` as the template:
 - `<Name>RoundResult` (if applicable)
 - `<Name>RoomState extends RoomData`
 
-### 3.2 `shared/src/game.ts`
+### 3.2 `shared/dto/game.ts`
 
 Add `| '<name>'` to the `GameType` union. Nothing else.
 

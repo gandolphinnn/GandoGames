@@ -1,4 +1,4 @@
-import { GamePlayer, GameState, GameType } from '@gandogames/shared/api';
+import { GamePlayer, GameState, GameType } from '@gandogames/shared/dto';
 
 export const GAMES_CONFIG: Record<GameType, {
 	minPlayers: number,

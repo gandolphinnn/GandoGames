@@ -1,5 +1,5 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/api';
+import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/dto';
 import { UserService } from '@gandogames/services/user.service';
 import { hueFromString } from './hue-from-string';
 

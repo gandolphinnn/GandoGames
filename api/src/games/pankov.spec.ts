@@ -1,4 +1,4 @@
-import type { GamePlayer } from '@gandogames/shared/api';
+import type { GamePlayer } from '@gandogames/shared/dto';
 import type { RollValue } from '@gandogames/shared/pankov';
 import { PankovGame } from './pankov';
 

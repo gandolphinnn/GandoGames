@@ -1,4 +1,4 @@
-import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/api';
+import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
 import { InnerFunction, InnerFunctionNotifier, pfPromise, PlayFabServer, registerFunction } from '../..';
 
 /**

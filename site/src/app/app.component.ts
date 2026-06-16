@@ -7,7 +7,7 @@ import {
 	MenuController,
 } from '@ionic/angular/standalone';
 
-import { GameType } from '@gandogames/shared/api';
+import { GameType } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
 import { RoomService } from '@gandogames/services/room.service';

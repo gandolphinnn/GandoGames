@@ -1,5 +1,5 @@
 import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput } from '@azure/functions';
-import { BaseRequest, GamePlayer, IconType, LangCode, Theme } from '@gandogames/shared/api';
+import { BaseRequest, GamePlayer, IconType, LangCode, Theme } from '@gandogames/shared/dto';
 import { PlayFab, PlayFabAdmin as RealPlayFabAdmin, PlayFabClient as RealPlayFabClient, PlayFabServer as RealPlayFabServer } from 'playfab-sdk';
 import { mockPlayFabAdmin, mockPlayFabClient, mockPlayFabServer } from './db/mockPlayFab';
 import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';

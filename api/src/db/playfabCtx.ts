@@ -1,4 +1,4 @@
-import { GameState, GameType, RoomData } from "@gandogames/shared/api";
+import { GameState, GameType, RoomData } from "@gandogames/shared/dto";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
 import { pfPromise, PlayFabServer } from "..";

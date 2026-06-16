@@ -4,9 +4,9 @@
 
 ```
 GandoGames/
-├── shared/              # Shared HTTP-contract types (site + api), imported as @gandogames/shared/api
-│   ├── index.ts         # Re-exports shared/src/*
-│   └── src/             # auth · room · game · signalr · friends
+├── shared/              # Shared HTTP-contract types (site + api), imported as @gandogames/shared/dto
+│   ├── index.ts         # Re-exports shared/dto/*
+│   └── dto/             # auth · room · game · signalr · friends · player-icons
 ├── site/                # Angular 20 SPA (standalone components + Ionic)
 │   ├── src/app/
 │   │   ├── pages/       # Routed components (about, auth/*, home/*)

@@ -18,8 +18,8 @@ Try playing at this [url](https://www.gandogames.org/).
 ```
 GandoGames/
 ├── shared/                 # Shared HTTP-contract types (site + api)
-│   ├── index.ts            # Re-exports shared/src/*
-│   └── src/                # auth · room · game · signalr · friends
+│   ├── index.ts            # Re-exports shared/dto/*
+│   └── dto/                # auth · room · game · signalr · friends · player-icons
 ├── api/                    # Azure Functions v4 — secure PlayFab proxy
 │   └── src/
 │       ├── index.ts        # Barrel: register wrappers, pfPromise, PlayFab clients, SignalR bindings

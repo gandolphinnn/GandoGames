@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 GandoGames/
 ├── shared/
-│   ├── index.ts               # Re-exports all shared types (imported as @gandogames/shared/api)
-│   └── src/                   # Shared HTTP contract types used by both site/ and api/
+│   ├── index.ts               # Re-exports all shared types (imported as @gandogames/shared/dto)
+│   └── dto/                   # Shared HTTP/SignalR contract types used by both site/ and api/
 │       ├── auth.ts            # AuthResponse, GamePlayer, ProfileData, Login/Register/GuestLoginRequest
 │       ├── room.ts            # RoomData, RoomSummary, RoomCreateRequest, ChatMessage
 │       ├── game.ts            # GameType, GameState, GameBaseRequest, GameActionRequest
@@ -74,7 +74,7 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 
 **Path aliases** (`site/tsconfig.json`):
 ```
-@gandogames/shared/api  →  ../shared/index
+@gandogames/shared/dto  →  ../shared/index
 @gandogames/lib/*       →  ./lib/*
 @gandogames/services/*  →  ./src/app/services/*
 ```
@@ -128,7 +128,7 @@ To add a new game: create `site/lib/games/<name>/index.ts` exporting the game co
 
 **SignalR:** Azure SignalR Service in serverless mode. `signalROutput` output binding on all registered functions. Broadcast by calling `InnerFunctionNotifier` methods (e.g. `notifier.roomUpsert(room)`), which queue `SignalRMessage`s flushed to the binding after a successful response.
 
-**Shared types:** `shared/index.ts` (imported as `@gandogames/shared/api`) is the single source of truth for all HTTP request/response shapes.
+**Shared types:** `shared/index.ts` (imported as `@gandogames/shared/dto`) is the single source of truth for all HTTP request/response shapes.
 
 **Data storage:** PlayFab SharedGroups store room and game state. PlayFab is also used for auth.
 

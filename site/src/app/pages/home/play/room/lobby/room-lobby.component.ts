@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { GamePlayer, RoomData } from '@gandogames/shared/api';
+import { GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { FriendService } from '@gandogames/services/friend.service';

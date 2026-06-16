@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/api';
+import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 import { UserService } from './user.service';

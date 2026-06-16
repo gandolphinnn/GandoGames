@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoomSummary } from '@gandogames/shared/api';
+import { RoomSummary } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService } from '@gandogames/services/room.service';

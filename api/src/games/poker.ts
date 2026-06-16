@@ -1,4 +1,4 @@
-import type { GamePlayer } from '@gandogames/shared/api';
+import type { GamePlayer } from '@gandogames/shared/dto';
 import { type Card, createDeck, shuffle } from '@gandogames/shared/common/cards';
 import { type PokerGameState, type HandRank, MIN_RAISE, STARTING_CHIPS, compareHandRanks, describeHand, evaluateHand } from '@gandogames/shared/poker';
 import { Game } from './game';

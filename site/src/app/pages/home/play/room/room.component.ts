@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { RoomData } from '@gandogames/shared/api';
+import { RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { RoomService } from '@gandogames/services/room.service';

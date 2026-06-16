@@ -4,7 +4,7 @@ Base URL (local): `http://localhost:7071/api` (the Angular dev server proxies `/
 
 All endpoints are `POST` unless noted. Authenticated endpoints take `sessionTicket` in the request body; the wrapper validates it via PlayFab and injects the resolved `GamePlayer`. Success responses are `200`. Errors return `{ "error": "<message>" }` with an endpoint-specific status (commonly `400`, `401`, `404`, or `500`).
 
-Request/response shapes are the shared types in `shared/src/` (imported as `@gandogames/shared/api`).
+Request/response shapes are the shared types in `shared/dto/` (imported as `@gandogames/shared/dto`).
 
 ---
 
@@ -199,7 +199,7 @@ Server-to-client events pushed over the hub (`SignalREventType`):
 
 ---
 
-## Shared types (`shared/src/`)
+## Shared types (`shared/dto/`)
 
 ```ts
 type GameType = 'pankov' | 'poker'

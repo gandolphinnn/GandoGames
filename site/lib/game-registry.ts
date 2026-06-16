@@ -1,5 +1,5 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
-import { GameState, GameType } from "@gandogames/shared/api";
+import { GameState, GameType } from "@gandogames/shared/dto";
 import { PankovGameComponent } from '@gandogames/lib/games/pankov';
 import { PokerGameComponent } from '@gandogames/lib/games/poker';
 

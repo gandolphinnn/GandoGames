@@ -1,6 +1,6 @@
 import { HttpHandler, InvocationContext } from '@azure/functions';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { BaseRequest } from '@gandogames/shared/api';
+import { BaseRequest } from '@gandogames/shared/dto';
 import { authenticateSession, InnerFunctionNotifier, registerBaseFunction, signalRInput } from '../..';
 
 function validateSignature(body: string, signature: string): boolean {

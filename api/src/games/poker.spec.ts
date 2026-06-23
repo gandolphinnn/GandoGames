@@ -1,6 +1,7 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
-import { compareHandRanks, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
+import { resolveSettings } from '@gandogames/shared/dto';
+import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
@@ -145,5 +146,66 @@ describe('PokerGame getPublicState (hole-card visibility)', () => {
 		const seen = game.getPublicState('p1').players;
 		expect(seen.find(p => p.id === 'p2')!.cards.length).toBe(2); // contender revealed
 		expect(seen.find(p => p.id === 'p3')!.cards).toEqual([]);     // folded → mucked
+	});
+});
+
+describe('PokerGame settings', () => {
+	const p1 = player('p1', 'Alice');
+	const p2 = player('p2', 'Bob');
+	const p3 = player('p3', 'Charlie');
+
+	it('seeds stacks from startingChips and blinds from minBet', () => {
+		const game = new PokerGame();
+		// Dealer=p1, SB=p2, BB=p3. Big blind = minBet (200), small blind = half (100).
+		game.initialize([p1, p2, p3], { startingChips: 5000, minBet: 200, smallerDeck: false, showWinOdds: true });
+		const sb = game.state!.players.find(p => p.id === 'p2')!;
+		const bb = game.state!.players.find(p => p.id === 'p3')!;
+		const utg = game.state!.players.find(p => p.id === 'p1')!;
+		expect(utg.chips).toBe(5000);          // dealer/UTG posts nothing pre-deal
+		expect(sb.streetBet).toBe(100);
+		expect(bb.streetBet).toBe(200);
+		expect(sb.chips).toBe(4900);
+		expect(bb.chips).toBe(4800);
+		expect(game.state!.currentBet).toBe(200);
+		expect(game.state!.pot).toBe(300);
+	});
+
+	it('deals from a 36-card short deck when smallerDeck is on', () => {
+		const game = new PokerGame();
+		game.initialize([p1, p2, p3], { startingChips: 1000, minBet: 100, smallerDeck: true, showWinOdds: true });
+		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
+		expect(game.state!.deck.length + dealt).toBe(36);
+		const all = [...game.state!.deck, ...game.state!.players.flatMap(p => p.cards)];
+		expect(all.some(card => ['2', '3', '4', '5'].includes(card.rank))).toBe(false);
+	});
+
+	it('defaults to a 52-card deck and 1000 chips when no settings are given', () => {
+		const game = new PokerGame();
+		game.initialize([p1, p2, p3]);
+		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
+		expect(game.state!.deck.length + dealt).toBe(52);
+		expect(game.state!.players.find(p => p.id === 'p1')!.chips).toBe(1000);
+	});
+});
+
+describe('resolveSettings', () => {
+	it('fills defaults for missing keys', () => {
+		const s = resolveSettings(POKER_SETTINGS_SCHEMA, {});
+		expect(s['startingChips']).toBe(1000);
+		expect(s['minBet']).toBe(100);
+		expect(s['smallerDeck']).toBe(false);
+		expect(s['showWinOdds']).toBe(true);
+	});
+
+	it('clamps numbers into range and drops unknown keys', () => {
+		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { startingChips: 9_999_999, minBet: 1, bogus: 5 });
+		expect(s['startingChips']).toBe(100000); // clamped to max
+		expect(s['minBet']).toBe(10);            // clamped to min
+		expect('bogus' in s).toBe(false);        // unknown key dropped
+	});
+
+	it('coerces toggles to booleans', () => {
+		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { smallerDeck: true });
+		expect(s['smallerDeck']).toBe(true);
 	});
 });

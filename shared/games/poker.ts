@@ -1,4 +1,4 @@
-import { GamePlayer, GameState, RoomData } from "..";
+import { GamePlayer, GameSettings, GameSettingsSchema, GameState, RoomData, resolveSettings } from "..";
 import { type Card, type Rank, cardKey, createDeck, shuffle } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {
@@ -16,6 +16,17 @@ export interface PokerHandResult {
 	potAmount: number;
 }
 
+export interface PokerSettings {
+	/** Starting chip stack per player. */
+	startingChips: number;
+	/** The big blind / minimum bet; small blind is half (floored), min raise equals this. */
+	minBet: number;
+	/** Short deck (6+ Hold'em): strip the 2s–5s. Hand rankings stay standard. */
+	smallerDeck: boolean;
+	/** Whether the live "your current hand / win %" hint is shown to players. */
+	showWinOdds: boolean;
+}
+
 export interface PokerGameState extends GameState {
 	gamePhase: 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown' | 'game-over';
 	players: PokerPlayer[];
@@ -25,6 +36,7 @@ export interface PokerGameState extends GameState {
 	currentBet: number;
 	currentPlayerIndex: number;
 	dealerIndex: number;
+	settings: PokerSettings;
 	result?: PokerHandResult;
 	winnerName?: string;
 }
@@ -40,6 +52,25 @@ export interface PokerActionRequest {
 
 export const STARTING_CHIPS = 1000;
 export const MIN_RAISE = 100;
+
+export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
+	{ key: 'startingChips', type: 'number', label: 'Player pot', default: STARTING_CHIPS, min: 100, max: 100000, step: 100, hint: 'Starting chips per player.' },
+	{ key: 'minBet', type: 'number', label: 'Minimum bet', default: MIN_RAISE, min: 10, max: 5000, step: 10, hint: 'Big blind; small blind is half, min raise equals this.' },
+	{ key: 'smallerDeck', type: 'toggle', label: 'Smaller deck', default: false, hint: 'Short deck — remove the 2s through 5s (36 cards).' },
+	{ key: 'showWinOdds', type: 'toggle', label: 'Show win %', default: true, hint: 'Show each player their live hand and win-odds estimate.' },
+];
+
+export const DEFAULT_POKER_SETTINGS: PokerSettings = {
+	startingChips: STARTING_CHIPS,
+	minBet: MIN_RAISE,
+	smallerDeck: false,
+	showWinOdds: true,
+};
+
+/** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */
+export function resolvePokerSettings(raw?: GameSettings): PokerSettings {
+	return resolveSettings(POKER_SETTINGS_SCHEMA, raw) as unknown as PokerSettings;
+}
 
 // ── Hand evaluation ──────────────────────────────────────────────────────────────
 // Texas Hold'em hand ranking, shared by the server (showdown resolution) and the client
@@ -156,12 +187,13 @@ export function describeHand(rank: HandRank): string {
 /**
  * Monte-Carlo win-equity estimate: the share of the pot `hole` expects to win against
  * `opponents` unknown hands given the current `community` cards. Returns 0–1 (ties split the pot).
- * An estimate, not exact — intended as a UI hint once the flop is out.
+ * An estimate, not exact — intended as a UI hint once the flop is out. Pass `deck` to draw from a
+ * reduced deck (e.g. short-deck) so the estimate matches the cards actually in play.
  */
-export function estimateWinOdds(hole: Card[], community: Card[], opponents: number, iterations = 2000): number {
+export function estimateWinOdds(hole: Card[], community: Card[], opponents: number, iterations = 2000, deck: Card[] = createDeck()): number {
 	if (opponents < 1) return 1;
 	const used = new Set([...hole, ...community].map(cardKey));
-	const remaining = createDeck().filter(c => !used.has(cardKey(c)));
+	const remaining = deck.filter(c => !used.has(cardKey(c)));
 	const boardNeeded = 5 - community.length;
 	let score = 0;
 	for (let iter = 0; iter < iterations; iter++) {

@@ -1,22 +1,20 @@
-import type { GamePlayer } from '@gandogames/shared/dto';
-import { type Card, createDeck, shuffle } from '@gandogames/shared/common/cards';
-import { type PokerGameState, type HandRank, MIN_RAISE, STARTING_CHIPS, compareHandRanks, describeHand, evaluateHand } from '@gandogames/shared/poker';
+import type { GamePlayer, GameSettings } from '@gandogames/shared/dto';
+import { type Card, RANKS, SHORT_DECK_RANKS, createDeck, shuffle } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, resolvePokerSettings } from '@gandogames/shared/poker';
 import { Game } from './game';
-
-const SMALL_BLIND = 50;
-const BIG_BLIND = 100;
 
 export class PokerGame extends Game<PokerGameState> {
 	public override minPlayers = 2;
 	public override maxPlayers = 8;
 
-	public override initialize(players: GamePlayer[]): void {
+	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
+		const resolved = resolvePokerSettings(settings);
 		this.state = {
 			lastUpdate: new Date(),
 			gamePhase: 'pre-flop',
 			players: players.map(p => ({
 				...p,
-				chips: STARTING_CHIPS,
+				chips: resolved.startingChips,
 				cards: [],
 				streetBet: 0,
 				folded: false,
@@ -29,6 +27,7 @@ export class PokerGame extends Game<PokerGameState> {
 			currentBet: 0,
 			currentPlayerIndex: 0,
 			dealerIndex: 0,
+			settings: resolved,
 		};
 		this.startNewHand();
 	}
@@ -61,7 +60,7 @@ export class PokerGame extends Game<PokerGameState> {
 			case 'fold': return this.applyFold(player.id);
 			case 'check': return this.applyCheck(player.id);
 			case 'call': return this.applyCall(player.id);
-			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? MIN_RAISE);
+			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? this.state.settings.minBet);
 			case 'all-in': return this.applyAllIn(player.id);
 			default: return this.state;
 		}
@@ -105,7 +104,7 @@ export class PokerGame extends Game<PokerGameState> {
 	private applyRaise(playerId: string, raiseBy: number): PokerGameState {
 		const state = this.state!;
 		const player = state.players.find(p => p.id === playerId)!;
-		const newTotalBet = state.currentBet + Math.max(raiseBy, MIN_RAISE);
+		const newTotalBet = state.currentBet + Math.max(raiseBy, state.settings.minBet);
 		const actualTotalBet = Math.min(newTotalBet, player.chips + player.streetBet);
 		const toPut = actualTotalBet - player.streetBet;
 		if (toPut <= 0 || toPut > player.chips) return state;
@@ -286,27 +285,30 @@ export class PokerGame extends Game<PokerGameState> {
 			p.hasActed = false;
 			p.isAllIn = false;
 		}
-		state.deck = shuffle(createDeck());
+		state.deck = shuffle(createDeck(state.settings.smallerDeck ? SHORT_DECK_RANKS : RANKS));
 		state.communityCards = [];
 		state.pot = 0;
 		state.result = undefined;
 		const n = state.players.length;
 		for (const p of state.players) p.cards = [state.deck.pop()!, state.deck.pop()!];
+		// Big blind = the configured minimum bet; small blind is half of it (floored).
+		const bigBlind = state.settings.minBet;
+		const smallBlind = Math.floor(bigBlind / 2);
 		const sbIdx = (state.dealerIndex + 1) % n;
 		const bbIdx = (state.dealerIndex + 2) % n;
 		const sb = state.players[sbIdx]!;
 		const bb = state.players[bbIdx]!;
-		const sbAmount = Math.min(SMALL_BLIND, sb.chips);
+		const sbAmount = Math.min(smallBlind, sb.chips);
 		sb.chips -= sbAmount;
 		sb.streetBet = sbAmount;
 		state.pot += sbAmount;
 		if (sb.chips === 0) sb.isAllIn = true;
-		const bbAmount = Math.min(BIG_BLIND, bb.chips);
+		const bbAmount = Math.min(bigBlind, bb.chips);
 		bb.chips -= bbAmount;
 		bb.streetBet = bbAmount;
 		state.pot += bbAmount;
 		if (bb.chips === 0) bb.isAllIn = true;
-		state.currentBet = BIG_BLIND;
+		state.currentBet = bigBlind;
 		// Heads-up: dealer/SB acts first pre-flop; otherwise UTG (after BB) acts first
 		state.currentPlayerIndex = n === 2 ? sbIdx : (bbIdx + 1) % n;
 		state.gamePhase = 'pre-flop';

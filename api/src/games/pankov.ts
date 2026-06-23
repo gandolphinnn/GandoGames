@@ -1,21 +1,24 @@
-import type { GamePlayer } from '@gandogames/shared/dto';
-import { type PankovGameState, type RollValue, INITIAL_LIVES, ROLL_VALUES, getRank, rollToValue } from '@gandogames/shared/pankov';
+import type { GamePlayer, GameSettings } from '@gandogames/shared/dto';
+import { type PankovGameState, type RollValue, PANKOV_VALUE, ROLL_VALUES, getRank, resolvePankovSettings, rollToValue } from '@gandogames/shared/pankov';
 import { Game } from './game';
 
 export class PankovGame extends Game<PankovGameState> {
 	public override minPlayers = 2;
 	public override maxPlayers = 6;
 
-	public override initialize(players: GamePlayer[]): void {
+	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
+		const resolved = resolvePankovSettings(settings);
 		this.state = {
 			lastUpdate: new Date(),
 			gamePhase: 'turn-start',
-			players: players.map(p => ({ ...p, lives: INITIAL_LIVES })),
+			players: players.map(p => ({ ...p, lives: resolved.initialLives })),
 			currentPlayerIndex: 0,
 			previousPlayerIndex: null,
 			previousDeclaration: null,
 			previousActualRoll: null,
 			currentRoll: null,
+			settings: resolved,
+			pankovStreak: 0,
 		};
 	}
 
@@ -63,6 +66,9 @@ export class PankovGame extends Game<PankovGameState> {
 		state.previousActualRoll = state.currentRoll;
 		state.previousPlayerIndex = state.currentPlayerIndex;
 		state.previousDeclaration = declaration;
+		// Track the run of consecutive Pankov declarations that drives sudden-death stakes; any
+		// lower declaration breaks it. (Once Pankov is declared, only Pankov can legally follow.)
+		state.pankovStreak = declaration === PANKOV_VALUE ? state.pankovStreak + 1 : 0;
 		state.currentRoll = null;
 		state.currentPlayerIndex = this.nextAliveIndex(state.currentPlayerIndex);
 		state.gamePhase = 'turn-start';
@@ -79,12 +85,19 @@ export class PankovGame extends Game<PankovGameState> {
 
 		const wasLying = getRank(state.previousDeclaration) > getRank(state.previousActualRoll);
 		const loserIndex = wasLying ? state.previousPlayerIndex : state.currentPlayerIndex;
-		state.players[loserIndex].lives = Math.max(0, state.players[loserIndex].lives - 1);
+		// Sudden death: a wrong challenge during a Pankov run costs double for each consecutive
+		// Pankov (1, 2, 4, …). Only the losing *challenger* pays it — a caught liar still loses one.
+		let livesLost = 1;
+		if (state.settings.suddenDeath && !wasLying && state.previousDeclaration === PANKOV_VALUE) {
+			livesLost = Math.pow(2, state.pankovStreak - 1);
+		}
+		state.players[loserIndex].lives = Math.max(0, state.players[loserIndex].lives - livesLost);
 		state.revealResult = {
 			declared: state.previousDeclaration,
 			actual: state.previousActualRoll,
 			wasLying,
 			loserIndex,
+			livesLost,
 		};
 		state.gamePhase = 'result';
 		state.lastUpdate = new Date();
@@ -107,6 +120,7 @@ export class PankovGame extends Game<PankovGameState> {
 			state.previousDeclaration = null;
 			state.previousActualRoll = null;
 			state.currentRoll = null;
+			state.pankovStreak = 0;
 			state.revealResult = undefined;
 			state.gamePhase = 'turn-start';
 		}

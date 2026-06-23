@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
-import { type Card, cardKey } from '@gandogames/shared/common/cards';
+import { type Card, RANKS, SHORT_DECK_RANKS, cardKey, createDeck } from '@gandogames/shared/common/cards';
 import { type PokerGameState, MIN_RAISE, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
@@ -69,7 +69,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 
 	protected readonly minRaise = computed(() => {
 		const gs = this.gameState();
-		return gs ? gs.currentBet + MIN_RAISE : MIN_RAISE;
+		return gs ? gs.currentBet + gs.settings.minBet : MIN_RAISE;
 	});
 
 	/** Five community slots: the dealt card, or null while still face down. */
@@ -97,11 +97,14 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		return (phase === 'flop' || phase === 'turn' || phase === 'river') && community.length >= 3;
 	});
 
+	/** Live insights (current hand + win %) are gated by the host's "Show win %" setting. */
+	protected readonly showInsights = computed(() => this.gameState()?.settings.showWinOdds ?? false);
+
 	/** The player's best current hand once the flop is out, e.g. "Two Pair: K & Q". */
 	protected readonly myCombo = computed(() => {
 		const gs = this.gameState();
 		const me = this.myPlayer();
-		if (!gs || !me || me.folded || me.cards.length < 2 || !this.boardRevealed()) return null;
+		if (!gs || !me || me.folded || me.cards.length < 2 || !this.boardRevealed() || !this.showInsights()) return null;
 		return describeHand(evaluateHand([...me.cards, ...gs.communityCards]));
 	});
 
@@ -109,10 +112,10 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	private readonly oddsInputs = computed(() => {
 		const gs = this.gameState();
 		const me = this.myPlayer();
-		if (!gs || !me || me.folded || me.cards.length < 2 || !this.boardRevealed()) return null;
+		if (!gs || !me || me.folded || me.cards.length < 2 || !this.boardRevealed() || !this.showInsights()) return null;
 		const opponents = gs.players.filter(p => !p.folded && p.id !== me.id).length;
 		if (opponents < 1) return null;
-		return { hole: me.cards, community: gs.communityCards, opponents };
+		return { hole: me.cards, community: gs.communityCards, opponents, smallerDeck: gs.settings.smallerDeck };
 	});
 
 	/** Stable key over the odds inputs, so the estimate only re-runs when the board/opponents change. */
@@ -140,8 +143,9 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 			const inp = untracked(() => this.oddsInputs())!;
 			this.winOdds.set(null);
 			const iterations = inp.opponents <= 3 ? 2500 : 1200;
+			const deck = createDeck(inp.smallerDeck ? SHORT_DECK_RANKS : RANKS);
 			const handle = setTimeout(() => {
-				this.winOdds.set(estimateWinOdds(inp.hole, inp.community, inp.opponents, iterations));
+				this.winOdds.set(estimateWinOdds(inp.hole, inp.community, inp.opponents, iterations, deck));
 			});
 			onCleanup(() => clearTimeout(handle));
 		});

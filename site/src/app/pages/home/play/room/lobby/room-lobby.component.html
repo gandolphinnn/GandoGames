@@ -69,6 +69,10 @@
 							}
 						}
 					}
+					<ion-button fill="outline" size="small" (click)="openSettings()">
+						<ion-icon name="settings-outline" slot="start" />
+						{{ isHost() ? 'Game settings' : 'View settings' }}
+					</ion-button>
 				</div>
 			}
 			@case ('ended') {
@@ -88,6 +92,15 @@
 				[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
 				[memberIds]="memberIds()"
 				(closed)="showInviteModal.set(false)" />
+		}
+
+		@if (showSettingsModal() && room()) {
+			<gg-game-settings-modal
+				[game]="room()!.game"
+				[roomId]="roomId()"
+				[settings]="room()!.settings ?? {}"
+				[editable]="isHost() && room()!.phase === 'waiting'"
+				(closed)="showSettingsModal.set(false)" />
 		}
 	}
 

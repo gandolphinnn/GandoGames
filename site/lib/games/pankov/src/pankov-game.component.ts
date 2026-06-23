@@ -1,6 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
-import { PankovGameState, formatValue, getRank, INITIAL_LIVES, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
+import { PankovGameState, formatValue, getRank, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
 
@@ -22,7 +22,23 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 
 	protected readonly ROLL_VALUES = ROLL_VALUES;
 	protected readonly formatValue = formatValue;
-	protected readonly livesRange = Array.from({ length: INITIAL_LIVES }, (_, i) => i);
+
+	/** Life-pip slots, sized to the room's configured starting lives. */
+	protected readonly livesRange = computed(() => {
+		const max = this.gameState()?.settings.initialLives ?? INITIAL_LIVES;
+		return Array.from({ length: max }, (_, i) => i);
+	});
+
+	/**
+	 * Lives a wrong challenge would cost right now: 1 normally, or 2^(streak-1) during a Pankov run
+	 * when sudden death is on. Drives the "risk" hint on the Challenge button.
+	 */
+	protected readonly challengeStake = computed(() => {
+		const gs = this.gameState();
+		if (!gs || !gs.settings.suddenDeath) return 1;
+		if (gs.previousDeclaration !== PANKOV_VALUE || gs.pankovStreak < 1) return 1;
+		return Math.pow(2, gs.pankovStreak - 1);
+	});
 
 	protected readonly playerChips = computed((): PlayerChipData[] => {
 		const gs = this.gameState();

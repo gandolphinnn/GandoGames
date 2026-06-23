@@ -1,0 +1,176 @@
+@use 'styles/variables' as *;
+
+:host {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $s4;
+}
+
+.backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.55);
+	backdrop-filter: blur(2px);
+}
+
+.modal {
+	position: relative;
+	width: 100%;
+	max-width: 460px;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-lg;
+	box-shadow: $shadow-hover;
+	display: flex;
+	flex-direction: column;
+	max-height: calc(100dvh - $s8);
+	overflow: hidden;
+
+	&-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: $s4 $s6;
+		border-bottom: 1px solid $border;
+		flex-shrink: 0;
+	}
+
+	&-title {
+		font-size: $text-lg; font-weight: 600;
+	}
+
+	&-close {
+		width: 32px;
+		height: 32px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: $radius-sm;
+		color: $text-muted;
+		font-size: $text-base;
+		cursor: pointer;
+		transition: color $transition, border-color $transition, background $transition;
+
+		&:hover {
+			color: $text; border-color: $border; background: $hover-overlay;
+		}
+	}
+
+	&-body {
+		padding: $s4 $s6 $s6;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: $s4;
+	}
+
+	&-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: $s3;
+		padding: $s4 $s6;
+		border-top: 1px solid $border;
+		flex-shrink: 0;
+	}
+}
+
+.empty-msg {
+	font-size: $text-sm; color: $text-muted;
+}
+
+.settings-list {
+	list-style: none; padding: 0; margin: 0;
+	display: flex; flex-direction: column; gap: $s4;
+}
+
+.setting-row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: $s4;
+}
+
+.setting-label {
+	display: flex;
+	flex-direction: column;
+	gap: $s1;
+	min-width: 0;
+}
+
+.setting-name {
+	font-size: $text-base; font-weight: 600;
+}
+
+.setting-hint {
+	font-size: $text-sm; color: $text-muted;
+}
+
+.setting-control {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	min-height: 44px;
+}
+
+.setting-number {
+	width: 110px;
+	padding: $s2 $s3;
+	min-height: 44px;
+	background: transparent;
+	color: $text;
+	border: 1px solid $border;
+	border-radius: $radius-sm;
+	font-size: $text-base;
+	text-align: right;
+	transition: border-color $transition;
+
+	&:focus {
+		outline: none;
+		border-color: $accent;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+	}
+}
+
+.btn-primary,
+.btn-secondary {
+	padding: $s2 $s4;
+	min-height: 44px;
+	border-radius: $radius-sm;
+	font-size: $text-sm;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background $transition, opacity $transition, border-color $transition;
+
+	&:disabled {
+		opacity: 0.5; cursor: not-allowed;
+	}
+}
+
+.btn-primary {
+	background: $accent;
+	color: $color-on-accent;
+	border: none;
+
+	&:hover:not(:disabled) {
+		background: $accent-hover;
+	}
+}
+
+.btn-secondary {
+	background: transparent;
+	color: $text;
+	border: 1px solid $border;
+
+	&:hover:not(:disabled) {
+		background: $hover-overlay;
+	}
+}

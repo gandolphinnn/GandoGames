@@ -1,4 +1,4 @@
-import { BaseRequest, GamePlayer, GameType } from "..";
+import { BaseRequest, GamePlayer, GameSettings, GameType } from "..";
 
 /** Base request for logged users in a room */
 export interface RoomBaseRequest extends BaseRequest {
@@ -23,6 +23,8 @@ export interface RoomSummary {
 export interface RoomData extends RoomSummary {
 	kickedPlayers: string[];
 	chat: ChatMessage[];
+	/** Host-chosen game settings for this room; undefined until set (server resolves to defaults). */
+	settings?: GameSettings;
 	lastUpdate: Date;
 }
 

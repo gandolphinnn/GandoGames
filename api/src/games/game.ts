@@ -1,4 +1,4 @@
-import { GamePlayer, GameState, GameType } from '@gandogames/shared/dto';
+import { GamePlayer, GameSettings, GameState, GameType } from '@gandogames/shared/dto';
 
 export const GAMES_CONFIG: Record<GameType, {
 	minPlayers: number,
@@ -21,7 +21,7 @@ export abstract class Game<TState extends GameState> {
 
 	public state: TState | null = null;
 
-	public abstract initialize(players: GamePlayer[]): void;
+	public abstract initialize(players: GamePlayer[], settings?: GameSettings): void;
 	public abstract getPublicState(requestingPlayerId: string): TState;
 	public abstract action(player: GamePlayer, action: string, data: any): TState;
 

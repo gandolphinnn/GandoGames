@@ -1,12 +1,9 @@
 - Redo the behaviour when a user leave a room and when a game is over
 	Display who won and for what reason (game based win or forfeit)
 	BUG: If a player leaves and just one player remain, that player win the game and remove the room from its list but the room stays open for everyone else to see.
-- Game settings editor:
-	In the room details, add the ability to open a game-specific modal, defined in "site\lib\games\$game_name\src\$to_be_defined_later"
-	This modal will contain every field to change the settings of the game for this room
-	"api/game/settings/get" and "api/game/settings/set" to access and edit
-	Example for poker: "player pot" amount, "minimum bet" amount, "smaller deck" flag, "display win percentage" flag.
-	Find some kind of method to save/import settings configuration, so a player that ofter plays a game with some particular combination of settings can import those in a click
+- Save/import game settings presets:
+	Let a player save a favourite combination of game settings and import them into a room in one click.
+	(The per-room Game settings editor — game/settings/get & set, schema-driven modal, pankov & poker settings — is already implemented; this presets feature was deferred.)
 - Room access policies:
 	Slider with: "invite only", "link only", "friends only", "join with code", "public access".
 	Change room visibility in the room list based on the slider:

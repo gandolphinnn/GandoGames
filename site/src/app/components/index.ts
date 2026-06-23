@@ -1,4 +1,5 @@
 export { ChatComponent } from './chat/chat.component';
+export { GameSettingsModalComponent } from './game-settings-modal/game-settings-modal.component';
 export { InviteModalComponent } from './invite-modal/invite-modal.component';
 export { PlayerAvatarComponent } from './player-avatar/player-avatar.component';
 export { RefreshableContentComponent } from './refreshable-content/refreshable-content.component';

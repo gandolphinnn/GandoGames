@@ -6,7 +6,7 @@
 
 	<div class="players-strip">
 		@for (chip of playerChips(); track chip.id) {
-			<gg-player-chip [data]="chip" [livesRange]="livesRange" [isMe]="chip.id === myPlayFabId()" />
+			<gg-player-chip [data]="chip" [livesRange]="livesRange()" [isMe]="chip.id === myPlayFabId()" />
 		}
 	</div>
 
@@ -30,9 +30,14 @@
 								<ion-button [disabled]="loading()" (click)="roll()">Roll dice</ion-button>
 							}
 							@if (gs.previousDeclaration !== null) {
-								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="challenge()">Challenge!</ion-button>
+								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="challenge()">
+									Challenge!{{ challengeStake() > 1 ? ' (−' + challengeStake() + ' lives)' : '' }}
+								</ion-button>
 							}
 						</div>
+						@if (challengeStake() > 1) {
+							<p class="hint">Sudden death — a wrong challenge now costs {{ challengeStake() }} lives.</p>
+						}
 						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				} @else {
@@ -99,11 +104,11 @@
 					</div>
 					@if (r.wasLying) {
 						<p class="verdict verdict-lie">
-							{{ players[r.loserIndex]?.name }} was lying — −1 life
+							{{ players[r.loserIndex]?.name }} was lying — −{{ r.livesLost }} {{ r.livesLost === 1 ? 'life' : 'lives' }}
 						</p>
 					} @else {
 						<p class="verdict verdict-honest">
-							Honest! {{ players[r.loserIndex]?.name }} loses −1 life
+							Honest! {{ players[r.loserIndex]?.name }} loses −{{ r.livesLost }} {{ r.livesLost === 1 ? 'life' : 'lives' }}
 						</p>
 					}
 					<ion-button [disabled]="loading()" (click)="continueGame()">Continue</ion-button>

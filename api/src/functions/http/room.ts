@@ -76,7 +76,7 @@ const roomStartInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, no
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 
 	const game = Game.Factory(room.game);
-	game.initialize(room.players);
+	game.initialize(room.players, room.settings);
 	await PlayfabCtx.game[room.game].upsert(body.roomId, game.state!);
 	for (const p of room.players) {
 		notifier.gameStateUpdatedForPlayer(p.id, body.roomId, game.getPublicState(p.id));

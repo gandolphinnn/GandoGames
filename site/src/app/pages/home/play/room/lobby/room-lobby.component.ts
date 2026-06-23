@@ -7,12 +7,12 @@ import { FriendService } from '@gandogames/services/friend.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { ToastService } from '@gandogames/services/toast.service';
 import { UserService } from '@gandogames/services/user.service';
-import { InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
+import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 /** Lobby body for a waiting/ended room. Header, chat and layout are owned by RoomComponent. */
 @Component({
 	selector: 'gg-room-lobby',
-	imports: [...ION_IMPORTS, InviteModalComponent, PlayerAvatarComponent, RouterLink],
+	imports: [...ION_IMPORTS, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RouterLink],
 	templateUrl: './room-lobby.component.html',
 	styleUrl: './room-lobby.component.scss',
 })
@@ -30,6 +30,7 @@ export class RoomLobbyComponent {
 
 	public readonly loading = signal(false);
 	public readonly showInviteModal = signal(false);
+	public readonly showSettingsModal = signal(false);
 	public readonly addingFriendId = signal<string | null>(null);
 
 	public readonly canJoin = computed(() => {
@@ -91,6 +92,10 @@ export class RoomLobbyComponent {
 
 	public invite(): void {
 		if (this.isInRoom() && this.room()?.phase === 'waiting') this.showInviteModal.set(true);
+	}
+
+	public openSettings(): void {
+		this.showSettingsModal.set(true);
 	}
 
 	/** Friend requests target registered players only, and never yourself or existing friends/requests. */

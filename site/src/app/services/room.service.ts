@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
+import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameSettings, GameSettingsSetRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 import { UserService } from './user.service';
@@ -109,5 +109,15 @@ export class RoomService {
 	public gameAction(game: GameType, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
 		const request: GameActionRequest = { sessionTicket: this.ticket, game, roomId, action, data: data ?? null };
 		return this.backend.post<GameState | null>('/game/action', request);
+	}
+
+	public getGameSettings(game: GameType, roomId: string): Promise<GameSettings> {
+		const request: GameBaseRequest = { sessionTicket: this.ticket, game, roomId };
+		return this.backend.post<GameSettings>('/game/settings/get', request);
+	}
+
+	public setGameSettings(game: GameType, roomId: string, settings: GameSettings): Promise<RoomData> {
+		const request: GameSettingsSetRequest = { sessionTicket: this.ticket, game, roomId, settings };
+		return this.backend.post<RoomData>('/game/settings/set', request);
 	}
 }

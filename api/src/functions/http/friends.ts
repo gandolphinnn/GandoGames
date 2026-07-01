@@ -37,6 +37,12 @@ async function getFriendInfos(playFabId: string): Promise<PlayFabServerModels.Fr
 	return result.Friends ?? [];
 }
 
+/** Whether `otherId` is a mutually-accepted friend on `ownerId`'s friend graph. */
+export async function areFriends(ownerId: string, otherId: string): Promise<boolean> {
+	const edge = (await getFriendInfos(ownerId)).find(f => f.FriendPlayFabId === otherId);
+	return tagOf(edge) === ACCEPTED;
+}
+
 /** Ensure the directed edge owner -> friend exists and set its single state tag. */
 async function setEdge(owner: string, friend: string, tag: string): Promise<void> {
 	// AddFriend rejects with "These users are already friends" when the edge already exists

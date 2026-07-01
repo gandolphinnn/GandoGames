@@ -7,6 +7,12 @@
 			<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
 			<span class="room-game-name">{{ gameInfo()?.name }}</span>
 			<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
+			<span class="room-access-badge"
+				[class.room-access-badge-closed]="room()!.access === 'closed'"
+				[title]="accessBadge().description">
+				<ion-icon [name]="accessBadge().icon" />
+				{{ accessBadge().label }}
+			</span>
 		</div>
 
 		<div class="player-grid">
@@ -54,8 +60,8 @@
 			@case ('waiting') {
 				<div class="phase-panel">
 					@if (!isInRoom()) {
-						@if (!canJoin()) {
-							<p class="status-msg">This room is full.</p>
+						@if (joinBlockedReason()) {
+							<p class="status-msg">{{ joinBlockedReason() }}</p>
 						}
 					} @else {
 						<p class="status-msg">Waiting for players…</p>
@@ -69,10 +75,18 @@
 							}
 						}
 					}
-					<ion-button fill="outline" size="small" (click)="openSettings()">
-						<ion-icon name="settings-outline" slot="start" />
-						{{ isHost() ? 'Game settings' : 'View settings' }}
-					</ion-button>
+					<div class="lobby-config-actions">
+						<ion-button fill="outline" size="small" (click)="openSettings()">
+							<ion-icon name="settings-outline" slot="start" />
+							{{ isHost() ? 'Game settings' : 'View settings' }}
+						</ion-button>
+						@if (isHost()) {
+							<ion-button fill="outline" size="small" (click)="openAccess()">
+								<ion-icon [name]="accessBadge().icon" slot="start" />
+								Room access
+							</ion-button>
+						}
+					</div>
 				</div>
 			}
 			@case ('ended') {
@@ -101,6 +115,14 @@
 				[settings]="room()!.settings ?? {}"
 				[editable]="isHost() && room()!.phase === 'waiting'"
 				(closed)="showSettingsModal.set(false)" />
+		}
+
+		@if (showAccessModal() && room()) {
+			<gg-room-access-modal
+				[roomId]="roomId()"
+				[access]="room()!.access"
+				[editable]="isHost() && room()!.phase === 'waiting'"
+				(closed)="showAccessModal.set(false)" />
 		}
 	}
 

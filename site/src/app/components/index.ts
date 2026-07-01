@@ -3,4 +3,5 @@ export { GameSettingsModalComponent } from './game-settings-modal/game-settings-
 export { InviteModalComponent } from './invite-modal/invite-modal.component';
 export { PlayerAvatarComponent } from './player-avatar/player-avatar.component';
 export { RefreshableContentComponent } from './refreshable-content/refreshable-content.component';
+export { RoomAccessModalComponent } from './room-access-modal/room-access-modal.component';
 export { ToastComponent } from './toast/toast.component';

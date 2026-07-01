@@ -38,6 +38,33 @@
 	color: $text-muted; font-size: $text-sm;
 }
 
+.join-code {
+	display: flex;
+	gap: $s2;
+	align-items: stretch;
+
+	&-input {
+		flex: 1;
+		min-width: 0;
+		padding: $s2 $s4;
+		min-height: 44px;
+		background: $bg-card;
+		color: $text;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		font-size: $text-sm;
+		text-transform: uppercase;
+		transition: border-color $transition;
+
+		&::placeholder {
+			text-transform: none; color: $text-muted;
+		}
+		&:focus {
+			outline: none; border-color: $accent;
+		}
+	}
+}
+
 .room {
 	&-list {
 		list-style: none;
@@ -71,6 +98,15 @@
 		}
 		&-game {
 			font-weight: 600; font-size: $text-base;
+			display: flex; align-items: center; gap: $s2;
+		}
+		&-badge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			color: $text-muted;
+
+			ion-icon { font-size: 1rem; }
 		}
 		&-players-list {
 			font-size: $text-sm; color: $text-muted;

@@ -3,8 +3,8 @@ import { addIcons } from 'ionicons';
 import {
   add, alertCircle, arrowBack, arrowForward, chatbubbles, checkmark,
   checkmarkCircle, chevronForward, close, contrastOutline, copy, dice,
-  enter, fileTray, gameController, hardwareChip, heart, helpCircle,
-  informationCircle, languageOutline, logOut, logOutOutline, mail,
+  enter, fileTray, gameController, globe, hardwareChip, heart, helpCircle,
+  informationCircle, languageOutline, link, lockClosed, logOut, logOutOutline, mail,
   moon, people, person, personAdd, personCircle, personRemove, ribbon, send, sunny, sync,
   trash, trashOutline, warning,
 } from 'ionicons/icons';
@@ -14,8 +14,8 @@ import { App } from './app/app.component';
 addIcons({
   add, alertCircle, arrowBack, arrowForward, chatbubbles, checkmark,
   checkmarkCircle, chevronForward, close, contrastOutline, copy, dice,
-  enter, fileTray, gameController, hardwareChip, heart, helpCircle,
-  informationCircle, languageOutline, logOut, logOutOutline, mail,
+  enter, fileTray, gameController, globe, hardwareChip, heart, helpCircle,
+  informationCircle, languageOutline, link, lockClosed, logOut, logOutOutline, mail,
   moon, people, person, personAdd, personCircle, personRemove, ribbon, send, sunny, sync,
   trash, trashOutline, warning,
 });

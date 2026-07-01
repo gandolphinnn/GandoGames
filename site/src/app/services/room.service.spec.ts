@@ -19,6 +19,7 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 		players: [makePlayer('player-1', 'Alice')],
 		kickedPlayers: [],
 		phase: 'waiting',
+		access: 'public',
 		chat: [],
 		lastUpdate: new Date(),
 		...overrides,
@@ -94,6 +95,19 @@ describe('RoomService', () => {
 		});
 	});
 
+	describe('browsableRooms (computed)', () => {
+		it('shows only public/friends rooms the player is not already in (link & closed are unlisted)', () => {
+			const mine = makeRoom({ id: 'mine', players: [makePlayer('player-1', 'Alice')] });
+			const publicRoom = makeRoom({ id: 'pub', players: [makePlayer('other', 'X')] });
+			const friendsRoom = makeRoom({ id: 'fr', access: 'friends', players: [makePlayer('other', 'X')] });
+			const linkRoom = makeRoom({ id: 'link', access: 'link', players: [makePlayer('other', 'X')] });
+			const closedRoom = makeRoom({ id: 'closed', access: 'closed', players: [makePlayer('other', 'X')] });
+			service.rooms.set([mine, publicRoom, friendsRoom, linkRoom, closedRoom]);
+
+			expect(service.browsableRooms().map(r => r.id)).toEqual(['pub', 'fr']);
+		});
+	});
+
 	describe('createRoom()', () => {
 		it('calls POST /rooms/create with game and ticket', async () => {
 			const room = makeRoom();
@@ -101,6 +115,14 @@ describe('RoomService', () => {
 			const result = await service.createRoom('pankov');
 			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/create', { sessionTicket: 'ticket-abc', game: 'pankov' });
 			expect(result).toEqual(room);
+		});
+	});
+
+	describe('setRoomAccess()', () => {
+		it('calls POST /rooms/access with the access policy', async () => {
+			backendSpy.post.and.returnValue(Promise.resolve(makeRoom()));
+			await service.setRoomAccess('room-1', 'friends');
+			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/access', { sessionTicket: 'ticket-abc', roomId: 'room-1', access: 'friends' });
 		});
 	});
 

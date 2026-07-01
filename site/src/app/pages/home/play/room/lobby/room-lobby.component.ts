@@ -3,16 +3,17 @@ import { RouterLink } from '@angular/router';
 import { GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { roomAccessOption } from '@gandogames/lib/room-access';
 import { FriendService } from '@gandogames/services/friend.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { ToastService } from '@gandogames/services/toast.service';
 import { UserService } from '@gandogames/services/user.service';
-import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
+import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RoomAccessModalComponent } from '@gandogames/components';
 
 /** Lobby body for a waiting/ended room. Header, chat and layout are owned by RoomComponent. */
 @Component({
 	selector: 'gg-room-lobby',
-	imports: [...ION_IMPORTS, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RouterLink],
+	imports: [...ION_IMPORTS, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RoomAccessModalComponent, RouterLink],
 	templateUrl: './room-lobby.component.html',
 	styleUrl: './room-lobby.component.scss',
 })
@@ -31,14 +32,36 @@ export class RoomLobbyComponent {
 	public readonly loading = signal(false);
 	public readonly showInviteModal = signal(false);
 	public readonly showSettingsModal = signal(false);
+	public readonly showAccessModal = signal(false);
 	public readonly addingFriendId = signal<string | null>(null);
+
+	/** Whether the room's host is an accepted friend of the viewer — gates friends-only joins. */
+	public readonly isHostFriend = computed(() => {
+		const hostId = this.room()?.hostId;
+		return hostId ? this.friendService.relationship(hostId) === 'accepted' : false;
+	});
+
+	/** Icon + label describing the room's access policy, for the lobby badge. */
+	public readonly accessBadge = computed(() => roomAccessOption(this.room()?.access ?? 'public'));
 
 	public readonly canJoin = computed(() => {
 		const r = this.room();
 		if (!r || r.phase !== 'waiting' || this.isInRoom()) return false;
 		if (r.kickedPlayers?.includes(this.myId())) return false;
+		if ((r.access ?? 'public') === 'closed') return false;
+		if ((r.access ?? 'public') === 'friends' && r.hostId !== this.myId() && !this.isHostFriend()) return false;
 		const maxPlayers = GAME_REGISTRY[r.game]?.maxPlayers ?? 0;
 		return r.players.length < maxPlayers;
+	});
+
+	/** Why a non-member can't join right now (empty when they can, or are already in). */
+	public readonly joinBlockedReason = computed(() => {
+		const r = this.room();
+		if (!r || r.phase !== 'waiting' || this.isInRoom() || this.canJoin()) return '';
+		if (r.kickedPlayers?.includes(this.myId())) return 'You have been kicked from this room.';
+		if ((r.access ?? 'public') === 'closed') return 'This room is closed.';
+		if ((r.access ?? 'public') === 'friends' && !this.isHostFriend()) return "Only the host's friends can join this room.";
+		return 'This room is full.';
 	});
 
 	public readonly canStart = computed(() => {
@@ -96,6 +119,10 @@ export class RoomLobbyComponent {
 
 	public openSettings(): void {
 		this.showSettingsModal.set(true);
+	}
+
+	public openAccess(): void {
+		this.showAccessModal.set(true);
 	}
 
 	/** Friend requests target registered players only, and never yourself or existing friends/requests. */

@@ -1,6 +1,7 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, BaseRequest } from '@gandogames/shared/dto';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, resolveAccessPolicy } from '@gandogames/shared/dto';
 import { Game, GAMES_CONFIG } from '../../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
+import { areFriends } from './friends';
 
 const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body, notifier, player) => {
 	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -11,6 +12,8 @@ const roomCreateInner: InnerFunction<RoomCreateRequest, RoomData> = async (body,
 		players: [player],
 		kickedPlayers: [],
 		phase: 'waiting',
+		// Rooms are always created public; the host can change access later from the lobby.
+		access: 'public',
 		chat: [],
 		lastUpdate: new Date(),
 	};
@@ -26,9 +29,12 @@ const roomListInner: InnerFunction<BaseRequest, RoomSummary[]> = async (_body, _
 	return rooms
 		// Include the caller's own rooms: the client splits them into the menu's "Active Rooms"
 		// (myRooms) vs the browsable list (browsableRooms). Only hide rooms they were kicked from.
+		// Only public/friends rooms are listed to non-members; link & closed rooms are unlisted
+		// (surfaced only to members, who reached them via code/invite).
 		.filter(r =>
 			!(r.kickedPlayers ?? []).includes(player.id) &&
-			new Date(r.lastUpdate) >= oneHourAgo
+			new Date(r.lastUpdate) >= oneHourAgo &&
+			(r.access === 'public' || r.access === 'friends' || r.players.some(p => p.id === player.id))
 		)
 		.map(({ chat: _c, kickedPlayers: _k, ...summary }) => summary);
 };
@@ -37,6 +43,9 @@ const roomGetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, noti
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
 	const idx = room.players.findIndex(p => p.id === player.id);
+	// A closed room is invisible to anyone who isn't already a member — indistinguishable from
+	// a missing room, so it can't be reached by code lookup or a direct URL either.
+	if (room.access === 'closed' && idx === -1) throw new Error('Room not found');
 	if (idx !== -1 && room.players[idx].icon !== player.icon) {
 		room.players[idx] = { ...room.players[idx], icon: player.icon };
 		await PlayfabCtx.rooms.upsert(body.roomId, room);
@@ -51,9 +60,16 @@ const roomJoinInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, not
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 	if (room.players.some(p => p.id === player.id)) throw new Error('Already in this room');
 	if (room.kickedPlayers?.includes(player.id)) throw new Error('You have been kicked from this room');
+	if (room.access === 'closed') throw new Error('This room is closed');
 
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max players for this game');
+
+	// Friends-only rooms admit only the host's accepted friends. Link rooms need no extra check:
+	// reaching join with the right room code is itself proof of access (the code is the room id).
+	if (room.access === 'friends' && !(await areFriends(room.hostId, player.id))) {
+		throw new Error("Only the host's friends can join this room");
+	}
 
 	room.players.push(player);
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
@@ -123,6 +139,18 @@ const roomResetInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, no
 	return room;
 };
 
+const roomAccessSetInner: InnerFunction<RoomAccessSetRequest, RoomData> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.phase !== 'waiting') throw new Error('Cannot change access after the game has started');
+
+	room.access = resolveAccessPolicy(body.access);
+	await PlayfabCtx.rooms.upsert(body.roomId, room);
+	notifier.roomUpsert(room);
+	return room;
+};
+
 const roomKickInner: InnerFunction<RoomKickRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -181,6 +209,7 @@ registerFunction('room_get', 'rooms/get', roomGetInner, { skipLock: true });
 registerFunction('room_join', 'rooms/join', roomJoinInner);
 registerFunction('room_start', 'rooms/start', roomStartInner);
 registerFunction('room_reset', 'rooms/reset', roomResetInner);
+registerFunction('room_access', 'rooms/access', roomAccessSetInner);
 registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);
 registerFunction('room_invite', 'rooms/invite', roomInviteInner);

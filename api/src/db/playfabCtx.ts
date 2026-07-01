@@ -1,4 +1,4 @@
-import { GameState, GameType, RoomData } from "@gandogames/shared/dto";
+import { GameState, GameType, resolveAccessPolicy, RoomData } from "@gandogames/shared/dto";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
 import { pfPromise, PlayFabServer } from "..";
@@ -100,6 +100,20 @@ class PlayFabEntity<T> {
 
 export class PlayfabCtx {
 	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', {
+		// Normalize `access` so rooms predating the current access model read with a valid value;
+		// downstream code can then treat `access` as always present. Migrate the old orthogonal
+		// model (a `private` policy + a separate `locked` boolean) onto the single access axis.
+		onParse: (room) => {
+			if (room) {
+				const legacyAccess = room.access as string | undefined;
+				const legacy = room as { locked?: boolean };
+				if (legacy.locked) room.access = 'closed';
+				else if (legacyAccess === 'private') room.access = 'link';
+				room.access = resolveAccessPolicy(room.access);
+				delete legacy.locked;
+			}
+			return room;
+		},
 		beforeUpsert: (_id, value) => { value.lastUpdate = new Date() }
 	});
 

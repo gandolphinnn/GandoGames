@@ -84,7 +84,7 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 All in `src/app/services/`, imported via `@gandogames/services/<name>.service`.
 
 - `UserService` — `user` signal; login/register/guest/logout; session ticket persisted in `localStorage`; debounced profile updates
-- `BackendService` — `get()`, `post()`, `postBeacon()` (keepalive fetch for page-unload calls)
+- `BackendService` — `get()`, `post()`, `postBeacon()` (keepalive fetch for page-unload calls); surfaces any failed request's error message as a toast automatically before rethrowing
 - `RoomService` — `rooms`/`myRooms`/`browsableRooms` signals, CRUD methods, subscribes to SignalR events for reactive updates
 - `SignalRService` — manages HubConnection lifecycle (auto-connect on auth), exposes `events.roomUpsert`, `events.roomDeleted`, `events.gameStateUpdated`, `events.chatMessage`, `events.roomInvite`, `events.friendRequest`, `events.friendsChanged` as RxJS Subjects
 - `FriendService` — `friends`/`incoming`/`outgoing` signals + `pendingCount`; reacts to friend SignalR events
@@ -103,6 +103,8 @@ return this.backend.post<void>('/rooms/leave', request);
 // wrong — no type generic, inline body
 await this.backend.post('/rooms/leave', { sessionTicket: this.ticket, roomId });
 ```
+
+**Error toasts:** `BackendService` already shows the API's error message as a toast on every failed call (before rethrowing). Never call `toast.error`/`warning`/`show` for the same error in a caller's `catch` — that double-toasts. In a `catch` after a backend call, only handle control flow (skip navigation, reset a loading flag). There is no per-call opt-out today; if a call must NOT toast on error, add that capability deliberately rather than working around it at the call site.
 
 ### Game packages
 

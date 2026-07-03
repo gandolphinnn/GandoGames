@@ -1,17 +1,12 @@
+- Redo the UI for the room lobby and game
+	Display a table and sit players around with the active player in a fixed place (TBD where).
+	The table might change depending on the game, so create some presets or use a default and allow games to use overrides. 
 - Redo the behaviour when a user leave a room and when a game is over
 	Display who won and for what reason (game based win or forfeit)
 	BUG: If a player leaves and just one player remain, that player win the game and remove the room from its list but the room stays open for everyone else to see.
 - Save/import game settings presets:
 	Let a player save a favourite combination of game settings and import them into a room in one click.
 	(The per-room Game settings editor — game/settings/get & set, schema-driven modal, pankov & poker settings — is already implemented; this presets feature was deferred.)
-- Room access policies:
-	Slider with: "invite only", "link only", "friends only", "join with code", "public access".
-	Change room visibility in the room list based on the slider:
-		- invite only -> completely invisible
-		- link only -> completely invisible
-		- friends only -> visible just to friends (maybe add a section in the room list called "friends rooms")
-		- join with code -> publicly visible, details hidden behind a host-picked access code
-		- public access -> publicly visible, details visible, free join
 - Improved login page:
 	login with other means (google, facebook, apple...)
 	alert guest login that many functionalities are not available and that the profile could be deleted

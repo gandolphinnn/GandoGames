@@ -1,13 +1,15 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
-import { PankovGameState, formatValue, getRank, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
+import { PankovGameState, type PankovPlayer, formatValue, getRank, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';
-import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
+import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
+import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
+import { PANKOV_TABLE_PRESET } from './pankov.table';
 
 @Component({
 	selector: 'gg-pankov-game',
 	standalone: true,
-	imports: [IonButton, PlayerChipComponent],
+	imports: [IonButton, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent],
 	templateUrl: './pankov-game.component.html',
 	styleUrl: './pankov-game.component.scss',
 })
@@ -40,18 +42,23 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 		return Math.pow(2, gs.pankovStreak - 1);
 	});
 
-	protected readonly playerChips = computed((): PlayerChipData[] => {
+	/** Seat ring: players in playing order, me rotated to bottom-centre, padded to the table's seat count. */
+	protected readonly seats = computed<TableSeat[]>(() => {
 		const gs = this.gameState();
 		if (!gs) return [];
+		const maxSeats = PANKOV_TABLE_PRESET.seats ?? gs.players.length;
 		const isActive = gs.gamePhase !== 'result' && gs.gamePhase !== 'game-over';
 		const currentId = gs.players[gs.currentPlayerIndex]?.id;
-		return gs.players.map(p => ({
-			id: p.id,
-			name: p.name,
-			lives: p.lives,
-			highlight: isActive && p.id === currentId,
+		return buildTableSeats(gs.players, this.myPlayFabId(), maxSeats, p => ({
+			isCurrentTurn: isActive && p.id === currentId,
+			faded: p.lives === 0,
 		}));
 	});
+
+	/** Narrow a seat's player back to the pankov shape (`buildTableSeats` preserves the object). */
+	protected seatPlayer(seat: TableSeat): PankovPlayer | null {
+		return seat.player as PankovPlayer | null;
+	}
 
 	protected readonly currentPlayer = computed(() => {
 		const gs = this.gameState();

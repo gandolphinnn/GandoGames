@@ -3,110 +3,109 @@
 
 :host { display: contents; }
 
-// ── Player strip ───────────────────────────────────────────────────────────────
-
-.player-card {
+gg-game-table {
 	flex: 1;
-	min-width: 72px;
-	padding: $s2 $s3;
-	background: $bg-surface;
-	border: 1px solid $border;
-	border-radius: $radius-md;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	transition: border-color $transition, opacity $transition;
-
-	&-active { border-color: $accent; }
-	&-folded { opacity: 0.45; }
-	&-me { background: $accent-muted; }
+	min-height: 0;
 }
 
-.player-name {
+// ── Seats ────────────────────────────────────────────────────────────────────
+
+.pk-avatar {
+	width: clamp(34px, 10cqw, 54px);
+	height: clamp(34px, 10cqw, 54px);
+	border-radius: $radius-full;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: clamp(0.9rem, 4.5cqw, 1.4rem);
+	flex-shrink: 0;
+}
+
+.pk-name {
 	font-size: $text-sm;
 	font-weight: 600;
-	white-space: nowrap;
+	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&-muted { font-weight: 500; opacity: 0.75; }
 }
 
-.player-bet {
-	font-size: $text-sm;
+gg-chip-count { font-size: $text-sm; }
+
+.pk-bet {
+	font-size: 0.75rem;
+	font-weight: 700;
 	color: $color-warning;
 }
 
-.player-status-tag {
-	font-size: 0.7rem;
-	font-weight: 700;
-	color: $color-danger;
+.pk-tag {
+	font-size: 0.65rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
 
-	&-folded { color: $text-muted; }
+	&-allin { color: $color-warning; }
+	&-folded { opacity: 0.7; }
 }
 
-.player-hole-cards {
+.pk-hole {
 	display: flex;
-	gap: $s1;
-	margin-top: $s1;
+	gap: 3px;
+	margin-top: 2px;
 }
 
-// ── Table ──────────────────────────────────────────────────────────────────────
+// ── Centre ───────────────────────────────────────────────────────────────────
 
-.poker-table {
+.pk-center {
+	gap: $s3;
+}
+
+.pk-pot {
+	font-size: $text-base;
+	font-weight: 800;
+	letter-spacing: 0.02em;
+}
+
+.pk-community {
+	display: flex;
+	gap: 4px;
+
+	@media (min-width: $bp-sm) { gap: $s2; }
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+
+.pk-footer {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: $s3;
-	padding: $s4;
-	background: $bg-card;
-	border: 1px solid $border;
-	border-radius: $radius-lg;
+	padding: $s3 $s4 $s4;
 }
 
-.table-pot {
-	font-size: $text-sm;
-	color: $text-muted;
-	font-weight: 600;
-}
-
-.community-cards {
-	display: flex;
-	gap: $s2;
-}
-
-// ── My hand ───────────────────────────────────────────────────────────────────
-
-.my-hand {
+.pk-hand {
 	display: flex;
 	align-items: center;
-	gap: $s3;
+	gap: $s4;
 }
 
-.my-hand-label {
-	font-size: $text-sm;
-	color: $text-muted;
-	font-weight: 600;
-}
-
-.my-hand-cards {
+.pk-hand-cards {
 	display: flex;
 	gap: $s2;
 }
 
-.my-hand-insights {
-	margin-left: auto;
+.pk-hand-insights {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-end;
+	align-items: flex-start;
 	gap: 2px;
-	text-align: right;
 }
 
-.my-combo {
-	font-size: $text-sm;
-	font-weight: 600;
-}
+.pk-combo { font-size: $text-sm; font-weight: 600; }
 
-.my-odds {
+.pk-odds {
 	font-size: $text-sm;
 	font-weight: 700;
 	color: $accent;
@@ -114,15 +113,21 @@
 	&-pending { color: $text-muted; font-weight: 600; }
 }
 
-// ── Action panel ──────────────────────────────────────────────────────────────
+.pk-actions {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	width: 100%;
+	max-width: 520px;
+}
 
 .action-row {
 	display: flex;
 	gap: $s3;
 	width: 100%;
-}
 
-.action-row ion-button { flex: 1; }
+	ion-button { flex: 1; }
+}
 
 .raise-row {
 	display: flex;
@@ -132,18 +137,18 @@
 }
 
 .raise-input {
-	width: 88px;
+	width: 96px;
 
 	&::part(native) { text-align: center; font-weight: 600; }
 }
 
 .raise-btn {
 	flex: 1;
-	--background: $accent-subtle;
-	--border-color: $accent-muted;
-	--color: $accent;
+	--background: #{$accent-subtle};
+	--border-color: #{$accent-muted};
+	--color: #{$accent};
 	--border-width: 1px;
-	--background-hover: $accent-muted;
+	--background-hover: #{$accent-muted};
 }
 
 .all-in-btn {
@@ -152,12 +157,30 @@
 	letter-spacing: 0.04em;
 }
 
-.won-by-fold-note {
-	font-size: $text-sm;
+.pk-waiting {
+	font-size: $text-base;
 	color: $text-muted;
+
+	strong { color: $text; font-weight: 700; }
 }
 
-// ── Showdown ──────────────────────────────────────────────────────────────────
+// ── Result (showdown / game over) ────────────────────────────────────────────
+
+.pk-result {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $s3;
+	width: 100%;
+	max-width: 520px;
+	text-align: center;
+}
+
+.pk-result-title {
+	font-size: $text-2xl;
+	font-weight: 700;
+	line-height: 1.1;
+}
 
 .showdown-rows {
 	display: flex;
@@ -169,34 +192,15 @@
 .showdown-row {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: $s3;
-	padding: $s3 $s4;
+	padding: $s2 $s4;
 	background: $bg-surface;
 	border: 1px solid $border;
 	border-radius: $radius-md;
-	transition: border-color $transition;
 
 	&-winner { border-color: $color-success-border; background: $color-success-bg; }
 }
 
-.showdown-name {
-	font-size: $text-base;
-	font-weight: 600;
-	min-width: 60px;
-}
-
-.showdown-cards {
-	display: flex;
-	gap: $s1;
-}
-
-.showdown-rank {
-	font-size: $text-sm;
-	color: $text-muted;
-	font-weight: 600;
-	margin-left: auto;
-}
-
-@media (min-width: $bp-sm) {
-	.player-card { min-width: 88px; padding: $s3 $s4; }
-}
+.showdown-name { font-size: $text-base; font-weight: 600; }
+.showdown-rank { font-size: $text-sm; color: $text-muted; font-weight: 600; }

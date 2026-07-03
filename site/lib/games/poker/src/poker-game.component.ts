@@ -1,16 +1,19 @@
 import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
 import { type Card, RANKS, SHORT_DECK_RANKS, cardKey, createDeck } from '@gandogames/shared/common/cards';
-import { type PokerGameState, MIN_RAISE, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
+import { type PokerGameState, type PokerPlayer, MIN_RAISE, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';
+import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
+import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 import { ToastService } from '@gandogames/services/toast.service';
+import { POKER_TABLE_PRESET } from './poker.table';
 
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [ChipCountComponent, FrenchCardComponent, IonButton, IonInput],
+	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, IonInput],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })
@@ -52,6 +55,26 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		const phase = this.gameState()?.gamePhase;
 		return phase === 'pre-flop' || phase === 'flop' || phase === 'turn' || phase === 'river';
 	});
+
+	/** Seat ring: players in playing order, me rotated to bottom-centre, padded to the table's seat count. */
+	protected readonly seats = computed<TableSeat[]>(() => {
+		const gs = this.gameState();
+		if (!gs) return [];
+		const maxSeats = POKER_TABLE_PRESET.seats ?? gs.players.length;
+		const currentId = gs.players[gs.currentPlayerIndex]?.id;
+		const dealerId = gs.players[gs.dealerIndex]?.id;
+		const active = gs.gamePhase !== 'game-over';
+		return buildTableSeats(gs.players, this.myPlayFabId(), maxSeats, p => ({
+			isCurrentTurn: active && p.id === currentId,
+			isDealer: p.id === dealerId,
+			faded: p.folded,
+		}));
+	});
+
+	/** Narrow a seat's player back to the poker shape (`buildTableSeats` preserves the object). */
+	protected seatPlayer(seat: TableSeat): PokerPlayer | null {
+		return seat.player as PokerPlayer | null;
+	}
 
 	protected readonly canCheck = computed(() => {
 		const gs = this.gameState();

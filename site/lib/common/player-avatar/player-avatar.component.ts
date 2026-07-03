@@ -15,7 +15,7 @@ import { hueFromString } from './hue-from-string';
 export class PlayerAvatarComponent {
 	private readonly userService = inject(UserService);
 	public readonly isLightTheme = computed(() => !this.userService.isDarkTheme());
-	
+
 	public readonly player = input.required<AvatarPlayer>();
 
 	public readonly iconFaClass = computed(() =>

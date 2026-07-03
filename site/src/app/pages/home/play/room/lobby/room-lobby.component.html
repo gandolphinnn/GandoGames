@@ -1,101 +1,100 @@
-<div class="room-detail">
+<div class="lobby">
 
 	@if (!room()) {
 		<p class="status-msg">Loading room…</p>
 	} @else {
-		<div class="room-info">
-			<span class="room-game-icon"><i [class]="gameInfo()?.icon"></i></span>
-			<span class="room-game-name">{{ gameInfo()?.name }}</span>
-			<span class="room-player-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }}</span>
-			<span class="room-access-badge"
-				[class.room-access-badge-closed]="room()!.access === 'closed'"
-				[title]="accessBadge().description">
-				<ion-icon [name]="accessBadge().icon" />
-				{{ accessBadge().label }}
-			</span>
-		</div>
+		<gg-game-table
+			class="lobby-table"
+			fit="contain"
+			[variant]="preset().variant"
+			[label]="preset().label ?? null"
+			[seats]="seats()"
+			(seatClick)="onSeatClick($event.seat)">
 
-		<div class="player-grid">
-			@for (slot of playerSlots(); track $index) {
-				@if (slot) {
-					<div class="player-card"
-						[class.player-card-host]="slot.id === room()!.hostId"
-						[class.player-card-me]="slot.id === myId()">
-						@if (slot.id === room()!.hostId) {
-							<ion-icon name="ribbon" class="player-card-crown" title="host" />
-						}
-						@if (isHost() && slot.id !== myId() && room()!.phase === 'waiting') {
-							<button class="player-card-kick" (click)="kick(slot)" title="Kick player">
-								<ion-icon name="close" />
-							</button>
-						}
-						@if (canAddFriend(slot)) {
-							<button class="player-card-friend" [disabled]="addingFriendId() === slot.id" (click)="addFriend(slot)" title="Add friend">
-								<ion-icon name="person-add" />
-							</button>
-						}
-						<gg-player-avatar class="player-card-avatar" [player]="slot" />
-						<span class="player-card-name">{{ slot.name }}</span>
+			<div table-center class="lobby-meta">
+				<span class="lobby-meta-game"><i [class]="gameInfo()?.icon"></i> {{ gameInfo()?.name }}</span>
+				<span class="lobby-meta-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }} players</span>
+				<span class="room-access-badge"
+					[class.room-access-badge-closed]="room()!.access === 'closed'"
+					[title]="accessBadge().description">
+					<ion-icon [name]="accessBadge().icon" />
+					{{ accessBadge().label }}
+				</span>
+			</div>
+
+			<ng-template ggTableSeat let-seat>
+				@if (seat.player; as p) {
+					@if (p.id === room()!.hostId) {
+						<ion-icon name="ribbon" class="seat-crown" title="Host" />
+					}
+					@if (isHost() && p.id !== myId() && room()!.phase === 'waiting') {
+						<button class="seat-btn seat-kick" (click)="kick(p); $event.stopPropagation()" title="Kick player">
+							<ion-icon name="close" />
+						</button>
+					}
+					@if (canAddFriend(p)) {
+						<button class="seat-btn seat-friend" [disabled]="addingFriendId() === p.id"
+							(click)="addFriend(p); $event.stopPropagation()" title="Add friend">
+							<ion-icon name="person-add" />
+						</button>
+					}
+					<gg-player-avatar class="seat-avatar" [player]="p" />
+					<span class="seat-name">{{ p.name }}</span>
+				} @else {
+					<div class="seat-avatar seat-avatar-empty">
+						<ion-icon [name]="!isInRoom() && canJoin() ? 'enter' : 'add'" />
 					</div>
-				} @else if (isInRoom()) {
-					<div class="player-card player-card-empty" (click)="invite()">
-						<div class="player-card-avatar player-card-avatar-empty">
-							<ion-icon name="add" />
-						</div>
-						<span class="player-card-name">Empty</span>
-					</div>
+					<span class="seat-name seat-name-muted">
+						{{ !isInRoom() && canJoin() ? 'Sit' : 'Empty' }}
+					</span>
 				}
-			}
-			@if (!isInRoom() && canJoin()) {
-				<div class="player-card player-card-join" [class.player-card-join-loading]="loading()" (click)="join()">
-					<div class="player-card-avatar player-card-avatar-empty">
-						<ion-icon name="enter" />
-					</div>
-					<span class="player-card-name">{{ loading() ? 'Joining…' : 'Join Room' }}</span>
-				</div>
-			}
-		</div>
+			</ng-template>
 
-		@switch (room()!.phase) {
-			@case ('waiting') {
-				<div class="phase-panel">
-					@if (!isInRoom()) {
-						@if (joinBlockedReason()) {
-							<p class="status-msg">{{ joinBlockedReason() }}</p>
-						}
-					} @else {
-						<p class="status-msg">Waiting for players…</p>
-						@if (isHost()) {
+			<div table-footer class="lobby-footer">
+				@switch (room()!.phase) {
+					@case ('waiting') {
+						@if (!isInRoom()) {
+							@if (canJoin()) {
+								<ion-button expand="block" [disabled]="loading()" (click)="join()">
+									{{ loading() ? 'Joining…' : 'Join Room' }}
+								</ion-button>
+							} @else if (joinBlockedReason()) {
+								<p class="status-msg">{{ joinBlockedReason() }}</p>
+							}
+						} @else if (isHost()) {
 							@if (canStart()) {
-								<ion-button [disabled]="loading()" (click)="start()">
+								<ion-button expand="block" [disabled]="loading()" (click)="start()">
 									{{ loading() ? 'Starting…' : 'Start Game' }}
 								</ion-button>
 							} @else {
-								<p class="hint">Need more players to start.</p>
+								<p class="hint">Need at least {{ gameInfo()?.minPlayers }} players to start.</p>
 							}
+						} @else {
+							<p class="status-msg">Waiting for the host to start…</p>
 						}
-					}
-					<div class="lobby-config-actions">
-						<ion-button fill="outline" size="small" (click)="openSettings()">
-							<ion-icon name="settings-outline" slot="start" />
-							{{ isHost() ? 'Game settings' : 'View settings' }}
-						</ion-button>
-						@if (isHost()) {
-							<ion-button fill="outline" size="small" (click)="openAccess()">
-								<ion-icon [name]="accessBadge().icon" slot="start" />
-								Room access
+
+						<div class="lobby-config-actions">
+							<ion-button fill="outline" size="small" (click)="openSettings()">
+								<ion-icon name="settings-outline" slot="start" />
+								{{ isHost() ? 'Game settings' : 'View settings' }}
 							</ion-button>
-						}
-					</div>
-				</div>
-			}
-			@case ('ended') {
-				<div class="phase-panel game-over">
-					<h2>Game Over</h2>
-					<ion-button [routerLink]="['/play']">Find another room</ion-button>
-				</div>
-			}
-		}
+							@if (isHost()) {
+								<ion-button fill="outline" size="small" (click)="openAccess()">
+									<ion-icon [name]="accessBadge().icon" slot="start" />
+									Room access
+								</ion-button>
+							}
+						</div>
+					}
+					@case ('ended') {
+						<div class="game-over">
+							<h2>Game Over</h2>
+							<ion-button [routerLink]="['/play']">Find another room</ion-button>
+						</div>
+					}
+				}
+			</div>
+		</gg-game-table>
 
 		@if (showInviteModal() && room()) {
 			<gg-invite-modal

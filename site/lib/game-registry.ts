@@ -1,7 +1,8 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
 import { GameSettingsSchema, GameState, GameType } from "@gandogames/shared/dto";
-import { PankovGameComponent, PANKOV_SETTINGS_SCHEMA } from '@gandogames/lib/games/pankov';
-import { PokerGameComponent, POKER_SETTINGS_SCHEMA } from '@gandogames/lib/games/poker';
+import { TablePreset } from '@gandogames/lib/common/game-table';
+import { PankovGameComponent, PANKOV_SETTINGS_SCHEMA, PANKOV_TABLE_PRESET } from '@gandogames/lib/games/pankov';
+import { PokerGameComponent, POKER_SETTINGS_SCHEMA, POKER_TABLE_PRESET } from '@gandogames/lib/games/poker';
 
 export interface GameComponent<TState extends GameState = GameState> {
 	gameState: InputSignal<TState | null>;
@@ -23,6 +24,8 @@ interface GameDescriptor {
 	component: Type<unknown>;
 	/** Declarative schema for the per-room game-settings editor. */
 	settingsSchema: GameSettingsSchema;
+	/** Table look shared by this game's lobby and its in-game view. */
+	table: TablePreset;
 }
 
 export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
@@ -35,6 +38,7 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 		maxPlayers: 6,
 		component: PankovGameComponent,
 		settingsSchema: PANKOV_SETTINGS_SCHEMA,
+		table: PANKOV_TABLE_PRESET,
 	},
 	poker: {
 		id: 'poker',
@@ -45,5 +49,6 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 		maxPlayers: 8,
 		component: PokerGameComponent,
 		settingsSchema: POKER_SETTINGS_SCHEMA,
+		table: POKER_TABLE_PRESET,
 	},
 };

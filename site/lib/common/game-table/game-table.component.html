@@ -1,0 +1,35 @@
+<div class="table-area">
+	<div class="table-felt">
+		@if (label(); as l) {
+			<span class="table-label">{{ l }}</span>
+		}
+		<div class="table-center">
+			<ng-content select="[table-center]" />
+		</div>
+	</div>
+
+	@for (seat of seats(); track seat.key; let i = $index) {
+		<div class="table-seat"
+			[class.seat-hero]="seat.isHero"
+			[class.seat-turn]="seat.isCurrentTurn"
+			[class.seat-dealer]="seat.isDealer"
+			[class.seat-empty]="!seat.player"
+			[class.seat-faded]="seat.faded"
+			[style.left.%]="positions()[i].left"
+			[style.top.%]="positions()[i].top"
+			(click)="seatClick.emit({ seat, index: i })">
+			@if (!seat.player && emptySeatDef()) {
+				<ng-container *ngTemplateOutlet="emptySeatDef()!.template; context: { $implicit: seat, index: i }" />
+			} @else if (seatDef()) {
+				<ng-container *ngTemplateOutlet="seatDef()!.template; context: { $implicit: seat, index: i }" />
+			}
+			@if (showDealerChip() && seat.isDealer) {
+				<span class="dealer-chip" title="Dealer">D</span>
+			}
+		</div>
+	}
+</div>
+
+<div class="table-footer">
+	<ng-content select="[table-footer]" />
+</div>

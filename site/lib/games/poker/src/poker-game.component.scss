@@ -56,6 +56,18 @@ gg-chip-count { font-size: $text-sm; }
 	margin-top: 2px;
 }
 
+// Live all-in win % badge on a seat.
+.pk-equity {
+	margin-top: 3px;
+	font-size: 0.72rem;
+	font-weight: 800;
+	letter-spacing: 0.02em;
+	color: #1c1208;
+	background: $color-warning;
+	padding: 1px 7px;
+	border-radius: $radius-full;
+}
+
 // ── Centre ───────────────────────────────────────────────────────────────────
 
 .pk-center {
@@ -104,14 +116,6 @@ gg-chip-count { font-size: $text-sm; }
 }
 
 .pk-combo { font-size: $text-sm; font-weight: 600; }
-
-.pk-odds {
-	font-size: $text-sm;
-	font-weight: 700;
-	color: $accent;
-
-	&-pending { color: $text-muted; font-weight: 600; }
-}
 
 .pk-actions {
 	display: flex;

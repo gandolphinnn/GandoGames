@@ -23,8 +23,6 @@ export interface PokerSettings {
 	minBet: number;
 	/** Short deck (6+ Hold'em): strip the 2s–5s. Hand rankings stay standard. */
 	smallerDeck: boolean;
-	/** Whether the live "your current hand / win %" hint is shown to players. */
-	showWinOdds: boolean;
 }
 
 export interface PokerGameState extends GameState {
@@ -57,14 +55,12 @@ export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
 	{ key: 'startingChips', type: 'number', label: 'Player pot', default: STARTING_CHIPS, min: 100, max: 100000, step: 100, hint: 'Starting chips per player.' },
 	{ key: 'minBet', type: 'number', label: 'Minimum bet', default: MIN_RAISE, min: 10, max: 5000, step: 10, hint: 'Big blind; small blind is half, min raise equals this.' },
 	{ key: 'smallerDeck', type: 'toggle', label: 'Smaller deck', default: false, hint: 'Short deck — remove the 2s through 5s (36 cards).' },
-	{ key: 'showWinOdds', type: 'toggle', label: 'Show win %', default: true, hint: 'Show each player their live hand and win-odds estimate.' },
 ];
 
 export const DEFAULT_POKER_SETTINGS: PokerSettings = {
 	startingChips: STARTING_CHIPS,
 	minBet: MIN_RAISE,
 	smallerDeck: false,
-	showWinOdds: true,
 };
 
 /** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */
@@ -212,4 +208,41 @@ export function estimateWinOdds(hole: Card[], community: Card[], opponents: numb
 		if (!beaten) score += 1 / (1 + ties);
 	}
 	return score / iterations;
+}
+
+/**
+ * All-in equity for a showdown where every contender's hole cards are KNOWN (their hands are tabled).
+ * Returns each hand's share of the pot (0–1, summing to ~1) given the current `community` cards, by
+ * running out the remaining board. When the board is already complete the result is exact; otherwise
+ * it's a Monte-Carlo estimate over the undealt board. Ties split the pot. Used to show the live win %
+ * at each seat during an all-in run-out. `deck` lets short-deck games draw from the right card pool.
+ */
+export function estimateAllInEquities(hands: Card[][], community: Card[], iterations = 1500, deck: Card[] = createDeck()): number[] {
+	const n = hands.length;
+	if (n === 0) return [];
+	if (n === 1) return [1];
+
+	const used = new Set([...hands.flat(), ...community].map(cardKey));
+	const remaining = deck.filter(c => !used.has(cardKey(c)));
+	const boardNeeded = 5 - community.length;
+	const equity = new Array<number>(n).fill(0);
+
+	const award = (board: Card[]): void => {
+		const ranks = hands.map(h => evaluateHand([...h, ...board]));
+		let best = ranks[0]!;
+		for (const r of ranks) if (compareHandRanks(r, best) > 0) best = r;
+		const winners = ranks.reduce((c, r) => c + (compareHandRanks(r, best) === 0 ? 1 : 0), 0);
+		ranks.forEach((r, i) => { if (compareHandRanks(r, best) === 0) equity[i]! += 1 / winners; });
+	};
+
+	// Board already out → the outcome is deterministic; evaluate once.
+	if (boardNeeded <= 0) {
+		award(community);
+		return equity;
+	}
+
+	for (let iter = 0; iter < iterations; iter++) {
+		award([...community, ...shuffle(remaining).slice(0, boardNeeded)]);
+	}
+	return equity.map(e => e / iterations);
 }

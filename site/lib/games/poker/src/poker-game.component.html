@@ -47,6 +47,9 @@
 						</div>
 					}
 				}
+				@if (isAllInReveal() && equityPercent()[p.id] !== undefined) {
+					<span class="pk-equity">Win {{ equityPercent()[p.id] }}%</span>
+				}
 			} @else {
 				<span class="pk-name pk-name-muted">SIT</span>
 			}
@@ -65,11 +68,6 @@
 					@if (myCombo()) {
 						<div class="pk-hand-insights">
 							<span class="pk-combo">{{ myCombo() }}</span>
-							@if (winPercent() !== null) {
-								<span class="pk-odds">Win {{ winPercent() }}%</span>
-							} @else {
-								<span class="pk-odds pk-odds-pending">Win …</span>
-							}
 						</div>
 					}
 				</div>
@@ -87,7 +85,7 @@
 							}
 						</div>
 						<div class="raise-row">
-							<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="50" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
+							<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="minRaise()" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
 							<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">Raise</ion-button>
 						</div>
 						<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">All In ({{ me?.chips }})</ion-button>
@@ -97,25 +95,29 @@
 					<p class="pk-waiting">Waiting for <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
 				}
 			} @else if (gs.gamePhase === 'showdown') {
-				<div class="pk-result">
-					@if (wonByFold()) {
-						<p class="panel-eyebrow">Hand over</p>
-						<h2 class="pk-result-title">{{ showdownPlayers()[0]?.name }} wins the pot</h2>
-						<p class="hint">Everyone else folded — no cards shown.</p>
-					} @else {
-						<h2 class="pk-result-title">Showdown</h2>
-						<div class="showdown-rows">
-							@for (p of showdownPlayers(); track p.id) {
-								<div class="showdown-row" [class.showdown-row-winner]="gs.result?.winners?.includes(p.id)">
-									<span class="showdown-name">{{ p.name }}</span>
-									<span class="showdown-rank">{{ gs.result?.hands?.[p.id] }}</span>
-								</div>
-							}
-						</div>
-					}
-					<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
-					@if (error()) { <p class="action-error">{{ error() }}</p> }
-				</div>
+				@if (!revealComplete()) {
+					<p class="pk-waiting">Running it out<span class="waiting-dots"> · · ·</span></p>
+				} @else {
+					<div class="pk-result">
+						@if (wonByFold()) {
+							<p class="panel-eyebrow">Hand over</p>
+							<h2 class="pk-result-title">{{ showdownPlayers()[0]?.name }} wins the pot</h2>
+							<p class="hint">Everyone else folded — no cards shown.</p>
+						} @else {
+							<h2 class="pk-result-title">Showdown</h2>
+							<div class="showdown-rows">
+								@for (p of showdownPlayers(); track p.id) {
+									<div class="showdown-row" [class.showdown-row-winner]="gs.result?.winners?.includes(p.id)">
+										<span class="showdown-name">{{ p.name }}</span>
+										<span class="showdown-rank">{{ gs.result?.hands?.[p.id] }}</span>
+									</div>
+								}
+							</div>
+						}
+						<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
+						@if (error()) { <p class="action-error">{{ error() }}</p> }
+					</div>
+				}
 			} @else if (gs.gamePhase === 'game-over') {
 				<div class="pk-result">
 					<p class="panel-eyebrow">Winner</p>

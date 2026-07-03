@@ -1,7 +1,7 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
 import { resolveSettings } from '@gandogames/shared/dto';
-import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
+import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
@@ -157,7 +157,7 @@ describe('PokerGame settings', () => {
 	it('seeds stacks from startingChips and blinds from minBet', () => {
 		const game = new PokerGame();
 		// Dealer=p1, SB=p2, BB=p3. Big blind = minBet (200), small blind = half (100).
-		game.initialize([p1, p2, p3], { startingChips: 5000, minBet: 200, smallerDeck: false, showWinOdds: true });
+		game.initialize([p1, p2, p3], { startingChips: 5000, minBet: 200, smallerDeck: false });
 		const sb = game.state!.players.find(p => p.id === 'p2')!;
 		const bb = game.state!.players.find(p => p.id === 'p3')!;
 		const utg = game.state!.players.find(p => p.id === 'p1')!;
@@ -172,7 +172,7 @@ describe('PokerGame settings', () => {
 
 	it('deals from a 36-card short deck when smallerDeck is on', () => {
 		const game = new PokerGame();
-		game.initialize([p1, p2, p3], { startingChips: 1000, minBet: 100, smallerDeck: true, showWinOdds: true });
+		game.initialize([p1, p2, p3], { startingChips: 1000, minBet: 100, smallerDeck: true });
 		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
 		expect(game.state!.deck.length + dealt).toBe(36);
 		const all = [...game.state!.deck, ...game.state!.players.flatMap(p => p.cards)];
@@ -194,7 +194,7 @@ describe('resolveSettings', () => {
 		expect(s['startingChips']).toBe(1000);
 		expect(s['minBet']).toBe(100);
 		expect(s['smallerDeck']).toBe(false);
-		expect(s['showWinOdds']).toBe(true);
+		expect('showWinOdds' in s).toBe(false);
 	});
 
 	it('clamps numbers into range and drops unknown keys', () => {
@@ -207,5 +207,30 @@ describe('resolveSettings', () => {
 	it('coerces toggles to booleans', () => {
 		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { smallerDeck: true });
 		expect(s['smallerDeck']).toBe(true);
+	});
+});
+
+describe('estimateAllInEquities', () => {
+	it('is exact and gives the pot to the made hand on a complete board', () => {
+		const aces = [c('A', 'spades'), c('A', 'hearts')];
+		const kings = [c('K', 'spades'), c('K', 'hearts')];
+		const board = [c('A', 'diamonds'), c('5', 'clubs'), c('9', 'diamonds'), c('2', 'spades'), c('7', 'hearts')];
+		expect(estimateAllInEquities([aces, kings], board)).toEqual([1, 0]);
+	});
+
+	it('splits the pot when both play the board', () => {
+		const a = [c('2', 'hearts'), c('3', 'hearts')];
+		const b = [c('4', 'diamonds'), c('6', 'diamonds')];
+		// Royal flush on the board — neither hole card improves it, so it's a dead tie.
+		const board = [c('A', 'spades'), c('K', 'spades'), c('Q', 'spades'), c('J', 'spades'), c('10', 'spades')];
+		expect(estimateAllInEquities([a, b], board)).toEqual([0.5, 0.5]);
+	});
+
+	it('estimates a running-out board and returns equities that sum to ~1', () => {
+		const aces = [c('A', 'spades'), c('A', 'hearts')];
+		const conn = [c('7', 'clubs'), c('8', 'clubs')];
+		const eq = estimateAllInEquities([aces, conn], [], 2000);
+		expect(eq[0]! + eq[1]!).toBeCloseTo(1, 5);
+		expect(eq[0]!).toBeGreaterThan(eq[1]!); // aces are a big favourite pre-flop
 	});
 });

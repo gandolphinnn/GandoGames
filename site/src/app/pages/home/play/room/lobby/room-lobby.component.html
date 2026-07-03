@@ -42,11 +42,9 @@
 					<span class="seat-name">{{ p.name }}</span>
 				} @else {
 					<div class="seat-avatar seat-avatar-empty">
-						<ion-icon [name]="!isInRoom() && canJoin() ? 'enter' : 'add'" />
+						<ion-icon name="add" />
 					</div>
-					<span class="seat-name seat-name-muted">
-						{{ !isInRoom() && canJoin() ? 'Sit' : 'Empty' }}
-					</span>
+					<span class="seat-name seat-name-muted">Invite</span>
 				}
 			</ng-template>
 

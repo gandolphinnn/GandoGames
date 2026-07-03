@@ -38,5 +38,9 @@ export class GameTableComponent {
 	protected readonly seatDef = contentChild(GameTableSeatDef);
 	protected readonly emptySeatDef = contentChild(GameTableEmptySeatDef);
 
-	protected readonly positions = computed(() => layoutSeats(this.seats().length));
+	// `fill` (in-game) has no header/footer scroll room, so flatten the ring vertically to keep the
+	// tall player pods clear of the header above and the action bar below. `contain` (lobby) stays round.
+	protected readonly positions = computed(() =>
+		layoutSeats(this.seats().length, 40, this.fit() === 'fill' ? 30 : 40)
+	);
 }

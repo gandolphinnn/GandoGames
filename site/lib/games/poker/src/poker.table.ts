@@ -4,5 +4,4 @@ import { TablePreset } from '@gandogames/lib/common/game-table';
 export const POKER_TABLE_PRESET: TablePreset = {
 	variant: 'felt',
 	label: "Texas Hold'em",
-	seats: 8,
 };

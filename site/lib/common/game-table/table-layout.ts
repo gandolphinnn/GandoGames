@@ -18,8 +18,6 @@ export interface TablePreset {
 	variant: TableVariant;
 	/** Faint label rendered on the felt (usually the game name). */
 	label?: string;
-	/** Seat-ring size (match the game's maxPlayers) so the lobby ring and the in-game ring line up. */
-	seats?: number;
 }
 
 /** One seat around the table. `player` is null for an open seat. */
@@ -54,15 +52,17 @@ const DEG = Math.PI / 180;
  * opponents spread across a top arc centred on 270° (top-centre) and never dip
  * into the bottom ±50°, so they can't crowd the hero seat or the footer/action bar.
  *
- * `r` is a percentage radius; the surrounding container's aspect-ratio warps the
+ * `r` is the percentage radius; the surrounding container's aspect-ratio warps the
  * circle into a tall (mobile) or wide (desktop) oval, so the same numbers serve both.
+ * `ry` overrides the vertical radius — pass a smaller value to flatten the ring where
+ * vertical room is tight (e.g. the non-scrolling in-game view).
  */
-export function layoutSeats(n: number, r = 40): SeatPosition[] {
+export function layoutSeats(n: number, r = 40, ry = r): SeatPosition[] {
 	if (n <= 0) return [];
 
 	const at = (deg: number): SeatPosition => ({
 		left: 50 + r * Math.cos(deg * DEG),
-		top: 50 + r * Math.sin(deg * DEG),
+		top: 50 + ry * Math.sin(deg * DEG),
 	});
 
 	const positions: SeatPosition[] = [at(90)]; // hero — bottom-centre

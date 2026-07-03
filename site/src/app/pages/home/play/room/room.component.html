@@ -35,7 +35,7 @@
 			<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
 		</div>
 	}
-	<gg-refreshable-content [fullscreen]="true" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
+	<gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
 		@if (isPlaying()) {
 			<gg-room-game [roomId]="roomId()" [gameType]="room()!.game" />
 		} @else {

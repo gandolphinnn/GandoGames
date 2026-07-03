@@ -86,18 +86,23 @@ export class RoomLobbyComponent {
 		return g ? GAME_REGISTRY[g].table : { variant: 'neutral' };
 	});
 
-	/** Seat ring: players in playing order, viewer rotated to bottom-centre, padded to maxPlayers. */
+	/**
+	 * Seat ring: players in playing order, viewer rotated to bottom-centre. Members waiting in a
+	 * non-full room get a single extra open seat (the invite affordance); everyone else sees just the
+	 * seated players — non-members join via the footer button rather than an empty "sit" seat.
+	 */
 	public readonly seats = computed<TableSeat[]>(() => {
 		const r = this.room();
 		if (!r) return [];
 		const max = GAME_REGISTRY[r.game]?.maxPlayers ?? r.players.length;
-		return buildTableSeats(r.players, this.myId(), max);
+		const canInvite = this.isInRoom() && r.phase === 'waiting' && r.players.length < max;
+		const ringSize = canInvite ? r.players.length + 1 : r.players.length;
+		return buildTableSeats(r.players, this.myId(), ringSize);
 	});
 
-	/** Tapping an open seat sits you down (join) if you can, or opens invite if you're already in. */
+	/** The lone open seat is an invite affordance for members while waiting. */
 	public onSeatClick(seat: TableSeat): void {
 		if (seat.player) return;
-		if (!this.isInRoom() && this.canJoin()) { void this.join(); return; }
 		if (this.isInRoom() && this.room()?.phase === 'waiting') this.invite();
 	}
 

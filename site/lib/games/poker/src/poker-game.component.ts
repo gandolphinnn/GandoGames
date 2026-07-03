@@ -8,7 +8,6 @@ import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 import { ToastService } from '@gandogames/services/toast.service';
-import { POKER_TABLE_PRESET } from './poker.table';
 
 @Component({
 	selector: 'gg-poker-game',
@@ -56,15 +55,14 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		return phase === 'pre-flop' || phase === 'flop' || phase === 'turn' || phase === 'river';
 	});
 
-	/** Seat ring: players in playing order, me rotated to bottom-centre, padded to the table's seat count. */
+	/** Seat ring: only the seated players, me rotated to bottom-centre — no empty seats in-game. */
 	protected readonly seats = computed<TableSeat[]>(() => {
 		const gs = this.gameState();
 		if (!gs) return [];
-		const maxSeats = POKER_TABLE_PRESET.seats ?? gs.players.length;
 		const currentId = gs.players[gs.currentPlayerIndex]?.id;
 		const dealerId = gs.players[gs.dealerIndex]?.id;
 		const active = gs.gamePhase !== 'game-over';
-		return buildTableSeats(gs.players, this.myPlayFabId(), maxSeats, p => ({
+		return buildTableSeats(gs.players, this.myPlayFabId(), gs.players.length, p => ({
 			isCurrentTurn: active && p.id === currentId,
 			isDealer: p.id === dealerId,
 			faded: p.folded,

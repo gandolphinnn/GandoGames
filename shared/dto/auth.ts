@@ -1,6 +1,6 @@
 export type Theme = 'dark' | 'light';
 export type LangCode = 'en' | 'it';
-export type IconType = 'profile'| 'luck' | 'hat' | 'paw' | 'pizza' | 'bot';
+export type IconType = 'profile'| 'luck' | 'cookie' | 'paw' | 'pizza' | 'bot';
 
 /** Profile preferences data */
 export interface ProfileData {

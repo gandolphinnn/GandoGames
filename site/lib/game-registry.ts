@@ -43,7 +43,7 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 	poker: {
 		id: 'poker',
 		name: 'Texas Hold\'em',
-		icon: 'fa-solid fa-heart',
+		icon: 'fa-solid fa-hat-cowboy',
 		description: 'Bet, bluff, and outlast everyone at the table.',
 		minPlayers: 2,
 		maxPlayers: 8,

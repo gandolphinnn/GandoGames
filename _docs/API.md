@@ -205,7 +205,7 @@ Server-to-client events pushed over the hub (`SignalREventType`):
 type GameType = 'pankov' | 'poker'
 type Theme    = 'dark' | 'light'
 type LangCode = 'en' | 'it'
-type IconType = 'profile' | 'luck' | 'hat' | 'paw' | 'pizza' | 'bot'
+type IconType = 'profile' | 'luck' | 'cookie' | 'paw' | 'pizza' | 'bot'
 
 interface ProfileData { theme: Theme; icon: IconType; language: LangCode }
 

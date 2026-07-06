@@ -10,8 +10,19 @@
 		[showDealerChip]="true"
 		[seats]="seats()">
 
-		<!-- Centre: pot + community cards -->
+		<!-- Centre: blinds + pot + community cards -->
 		<div table-center class="pk-center">
+			<div class="pk-blinds">
+				<span class="pk-blinds-amount">Big blind {{ bigBlind() }}</span>
+				@if (hasBlindSchedule()) {
+					<span class="pk-blinds-level">Lv {{ gs.blindLevel + 1 }}/{{ gs.settings.blindLevels.length }}</span>
+					@if (blindsUpNextHand()) {
+						<span class="pk-blinds-next pk-blinds-next-due">Blinds up next hand</span>
+					} @else if (blindCountdownLabel()) {
+						<span class="pk-blinds-next">↑ {{ blindCountdownLabel() }}</span>
+					}
+				}
+			</div>
 			<span class="pk-pot">Pot: {{ gs.pot }}</span>
 			<div class="pk-community">
 				@for (slot of communitySlots(); track $index) {

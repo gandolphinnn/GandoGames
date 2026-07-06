@@ -80,6 +80,36 @@ gg-chip-count { font-size: $text-sm; }
 	letter-spacing: 0.02em;
 }
 
+.pk-blinds {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: $s2;
+	font-size: 0.72rem;
+	line-height: 1;
+
+	@media (min-width: $bp-sm) { font-size: $text-sm; }
+}
+
+.pk-blinds-amount {
+	font-weight: 700;
+	letter-spacing: 0.02em;
+}
+
+.pk-blinds-level,
+.pk-blinds-next {
+	font-weight: 700;
+	padding: 1px 7px;
+	border-radius: $radius-full;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.pk-blinds-next-due {
+	color: #1c1208;
+	background: $color-warning;
+}
+
 .pk-community {
 	display: flex;
 	gap: 4px;

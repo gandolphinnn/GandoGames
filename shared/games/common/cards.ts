@@ -18,9 +18,6 @@ export function cardKey(card: Card): string {
 export const SUITS: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
 export const RANKS: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-/** The "short deck" ranks (6+ Hold'em): the 2s–5s are removed, leaving a 36-card deck. */
-export const SHORT_DECK_RANKS: Rank[] = RANKS.filter(r => !['2', '3', '4', '5'].includes(r));
-
 /** A fresh, ordered deck. Defaults to the full 52 cards; pass `ranks` for a reduced deck. */
 export function createDeck(ranks: readonly Rank[] = RANKS): Card[] {
 	const deck: Card[] = [];

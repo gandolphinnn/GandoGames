@@ -21,16 +21,26 @@ export interface GameActionRequest extends GameBaseRequest {
 // and the same schema drives server-side validation. Values are primitives so settings stay
 // trivially serializable (stored on the room, broadcast via SignalR).
 
-export type SettingValue = number | boolean;
+/**
+ * One entry in a blinds schedule: the big blind for this level and how long it lasts (minutes).
+ * Small blind is always half the big blind (floored). The last level is terminal — it runs until the
+ * game ends — so its `durationMinutes` is meaningless and normalized to 0 ("unlimited").
+ */
+export interface BlindLevel {
+	bigBlind: number;
+	durationMinutes: number;
+}
+
+export type SettingValue = number | boolean | BlindLevel[];
 export type GameSettings = Record<string, SettingValue>;
 
 /** One configurable field in a game's settings schema. */
 export interface SettingField {
 	key: string;
-	type: 'number' | 'toggle';
+	type: 'number' | 'toggle' | 'blind-levels';
 	label: string;
 	default: SettingValue;
-	/** Numeric bounds/step — used by `type: 'number'` only. */
+	/** Numeric bounds/step — used by `type: 'number'`, and by `blind-levels` to bound each big blind. */
 	min?: number;
 	max?: number;
 	step?: number;
@@ -56,6 +66,8 @@ export function resolveSettings(schema: GameSettingsSchema, raw?: GameSettings):
 		const value = raw?.[field.key];
 		if (field.type === 'toggle') {
 			out[field.key] = typeof value === 'boolean' ? value : Boolean(field.default);
+		} else if (field.type === 'blind-levels') {
+			out[field.key] = resolveBlindLevels(field, value);
 		} else {
 			let n = typeof value === 'number' && Number.isFinite(value) ? value : Number(field.default);
 			if (field.min !== undefined) n = Math.max(field.min, n);
@@ -64,4 +76,34 @@ export function resolveSettings(schema: GameSettingsSchema, raw?: GameSettings):
 		}
 	}
 	return out;
+}
+
+/** Upper bound on any single (non-terminal) blind level's duration. */
+const MAX_LEVEL_MINUTES = 1440; // 24h
+
+/**
+ * Validate/normalize a blinds schedule against a schema field: clamp each big blind into the field's
+ * [min, max], round durations to whole minutes ≥ 1, drop malformed entries, and always keep at least
+ * one level (falling back to the field default). The final level is terminal, so its duration is wiped
+ * to 0 ("unlimited"). Never trusts the incoming shape.
+ */
+function resolveBlindLevels(field: SettingField, value: SettingValue | undefined): BlindLevel[] {
+	const fallback = (field.default as BlindLevel[]).map(l => ({ ...l }));
+	const source = Array.isArray(value) ? value : fallback;
+	const clampBb = (bb: number): number => {
+		let n = typeof bb === 'number' && Number.isFinite(bb) ? bb : 0;
+		if (field.min !== undefined) n = Math.max(field.min, n);
+		if (field.max !== undefined) n = Math.min(field.max, n);
+		return Math.round(n);
+	};
+	let levels = source
+		.filter((l): l is BlindLevel => !!l && typeof (l as BlindLevel).bigBlind === 'number')
+		.map(l => ({
+			bigBlind: clampBb(l.bigBlind),
+			durationMinutes: Math.min(MAX_LEVEL_MINUTES, Math.max(1, Math.round(Number(l.durationMinutes) || 1))),
+		}));
+	if (levels.length === 0) levels = fallback;
+	// The final level runs until the game ends, so its duration carries no meaning.
+	levels[levels.length - 1]!.durationMinutes = 0;
+	return levels;
 }

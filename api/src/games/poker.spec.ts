@@ -1,7 +1,7 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
 import { resolveSettings } from '@gandogames/shared/dto';
-import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, estimateWinOdds, evaluateHand } from '@gandogames/shared/poker';
+import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, estimateWinOdds, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
@@ -74,8 +74,8 @@ describe('PokerGame all-in', () => {
 	const me = () => game.state!.players.find(p => p.id === 'p1')!;
 
 	beforeEach(() => {
-		// 3 players (avoids the heads-up special case). Dealer=p1, SB=p2 (50), BB=p3 (100),
-		// so UTG p1 is first to act with currentBet=100 and pot=150.
+		// 3 players (avoids the heads-up special case). Default settings → 500 chips, BB=20, SB=10.
+		// Dealer=p1, SB=p2 (10), BB=p3 (20), so UTG p1 is first to act with currentBet=20 and pot=30.
 		game = new PokerGame();
 		game.initialize([player('p1', 'Alice'), player('p2', 'Bob'), player('p3', 'Charlie')]);
 	});
@@ -84,20 +84,20 @@ describe('PokerGame all-in', () => {
 		game.action(me(), 'all-in', null);
 		expect(me().chips).toBe(0);
 		expect(me().isAllIn).toBe(true);
-		expect(me().streetBet).toBe(1000);
-		expect(game.state!.currentBet).toBe(1000);
-		expect(game.state!.pot).toBe(1150);
+		expect(me().streetBet).toBe(500);
+		expect(game.state!.currentBet).toBe(500);
+		expect(game.state!.pot).toBe(530);
 		expect(game.state!.currentPlayerIndex).toBe(1); // action moved on to the SB
 	});
 
 	it('does NOT lower the current bet on a short all-in below the call amount', () => {
-		me().chips = 30; // short stack — can't cover the 100 bet
+		me().chips = 15; // short stack — can't cover the 20 bet
 		game.action(me(), 'all-in', null);
 		expect(me().chips).toBe(0);
 		expect(me().isAllIn).toBe(true);
-		expect(me().streetBet).toBe(30);
-		expect(game.state!.currentBet).toBe(100); // unchanged — others still owe 100, not 30
-		expect(game.state!.pot).toBe(180);
+		expect(me().streetBet).toBe(15);
+		expect(game.state!.currentBet).toBe(20); // unchanged — others still owe 20, not 15
+		expect(game.state!.pot).toBe(45);
 	});
 
 	it('is ignored for a player with no chips', () => {
@@ -154,10 +154,10 @@ describe('PokerGame settings', () => {
 	const p2 = player('p2', 'Bob');
 	const p3 = player('p3', 'Charlie');
 
-	it('seeds stacks from startingChips and blinds from minBet', () => {
+	it('seeds stacks from startingChips and blinds from the first blind level', () => {
 		const game = new PokerGame();
-		// Dealer=p1, SB=p2, BB=p3. Big blind = minBet (200), small blind = half (100).
-		game.initialize([p1, p2, p3], { startingChips: 5000, minBet: 200, smallerDeck: false });
+		// Dealer=p1, SB=p2, BB=p3. Big blind = first level (200), small blind = half (100).
+		game.initialize([p1, p2, p3], { startingChips: 5000, blindLevels: [{ bigBlind: 200, durationMinutes: 0 }], smallerDeck: false });
 		const sb = game.state!.players.find(p => p.id === 'p2')!;
 		const bb = game.state!.players.find(p => p.id === 'p3')!;
 		const utg = game.state!.players.find(p => p.id === 'p1')!;
@@ -168,45 +168,113 @@ describe('PokerGame settings', () => {
 		expect(bb.chips).toBe(4800);
 		expect(game.state!.currentBet).toBe(200);
 		expect(game.state!.pot).toBe(300);
+		expect(game.state!.blindLevel).toBe(0);
+		expect(game.state!.bigBlind).toBe(200);
 	});
 
-	it('deals from a 36-card short deck when smallerDeck is on', () => {
+	it('scales the short deck to the table size — a 3-handed table starts at the 8 (11 − 3)', () => {
 		const game = new PokerGame();
-		game.initialize([p1, p2, p3], { startingChips: 1000, minBet: 100, smallerDeck: true });
+		game.initialize([p1, p2, p3], { startingChips: 1000, blindLevels: [{ bigBlind: 100, durationMinutes: 0 }], smallerDeck: true });
 		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
-		expect(game.state!.deck.length + dealt).toBe(36);
+		expect(game.state!.deck.length + dealt).toBe(28); // ranks 8..A = 7 ranks × 4 suits
 		const all = [...game.state!.deck, ...game.state!.players.flatMap(p => p.cards)];
-		expect(all.some(card => ['2', '3', '4', '5'].includes(card.rank))).toBe(false);
+		expect(all.some(card => ['2', '3', '4', '5', '6', '7'].includes(card.rank))).toBe(false);
+		expect(all.some(card => card.rank === '8')).toBe(true);
 	});
 
-	it('defaults to a 52-card deck and 1000 chips when no settings are given', () => {
+	it('defaults to a 52-card deck and 500 chips when no settings are given', () => {
 		const game = new PokerGame();
 		game.initialize([p1, p2, p3]);
 		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
 		expect(game.state!.deck.length + dealt).toBe(52);
-		expect(game.state!.players.find(p => p.id === 'p1')!.chips).toBe(1000);
+		expect(game.state!.players.find(p => p.id === 'p1')!.chips).toBe(500);
 	});
 });
 
 describe('resolveSettings', () => {
 	it('fills defaults for missing keys', () => {
 		const s = resolveSettings(POKER_SETTINGS_SCHEMA, {});
-		expect(s['startingChips']).toBe(1000);
-		expect(s['minBet']).toBe(100);
+		expect(s['startingChips']).toBe(500);
+		expect(s['blindLevels']).toEqual([{ bigBlind: 20, durationMinutes: 0 }]);
 		expect(s['smallerDeck']).toBe(false);
 		expect('showWinOdds' in s).toBe(false);
 	});
 
 	it('clamps numbers into range and drops unknown keys', () => {
-		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { startingChips: 9_999_999, minBet: 1, bogus: 5 });
+		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { startingChips: 9_999_999, bogus: 5 });
 		expect(s['startingChips']).toBe(100000); // clamped to max
-		expect(s['minBet']).toBe(10);            // clamped to min
 		expect('bogus' in s).toBe(false);        // unknown key dropped
 	});
 
 	it('coerces toggles to booleans', () => {
 		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { smallerDeck: true });
 		expect(s['smallerDeck']).toBe(true);
+	});
+
+	it('normalizes a blind-levels schedule: clamps big blinds, forces whole-minute durations, and makes the last level unlimited', () => {
+		const s = resolveSettings(POKER_SETTINGS_SCHEMA, {
+			blindLevels: [
+				{ bigBlind: 1, durationMinutes: 5 },       // big blind clamped up to the min (10)
+				{ bigBlind: 999_999, durationMinutes: 0 }, // big blind clamped to max (5000); duration forced to ≥ 1
+				{ bigBlind: 200, durationMinutes: 5 },      // last level → terminal, duration wiped to 0
+			],
+		});
+		expect(s['blindLevels']).toEqual([
+			{ bigBlind: 10, durationMinutes: 5 },
+			{ bigBlind: 5000, durationMinutes: 1 },
+			{ bigBlind: 200, durationMinutes: 0 },
+		]);
+	});
+
+	it('falls back to the default schedule when blind-levels is missing or empty', () => {
+		expect(resolveSettings(POKER_SETTINGS_SCHEMA, { blindLevels: [] })['blindLevels'])
+			.toEqual([{ bigBlind: 20, durationMinutes: 0 }]);
+	});
+});
+
+describe('levelForElapsed', () => {
+	const levels = [
+		{ bigBlind: 20, durationMinutes: 5 },
+		{ bigBlind: 40, durationMinutes: 5 },
+		{ bigBlind: 50, durationMinutes: 0 }, // terminal
+	];
+
+	it('stays on level 0 before the first boundary', () => {
+		expect(levelForElapsed(levels, 0)).toBe(0);
+		expect(levelForElapsed(levels, 4 * 60_000)).toBe(0);
+	});
+
+	it('advances exactly at each duration boundary', () => {
+		expect(levelForElapsed(levels, 5 * 60_000)).toBe(1);
+		expect(levelForElapsed(levels, 9 * 60_000)).toBe(1);
+		expect(levelForElapsed(levels, 10 * 60_000)).toBe(2);
+	});
+
+	it('holds on the terminal level no matter how much time passes', () => {
+		expect(levelForElapsed(levels, 999 * 60_000)).toBe(2);
+	});
+
+	it('returns level 0 for a single-level schedule', () => {
+		expect(levelForElapsed([{ bigBlind: 100, durationMinutes: 0 }], 999 * 60_000)).toBe(0);
+	});
+});
+
+describe('pokerDeckRanks', () => {
+	it('is the full 52-card deck when the short deck is off', () => {
+		expect(pokerDeckRanks(5, false)).toHaveLength(13);
+		expect(pokerDeckRanks(2, false)[0]).toBe('2');
+	});
+
+	it('sets the lowest card to (11 − players) when the short deck is on', () => {
+		expect(pokerDeckRanks(5, true)[0]).toBe('6');  // 11 − 5 = 6
+		expect(pokerDeckRanks(3, true)[0]).toBe('8');  // 11 − 3 = 8
+		expect(pokerDeckRanks(2, true)[0]).toBe('9');  // heads-up → 9
+		expect(pokerDeckRanks(8, true)[0]).toBe('3');  // full ring → 3
+	});
+
+	it('shrinks the rank count as the table shrinks', () => {
+		expect(pokerDeckRanks(5, true)).toHaveLength(9);  // 6..A
+		expect(pokerDeckRanks(2, true)).toHaveLength(6);  // 9..A
 	});
 });
 

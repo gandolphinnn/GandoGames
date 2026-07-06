@@ -1,6 +1,6 @@
 import type { GamePlayer, GameSettings } from '@gandogames/shared/dto';
-import { type Card, RANKS, SHORT_DECK_RANKS, createDeck, shuffle } from '@gandogames/shared/common/cards';
-import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, resolvePokerSettings } from '@gandogames/shared/poker';
+import { type Card, createDeck, shuffle } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, levelForElapsed, pokerDeckRanks, resolvePokerSettings, smallBlindFor } from '@gandogames/shared/poker';
 import { Game } from './game';
 
 export class PokerGame extends Game<PokerGameState> {
@@ -28,6 +28,9 @@ export class PokerGame extends Game<PokerGameState> {
 			currentPlayerIndex: 0,
 			dealerIndex: 0,
 			settings: resolved,
+			startedAt: new Date(),
+			blindLevel: 0,
+			bigBlind: resolved.blindLevels[0]!.bigBlind,
 		};
 		this.startNewHand();
 	}
@@ -60,7 +63,7 @@ export class PokerGame extends Game<PokerGameState> {
 			case 'fold': return this.applyFold(player.id);
 			case 'check': return this.applyCheck(player.id);
 			case 'call': return this.applyCall(player.id);
-			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? this.state.settings.minBet);
+			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? this.state.bigBlind);
 			case 'all-in': return this.applyAllIn(player.id);
 			default: return this.state;
 		}
@@ -104,7 +107,7 @@ export class PokerGame extends Game<PokerGameState> {
 	private applyRaise(playerId: string, raiseBy: number): PokerGameState {
 		const state = this.state!;
 		const player = state.players.find(p => p.id === playerId)!;
-		const newTotalBet = state.currentBet + Math.max(raiseBy, state.settings.minBet);
+		const newTotalBet = state.currentBet + Math.max(raiseBy, state.bigBlind);
 		const actualTotalBet = Math.min(newTotalBet, player.chips + player.streetBet);
 		const toPut = actualTotalBet - player.streetBet;
 		if (toPut <= 0 || toPut > player.chips) return state;
@@ -278,6 +281,10 @@ export class PokerGame extends Game<PokerGameState> {
 
 	private startNewHand(): void {
 		const state = this.state!;
+		// Self-heal a game persisted before blind schedules existed: backfill the schedule/clock so an
+		// in-flight legacy hand can advance instead of crashing on the missing fields.
+		if (!state.settings.blindLevels?.length) state.settings = resolvePokerSettings(state.settings as unknown as GameSettings);
+		if (!state.startedAt) state.startedAt = new Date();
 		for (const p of state.players) {
 			p.cards = [];
 			p.streetBet = 0;
@@ -285,15 +292,19 @@ export class PokerGame extends Game<PokerGameState> {
 			p.hasActed = false;
 			p.isAllIn = false;
 		}
-		state.deck = shuffle(createDeck(state.settings.smallerDeck ? SHORT_DECK_RANKS : RANKS));
+		state.deck = shuffle(createDeck(pokerDeckRanks(state.players.length, state.settings.smallerDeck)));
 		state.communityCards = [];
 		state.pot = 0;
 		state.result = undefined;
 		const n = state.players.length;
 		for (const p of state.players) p.cards = [state.deck.pop()!, state.deck.pop()!];
-		// Big blind = the configured minimum bet; small blind is half of it (floored).
-		const bigBlind = state.settings.minBet;
-		const smallBlind = Math.floor(bigBlind / 2);
+		// Blinds escalate on a real-time clock: pick the level for how long the game's been running and
+		// lock it in for this hand. Big blind = that level's; small blind is half of it (floored).
+		const level = levelForElapsed(state.settings.blindLevels, Date.now() - new Date(state.startedAt).getTime());
+		state.blindLevel = level;
+		const bigBlind = state.settings.blindLevels[level]!.bigBlind;
+		state.bigBlind = bigBlind;
+		const smallBlind = smallBlindFor(bigBlind);
 		const sbIdx = (state.dealerIndex + 1) % n;
 		const bbIdx = (state.dealerIndex + 2) % n;
 		const sb = state.players[sbIdx]!;

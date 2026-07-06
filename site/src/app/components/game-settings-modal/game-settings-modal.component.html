@@ -16,31 +16,42 @@
 
 		<ul class="settings-list">
 			@for (field of schema(); track field.key) {
-				<li class="setting-row">
+				<li class="setting-row" [class.setting-row-block]="field.type === 'blind-levels'">
 					<div class="setting-label">
 						<span class="setting-name">{{ field.label }}</span>
 						@if (field.hint) {
-							<span class="setting-hint">{{ field.hint }}</span>
+							<span class="setting-hint" [innerHTML]="field.hint"></span>
 						}
 					</div>
-					<div class="setting-control">
-						@if (field.type === 'toggle') {
-							<ion-toggle
-								[checked]="bool(field.key)"
-								[disabled]="!editable()"
-								(ionChange)="onToggle(field, $event)" />
-						} @else {
-							<input
-								class="setting-number"
-								type="number"
-								[value]="num(field.key)"
-								[attr.min]="field.min ?? null"
-								[attr.max]="field.max ?? null"
-								[attr.step]="field.step ?? 1"
-								[disabled]="!editable()"
-								(input)="onNumber(field, $event)" />
-						}
-					</div>
+					@if (field.type === 'blind-levels') {
+						<gg-blind-levels-editor
+							class="setting-block-control"
+							[levels]="list(field.key)"
+							[editable]="editable()"
+							[min]="field.min ?? 10"
+							[max]="field.max ?? 5000"
+							[step]="field.step ?? 10"
+							(changed)="onBlindLevels(field, $event)" />
+					} @else {
+						<div class="setting-control">
+							@if (field.type === 'toggle') {
+								<ion-toggle
+									[checked]="bool(field.key)"
+									[disabled]="!editable()"
+									(ionChange)="onToggle(field, $event)" />
+							} @else {
+								<input
+									class="setting-number"
+									type="number"
+									[value]="num(field.key)"
+									[attr.min]="field.min ?? null"
+									[attr.max]="field.max ?? null"
+									[attr.step]="field.step ?? 1"
+									[disabled]="!editable()"
+									(input)="onNumber(field, $event)" />
+							}
+						</div>
+					}
 				</li>
 			}
 		</ul>

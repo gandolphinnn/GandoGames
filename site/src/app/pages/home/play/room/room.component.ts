@@ -4,11 +4,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { roomAccessOption } from '@gandogames/lib/room-access';
 import { RoomService } from '@gandogames/services/room.service';
 import { UserService } from '@gandogames/services/user.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 import { ToastService } from '@gandogames/services/toast.service';
-import { ChatComponent, RefreshableContentComponent } from '@gandogames/components';
+import { ChatComponent, RefreshableContentComponent, RoomAccessModalComponent } from '@gandogames/components';
 import { RoomLobbyComponent } from './lobby/room-lobby.component';
 import { RoomGameComponent } from './game/room-game.component';
 
@@ -19,7 +20,7 @@ import { RoomGameComponent } from './game/room-game.component';
 @Component({
 	selector: 'gg-room',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, ChatComponent, RefreshableContentComponent, RoomGameComponent, RoomLobbyComponent, RouterLink],
+	imports: [...ION_IMPORTS, ChatComponent, RefreshableContentComponent, RoomAccessModalComponent, RoomGameComponent, RoomLobbyComponent, RouterLink],
 	templateUrl: './room.component.html',
 	styleUrl: './room.component.scss',
 })
@@ -35,6 +36,10 @@ export class RoomComponent implements OnInit {
 	public readonly roomId = signal('');
 	public readonly room = signal<RoomData | null>(null);
 	public readonly copied = signal(false);
+	public readonly showAccessModal = signal(false);
+
+	/** Icon + label describing the room's current access policy, for the toolbar action. */
+	public readonly accessBadge = computed(() => roomAccessOption(this.room()?.access ?? 'public'));
 
 	public readonly myId = computed(() => this.auth.user()?.player.id ?? '');
 	public readonly isHost = computed(() => this.room()?.hostId === this.myId());
@@ -115,5 +120,9 @@ export class RoomComponent implements OnInit {
 		await navigator.clipboard.writeText(window.location.href);
 		this.copied.set(true);
 		setTimeout(() => this.copied.set(false), 2000);
+	}
+
+	public openAccess(): void {
+		this.showAccessModal.set(true);
 	}
 }

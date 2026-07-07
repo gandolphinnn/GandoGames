@@ -51,6 +51,7 @@
 	ion-icon { font-size: 0.95rem; }
 
 	&-closed { color: $color-danger; }
+	&-restricted { color: $color-warning; }
 }
 
 // ── Seats (rendered inside gg-game-table's seat wrappers) ─────────────────────

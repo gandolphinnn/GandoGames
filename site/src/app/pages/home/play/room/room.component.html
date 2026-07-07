@@ -14,6 +14,11 @@
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
 				}
+				@if (isHost() && room()!.phase === 'waiting') {
+					<ion-button fill="clear" (click)="openAccess()" [title]="'Room access: ' + accessBadge().label">
+						<ion-icon [name]="accessBadge().icon" slot="icon-only" />
+					</ion-button>
+				}
 				@if (isHost()) {
 					<ion-button fill="clear" color="danger" (click)="closeRoom()" title="Close room">
 						<ion-icon name="trash" slot="icon-only" />
@@ -48,3 +53,11 @@
 		}
 	</gg-refreshable-content>
 </div>
+
+@if (showAccessModal() && room()) {
+	<gg-room-access-modal
+		[roomId]="roomId()"
+		[access]="room()!.access"
+		[editable]="isHost() && room()!.phase === 'waiting'"
+		(closed)="showAccessModal.set(false)" />
+}

@@ -23,7 +23,7 @@
 						<i [class]="'game-card-icon ' + game.icon"></i>
 						<span class="game-card-name">{{ game.name }}</span>
 						<span class="game-card-desc">{{ game.description }}</span>
-						<span class="game-card-players">{{ game.minPlayers }}–{{ game.maxPlayers }} players</span>
+						<span class="game-card-players">{{ playerCountLabel(game) }}</span>
 					</button>
 				}
 			</div>

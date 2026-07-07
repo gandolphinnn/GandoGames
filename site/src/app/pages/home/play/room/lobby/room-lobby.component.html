@@ -7,6 +7,7 @@
 			class="lobby-table"
 			fit="contain"
 			[variant]="preset().variant"
+			[shape]="preset().shape ?? 'oval'"
 			[label]="preset().label ?? null"
 			[seats]="seats()"
 			(seatClick)="onSeatClick($event.seat)">
@@ -16,6 +17,7 @@
 				<span class="lobby-meta-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }} players</span>
 				<span class="room-access-badge"
 					[class.room-access-badge-closed]="room()!.access === 'closed'"
+					[class.room-access-badge-restricted]="room()!.access === 'link' || room()!.access === 'friends'"
 					[title]="accessBadge().description">
 					<ion-icon [name]="accessBadge().icon" />
 					{{ accessBadge().label }}
@@ -71,18 +73,14 @@
 							<p class="status-msg">Waiting for the host to start…</p>
 						}
 
-						<div class="lobby-config-actions">
-							<ion-button fill="outline" size="small" (click)="openSettings()">
-								<ion-icon name="settings-outline" slot="start" />
-								{{ isHost() ? 'Game settings' : 'View settings' }}
-							</ion-button>
-							@if (isHost()) {
-								<ion-button fill="outline" size="small" (click)="openAccess()">
-									<ion-icon [name]="accessBadge().icon" slot="start" />
-									Room access
+						@if (hasSettings()) {
+							<div class="lobby-config-actions">
+								<ion-button fill="outline" size="small" (click)="openSettings()">
+									<ion-icon name="settings-outline" slot="start" />
+									{{ isHost() ? 'Game settings' : 'View settings' }}
 								</ion-button>
-							}
-						</div>
+							</div>
+						}
 					}
 					@case ('ended') {
 						<div class="game-over">
@@ -112,14 +110,6 @@
 				[settings]="room()!.settings ?? {}"
 				[editable]="isHost() && room()!.phase === 'waiting'"
 				(closed)="showSettingsModal.set(false)" />
-		}
-
-		@if (showAccessModal() && room()) {
-			<gg-room-access-modal
-				[roomId]="roomId()"
-				[access]="room()!.access"
-				[editable]="isHost() && room()!.phase === 'waiting'"
-				(closed)="showAccessModal.set(false)" />
 		}
 	}
 

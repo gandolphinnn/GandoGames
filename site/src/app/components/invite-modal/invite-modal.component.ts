@@ -1,11 +1,11 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { Friend, GameType } from '@gandogames/shared/api';
+import { Friend, GameType } from '@gandogames/shared/dto';
 import { FriendService } from '@gandogames/services/friend.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { UserService } from '@gandogames/services/user.service';
 import { ToastService } from '@gandogames/services/toast.service';
-import { PlayerAvatarComponent } from '../player-avatar/player-avatar.component';
+import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 
 @Component({
 	selector: 'gg-invite-modal',

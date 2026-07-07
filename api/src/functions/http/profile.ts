@@ -1,4 +1,4 @@
-import { BaseRequest, IconType, LangCode, ProfileUpdateRequest, ProfileData, Theme } from '@gandogames/shared/api';
+import { BaseRequest, IconType, LangCode, ProfileUpdateRequest, ProfileData, Theme } from '@gandogames/shared/dto';
 import { InnerFunction, pfPromise, PlayFabAdmin, PlayFabServer, registerFunction } from '../..';
 
 const DEFAULT_PROFILE_DATA: ProfileData = {

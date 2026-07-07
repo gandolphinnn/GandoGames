@@ -1,9 +1,9 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/api';
-import { UserService } from './user.service';
+import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 import { ToastService } from './toast.service';
+import { UserService } from './user.service';
 
 export type FriendRelationship = 'none' | 'incoming' | 'outgoing' | 'accepted';
 

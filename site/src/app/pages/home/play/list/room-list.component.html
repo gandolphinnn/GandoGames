@@ -10,6 +10,21 @@
 <gg-refreshable-content [fullscreen]="true" [onRefresh]="refreshFn">
 	<div class="rooms-page">
 		<div class="room-list-wrap">
+			<form class="join-code" (submit)="$event.preventDefault(); joinByCode()">
+				<input
+					class="join-code-input"
+					type="text"
+					inputmode="latin"
+					autocapitalize="characters"
+					placeholder="Have a code? Enter it to join a private room"
+					[value]="joinCode()"
+					(input)="onCodeInput($event)"
+				/>
+				<ion-button type="submit" fill="outline" [disabled]="!joinCode().trim() || checkingCode()">
+					{{ checkingCode() ? 'Checking…' : 'Join' }}
+				</ion-button>
+			</form>
+
 			@if (filteredRooms().length === 0) {
 				<div class="empty-state">
 					<ion-icon name="game-controller" class="empty-icon" />
@@ -23,7 +38,14 @@
 					@for (room of filteredRooms(); track room.id) {
 						<li class="room-card" (click)="navigateToRoom(room)">
 							<div class="room-card-info">
-								<span class="room-card-game">{{ gameLabel(room.game) }}</span>
+								<span class="room-card-game">
+									{{ gameLabel(room.game) }}
+									@if (accessBadge(room); as badge) {
+										<span class="room-card-badge" [title]="badge.label">
+											<ion-icon [name]="badge.icon" />
+										</span>
+									}
+								</span>
 								<span class="room-card-players-list">{{ playerNames(room) }}</span>
 							</div>
 							<span class="room-card-count">

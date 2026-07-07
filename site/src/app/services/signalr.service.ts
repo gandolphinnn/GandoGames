@@ -1,7 +1,7 @@
 import { effect, inject, Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/api';
+import { ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { UserService } from './user.service';
 
@@ -11,10 +11,6 @@ export class SignalRService {
 	private readonly backend = inject(BackendService);
 	private connection?: HubConnection;
 	private negotiateCache?: { response: NegotiateResponse; expiresAt: number };
-
-	public get connectionStatus() {
-		return this.connection?.state;
-	}
 
 	public readonly events = {
 		roomUpsert: new Subject<RoomData>(),

@@ -5,7 +5,7 @@
 	"compilerOptions": {
 		"rootDir": "..",
 		"paths": {
-			"@gandogames/shared/api": ["../shared/index"],
+			"@gandogames/shared/dto": ["../shared/index"],
 			"@gandogames/shared/*": ["../shared/games/*"],
 			"@gandogames/lib/*": ["./lib/*"],
 			"@gandogames/services/*": ["./src/app/services/*"],

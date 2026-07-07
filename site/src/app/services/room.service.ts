@@ -1,8 +1,8 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/api';
-import { UserService } from './user.service';
+import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameSettings, GameSettingsSetRequest, GameState, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
+import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
@@ -18,11 +18,17 @@ export class RoomService {
 		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
 
-	/** Rooms to show in the browse list (/play): everything except rooms the player is already in —
-	 *  those are surfaced separately in the menu's "Active Rooms" via myRooms. */
+	/** Rooms to show in the browse list (/play): everything except rooms the player is already in
+	 *  (those are surfaced separately in the menu's "Active Rooms" via myRooms) and unlisted rooms
+	 *  (link/closed), which are reachable only by code or invite. The cache can receive an unlisted
+	 *  room via the global roomUpsert broadcast, so we filter here too, not just on the server list. */
 	public readonly browsableRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
-		return this.rooms().filter(r => !userId || !r.players.some(p => p.id === userId));
+		return this.rooms().filter(r => {
+			const access = r.access ?? 'public';
+			const notInRoom = !userId || !r.players.some(p => p.id === userId);
+			return notInRoom && (access === 'public' || access === 'friends');
+		});
 	});
 
 	private get ticket(): string {
@@ -81,6 +87,16 @@ export class RoomService {
 		return this.backend.post<RoomData>('/rooms/start', request);
 	}
 
+	public resetRoom(roomId: string): Promise<void> {
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<void>('/rooms/reset', request);
+	}
+
+	public setRoomAccess(roomId: string, access: RoomAccessPolicy): Promise<RoomData> {
+		const request: RoomAccessSetRequest = { sessionTicket: this.ticket, roomId, access };
+		return this.backend.post<RoomData>('/rooms/access', request);
+	}
+
 	public kickPlayer(roomId: string, playerId: string): Promise<void> {
 		const request: RoomKickRequest = { sessionTicket: this.ticket, roomId, playerId };
 		return this.backend.post<void>('/rooms/kick', request);
@@ -109,5 +125,10 @@ export class RoomService {
 	public gameAction(game: GameType, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
 		const request: GameActionRequest = { sessionTicket: this.ticket, game, roomId, action, data: data ?? null };
 		return this.backend.post<GameState | null>('/game/action', request);
+	}
+
+	public setGameSettings(game: GameType, roomId: string, settings: GameSettings): Promise<RoomData> {
+		const request: GameSettingsSetRequest = { sessionTicket: this.ticket, game, roomId, settings };
+		return this.backend.post<RoomData>('/game/settings/set', request);
 	}
 }

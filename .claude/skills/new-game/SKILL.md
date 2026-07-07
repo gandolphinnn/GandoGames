@@ -21,7 +21,7 @@ Read every file listed below before asking the user anything or generating any c
 
 **Reference implementation (pankov — the canonical game):**
 - `shared/games/pankov.ts` — shared state/player/action types
-- `api/src/games/game.ts` — abstract `Game<TState>` class + `GAMES_CONFIG`
+- `api/src/games/game.ts` — abstract `Game<TState>` class; `shared/games/config.ts` — `GAMES_CONFIG` (player limits)
 - `api/src/games/pankov.ts` — complete `Game` implementation
 - `api/src/games/index.ts` — `Game.Factory` wiring
 - `site/lib/games/pankov/src/pankov.models.ts` — frontend models + constants
@@ -29,10 +29,10 @@ Read every file listed below before asking the user anything or generating any c
 - `site/lib/games/pankov/src/pankov-game.component.html` — template patterns (`@let`, `@switch`, input-signal-driven state)
 - `site/lib/games/pankov/src/pankov-game.component.scss` — SCSS conventions
 - `site/lib/games/pankov/index.ts` — package export
-- `site/lib/common/` — reusable game widgets (dice, french-card, player-chip) to compose from
+- `site/lib/common/` — reusable game widgets (french-card, chips, game-table, player-avatar) to compose from
 
 **Files to modify (read before editing):**
-- `shared/src/game.ts` — `GameType` union
+- `shared/dto/game.ts` — `GameType` union
 - `shared/index.ts` — top-level re-exports
 - `site/tsconfig.json` — path aliases
 - `site/lib/game-registry.ts` — `GAME_REGISTRY` (`Record<GameType, GameDescriptor>`, including each game's `component`)
@@ -87,7 +87,7 @@ Follow `shared/games/pankov.ts` as the template:
 - `<Name>RoundResult` (if applicable)
 - `<Name>RoomState extends RoomData`
 
-### 3.2 `shared/src/game.ts`
+### 3.2 `shared/dto/game.ts`
 
 Add `| '<name>'` to the `GameType` union. Nothing else.
 
@@ -99,9 +99,9 @@ Implement `<Name>Game extends Game<<Name>GameState>`:
 - `getPublicState(playerId)` — strip hidden fields from opponents if applicable
 - `action(player, action, data)` — dispatch to private methods; update `state.lastUpdate = new Date()` in each; return `this.state!` for unknown actions
 
-### 3.4 `api/src/games/game.ts`
+### 3.4 `shared/games/config.ts`
 
-Add `'<name>': { minPlayers: N, maxPlayers: M }` to `GAMES_CONFIG`.
+Add `'<name>': { minPlayers: N, maxPlayers: M }` to `GAMES_CONFIG` (shared by the API and the site registry).
 
 ### 3.5 `api/src/games/index.ts`
 
@@ -120,10 +120,10 @@ Re-export shared types + frontend-only constants (display labels, etc.).
 Standalone Angular component following `pankov-game.component.ts` exactly. It implements `GameComponent<<Name>GameState>` (`site/lib/game-registry.ts`) and is **driven by `RoomPlayComponent`** — it injects no services, fetches no state, and does not know the `roomId`:
 - Selector: `gg-<name>-game`
 - Inputs (signals): `gameState = input.required<<Name>GameState | null>()`, `loading = input.required<boolean>()`, `error = input.required<string | null>()`, `myPlayFabId = input.required<string | null>()`
-- Outputs: `gameAction = output<{ action: string; data?: unknown }>()`, `back = output<void>()`, `playAgain = output<void>()`
+- Outputs: `gameAction = output<{ action: string; data?: unknown }>()`, `playAgain = output<void>()`
 - Action handlers emit, e.g. `this.gameAction.emit({ action: 'roll' })`; `RoomPlayComponent` POSTs `/game/action` and feeds the next state back into `gameState`
 - Derive view state with `computed()` from the `gameState()` input (e.g. `isMyTurn`, current player)
-- Reuse shared widgets from `site/lib/common` where applicable (e.g. `PlayerChipComponent`); if a widget could serve other games, add it there rather than inline
+- Reuse shared widgets from `site/lib/common` where applicable (e.g. `GameTableComponent`, `FrenchCardComponent`); if a widget could serve other games, add it there rather than inline
 - Use `public` for the interface inputs/outputs and `private`/`protected` for the rest; `protected` for template-only members
 
 ### 3.9 `site/lib/games/<name>/src/<name>-game.component.html`
@@ -135,10 +135,6 @@ Required structure:
   <div class="game-loading"><p>Loading game…</p></div>
 } @else {
   <div class="<name>-game">
-    <header class="game-header">
-      <button class="game-back" (click)="back.emit()">← Back</button>
-      <h1 class="game-title"><Display Name></h1>
-    </header>
     <!-- players strip -->
     <main class="game-panel">
       @switch (gs.gamePhase) {

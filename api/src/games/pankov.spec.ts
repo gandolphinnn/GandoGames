@@ -1,6 +1,6 @@
-import { PankovGame } from './pankov';
-import type { GamePlayer } from '@gandogames/shared/api';
+import type { GamePlayer } from '@gandogames/shared/dto';
 import type { RollValue } from '@gandogames/shared/pankov';
+import { PankovGame } from './pankov';
 
 const p1: GamePlayer = { id: 'p1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
 const p2: GamePlayer = { id: 'p2', name: 'Bob', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
@@ -209,6 +209,80 @@ describe('PankovGame', () => {
 			rollTo(game, p1, 31);
 			game.action(p1, 'declare', { declaration: 31 as RollValue });
 			expect(game.state!.currentPlayerIndex).toBe(2); // skipped p2, landed on p3
+		});
+	});
+
+	describe('settings & sudden death', () => {
+		it('seeds a custom initial lives count', () => {
+			game.initialize([p1, p2], { initialLives: 3 });
+			expect(game.state!.players.every(p => p.lives === 3)).toBe(true);
+		});
+
+		it('doubles the lives a wrong challenger loses during a Pankov run', () => {
+			game.initialize([p1, p2], { suddenDeath: true, initialLives: 8 });
+			rollTo(game, p1, 31);
+			game.action(p1, 'declare', { declaration: 21 as RollValue }); // Pankov run, streak 1
+			rollTo(game, p2, 21);
+			game.action(p2, 'declare', { declaration: 21 as RollValue }); // honest Pankov, streak 2
+			game.action(p1, 'challenge', {});                             // p1 wrongly challenges
+
+			const r = game.state!.revealResult!;
+			expect(r.wasLying).toBe(false);
+			expect(r.loserIndex).toBe(0);   // p1, the challenger
+			expect(r.livesLost).toBe(2);    // 2^(streak-1) = 2^1
+			expect(game.state!.players[0].lives).toBe(6);
+		});
+
+		it('keeps doubling along a longer Pankov run (streak 3 → 4 lives)', () => {
+			game.initialize([p1, p2], { suddenDeath: true, initialLives: 8 });
+			rollTo(game, p1, 31);
+			game.action(p1, 'declare', { declaration: 21 as RollValue }); // streak 1
+			rollTo(game, p2, 21);
+			game.action(p2, 'declare', { declaration: 21 as RollValue }); // streak 2
+			rollTo(game, p1, 21);
+			game.action(p1, 'declare', { declaration: 21 as RollValue }); // streak 3 (honest)
+			game.action(p2, 'challenge', {});                             // p2 wrongly challenges
+
+			expect(game.state!.revealResult!.livesLost).toBe(4); // 2^(3-1)
+			expect(game.state!.players[1].lives).toBe(4);
+		});
+
+		it('still costs a caught liar only one life under sudden death', () => {
+			game.initialize([p1, p2], { suddenDeath: true });
+			rollTo(game, p1, 31);
+			game.action(p1, 'declare', { declaration: 21 as RollValue });
+			rollTo(game, p2, 31);                                         // p2 rolls 31 …
+			game.action(p2, 'declare', { declaration: 21 as RollValue }); // … but lies "Pankov"
+			game.action(p1, 'challenge', {});                             // catches the lie
+
+			const r = game.state!.revealResult!;
+			expect(r.wasLying).toBe(true);
+			expect(r.loserIndex).toBe(1); // p2, the liar
+			expect(r.livesLost).toBe(1);  // doubling never applies to a caught liar
+			expect(game.state!.players[1].lives).toBe(7);
+		});
+
+		it('does not double a wrong challenge when sudden death is off', () => {
+			game.initialize([p1, p2], { suddenDeath: false });
+			rollTo(game, p1, 31);
+			game.action(p1, 'declare', { declaration: 21 as RollValue });
+			rollTo(game, p2, 21);
+			game.action(p2, 'declare', { declaration: 21 as RollValue });
+			game.action(p1, 'challenge', {});
+
+			expect(game.state!.revealResult!.livesLost).toBe(1);
+			expect(game.state!.players[0].lives).toBe(7);
+		});
+
+		it('resets the Pankov streak after a round ends', () => {
+			game.initialize([p1, p2], { suddenDeath: true, initialLives: 8 });
+			rollTo(game, p1, 31);
+			game.action(p1, 'declare', { declaration: 21 as RollValue }); // streak 1
+			rollTo(game, p2, 21);
+			game.action(p2, 'declare', { declaration: 21 as RollValue }); // streak 2
+			game.action(p1, 'challenge', {});
+			game.action(p1, 'continue', {});
+			expect(game.state!.pankovStreak).toBe(0);
 		});
 	});
 

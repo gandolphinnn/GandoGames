@@ -1,13 +1,14 @@
 import { Component, computed, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
-import { PankovGameState, formatValue, getRank, INITIAL_LIVES, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
-import { PlayerChipComponent, type PlayerChipData } from '@gandogames/lib/common/player-chip';
+import { PankovGameState, type PankovPlayer, formatValue, getRank, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';
+import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
+import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 
 @Component({
 	selector: 'gg-pankov-game',
 	standalone: true,
-	imports: [IonButton, PlayerChipComponent],
+	imports: [IonButton, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent],
 	templateUrl: './pankov-game.component.html',
 	styleUrl: './pankov-game.component.scss',
 })
@@ -17,25 +18,44 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	public readonly error = input.required<string | null>();
 	public readonly myPlayFabId = input.required<string | null>();
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
-	public readonly back = output<void>();
 	public readonly playAgain = output<void>();
 
 	protected readonly ROLL_VALUES = ROLL_VALUES;
 	protected readonly formatValue = formatValue;
-	protected readonly livesRange = Array.from({ length: INITIAL_LIVES }, (_, i) => i);
 
-	protected readonly playerChips = computed((): PlayerChipData[] => {
+	/** Life-pip slots, sized to the room's configured starting lives. */
+	protected readonly livesRange = computed(() => {
+		const max = this.gameState()?.settings.initialLives ?? INITIAL_LIVES;
+		return Array.from({ length: max }, (_, i) => i);
+	});
+
+	/**
+	 * Lives a wrong challenge would cost right now: 1 normally, or 2^(streak-1) during a Pankov run
+	 * when sudden death is on. Drives the "risk" hint on the Challenge button.
+	 */
+	protected readonly challengeStake = computed(() => {
+		const gs = this.gameState();
+		if (!gs || !gs.settings.suddenDeath) return 1;
+		if (gs.previousDeclaration !== PANKOV_VALUE || gs.pankovStreak < 1) return 1;
+		return Math.pow(2, gs.pankovStreak - 1);
+	});
+
+	/** Seat ring: only the seated players, me rotated to bottom-centre — no empty seats in-game. */
+	protected readonly seats = computed<TableSeat[]>(() => {
 		const gs = this.gameState();
 		if (!gs) return [];
 		const isActive = gs.gamePhase !== 'result' && gs.gamePhase !== 'game-over';
 		const currentId = gs.players[gs.currentPlayerIndex]?.id;
-		return gs.players.map(p => ({
-			id: p.id,
-			name: p.name,
-			lives: p.lives,
-			highlight: isActive && p.id === currentId,
+		return buildTableSeats(gs.players, this.myPlayFabId(), gs.players.length, p => ({
+			isCurrentTurn: isActive && p.id === currentId,
+			faded: p.lives === 0,
 		}));
 	});
+
+	/** Narrow a seat's player back to the pankov shape (`buildTableSeats` preserves the object). */
+	protected seatPlayer(seat: TableSeat): PankovPlayer | null {
+		return seat.player as PankovPlayer | null;
+	}
 
 	protected readonly currentPlayer = computed(() => {
 		const gs = this.gameState();

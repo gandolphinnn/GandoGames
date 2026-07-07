@@ -1,99 +1,17 @@
-import type { GamePlayer } from '@gandogames/shared/api';
-import type { Card, PokerGameState, PokerPlayer } from '@gandogames/shared/poker';
-import { MIN_RAISE, STARTING_CHIPS } from '@gandogames/shared/poker';
-import type { Rank } from '@gandogames/shared/cards';
-import { createDeck, shuffle } from '@gandogames/shared/cards';
+import type { GamePlayer, GameSettings } from '@gandogames/shared/dto';
+import { type Card, createDeck, shuffle } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, levelForElapsed, pokerDeckRanks, resolvePokerSettings, smallBlindFor } from '@gandogames/shared/poker';
 import { Game } from './game';
 
-const SMALL_BLIND = 50;
-const BIG_BLIND = 100;
-
-const RANK_VALUE: Record<Rank, number> = {
-	'2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
-	'8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13, 'A': 14,
-};
-
-function combinations<T>(arr: T[], k: number): T[][] {
-	if (k === 0) return [[]];
-	if (arr.length < k) return [];
-	const [first, ...rest] = arr;
-	return [
-		...combinations(rest, k - 1).map(c => [first!, ...c]),
-		...combinations(rest, k),
-	];
-}
-
-interface HandRank {
-	category: number;
-	tiebreakers: number[];
-	description: string;
-}
-
-function compareHandRanks(a: HandRank, b: HandRank): number {
-	if (a.category !== b.category) return a.category - b.category;
-	for (let i = 0; i < Math.max(a.tiebreakers.length, b.tiebreakers.length); i++) {
-		const diff = (a.tiebreakers[i] ?? 0) - (b.tiebreakers[i] ?? 0);
-		if (diff !== 0) return diff;
-	}
-	return 0;
-}
-
-function evaluateFiveCard(cards: Card[]): HandRank {
-	const values = cards.map(c => RANK_VALUE[c.rank]).sort((a, b) => b - a);
-	const isFlush = cards.every(c => c.suit === cards[0]!.suit);
-	const unique = [...new Set(values)].sort((a, b) => b - a);
-
-	const isWheelStraight = unique.length === 5 &&
-		unique[0] === 14 && unique[1] === 5 && unique[2] === 4 && unique[3] === 3 && unique[4] === 2;
-	const isNormalStraight = unique.length === 5 && unique[0]! - unique[4]! === 4;
-	const isStraight = isNormalStraight || isWheelStraight;
-	const straightValues = isWheelStraight ? [5, 4, 3, 2, 1] : values;
-
-	const freq: Record<number, number> = {};
-	for (const v of values) freq[v] = (freq[v] ?? 0) + 1;
-	const groups = Object.entries(freq)
-		.map(([k, c]) => ({ v: Number(k), c }))
-		.sort((a, b) => b.c - a.c || b.v - a.v);
-	const tiebreakers = groups.flatMap(({ v, c }) => Array<number>(c).fill(v));
-
-	const topCount = groups[0]?.c ?? 1;
-	const secondCount = groups[1]?.c ?? 0;
-
-	if (isFlush && isStraight) {
-		const isRoyal = !isWheelStraight && values[0] === 14;
-		return { category: 8, tiebreakers: straightValues, description: isRoyal ? 'Royal Flush' : 'Straight Flush' };
-	}
-	if (topCount === 4) return { category: 7, tiebreakers, description: 'Four of a Kind' };
-	if (topCount === 3 && secondCount === 2) return { category: 6, tiebreakers, description: 'Full House' };
-	if (isFlush) return { category: 5, tiebreakers: values, description: 'Flush' };
-	if (isStraight) return { category: 4, tiebreakers: straightValues, description: 'Straight' };
-	if (topCount === 3) return { category: 3, tiebreakers, description: 'Three of a Kind' };
-	if (topCount === 2 && secondCount === 2) return { category: 2, tiebreakers, description: 'Two Pair' };
-	if (topCount === 2) return { category: 1, tiebreakers, description: 'One Pair' };
-	return { category: 0, tiebreakers: values, description: 'High Card' };
-}
-
-function evaluateHand(cards: Card[]): HandRank {
-	if (cards.length <= 5) return evaluateFiveCard(cards);
-	let best: HandRank | null = null;
-	for (const combo of combinations(cards, 5)) {
-		const rank = evaluateFiveCard(combo);
-		if (!best || compareHandRanks(rank, best) > 0) best = rank;
-	}
-	return best!;
-}
-
 export class PokerGame extends Game<PokerGameState> {
-	public override minPlayers = 2;
-	public override maxPlayers = 8;
-
-	public override initialize(players: GamePlayer[]): void {
+	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
+		const resolved = resolvePokerSettings(settings);
 		this.state = {
 			lastUpdate: new Date(),
 			gamePhase: 'pre-flop',
 			players: players.map(p => ({
 				...p,
-				chips: STARTING_CHIPS,
+				chips: resolved.startingChips,
 				cards: [],
 				streetBet: 0,
 				folded: false,
@@ -106,15 +24,24 @@ export class PokerGame extends Game<PokerGameState> {
 			currentBet: 0,
 			currentPlayerIndex: 0,
 			dealerIndex: 0,
+			settings: resolved,
+			startedAt: new Date(),
+			blindLevel: 0,
+			bigBlind: resolved.blindLevels[0]!.bigBlind,
 		};
 		this.startNewHand();
 	}
 
 	public override getPublicState(playerId: string): PokerGameState {
 		if (!this.state) throw new Error('Game not initialized');
+		// Hole cards are revealed only at a *contested* showdown (more than one player still in).
+		// An uncontested win — everyone else folded — is taken without showing, so the lone winner's
+		// hand stays hidden. Folded hands are always mucked, even at a real showdown.
+		const contestedShowdown = this.state.gamePhase === 'showdown' &&
+			this.state.players.filter(p => !p.folded).length > 1;
 		const players = this.state.players.map(p => {
 			if (p.id === playerId) return p;
-			if (this.state!.gamePhase === 'showdown') return p;
+			if (contestedShowdown && !p.folded) return p;
 			return { ...p, cards: [] as Card[] };
 		});
 		return { ...this.state, players, deck: [] };
@@ -133,7 +60,8 @@ export class PokerGame extends Game<PokerGameState> {
 			case 'fold': return this.applyFold(player.id);
 			case 'check': return this.applyCheck(player.id);
 			case 'call': return this.applyCall(player.id);
-			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? MIN_RAISE);
+			case 'raise': return this.applyRaise(player.id, data?.amount as number ?? this.state.bigBlind);
+			case 'all-in': return this.applyAllIn(player.id);
 			default: return this.state;
 		}
 	}
@@ -176,7 +104,7 @@ export class PokerGame extends Game<PokerGameState> {
 	private applyRaise(playerId: string, raiseBy: number): PokerGameState {
 		const state = this.state!;
 		const player = state.players.find(p => p.id === playerId)!;
-		const newTotalBet = state.currentBet + Math.max(raiseBy, MIN_RAISE);
+		const newTotalBet = state.currentBet + Math.max(raiseBy, state.bigBlind);
 		const actualTotalBet = Math.min(newTotalBet, player.chips + player.streetBet);
 		const toPut = actualTotalBet - player.streetBet;
 		if (toPut <= 0 || toPut > player.chips) return state;
@@ -188,6 +116,29 @@ export class PokerGame extends Game<PokerGameState> {
 		player.hasActed = true;
 		for (const p of state.players) {
 			if (p.id !== playerId && !p.folded && !p.isAllIn) p.hasActed = false;
+		}
+		this.advanceAfterAction();
+		state.lastUpdate = new Date();
+		return state;
+	}
+
+	private applyAllIn(playerId: string): PokerGameState {
+		const state = this.state!;
+		const player = state.players.find(p => p.id === playerId)!;
+		const toPut = player.chips;
+		if (toPut <= 0) return state;
+		player.chips = 0;
+		player.streetBet += toPut;
+		state.pot += toPut;
+		player.isAllIn = true;
+		player.hasActed = true;
+		// Pushing past the current bet is a raise: everyone still in must act again. A short all-in
+		// (stack below the call amount) only matches part of it — it must NOT lower the bet for others.
+		if (player.streetBet > state.currentBet) {
+			state.currentBet = player.streetBet;
+			for (const p of state.players) {
+				if (p.id !== playerId && !p.folded && !p.isAllIn) p.hasActed = false;
+			}
 		}
 		this.advanceAfterAction();
 		state.lastUpdate = new Date();
@@ -320,13 +271,17 @@ export class PokerGame extends Game<PokerGameState> {
 			.filter(p => compareHandRanks(ranks.get(p.id)!, bestRank!) === 0)
 			.map(p => p.id);
 		const hands: Record<string, string> = {};
-		for (const [id, r] of ranks) hands[id] = r.description;
+		for (const [id, r] of ranks) hands[id] = describeHand(r);
 		state.result = { winners, hands, potAmount: state.pot };
 		state.gamePhase = 'showdown';
 	}
 
 	private startNewHand(): void {
 		const state = this.state!;
+		// Self-heal a game persisted before blind schedules existed: backfill the schedule/clock so an
+		// in-flight legacy hand can advance instead of crashing on the missing fields.
+		if (!state.settings.blindLevels?.length) state.settings = resolvePokerSettings(state.settings as unknown as GameSettings);
+		if (!state.startedAt) state.startedAt = new Date();
 		for (const p of state.players) {
 			p.cards = [];
 			p.streetBet = 0;
@@ -334,27 +289,34 @@ export class PokerGame extends Game<PokerGameState> {
 			p.hasActed = false;
 			p.isAllIn = false;
 		}
-		state.deck = shuffle(createDeck());
+		state.deck = shuffle(createDeck(pokerDeckRanks(state.players.length, state.settings.smallerDeck)));
 		state.communityCards = [];
 		state.pot = 0;
 		state.result = undefined;
 		const n = state.players.length;
 		for (const p of state.players) p.cards = [state.deck.pop()!, state.deck.pop()!];
+		// Blinds escalate on a real-time clock: pick the level for how long the game's been running and
+		// lock it in for this hand. Big blind = that level's; small blind is half of it (floored).
+		const level = levelForElapsed(state.settings.blindLevels, Date.now() - new Date(state.startedAt).getTime());
+		state.blindLevel = level;
+		const bigBlind = state.settings.blindLevels[level]!.bigBlind;
+		state.bigBlind = bigBlind;
+		const smallBlind = smallBlindFor(bigBlind);
 		const sbIdx = (state.dealerIndex + 1) % n;
 		const bbIdx = (state.dealerIndex + 2) % n;
 		const sb = state.players[sbIdx]!;
 		const bb = state.players[bbIdx]!;
-		const sbAmount = Math.min(SMALL_BLIND, sb.chips);
+		const sbAmount = Math.min(smallBlind, sb.chips);
 		sb.chips -= sbAmount;
 		sb.streetBet = sbAmount;
 		state.pot += sbAmount;
 		if (sb.chips === 0) sb.isAllIn = true;
-		const bbAmount = Math.min(BIG_BLIND, bb.chips);
+		const bbAmount = Math.min(bigBlind, bb.chips);
 		bb.chips -= bbAmount;
 		bb.streetBet = bbAmount;
 		state.pot += bbAmount;
 		if (bb.chips === 0) bb.isAllIn = true;
-		state.currentBet = BIG_BLIND;
+		state.currentBet = bigBlind;
 		// Heads-up: dealer/SB acts first pre-flop; otherwise UTG (after BB) acts first
 		state.currentPlayerIndex = n === 2 ? sbIdx : (bbIdx + 1) % n;
 		state.gamePhase = 'pre-flop';

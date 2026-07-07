@@ -8,9 +8,11 @@
 		"esModuleInterop": true,
 		"moduleResolution": "node16",
 		"sourceMap": true,
+		"skipLibCheck": true,
 		"types": [ "node", "jest" ],
 		"paths": {
-			"@gandogames/shared/api": ["../shared/index"],
+			"@gandogames/shared/dto": ["../shared/index"],
+			"@gandogames/shared/common": ["../shared/games/common"],
 			"@gandogames/shared/*": ["../shared/games/*"],
 		}
 	}

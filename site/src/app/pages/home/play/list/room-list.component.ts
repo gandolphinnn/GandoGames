@@ -1,8 +1,9 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RoomSummary } from '@gandogames/shared/api';
+import { RoomSummary } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
+import { roomAccessOption } from '@gandogames/lib/room-access';
 import { RoomService } from '@gandogames/services/room.service';
 import { RefreshableContentComponent } from '@gandogames/components';
 
@@ -22,6 +23,8 @@ export class RoomListComponent implements OnInit {
 	public readonly activeGames = signal<string[]>([]);
 	public readonly browsableRooms = this.roomService.browsableRooms;
 	public readonly loading = signal(false);
+	public readonly joinCode = signal('');
+	public readonly checkingCode = signal(false);
 
 	public readonly filteredRooms = computed(() => {
 		const active = this.activeGames();
@@ -42,6 +45,30 @@ export class RoomListComponent implements OnInit {
 
 	public playerNames(room: RoomSummary): string {
 		return room.players.map((p) => p.name).join(', ');
+	}
+
+	/** Access badge metadata for a room; null for plain public rooms (no badge shown). */
+	public accessBadge(room: RoomSummary): { icon: string; label: string } | null {
+		const access = room.access ?? 'public';
+		return access === 'public' ? null : roomAccessOption(access);
+	}
+
+	public onCodeInput(event: Event): void {
+		this.joinCode.set((event.target as HTMLInputElement).value);
+	}
+
+	/** Verify the room exists (and is reachable by this player) before navigating; a closed room the
+	 *  player isn't in resolves as "not found" on the server, so it can't be entered by code either. */
+	public async joinByCode(): Promise<void> {
+		const code = this.joinCode().trim().toUpperCase();
+		if (!code || this.checkingCode()) return;
+		this.checkingCode.set(true);
+		try {
+			await this.roomService.getRoom(code);
+			void this.router.navigate(['/play', code]);
+		} finally {
+			this.checkingCode.set(false);
+		}
 	}
 
 	public ngOnInit(): void {

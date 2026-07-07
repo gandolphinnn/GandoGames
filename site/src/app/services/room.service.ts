@@ -87,6 +87,11 @@ export class RoomService {
 		return this.backend.post<RoomData>('/rooms/start', request);
 	}
 
+	public resetRoom(roomId: string): Promise<void> {
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<void>('/rooms/reset', request);
+	}
+
 	public setRoomAccess(roomId: string, access: RoomAccessPolicy): Promise<RoomData> {
 		const request: RoomAccessSetRequest = { sessionTicket: this.ticket, roomId, access };
 		return this.backend.post<RoomData>('/rooms/access', request);
@@ -120,11 +125,6 @@ export class RoomService {
 	public gameAction(game: GameType, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
 		const request: GameActionRequest = { sessionTicket: this.ticket, game, roomId, action, data: data ?? null };
 		return this.backend.post<GameState | null>('/game/action', request);
-	}
-
-	public getGameSettings(game: GameType, roomId: string): Promise<GameSettings> {
-		const request: GameBaseRequest = { sessionTicket: this.ticket, game, roomId };
-		return this.backend.post<GameSettings>('/game/settings/get', request);
 	}
 
 	public setGameSettings(game: GameType, roomId: string, settings: GameSettings): Promise<RoomData> {

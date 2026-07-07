@@ -18,10 +18,8 @@
 			[style.left.%]="positions()[i].left"
 			[style.top.%]="positions()[i].top"
 			(click)="seatClick.emit({ seat, index: i })">
-			@if (!seat.player && emptySeatDef()) {
-				<ng-container *ngTemplateOutlet="emptySeatDef()!.template; context: { $implicit: seat, index: i }" />
-			} @else if (seatDef()) {
-				<ng-container *ngTemplateOutlet="seatDef()!.template; context: { $implicit: seat, index: i }" />
+			@if (seatDef(); as def) {
+				<ng-container *ngTemplateOutlet="def.template; context: { $implicit: seat, index: i }" />
 			}
 			@if (showDealerChip() && seat.isDealer) {
 				<span class="dealer-chip" title="Dealer">D</span>

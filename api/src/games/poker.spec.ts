@@ -1,7 +1,7 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
 import { resolveSettings } from '@gandogames/shared/dto';
-import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, estimateWinOdds, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
+import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
@@ -48,24 +48,6 @@ describe('describeHand', () => {
 	it('labels two pair with both ranks', () => {
 		const hand = evaluateHand([c('K', 'spades'), c('K', 'hearts'), c('Q', 'clubs'), c('Q', 'diamonds'), c('2', 'spades')]);
 		expect(describeHand(hand)).toBe('Two Pair: K & Q');
-	});
-});
-
-describe('estimateWinOdds', () => {
-	it('returns certainty for an unbeatable made hand', () => {
-		// Royal flush already on the board+hole — no opponent can beat or tie it.
-		const odds = estimateWinOdds(
-			[c('A', 'spades'), c('K', 'spades')],
-			[c('Q', 'spades'), c('J', 'spades'), c('10', 'spades')],
-			1,
-		);
-		expect(odds).toBe(1);
-	});
-
-	it('stays within [0, 1] for a marginal hand', () => {
-		const odds = estimateWinOdds([c('7', 'spades'), c('2', 'hearts')], [c('K', 'clubs'), c('Q', 'diamonds'), c('9', 'spades')], 3, 500);
-		expect(odds).toBeGreaterThanOrEqual(0);
-		expect(odds).toBeLessThanOrEqual(1);
 	});
 });
 
@@ -197,7 +179,7 @@ describe('resolveSettings', () => {
 		expect(s['startingChips']).toBe(500);
 		expect(s['blindLevels']).toEqual([{ bigBlind: 20, durationMinutes: 0 }]);
 		expect(s['smallerDeck']).toBe(false);
-		expect('showWinOdds' in s).toBe(false);
+		expect(Object.keys(s).sort()).toEqual(['blindLevels', 'smallerDeck', 'startingChips']);
 	});
 
 	it('clamps numbers into range and drops unknown keys', () => {

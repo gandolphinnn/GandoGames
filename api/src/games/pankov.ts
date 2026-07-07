@@ -3,9 +3,6 @@ import { type PankovGameState, type RollValue, PANKOV_VALUE, ROLL_VALUES, getRan
 import { Game } from './game';
 
 export class PankovGame extends Game<PankovGameState> {
-	public override minPlayers = 2;
-	public override maxPlayers = 6;
-
 	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
 		const resolved = resolvePankovSettings(settings);
 		this.state = {

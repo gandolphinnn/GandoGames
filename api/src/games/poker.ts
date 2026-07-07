@@ -4,9 +4,6 @@ import { type PokerGameState, type HandRank, compareHandRanks, describeHand, eva
 import { Game } from './game';
 
 export class PokerGame extends Game<PokerGameState> {
-	public override minPlayers = 2;
-	public override maxPlayers = 8;
-
 	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
 		const resolved = resolvePokerSettings(settings);
 		this.state = {

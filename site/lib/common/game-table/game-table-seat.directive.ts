@@ -20,13 +20,3 @@ export class GameTableSeatDef {
 		return true;
 	}
 }
-
-/** Optional override for the default open-seat visual (falls back to the seat template). */
-@Directive({ selector: '[ggTableEmptySeat]', standalone: true })
-export class GameTableEmptySeatDef {
-	public readonly template = inject<TemplateRef<SeatContext>>(TemplateRef);
-
-	public static ngTemplateContextGuard(_dir: GameTableEmptySeatDef, ctx: unknown): ctx is SeatContext {
-		return true;
-	}
-}

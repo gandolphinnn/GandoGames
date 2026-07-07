@@ -29,7 +29,7 @@ GandoGames/
 └── site/                   # Angular 20 SPA (Ionic)
     ├── src/app/            # pages, components, services, guards
     ├── lib/games/          # Self-contained game packages (pankov, poker)
-    ├── lib/common/         # Reusable game widgets (dice, french-card, player-chip)
+    ├── lib/common/         # Reusable game widgets (french-card, chips, game-table, player-avatar)
     └── public/             # Static assets (manifest.webmanifest, …)
 ```
 
@@ -155,7 +155,7 @@ export const environment = {
 3. Register the game in `site/lib/game-registry.ts` — add a `GAME_REGISTRY` entry (metadata + the `component`).
 4. Add the server-side logic under `api/src/games/` and wire it into `Game.Factory`.
 
-When building game UI, reuse or extend the shared widgets in `site/lib/common/` (dice, cards, chips) where sensible — see the component-reuse rule in `CLAUDE.md`.
+When building game UI, reuse or extend the shared widgets in `site/lib/common/` (cards, chips, game table) where sensible — see the component-reuse rule in `CLAUDE.md`.
 
 ## Deployment
 

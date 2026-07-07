@@ -1,4 +1,4 @@
-import { BlindLevel, GamePlayer, GameSettings, GameSettingsSchema, GameState, RoomData, resolveSettings } from "..";
+import { BlindLevel, GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "..";
 import { type Card, type Rank, RANKS, cardKey, createDeck, shuffle } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {
@@ -53,15 +53,6 @@ export interface PokerGameState extends GameState {
 	winnerName?: string;
 }
 
-export interface PokerRoomState extends RoomData {
-	gameState?: PokerGameState;
-}
-
-export interface PokerActionRequest {
-	action: 'fold' | 'check' | 'call' | 'raise' | 'all-in' | 'next-hand';
-	amount?: number;
-}
-
 export const STARTING_CHIPS = 500;
 export const MIN_RAISE = 20;
 
@@ -73,12 +64,6 @@ export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
 	{ key: 'blindLevels', type: 'blind-levels', label: 'Blind levels', default: DEFAULT_BLIND_LEVELS, min: 10, max: 5000, step: 10, hint: 'Big blind schedule; small blind is half. The last level runs to the end.' },
 	{ key: 'smallerDeck', type: 'toggle', label: 'Smaller deck', default: false, hint: 'The lowest card is (11 - players)<br>Fewer players ⇒ Lowest card is higher.' },
 ];
-
-export const DEFAULT_POKER_SETTINGS: PokerSettings = {
-	startingChips: STARTING_CHIPS,
-	blindLevels: DEFAULT_BLIND_LEVELS,
-	smallerDeck: false,
-};
 
 /** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */
 export function resolvePokerSettings(raw?: GameSettings): PokerSettings {
@@ -163,7 +148,7 @@ function combinations(arr: Card[], k: number): Card[][] {
 }
 
 /** Rank exactly five cards. */
-export function evaluateFiveCard(cards: Card[]): HandRank {
+function evaluateFiveCard(cards: Card[]): HandRank {
 	const values = cards.map(c => RANK_VALUE[c.rank]).sort((a, b) => b - a);
 	const isFlush = cards.every(c => c.suit === cards[0]!.suit);
 	const unique = [...new Set(values)].sort((a, b) => b - a);
@@ -234,36 +219,6 @@ export function describeHand(rank: HandRank): string {
 		case 1: return `Pair: ${rankLabel(tb[0]!)}`;
 		default: return `High Card: ${rankLabel(tb[0]!)}`;
 	}
-}
-
-/**
- * Monte-Carlo win-equity estimate: the share of the pot `hole` expects to win against
- * `opponents` unknown hands given the current `community` cards. Returns 0–1 (ties split the pot).
- * An estimate, not exact — intended as a UI hint once the flop is out. Pass `deck` to draw from a
- * reduced deck (e.g. short-deck) so the estimate matches the cards actually in play.
- */
-export function estimateWinOdds(hole: Card[], community: Card[], opponents: number, iterations = 2000, deck: Card[] = createDeck()): number {
-	if (opponents < 1) return 1;
-	const used = new Set([...hole, ...community].map(cardKey));
-	const remaining = deck.filter(c => !used.has(cardKey(c)));
-	const boardNeeded = 5 - community.length;
-	let score = 0;
-	for (let iter = 0; iter < iterations; iter++) {
-		const drawn = shuffle(remaining);
-		let next = 0;
-		const board = [...community, ...drawn.slice(next, next += boardNeeded)];
-		const myRank = evaluateHand([...hole, ...board]);
-		let beaten = false;
-		let ties = 0;
-		for (let o = 0; o < opponents; o++) {
-			const oppRank = evaluateHand([drawn[next++]!, drawn[next++]!, ...board]);
-			const cmp = compareHandRanks(oppRank, myRank);
-			if (cmp > 0) { beaten = true; break; }
-			if (cmp === 0) ties++;
-		}
-		if (!beaten) score += 1 / (1 + ties);
-	}
-	return score / iterations;
 }
 
 /**

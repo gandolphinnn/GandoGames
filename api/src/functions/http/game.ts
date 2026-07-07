@@ -1,4 +1,4 @@
-import { GameActionRequest, GameBaseRequest, GameSettings, GameSettingsSetRequest, GameState, RoomData, resolveSettings } from '@gandogames/shared/dto';
+import { GameActionRequest, GameBaseRequest, GameSettingsSetRequest, GameState, RoomData, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_SETTINGS } from '@gandogames/shared/settings';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 import { Game } from '../../games';
@@ -35,29 +35,20 @@ const gameActionInner: InnerFunction<GameActionRequest, GameState | null> = asyn
 	return game.getPublicState(player.id);
 };
 
-const gameSettingsGetInner: InnerFunction<GameBaseRequest, GameSettings> = async (body, _notifier, _player) => {
-	const room = await PlayfabCtx.rooms.get(body.roomId);
-	if (!room) throw new Error('Room not found');
-	// Resolve against the schema so callers always get a complete, valid object (defaults filled in)
-	// even for a room whose settings were never explicitly set.
-	return resolveSettings(GAME_SETTINGS[body.game].schema, room.settings);
-};
-
 const gameSettingsSetInner: InnerFunction<GameSettingsSetRequest, RoomData> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (!room) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('Only the host can change game settings');
 	if (room.phase !== 'waiting') throw new Error('Cannot change settings after the game has started');
 
-	room.settings = resolveSettings(GAME_SETTINGS[room.game].schema, body.settings);
+	room.settings = resolveSettings(GAME_SETTINGS[room.game], body.settings);
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);
 	return room;
 };
 
-// game/state & game/settings/get are read-only, so they opt out of the per-room lock; game/action
-// and game/settings/set mutate and are locked automatically (their request carries a roomId).
+// game/state is read-only, so it opts out of the per-room lock; game/action and game/settings/set
+// mutate and are locked automatically (their request carries a roomId).
 registerFunction('game_state', 'game/state', gameStateInner, { skipLock: true });
 registerFunction('game_action', 'game/action', gameActionInner);
-registerFunction('game_settings_get', 'game/settings/get', gameSettingsGetInner, { skipLock: true });
 registerFunction('game_settings_set', 'game/settings/set', gameSettingsSetInner);

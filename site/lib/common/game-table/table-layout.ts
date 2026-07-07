@@ -34,8 +34,6 @@ export interface TableSeat {
 	isDealer?: boolean;
 	/** Dimmed — folded, eliminated, or otherwise out of the action. */
 	faded?: boolean;
-	/** Optional per-seat payload a game may want to thread through (rarely needed). */
-	data?: unknown;
 }
 
 /** A seat's centre, as a percentage of the table box. */

@@ -18,7 +18,6 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	public readonly error = input.required<string | null>();
 	public readonly myPlayFabId = input.required<string | null>();
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
-	public readonly back = output<void>();
 	public readonly playAgain = output<void>();
 
 	protected readonly ROLL_VALUES = ROLL_VALUES;

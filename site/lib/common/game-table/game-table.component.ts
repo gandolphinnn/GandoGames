@@ -1,6 +1,6 @@
 import { Component, computed, contentChild, input, output } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { GameTableEmptySeatDef, GameTableSeatDef } from './game-table-seat.directive';
+import { GameTableSeatDef } from './game-table-seat.directive';
 import { layoutSeats, TableFit, TableSeat, TableVariant } from './table-layout';
 
 /**
@@ -36,7 +36,6 @@ export class GameTableComponent {
 	public readonly seatClick = output<{ seat: TableSeat; index: number }>();
 
 	protected readonly seatDef = contentChild(GameTableSeatDef);
-	protected readonly emptySeatDef = contentChild(GameTableEmptySeatDef);
 
 	// `fill` (in-game) has no header/footer scroll room, so flatten the ring vertically to keep the
 	// tall player pods clear of the header above and the action bar below. `contain` (lobby) stays round.

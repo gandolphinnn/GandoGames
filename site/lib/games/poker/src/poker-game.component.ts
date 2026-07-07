@@ -25,7 +25,6 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	public readonly error = input.required<string | null>();
 	public readonly myPlayFabId = input.required<string | null>();
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
-	public readonly back = output<void>();
 	public readonly playAgain = output<void>();
 
 	private readonly toast = inject(ToastService);

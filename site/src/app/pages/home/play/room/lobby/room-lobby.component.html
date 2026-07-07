@@ -7,7 +7,6 @@
 			class="lobby-table"
 			fit="contain"
 			[variant]="preset().variant"
-			[shape]="preset().shape ?? 'oval'"
 			[label]="preset().label ?? null"
 			[seats]="seats()"
 			(seatClick)="onSeatClick($event.seat)">

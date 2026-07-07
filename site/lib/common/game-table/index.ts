@@ -3,5 +3,5 @@ export { GameTableSeatDef, GameTableEmptySeatDef, type SeatContext } from './gam
 export {
 	layoutSeats, buildTableSeats,
 	type TableSeat, type SeatPosition, type SeatFlags,
-	type TableVariant, type TableShape, type TableFit, type TablePreset,
+	type TableVariant, type TableFit, type TablePreset,
 } from './table-layout';

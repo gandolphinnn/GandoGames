@@ -3,7 +3,6 @@ import { GameSettingsSchema, GameState, GameType } from "@gandogames/shared/dto"
 import { TablePreset } from '@gandogames/lib/common/game-table';
 import { PankovGameComponent, PANKOV_SETTINGS_SCHEMA, PANKOV_TABLE_PRESET } from '@gandogames/lib/games/pankov';
 import { PokerGameComponent, POKER_SETTINGS_SCHEMA, POKER_TABLE_PRESET } from '@gandogames/lib/games/poker';
-import { BattleshipGameComponent, BATTLESHIP_SETTINGS_SCHEMA, BATTLESHIP_TABLE_PRESET } from '@gandogames/lib/games/battleship';
 
 export interface GameComponent<TState extends GameState = GameState> {
 	gameState: InputSignal<TState | null>;
@@ -58,16 +57,5 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 		component: PokerGameComponent,
 		settingsSchema: POKER_SETTINGS_SCHEMA,
 		table: POKER_TABLE_PRESET,
-	},
-	battleship: {
-		id: 'battleship',
-		name: 'Battleship',
-		icon: 'fa-solid fa-ship',
-		description: 'Hide your fleet, hunt theirs. Sink all 5 enemy ships to win.',
-		minPlayers: 2,
-		maxPlayers: 2,
-		component: BattleshipGameComponent,
-		settingsSchema: BATTLESHIP_SETTINGS_SCHEMA,
-		table: BATTLESHIP_TABLE_PRESET,
 	},
 };

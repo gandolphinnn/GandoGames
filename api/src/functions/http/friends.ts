@@ -1,4 +1,4 @@
-import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/api';
+import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
 import { InnerFunction, InnerFunctionNotifier, pfPromise, PlayFabServer, registerFunction } from '../..';
 
 /**
@@ -35,6 +35,12 @@ async function getFriendInfos(playFabId: string): Promise<PlayFabServerModels.Fr
 		cb => PlayFabServer.GetFriendsList({ PlayFabId: playFabId }, cb),
 	);
 	return result.Friends ?? [];
+}
+
+/** Whether `otherId` is a mutually-accepted friend on `ownerId`'s friend graph. */
+export async function areFriends(ownerId: string, otherId: string): Promise<boolean> {
+	const edge = (await getFriendInfos(ownerId)).find(f => f.FriendPlayFabId === otherId);
+	return tagOf(edge) === ACCEPTED;
 }
 
 /** Ensure the directed edge owner -> friend exists and set its single state tag. */

@@ -67,7 +67,7 @@ test.describe('Login page', () => {
 		await expect(page).toHaveURL(/\/play/, { timeout: 10_000 });
 	});
 
-	test('shows error message when login API fails', async ({ page }) => {
+	test('shows error toast when login API fails', async ({ page }) => {
 		await page.route('**/api/auth/login', route =>
 			route.fulfill({ status: 401, json: { error: 'Invalid credentials' } }),
 		);
@@ -75,7 +75,9 @@ test.describe('Login page', () => {
 		await page.locator('ion-input[formcontrolname="email"]').locator('input').fill('wrong@example.com');
 		await page.locator('ion-input[formcontrolname="password"]').locator('input').fill('wrong');
 		await page.getByRole('button', { name: /log in/i }).click();
-		await expect(page.locator('.auth-error')).toBeVisible({ timeout: 5_000 });
+		// Errors surface as a toast (BackendService toasts every failed call — see CLAUDE.md).
+		await expect(page.locator('.toast-error .toast-message')).toHaveText('Invalid credentials', { timeout: 5_000 });
+		await expect(page).toHaveURL(/\/login/); // failed login must not navigate away
 	});
 });
 

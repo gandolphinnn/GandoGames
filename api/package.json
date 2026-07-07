@@ -27,12 +27,13 @@
 			]
 		},
 		"moduleNameMapper": {
-			"^@gandogames/shared/api$": "<rootDir>/../shared/index",
+			"^@gandogames/shared/dto$": "<rootDir>/../shared/index",
 			"^@gandogames/shared/(.*)$": "<rootDir>/../shared/games/$1"
 		}
 	},
 	"dependencies": {
 		"@azure/functions": "^4.0.0",
+		"@azure/storage-blob": "^12.32.0",
 		"playfab-sdk": "^2.187.251205"
 	},
 	"devDependencies": {

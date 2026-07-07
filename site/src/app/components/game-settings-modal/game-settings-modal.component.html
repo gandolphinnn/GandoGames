@@ -1,0 +1,67 @@
+<div class="backdrop" (click)="onBackdropClick()"></div>
+
+<div class="modal" (click)="$event.stopPropagation()">
+
+	<header class="modal-header">
+		<h2 class="modal-title">{{ gameName() }} settings</h2>
+		<button class="modal-close" (click)="closed.emit()" title="Close">
+			<ion-icon name="close" />
+		</button>
+	</header>
+
+	<div class="modal-body">
+		@if (!editable()) {
+			<p class="empty-msg">Only the host can change these settings.</p>
+		}
+
+		<ul class="settings-list">
+			@for (field of schema(); track field.key) {
+				<li class="setting-row" [class.setting-row-block]="field.type === 'blind-levels'">
+					<div class="setting-label">
+						<span class="setting-name">{{ field.label }}</span>
+						@if (field.hint) {
+							<span class="setting-hint" [innerHTML]="field.hint"></span>
+						}
+					</div>
+					@if (field.type === 'blind-levels') {
+						<gg-blind-levels-editor
+							class="setting-block-control"
+							[levels]="list(field.key)"
+							[editable]="editable()"
+							[min]="field.min ?? 10"
+							[max]="field.max ?? 5000"
+							[step]="field.step ?? 10"
+							(changed)="onBlindLevels(field, $event)" />
+					} @else {
+						<div class="setting-control">
+							@if (field.type === 'toggle') {
+								<ion-toggle
+									[checked]="bool(field.key)"
+									[disabled]="!editable()"
+									(ionChange)="onToggle(field, $event)" />
+							} @else {
+								<input
+									class="setting-number"
+									type="number"
+									[value]="num(field.key)"
+									[attr.min]="field.min ?? null"
+									[attr.max]="field.max ?? null"
+									[attr.step]="field.step ?? 1"
+									[disabled]="!editable()"
+									(input)="onNumber(field, $event)" />
+							}
+						</div>
+					}
+				</li>
+			}
+		</ul>
+	</div>
+
+	@if (editable()) {
+		<footer class="modal-footer">
+			<button class="btn-secondary" [disabled]="saving()" (click)="resetDefaults()">Reset to defaults</button>
+			<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+		</footer>
+	}
+
+</div>

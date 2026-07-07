@@ -1,0 +1,107 @@
+@use 'styles/variables' as *;
+
+.bl-editor {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+	width: 100%;
+}
+
+.bl-row {
+	display: grid;
+	grid-template-columns: 1.5rem 1fr 1.4fr 2.75rem;
+	align-items: center;
+	gap: $s2;
+}
+
+.bl-head {
+	.bl-col {
+		font-size: $text-sm;
+		font-weight: 600;
+		color: $text-muted;
+		text-align: center;
+	}
+}
+
+.bl-idx {
+	font-size: $text-sm;
+	color: $text-muted;
+	text-align: center;
+}
+
+.bl-input {
+	width: 100%;
+	min-height: 44px;
+	padding: $s2;
+	background: transparent;
+	color: $text;
+	border: 1px solid $border;
+	border-radius: $radius-sm;
+	font-size: $text-base;
+	text-align: center;
+	transition: border-color $transition;
+
+	&:focus {
+		outline: none;
+		border-color: $accent;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+	}
+}
+
+.bl-infinite {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	color: $text-muted;
+	font-size: $text-xl;
+	line-height: 1;
+}
+
+.bl-remove-slot {
+	width: 2.75rem;
+}
+
+.bl-remove {
+	width: 2.75rem;
+	height: 2.75rem;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	background: $color-danger-bg;
+	color: $color-danger;
+	border: 1px solid $color-danger-border;
+	border-radius: $radius-sm;
+	font-size: $text-base;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background $transition;
+
+	&:hover {
+		background: $color-danger-muted;
+	}
+}
+
+.bl-add {
+	align-self: flex-start;
+	margin-top: $s1;
+	min-height: 44px;
+	padding: $s2 $s4;
+	background: transparent;
+	color: $accent;
+	border: 1px dashed $border;
+	border-radius: $radius-sm;
+	font-size: $text-sm;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background $transition, border-color $transition;
+
+	&:hover {
+		background: $hover-overlay;
+		border-color: $accent;
+	}
+}

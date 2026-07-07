@@ -7,17 +7,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 GandoGames/
 ├── shared/
-│   ├── index.ts               # Re-exports all shared types (imported as @gandogames/shared/api)
-│   └── src/                   # Shared HTTP contract types used by both site/ and api/
+│   ├── index.ts               # Re-exports all shared types (imported as @gandogames/shared/dto)
+│   └── dto/                   # Shared HTTP/SignalR contract types used by both site/ and api/
 │       ├── auth.ts            # AuthResponse, GamePlayer, ProfileData, Login/Register/GuestLoginRequest
 │       ├── room.ts            # RoomData, RoomSummary, RoomCreateRequest, ChatMessage
 │       ├── game.ts            # GameType, GameState, GameBaseRequest, GameActionRequest
-│       ├── signalr.ts         # NegotiateResponse, SignalREvent types
+│       ├── signalr.ts         # NegotiateResponse, SignalR event contract (SignalREventArgs)
 │       └── friends.ts         # Friend, FriendsListResponse, FriendBaseRequest
 ├── site/                      # Angular 20 SPA + Ionic (Azure Static Web Apps)
 │   ├── src/app/               # pages, components, services, guards
 │   ├── lib/games/             # Self-contained game packages (pankov, poker)
-│   ├── lib/common/            # Reusable game widgets (dice, french-card, player-chip)
+│   ├── lib/common/            # Reusable game widgets (french-card, chips, game-table, player-avatar)
 │   ├── lib/game-registry.ts   # Game metadata + GameComponent interface
 │   └── public/                # Static assets (staticwebapp.config.json, manifest.webmanifest)
 └── api/                       # Azure Functions v4 (TypeScript)
@@ -74,7 +74,7 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 
 **Path aliases** (`site/tsconfig.json`):
 ```
-@gandogames/shared/api  →  ../shared/index
+@gandogames/shared/dto  →  ../shared/index
 @gandogames/lib/*       →  ./lib/*
 @gandogames/services/*  →  ./src/app/services/*
 ```
@@ -84,7 +84,7 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 All in `src/app/services/`, imported via `@gandogames/services/<name>.service`.
 
 - `UserService` — `user` signal; login/register/guest/logout; session ticket persisted in `localStorage`; debounced profile updates
-- `BackendService` — `get()`, `post()`, `postBeacon()` (keepalive fetch for page-unload calls)
+- `BackendService` — `get()`, `post()`; surfaces any failed request's error message as a toast automatically before rethrowing
 - `RoomService` — `rooms`/`myRooms`/`browsableRooms` signals, CRUD methods, subscribes to SignalR events for reactive updates
 - `SignalRService` — manages HubConnection lifecycle (auto-connect on auth), exposes `events.roomUpsert`, `events.roomDeleted`, `events.gameStateUpdated`, `events.chatMessage`, `events.roomInvite`, `events.friendRequest`, `events.friendsChanged` as RxJS Subjects
 - `FriendService` — `friends`/`incoming`/`outgoing` signals + `pendingCount`; reacts to friend SignalR events
@@ -104,13 +104,15 @@ return this.backend.post<void>('/rooms/leave', request);
 await this.backend.post('/rooms/leave', { sessionTicket: this.ticket, roomId });
 ```
 
+**Error toasts:** `BackendService` already shows the API's error message as a toast on every failed call (before rethrowing). Never call `toast.error`/`warning`/`show` for the same error in a caller's `catch` — that double-toasts. In a `catch` after a backend call, only handle control flow (skip navigation, reset a loading flag). There is no per-call opt-out today; if a call must NOT toast on error, add that capability deliberately rather than working around it at the call site.
+
 ### Game packages
 
 Games live in `site/lib/games/<name>/`, each with an `index.ts` as its public API that exports a standalone game component implementing the `GameComponent` interface (`site/lib/game-registry.ts`). Games are imported via the `@gandogames/lib/*` path alias and mounted dynamically by `RoomPlayComponent` — they are not routed.
 
 To add a new game: create `site/lib/games/<name>/index.ts` exporting the game component, then register it in `site/lib/game-registry.ts` by adding a `GameDescriptor` (metadata + the `component`) to `GAME_REGISTRY`. Add the server-side logic under `api/src/games/` and wire it into `Game.Factory`. The `@gandogames/lib/*` alias already resolves `site/lib/*`, so no `tsconfig` change is needed.
 
-**Reusable game components:** When developing a new game, decide whether a game component might be usable in the future by other games or existing ones. If so, try to use common components in `site/lib/common`; if there isn't one already, try to add it. Examples are: dices, cards, poker fiches… (the existing `dice`, `french-card`, and `player-chip` widgets already live there).
+**Reusable game components:** When developing a new game, decide whether a game component might be usable in the future by other games or existing ones. If so, try to use common components in `site/lib/common`; if there isn't one already, try to add it. Examples are: cards, poker fiches, table layouts… (the existing `french-card`, `chips`, `game-table`, and `player-avatar` widgets already live there).
 
 ## API (Azure Functions)
 
@@ -128,7 +130,7 @@ To add a new game: create `site/lib/games/<name>/index.ts` exporting the game co
 
 **SignalR:** Azure SignalR Service in serverless mode. `signalROutput` output binding on all registered functions. Broadcast by calling `InnerFunctionNotifier` methods (e.g. `notifier.roomUpsert(room)`), which queue `SignalRMessage`s flushed to the binding after a successful response.
 
-**Shared types:** `shared/index.ts` (imported as `@gandogames/shared/api`) is the single source of truth for all HTTP request/response shapes.
+**Shared types:** `shared/index.ts` (imported as `@gandogames/shared/dto`) is the single source of truth for all HTTP request/response shapes.
 
 **Data storage:** PlayFab SharedGroups store room and game state. PlayFab is also used for auth.
 

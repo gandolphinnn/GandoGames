@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { GameActionRequest, GameBaseRequest, GameState, GameType, RoomBaseRequest } from '@gandogames/shared/api';
+import { GameState, GameType } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { UserService } from '@gandogames/services/user.service';
-import { BackendService } from '@gandogames/services/backend.service';
+import { RoomService } from '@gandogames/services/room.service';
 import { SignalRService } from '@gandogames/services/signalr.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	private readonly gameSlot!: ViewContainerRef;
 
 	private readonly signalR = inject(SignalRService);
-	private readonly backend = inject(BackendService);
+	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(UserService);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
@@ -61,10 +61,6 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(({ action, data }) => void this.sendAction(action, data));
 
-		outputToObservable(instance.back)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(() => this.backToLobby());
-
 		outputToObservable(instance.playAgain)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => void this.resetRoom());
@@ -74,8 +70,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 
 	private async loadGameState(): Promise<void> {
 		try {
-			const request: GameBaseRequest = { sessionTicket: this.sessionTicket, game: this.gameType(), roomId: this.roomId() };
-			const state = await this.backend.post<GameState>('/game/state', request);
+			const state = await this.roomService.getGameState(this.gameType(), this.roomId());
 			this.gameState.set(state);
 		} catch {
 			// state arrives via SignalR when the next action occurs
@@ -86,8 +81,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 		this.loading.set(true);
 		this.error.set(null);
 		try {
-			const request: GameActionRequest = { sessionTicket: this.sessionTicket, game: this.gameType(), roomId: this.roomId(), action, data: data ?? null };
-			await this.backend.post<void>('/game/action', request);
+			await this.roomService.gameAction(this.gameType(), this.roomId(), action, data);
 		} catch (err) {
 			this.error.set((err as Error).message);
 		} finally {
@@ -95,23 +89,12 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	protected backToLobby(): void {
-		void this.router.navigate(['/play']);
-	}
-
 	private async resetRoom(): Promise<void> {
 		try {
-			const request: RoomBaseRequest = { sessionTicket: this.sessionTicket, roomId: this.roomId() };
-			await this.backend.post<void>('/rooms/reset', request);
+			await this.roomService.resetRoom(this.roomId());
 			void this.router.navigate(['/play', this.roomId()]);
 		} catch (err) {
 			this.error.set((err as Error).message);
 		}
-	}
-
-	private get sessionTicket(): string {
-		const user = this.auth.user();
-		if (!user) throw new Error('Not logged in');
-		return user.sessionTicket;
 	}
 }

@@ -1,31 +1,12 @@
-import { GamePlayer, GameState, GameType } from '@gandogames/shared/api';
+import { GamePlayer, GameSettings, GameState, GameType } from '@gandogames/shared/dto';
 
-export const GAMES_CONFIG: Record<GameType, {
-	minPlayers: number,
-	maxPlayers: number,
-}> = {
-	'pankov': {
-		minPlayers: 2,
-		maxPlayers: 6,
-	},
-	'poker': {
-		minPlayers: 2,
-		maxPlayers: 8,
-	},
-	'blackjack': {
-		minPlayers: 1,
-		maxPlayers: 7,
-	},
-}
+export { GAMES_CONFIG } from '@gandogames/shared/config';
 
 export abstract class Game<TState extends GameState> {
 
-	public abstract minPlayers: number;
-	public abstract maxPlayers: number;
-
 	public state: TState | null = null;
 
-	public abstract initialize(players: GamePlayer[]): void;
+	public abstract initialize(players: GamePlayer[], settings?: GameSettings): void;
 	public abstract getPublicState(requestingPlayerId: string): TState;
 	public abstract action(player: GamePlayer, action: string, data: any): TState;
 

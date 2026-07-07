@@ -1,4 +1,4 @@
-import { GamePlayer, GameState, RoomData } from "..";
+import { GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "..";
 
 export type RollValue =
 	| 31 | 32 | 41 | 42 | 43 | 51 | 52 | 53 | 54 | 61 | 62 | 63 | 64 | 65
@@ -14,6 +14,15 @@ export interface RevealResult {
 	actual: RollValue,
 	wasLying: boolean,
 	loserIndex: number,
+	/** Lives the loser lost — 1 normally, doubled under the sudden-death Pankov run. */
+	livesLost: number,
+}
+
+export interface PankovSettings {
+	/** Lives each player starts with. */
+	initialLives: number;
+	/** When on, a wrongly-challenged player loses 2^(pankovStreak-1) lives during a Pankov run. */
+	suddenDeath: boolean;
 }
 
 export interface PankovGameState extends GameState {
@@ -26,15 +35,27 @@ export interface PankovGameState extends GameState {
 	previousActualRoll: RollValue | null,
 	/** Hidden: current player's roll. Null for all other players. */
 	currentRoll: RollValue | null,
+	settings: PankovSettings,
+	/** Count of consecutive Pankov (21) declarations in the current run; drives sudden-death stakes. */
+	pankovStreak: number,
 	winnerName?: string,
 	revealResult?: RevealResult,
 }
 
-export interface PankovRoomState extends RoomData {
-	gameState?: PankovGameState,
-}
-
 export const INITIAL_LIVES = 8;
+
+/** The Pankov roll (2-1) — the single strongest value; nothing outranks it. */
+export const PANKOV_VALUE: RollValue = 21;
+
+export const PANKOV_SETTINGS_SCHEMA: GameSettingsSchema = [
+	{ key: 'initialLives', type: 'number', label: 'Lives', default: INITIAL_LIVES, min: 1, max: 20, step: 1, hint: 'Lives each player starts with.' },
+	{ key: 'suddenDeath', type: 'toggle', label: 'Sudden death', default: false, hint: 'On a Pankov run, a wrong challenge costs double each consecutive turn (1, 2, 4, …).' },
+];
+
+/** Normalize raw settings into a fully-typed, validated PankovSettings (defaults + clamping). */
+export function resolvePankovSettings(raw?: GameSettings): PankovSettings {
+	return resolveSettings(PANKOV_SETTINGS_SCHEMA, raw) as unknown as PankovSettings;
+}
 
 /** All roll values, ordered weakest → strongest (Pankov is the highest). */
 export const ROLL_VALUES: readonly RollValue[] = [

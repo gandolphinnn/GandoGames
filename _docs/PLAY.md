@@ -36,7 +36,7 @@ There is no URL change — the route stays `/play/:roomId` throughout.
 
 ### `ended` — Game over
 
-Handled inside the game component (game-over UI). It can emit `playAgain` (host → `POST /rooms/reset`, back to the lobby) or `back` (→ `/play`).
+Handled inside the game component (game-over UI). It can emit `playAgain` (host → `POST /rooms/reset`, back to the lobby).
 
 ---
 
@@ -45,7 +45,7 @@ Handled inside the game component (game-over UI). It can emit `playAgain` (host 
 Each game package (`site/lib/games/<name>/`) exports a standalone component implementing the `GameComponent` interface (`site/lib/game-registry.ts`). The component is **driven by `RoomPlayComponent`**, not by direct backend access:
 
 - **Inputs** (set by `RoomPlayComponent`): `gameState`, `loading`, `error`, `myPlayFabId`.
-- **Outputs** (handled by `RoomPlayComponent`): `gameAction` → `POST /game/action`, `back` → navigate to `/play`, `playAgain` → `POST /rooms/reset`.
+- **Outputs** (handled by `RoomPlayComponent`): `gameAction` → `POST /game/action`, `playAgain` → `POST /rooms/reset`.
 - Does **not** poll. State arrives via the `gameStateUpdated` SignalR event (plus an initial `POST /game/state`), which `RoomPlayComponent` feeds into the `gameState` input.
 - Takes over the full viewport while active.
 

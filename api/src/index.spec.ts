@@ -1,6 +1,6 @@
 import { pfPromise } from '.';
 import { InnerFunctionNotifier } from './types';
-import type { RoomData } from '@gandogames/shared/api';
+import type { RoomData } from '@gandogames/shared/dto';
 
 describe('pfPromise', () => {
 	it('resolves with result.data on success', async () => {
@@ -52,17 +52,6 @@ describe('InnerFunctionNotifier', () => {
 		expect(messages).toContainEqual(expect.objectContaining({ target: 'roomDeleted', arguments: ['room-42'] }));
 	});
 
-	it('roomDeletedForPlayer queues a user-targeted roomDeleted message', () => {
-		notifier.roomDeletedForPlayer('user-7', 'room-42');
-		notifier.prepareContext(mockCtx as any);
-		const [, messages] = mockCtx.extraOutputs.set.mock.calls[0];
-		expect(messages).toContainEqual(expect.objectContaining({
-			target: 'roomDeleted',
-			arguments: ['room-42'],
-			userId: 'user-7',
-		}));
-	});
-
 	it('addToGroup queues a group join action with prefixed group name', () => {
 		notifier.addToGroup('user-5', 'xyz');
 		notifier.prepareContext(mockCtx as any);
@@ -82,16 +71,6 @@ describe('InnerFunctionNotifier', () => {
 			action: 'remove',
 			userId: 'user-5',
 			groupName: 'room-xyz',
-		}));
-	});
-
-	it('gameStateUpdated queues a group-targeted message', () => {
-		notifier.gameStateUpdated('room-9', { phase: 'picking' });
-		notifier.prepareContext(mockCtx as any);
-		const [, messages] = mockCtx.extraOutputs.set.mock.calls[0];
-		expect(messages).toContainEqual(expect.objectContaining({
-			target: 'gameStateUpdated',
-			groupName: 'room-room-9',
 		}));
 	});
 

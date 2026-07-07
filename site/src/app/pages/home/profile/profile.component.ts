@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutline, trashOutline } from 'ionicons/icons';
 import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, } from '@ionic/angular/standalone';
-import { GamePlayer, IconType, LangCode, LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/shared/api';
+import { GamePlayer, IconType, LangCode, LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { AuthUser, UserService } from '@gandogames/services/user.service';
 import { ToastService } from '@gandogames/services/toast.service';

@@ -1,4 +1,4 @@
-import { ChatMessage, ChatSendRequest } from '@gandogames/shared/api';
+import { ChatMessage, ChatSendRequest } from '@gandogames/shared/dto';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 
 const chatSendInner: InnerFunction<ChatSendRequest, void> = async (body, notifier, player) => {

@@ -1,0 +1,172 @@
+@use 'styles/variables' as *;
+
+// Poker-green felt — theme-invariant (like french-card's hard-coded #fff/#c00),
+// since the green reads on both light and dark app themes.
+$felt-green: radial-gradient(circle at 50% 42%, #3f9d70 0%, #2f7d57 55%, #235d41 100%);
+$felt-ink: #f4ecd8;
+$felt-ink-muted: rgba(244, 236, 216, 0.55);
+
+:host {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	width: 100%;
+}
+
+// ── Table area (seat positioning context) ────────────────────────────────────
+
+.table-area {
+	position: relative;
+	container-type: size;
+	width: 100%;
+	margin: 0 auto;
+}
+
+:host(.table-fit-contain) .table-area {
+	aspect-ratio: 4 / 5;
+	max-width: 460px;
+
+	@media (min-width: $bp-sm) {
+		aspect-ratio: 16 / 9;
+		max-width: 880px;
+	}
+}
+
+:host(.table-fit-fill) .table-area {
+	flex: 1;
+	min-height: 0;
+}
+
+// ── Felt ─────────────────────────────────────────────────────────────────────
+
+.table-felt {
+	position: absolute;
+	inset: clamp(26px, 9cqmin, 64px);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	// Rail ring (wood/surface) + outer edge + inner depth.
+	box-shadow:
+		0 0 0 clamp(7px, 2.4cqmin, 16px) var(--table-rail),
+		0 0 0 calc(clamp(7px, 2.4cqmin, 16px) + 2px) rgba(0, 0, 0, 0.35),
+		inset 0 3px 16px rgba(0, 0, 0, 0.28);
+}
+
+:host(.table-variant-felt) .table-felt {
+	background: $felt-green;
+	--table-rail: #{$bg-card};
+}
+
+:host(.table-variant-neutral) .table-felt {
+	background: $bg-card;
+	--table-rail: #{$bg-surface};
+}
+
+.table-label {
+	position: absolute;
+	left: 50%;
+	bottom: 18%;
+	transform: translateX(-50%);
+	font-size: $text-sm;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	pointer-events: none;
+
+	:host(.table-variant-felt) & { color: $felt-ink-muted; }
+	:host(.table-variant-neutral) & { color: $text-muted; opacity: 0.5; }
+}
+
+.table-center {
+	position: relative;
+	z-index: 1;
+	max-width: 62cqw;
+	max-height: 46cqh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: $s2;
+	text-align: center;
+
+	:host(.table-variant-felt) & { color: $felt-ink; }
+}
+
+// ── Seats ────────────────────────────────────────────────────────────────────
+
+.table-seat {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+	width: clamp(66px, 17cqw, 108px);
+	padding: $s2 6px;
+	border-radius: $radius-md;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+	background: $bg-surface;
+	border: 1px solid $border;
+	color: $text;
+	text-align: center;
+	transition: border-color $transition, box-shadow $transition, opacity $transition;
+
+	&.seat-turn {
+		border-color: $accent;
+		box-shadow: 0 0 0 2px $accent, 0 0 16px rgba(0, 0, 0, 0.3);
+	}
+
+	&.seat-hero {
+		border-color: $accent-emphasis;
+	}
+
+	&.seat-faded {
+		opacity: 0.4;
+	}
+
+	&.seat-empty {
+		background: transparent;
+		border-style: dashed;
+		cursor: pointer;
+	}
+}
+
+// On the green felt, seats are dark translucent pods with light ink (readable in both themes).
+:host(.table-variant-felt) .table-seat {
+	background: rgba(14, 34, 24, 0.62);
+	border-color: rgba(244, 236, 216, 0.16);
+	color: $felt-ink;
+
+	&.seat-empty {
+		background: rgba(0, 0, 0, 0.18);
+		border-color: rgba(244, 236, 216, 0.28);
+		color: $felt-ink-muted;
+	}
+}
+
+.dealer-chip {
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	width: 22px;
+	height: 22px;
+	border-radius: $radius-full;
+	background: $felt-ink;
+	color: #1c1208;
+	font-size: 0.7rem;
+	font-weight: 800;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+// ── Footer (hero hand + action bar, or lobby buttons) ─────────────────────────
+
+.table-footer {
+	flex: 0 0 auto;
+
+	&:empty { display: none; }
+}

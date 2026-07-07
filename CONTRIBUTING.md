@@ -88,7 +88,7 @@ These are enforced by review; `CLAUDE.md` is the authoritative reference.
 
 - Put an **explicit access modifier on every class member** — `public` or `private`. Reserve `protected` for members an Angular template binds to (or genuine inheritance).
 - Avoid `any`; if you must bridge a third-party boundary, cast narrowly and locally.
-- Shared HTTP/SignalR contracts live in **`shared/`** and contain **types and interfaces only** (they're erased at build time). Import them via `@gandogames/shared/api`.
+- Shared HTTP/SignalR contracts live in **`shared/`** and contain **types and interfaces only** (they're erased at build time). Import them via `@gandogames/shared/dto`.
 
 **Angular (site)**
 

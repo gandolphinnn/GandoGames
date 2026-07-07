@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 
 /**
- * Reusable chip-total display shared by chip-based games (poker, blackjack, …).
+ * Reusable chip-total display shared by chip-based games (e.g. poker).
  * Renders the amount with a chip glyph and consistent styling.
  */
 @Component({

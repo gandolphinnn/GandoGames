@@ -1,0 +1,26 @@
+import { Component, computed, inject, input } from '@angular/core';
+import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/dto';
+import { UserService } from '@gandogames/services/user.service';
+import { hueFromString } from './hue-from-string';
+
+@Component({
+	selector: 'gg-player-avatar',
+	template: `<i [class]="iconFaClass()"></i>`,
+	styleUrl: './player-avatar.component.scss',
+	host: {
+		'[class.avatar-theme-light]': 'isLightTheme()',
+		'[style.background]': 'bg()',
+	},
+})
+export class PlayerAvatarComponent {
+	private readonly userService = inject(UserService);
+	public readonly isLightTheme = computed(() => !this.userService.isDarkTheme());
+
+	public readonly player = input.required<AvatarPlayer>();
+
+	public readonly iconFaClass = computed(() =>
+		PLAYER_ICONS.find(p => p.id === (this.player().icon ?? 'profile'))?.class ?? ''
+	);
+
+	public readonly bg = computed(() => `hsl(${hueFromString(this.player().id)}, 38%, 62%)`);
+}

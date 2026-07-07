@@ -4,16 +4,17 @@ import { GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
+import { buildTableSeats, GameTableComponent, GameTableSeatDef, TablePreset, TableSeat } from '@gandogames/lib/common/game-table';
 import { FriendService } from '@gandogames/services/friend.service';
 import { RoomService } from '@gandogames/services/room.service';
 import { ToastService } from '@gandogames/services/toast.service';
 import { UserService } from '@gandogames/services/user.service';
-import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RoomAccessModalComponent } from '@gandogames/components';
+import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 /** Lobby body for a waiting/ended room. Header, chat and layout are owned by RoomComponent. */
 @Component({
 	selector: 'gg-room-lobby',
-	imports: [...ION_IMPORTS, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RoomAccessModalComponent, RouterLink],
+	imports: [...ION_IMPORTS, GameTableComponent, GameTableSeatDef, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RouterLink],
 	templateUrl: './room-lobby.component.html',
 	styleUrl: './room-lobby.component.scss',
 })
@@ -23,7 +24,11 @@ export class RoomLobbyComponent {
 	private readonly auth = inject(UserService);
 	private readonly toast = inject(ToastService);
 
-	public readonly room = input<RoomData | null>(null);
+	public readonly room = input.required<RoomData | null>();
+	public readonly roomAccessClass = computed(() => {
+		const roomAccess = this.room();
+		return roomAccess ? roomAccessOption(roomAccess.access ?? 'public') : '';
+	});
 	public readonly roomId = input<string>('');
 	public readonly isHost = input<boolean>(false);
 	public readonly isInRoom = input<boolean>(false);
@@ -32,7 +37,6 @@ export class RoomLobbyComponent {
 	public readonly loading = signal(false);
 	public readonly showInviteModal = signal(false);
 	public readonly showSettingsModal = signal(false);
-	public readonly showAccessModal = signal(false);
 	public readonly addingFriendId = signal<string | null>(null);
 
 	/** Whether the room's host is an accepted friend of the viewer — gates friends-only joins. */
@@ -77,16 +81,36 @@ export class RoomLobbyComponent {
 		return g ? GAME_REGISTRY[g] : undefined;
 	});
 
+	/** Whether this game exposes any configurable settings — hides the settings button when it doesn't. */
+	public readonly hasSettings = computed(() => (this.gameInfo()?.settingsSchema.length ?? 0) > 0);
+
 	public readonly memberIds = computed(() => this.room()?.players.map(p => p.id) ?? []);
 
-	public readonly playerSlots = computed(() => {
+	/** The game's table look (felt/neutral + label), shared with the in-game view. */
+	public readonly preset = computed<TablePreset>(() => {
+		const g = this.room()?.game;
+		return g ? GAME_REGISTRY[g].table : { variant: 'neutral' };
+	});
+
+	/**
+	 * Seat ring: players in playing order, viewer rotated to bottom-centre. Members waiting in a
+	 * non-full room get a single extra open seat (the invite affordance); everyone else sees just the
+	 * seated players — non-members join via the footer button rather than an empty "sit" seat.
+	 */
+	public readonly seats = computed<TableSeat[]>(() => {
 		const r = this.room();
 		if (!r) return [];
 		const max = GAME_REGISTRY[r.game]?.maxPlayers ?? r.players.length;
-		const slots: (typeof r.players[0] | null)[] = [...r.players];
-		while (slots.length < max) slots.push(null);
-		return slots;
+		const canInvite = this.isInRoom() && r.phase === 'waiting' && r.players.length < max;
+		const ringSize = canInvite ? r.players.length + 1 : r.players.length;
+		return buildTableSeats(r.players, this.myId(), ringSize);
 	});
+
+	/** The lone open seat is an invite affordance for members while waiting. */
+	public onSeatClick(seat: TableSeat): void {
+		if (seat.player) return;
+		if (this.isInRoom() && this.room()?.phase === 'waiting') this.invite();
+	}
 
 	public async join(): Promise<void> {
 		try {
@@ -119,10 +143,6 @@ export class RoomLobbyComponent {
 
 	public openSettings(): void {
 		this.showSettingsModal.set(true);
-	}
-
-	public openAccess(): void {
-		this.showAccessModal.set(true);
 	}
 
 	/** Friend requests target registered players only, and never yourself or existing friends/requests. */

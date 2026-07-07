@@ -3,6 +3,90 @@
 
 :host { display: contents; }
 
+gg-game-table {
+	flex: 1;
+	min-height: 0;
+}
+
+// ── Centre: current claim ────────────────────────────────────────────────────
+
+.pv-center {
+	gap: $s1;
+
+	&-eyebrow {
+		font-size: $text-sm;
+		color: $text-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	&-value {
+		font-size: $text-3xl;
+		font-weight: 800;
+		color: $accent;
+		line-height: 1;
+
+		&-idle { color: $text-muted; opacity: 0.6; }
+	}
+
+	&-by { font-size: $text-sm; color: $text-muted; }
+}
+
+// ── Seats ────────────────────────────────────────────────────────────────────
+
+.pv-avatar {
+	width: clamp(34px, 10cqw, 54px);
+	height: clamp(34px, 10cqw, 54px);
+	border-radius: $radius-full;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: clamp(0.9rem, 4.5cqw, 1.4rem);
+	flex-shrink: 0;
+}
+
+.pv-name {
+	font-size: $text-sm;
+	font-weight: 600;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	&-muted { font-weight: 500; opacity: 0.75; }
+}
+
+.pv-lives {
+	display: flex;
+	gap: 3px;
+}
+
+.pv-life {
+	font-size: 9px;
+	color: $border;
+
+	&-full { color: $accent; }
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+
+.pv-footer {
+	width: 100%;
+	max-width: 620px;
+	margin: 0 auto;
+	padding: $s3 $s4 $s4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.pv-waiting {
+	font-size: $text-base;
+	color: $text-muted;
+
+	strong { color: $text; font-weight: 700; }
+}
+
 // ── Panel claim ────────────────────────────────────────────────────────────────
 
 .panel-claim {
@@ -41,7 +125,7 @@
 }
 
 .declare-btn {
-	height: 60px;
+	height: 56px;
 	background: $bg-surface;
 	border: 1px solid $border;
 	border-radius: $radius-md;
@@ -60,25 +144,19 @@
 	&-honest {
 		border-color: $color-success;
 
-		&:hover:not([disabled]) {
-			background: $color-success-bg;
-			border-color: $color-success;
-		}
+		&:hover:not([disabled]) { background: $color-success-bg; border-color: $color-success; }
 	}
 
 	&-pankov {
 		border-color: $color-warning;
 		color: $color-warning;
 
-		&:hover:not([disabled]) {
-			background: $color-warning-bg;
-			border-color: $color-warning;
-		}
+		&:hover:not([disabled]) { background: $color-warning-bg; border-color: $color-warning; }
 	}
 
 	&[disabled] { opacity: 0.4; cursor: not-allowed; }
 
-	@media (min-width: $bp-sm) { height: 72px; font-size: $text-base; }
+	@media (min-width: $bp-sm) { height: 64px; font-size: $text-base; }
 }
 
 // ── Reveal ─────────────────────────────────────────────────────────────────────
@@ -121,15 +199,6 @@
 	border-radius: $radius-md;
 	width: 100%;
 
-	&-lie {
-		background: $color-danger-bg;
-		color: $color-danger;
-		border: 1px solid $color-danger-dim;
-	}
-
-	&-honest {
-		background: $color-success-bg;
-		color: $color-success;
-		border: 1px solid $color-success-border;
-	}
+	&-lie { background: $color-danger-bg; color: $color-danger; border: 1px solid $color-danger-dim; }
+	&-honest { background: $color-success-bg; color: $color-success; border: 1px solid $color-success-border; }
 }

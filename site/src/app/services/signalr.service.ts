@@ -12,10 +12,6 @@ export class SignalRService {
 	private connection?: HubConnection;
 	private negotiateCache?: { response: NegotiateResponse; expiresAt: number };
 
-	public get connectionStatus() {
-		return this.connection?.state;
-	}
-
 	public readonly events = {
 		roomUpsert: new Subject<RoomData>(),
 		roomDeleted: new Subject<string>(),

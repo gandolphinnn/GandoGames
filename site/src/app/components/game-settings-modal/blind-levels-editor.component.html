@@ -1,0 +1,51 @@
+<div class="bl-editor">
+
+	<div class="bl-row bl-head" aria-hidden="true">
+		<span class="bl-idx"></span>
+		<span class="bl-col">BB</span>
+		<span class="bl-col">Duration (min)</span>
+		<span class="bl-remove-slot"></span>
+	</div>
+
+	@for (level of levels(); track $index; let i = $index, last = $last) {
+		<div class="bl-row">
+			<span class="bl-idx">{{ i + 1 }}</span>
+
+			<input
+				class="bl-input"
+				type="number"
+				inputmode="numeric"
+				[attr.min]="min()"
+				[attr.max]="max()"
+				[attr.step]="step()"
+				[value]="level.bigBlind"
+				[disabled]="!editable()"
+				(input)="onBigBlind(i, $event)" />
+
+			@if (last) {
+				<span class="bl-infinite" title="The last level runs until the game ends">∞</span>
+			} @else {
+				<input
+					class="bl-input"
+					type="number"
+					inputmode="numeric"
+					min="1"
+					step="1"
+					[value]="level.durationMinutes"
+					[disabled]="!editable()"
+					(input)="onDuration(i, $event)" />
+			}
+
+			@if (editable() && i > 0) {
+				<button type="button" class="bl-remove" title="Remove level" (click)="removeLevel(i)">✕</button>
+			} @else {
+				<span class="bl-remove-slot"></span>
+			}
+		</div>
+	}
+
+	@if (editable()) {
+		<button type="button" class="bl-add" (click)="addLevel()">+ Add level</button>
+	}
+
+</div>

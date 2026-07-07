@@ -1,5 +1,5 @@
-import { GamePlayer, GameSettings, GameSettingsSchema, GameState, RoomData, resolveSettings } from "..";
-import { type Card, type Rank, cardKey, createDeck, shuffle } from "./common/cards";
+import { BlindLevel, GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "..";
+import { type Card, type Rank, RANKS, cardKey, createDeck, shuffle } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {
 	chips: number;
@@ -19,12 +19,18 @@ export interface PokerHandResult {
 export interface PokerSettings {
 	/** Starting chip stack per player. */
 	startingChips: number;
-	/** The big blind / minimum bet; small blind is half (floored), min raise equals this. */
-	minBet: number;
-	/** Short deck (6+ Hold'em): strip the 2s–5s. Hand rankings stay standard. */
+	/**
+	 * Blinds schedule: each level's big blind + how long it lasts (minutes) before the next kicks in.
+	 * Small blind is half the big blind (floored); min raise equals the current big blind. The last
+	 * level is terminal and runs until the game ends.
+	 */
+	blindLevels: BlindLevel[];
+	/**
+	 * Short deck: strip the lowest cards so the deck scales with the table. The lowest rank in play
+	 * has value (11 − number of players) — e.g. 5 players → the 6, heads-up → the 9. Hand rankings
+	 * stay standard.
+	 */
 	smallerDeck: boolean;
-	/** Whether the live "your current hand / win %" hint is shown to players. */
-	showWinOdds: boolean;
 }
 
 export interface PokerGameState extends GameState {
@@ -37,39 +43,70 @@ export interface PokerGameState extends GameState {
 	currentPlayerIndex: number;
 	dealerIndex: number;
 	settings: PokerSettings;
+	/** When the blind clock started (game start); blinds escalate on real elapsed time from here. */
+	startedAt: Date;
+	/** Index into settings.blindLevels in effect for the in-progress hand (locked at each hand start). */
+	blindLevel: number;
+	/** Big blind for the in-progress hand — settings.blindLevels[blindLevel].bigBlind. */
+	bigBlind: number;
 	result?: PokerHandResult;
 	winnerName?: string;
 }
 
-export interface PokerRoomState extends RoomData {
-	gameState?: PokerGameState;
-}
+export const STARTING_CHIPS = 500;
+export const MIN_RAISE = 20;
 
-export interface PokerActionRequest {
-	action: 'fold' | 'check' | 'call' | 'raise' | 'all-in' | 'next-hand';
-	amount?: number;
-}
-
-export const STARTING_CHIPS = 1000;
-export const MIN_RAISE = 100;
+/** Default schedule: a single terminal level at the base big blind — i.e. blinds never escalate. */
+export const DEFAULT_BLIND_LEVELS: BlindLevel[] = [{ bigBlind: MIN_RAISE, durationMinutes: 0 }];
 
 export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
 	{ key: 'startingChips', type: 'number', label: 'Player pot', default: STARTING_CHIPS, min: 100, max: 100000, step: 100, hint: 'Starting chips per player.' },
-	{ key: 'minBet', type: 'number', label: 'Minimum bet', default: MIN_RAISE, min: 10, max: 5000, step: 10, hint: 'Big blind; small blind is half, min raise equals this.' },
-	{ key: 'smallerDeck', type: 'toggle', label: 'Smaller deck', default: false, hint: 'Short deck — remove the 2s through 5s (36 cards).' },
-	{ key: 'showWinOdds', type: 'toggle', label: 'Show win %', default: true, hint: 'Show each player their live hand and win-odds estimate.' },
+	{ key: 'blindLevels', type: 'blind-levels', label: 'Blind levels', default: DEFAULT_BLIND_LEVELS, min: 10, max: 5000, step: 10, hint: 'Big blind schedule; small blind is half. The last level runs to the end.' },
+	{ key: 'smallerDeck', type: 'toggle', label: 'Smaller deck', default: false, hint: 'The lowest card is (11 - players)<br>Fewer players ⇒ Lowest card is higher.' },
 ];
-
-export const DEFAULT_POKER_SETTINGS: PokerSettings = {
-	startingChips: STARTING_CHIPS,
-	minBet: MIN_RAISE,
-	smallerDeck: false,
-	showWinOdds: true,
-};
 
 /** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */
 export function resolvePokerSettings(raw?: GameSettings): PokerSettings {
 	return resolveSettings(POKER_SETTINGS_SCHEMA, raw) as unknown as PokerSettings;
+}
+
+/** Small blind for a given big blind: always half, floored. */
+export function smallBlindFor(bigBlind: number): number {
+	return Math.floor(bigBlind / 2);
+}
+
+/**
+ * The ranks in play for a hand. Full 52-card deck normally; with the short deck on, the lowest rank
+ * scales with the table — its value is (11 − numPlayers), so fewer players means a higher low card
+ * (5-handed → the 6, heads-up → the 9, 8-handed → the 3). RANKS is ascending 2→A, so index i holds
+ * value i+2; the lowest included index is therefore (11 − numPlayers) − 2 = 9 − numPlayers.
+ */
+export function pokerDeckRanks(numPlayers: number, smallerDeck: boolean): Rank[] {
+	if (!smallerDeck) return [...RANKS];
+	const lowestIndex = Math.min(RANKS.length - 1, Math.max(0, 9 - numPlayers));
+	return RANKS.slice(lowestIndex);
+}
+
+/**
+ * The blind level in effect after `elapsedMs` of play. Walks the schedule accumulating each level's
+ * duration; the last level is terminal (runs forever), so any time past the penultimate boundary
+ * stays on it.
+ */
+export function levelForElapsed(levels: BlindLevel[], elapsedMs: number): number {
+	let acc = 0;
+	for (let i = 0; i < levels.length - 1; i++) {
+		acc += levels[i]!.durationMinutes * 60_000;
+		if (elapsedMs < acc) return i;
+	}
+	return Math.max(0, levels.length - 1);
+}
+
+/** Milliseconds from game start at which `level` ends (blinds go up). Null for the terminal level. */
+export function levelEndMs(levels: BlindLevel[], level: number): number | null {
+	if (level >= levels.length - 1) return null;
+	let acc = 0;
+	for (let i = 0; i <= level; i++) acc += levels[i]!.durationMinutes * 60_000;
+	return acc;
 }
 
 // ── Hand evaluation ──────────────────────────────────────────────────────────────
@@ -111,7 +148,7 @@ function combinations(arr: Card[], k: number): Card[][] {
 }
 
 /** Rank exactly five cards. */
-export function evaluateFiveCard(cards: Card[]): HandRank {
+function evaluateFiveCard(cards: Card[]): HandRank {
 	const values = cards.map(c => RANK_VALUE[c.rank]).sort((a, b) => b - a);
 	const isFlush = cards.every(c => c.suit === cards[0]!.suit);
 	const unique = [...new Set(values)].sort((a, b) => b - a);
@@ -185,31 +222,38 @@ export function describeHand(rank: HandRank): string {
 }
 
 /**
- * Monte-Carlo win-equity estimate: the share of the pot `hole` expects to win against
- * `opponents` unknown hands given the current `community` cards. Returns 0–1 (ties split the pot).
- * An estimate, not exact — intended as a UI hint once the flop is out. Pass `deck` to draw from a
- * reduced deck (e.g. short-deck) so the estimate matches the cards actually in play.
+ * All-in equity for a showdown where every contender's hole cards are KNOWN (their hands are tabled).
+ * Returns each hand's share of the pot (0–1, summing to ~1) given the current `community` cards, by
+ * running out the remaining board. When the board is already complete the result is exact; otherwise
+ * it's a Monte-Carlo estimate over the undealt board. Ties split the pot. Used to show the live win %
+ * at each seat during an all-in run-out. `deck` lets short-deck games draw from the right card pool.
  */
-export function estimateWinOdds(hole: Card[], community: Card[], opponents: number, iterations = 2000, deck: Card[] = createDeck()): number {
-	if (opponents < 1) return 1;
-	const used = new Set([...hole, ...community].map(cardKey));
+export function estimateAllInEquities(hands: Card[][], community: Card[], iterations = 1500, deck: Card[] = createDeck()): number[] {
+	const n = hands.length;
+	if (n === 0) return [];
+	if (n === 1) return [1];
+
+	const used = new Set([...hands.flat(), ...community].map(cardKey));
 	const remaining = deck.filter(c => !used.has(cardKey(c)));
 	const boardNeeded = 5 - community.length;
-	let score = 0;
-	for (let iter = 0; iter < iterations; iter++) {
-		const drawn = shuffle(remaining);
-		let next = 0;
-		const board = [...community, ...drawn.slice(next, next += boardNeeded)];
-		const myRank = evaluateHand([...hole, ...board]);
-		let beaten = false;
-		let ties = 0;
-		for (let o = 0; o < opponents; o++) {
-			const oppRank = evaluateHand([drawn[next++]!, drawn[next++]!, ...board]);
-			const cmp = compareHandRanks(oppRank, myRank);
-			if (cmp > 0) { beaten = true; break; }
-			if (cmp === 0) ties++;
-		}
-		if (!beaten) score += 1 / (1 + ties);
+	const equity = new Array<number>(n).fill(0);
+
+	const award = (board: Card[]): void => {
+		const ranks = hands.map(h => evaluateHand([...h, ...board]));
+		let best = ranks[0]!;
+		for (const r of ranks) if (compareHandRanks(r, best) > 0) best = r;
+		const winners = ranks.reduce((c, r) => c + (compareHandRanks(r, best) === 0 ? 1 : 0), 0);
+		ranks.forEach((r, i) => { if (compareHandRanks(r, best) === 0) equity[i]! += 1 / winners; });
+	};
+
+	// Board already out → the outcome is deterministic; evaluate once.
+	if (boardNeeded <= 0) {
+		award(community);
+		return equity;
 	}
-	return score / iterations;
+
+	for (let iter = 0; iter < iterations; iter++) {
+		award([...community, ...shuffle(remaining).slice(0, boardNeeded)]);
+	}
+	return equity.map(e => e / iterations);
 }

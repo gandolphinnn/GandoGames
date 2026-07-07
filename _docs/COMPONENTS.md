@@ -35,9 +35,10 @@ Shared, game-agnostic UI used across game packages (see the component-reuse rule
 
 | Component | Selector | Notes |
 |---|---|---|
-| `DiceComponent` | `gg-dice` | Renders dice pips for a value |
 | `FrenchCardComponent` | `gg-french-card` | A standard playing card |
-| `PlayerChipComponent` | `gg-player-chip` | A poker chip / betting fiche |
+| `ChipCountComponent` | `gg-chip-count` | A player's chip count (poker fiches) |
+| `GameTableComponent` | `gg-game-table` | Seated table layout shared by lobby and games |
+| `PlayerAvatarComponent` | `gg-player-avatar` | A player's icon + colour |
 
 ## Game components (`site/lib/games/`)
 

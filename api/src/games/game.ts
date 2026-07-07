@@ -1,23 +1,8 @@
 import { GamePlayer, GameSettings, GameState, GameType } from '@gandogames/shared/dto';
 
-export const GAMES_CONFIG: Record<GameType, {
-	minPlayers: number,
-	maxPlayers: number,
-}> = {
-	'pankov': {
-		minPlayers: 2,
-		maxPlayers: 6,
-	},
-	'poker': {
-		minPlayers: 2,
-		maxPlayers: 8,
-	},
-}
+export { GAMES_CONFIG } from '@gandogames/shared/config';
 
 export abstract class Game<TState extends GameState> {
-
-	public abstract minPlayers: number;
-	public abstract maxPlayers: number;
 
 	public state: TState | null = null;
 

@@ -96,6 +96,18 @@
 	gap: $s4;
 }
 
+// A full-width field (e.g. the blind-levels table) stacks its control under the label.
+.setting-row-block {
+	flex-direction: column;
+	align-items: stretch;
+	gap: $s3;
+}
+
+.setting-block-control {
+	display: block;
+	width: 100%;
+}
+
 .setting-label {
 	display: flex;
 	flex-direction: column;

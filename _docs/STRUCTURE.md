@@ -15,7 +15,7 @@ GandoGames/
 │   │   └── guards/      # authGuard / noAuthGuard
 │   └── lib/
 │       ├── games/       # Self-contained game packages (pankov, poker)
-│       ├── common/      # Reusable game widgets (dice, french-card, player-chip)
+│       ├── common/      # Reusable game widgets (french-card, chips, game-table, player-avatar)
 │       ├── game-registry.ts   # Game metadata, GameComponent interface + component registry
 │       └── player-icons.ts
 └── api/                 # Azure Functions v4 (TypeScript)
@@ -41,7 +41,7 @@ PlayFab access goes through `PlayfabCtx` (rooms + game state in SharedGroups) an
 ## Site services (`src/app/services/`)
 
 - `UserService` — `user` signal; login / register / guest / logout; session ticket persisted in `localStorage` (via `StorageService`); debounced profile updates
-- `BackendService` — HTTP wrapper: `get()`, `post()`, `postBeacon()` (fire-and-forget on page unload)
+- `BackendService` — HTTP wrapper: `get()`, `post()`
 - `RoomService` — `rooms` / `myRooms` / `browsableRooms` signals; CRUD methods; reacts to SignalR room events
 - `SignalRService` — `HubConnection` lifecycle; auto-connects when a user logs in; exposes `events` Subjects
 - `FriendService` — `friends` / `incoming` / `outgoing` signals + `pendingCount`; reacts to `friendRequest` / `friendsChanged`

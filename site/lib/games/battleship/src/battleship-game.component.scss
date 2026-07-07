@@ -1,0 +1,305 @@
+@use 'styles/variables' as *;
+@use 'styles/game' as *;
+
+:host {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
+
+.bs-game {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+// Square cell size — scales with the viewport but capped so a 10×10 board stays tidy on desktop.
+$bs-cell: clamp(22px, 7.6vw, 36px);
+
+// ── Players strip ────────────────────────────────────────────────────────────
+
+.bs-players {
+	display: flex;
+	justify-content: center;
+	gap: $s4;
+	padding: $s3 $s4;
+	flex-shrink: 0;
+}
+
+.bs-player {
+	display: flex;
+	align-items: center;
+	gap: $s2;
+	padding: $s2 $s3;
+	border: 1px solid transparent;
+	border-radius: $radius-full;
+	transition: border-color $transition, background $transition;
+
+	&-turn {
+		border-color: $accent;
+		background: $accent-muted;
+	}
+
+	&-name {
+		font-size: $text-sm;
+		font-weight: 600;
+		max-width: 40vw;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.bs-avatar {
+	width: 32px;
+	height: 32px;
+	border-radius: $radius-full;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.95rem;
+	flex-shrink: 0;
+}
+
+// ── Panel & stage ────────────────────────────────────────────────────────────
+
+.bs-panel {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: $s4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.bs-stage {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $s4;
+	width: 100%;
+	max-width: 900px;
+}
+
+.bs-status {
+	font-size: $text-base;
+	color: $text-muted;
+	text-align: center;
+
+	&-turn { color: $accent; font-weight: 700; }
+}
+
+.bs-lastshot {
+	font-size: $text-sm;
+	font-weight: 600;
+	color: $text;
+	padding: $s2 $s3;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+}
+
+// ── Setup (placement) ──────────────────────────────────────────────────────────
+
+// Dock of not-yet-placed ships; each token is dragged onto the grid.
+.bs-dock {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	gap: $s3;
+	min-height: $bs-cell;
+}
+
+.bs-dock-ship {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: $s2;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-md;
+	cursor: grab;
+	touch-action: none;
+	user-select: none;
+	transition: border-color $transition;
+
+	&:hover { border-color: $accent; }
+	&:active { cursor: grabbing; }
+}
+
+.bs-dock-cells {
+	display: flex;
+	gap: 2px;
+}
+
+.bs-dock-cell {
+	width: clamp(16px, 5vw, 24px);
+	height: clamp(16px, 5vw, 24px);
+	border-radius: $radius-sm;
+	background: #6b7686;
+	border: 1px solid #56606e;
+}
+
+.bs-dock-name {
+	font-size: $text-sm;
+	font-weight: 600;
+}
+
+// The setup board is a drag surface — suppress scroll/selection so touch-drag works.
+.bs-board-setup {
+	touch-action: none;
+	user-select: none;
+
+	.bs-cell-ship { cursor: grab; }
+}
+
+.bs-setup-controls {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: $s2;
+}
+
+// ── Boards ─────────────────────────────────────────────────────────────────────
+
+.bs-boards {
+	display: flex;
+	flex-direction: column;
+	gap: $s6;
+	width: 100%;
+	align-items: center;
+
+	@media (min-width: $bp-sm) {
+		flex-direction: row;
+		justify-content: center;
+		align-items: flex-start;
+	}
+}
+
+.bs-board-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: $s2;
+}
+
+.bs-board-title {
+	font-size: $text-sm;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: $text-muted;
+	display: flex;
+	align-items: center;
+	gap: $s2;
+}
+
+.bs-fleet-count {
+	font-weight: 600;
+	color: $text;
+	background: $bg-surface;
+	border: 1px solid $border;
+	border-radius: $radius-full;
+	padding: 0 $s2;
+	text-transform: none;
+	letter-spacing: 0;
+}
+
+.bs-board {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.bs-board-row {
+	display: flex;
+	gap: 2px;
+}
+
+.bs-corner,
+.bs-axis {
+	width: $bs-cell;
+	height: $bs-cell;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.65rem;
+	font-weight: 600;
+	color: $text-muted;
+	flex-shrink: 0;
+}
+
+.bs-cell {
+	width: $bs-cell;
+	height: $bs-cell;
+	flex-shrink: 0;
+	padding: 0;
+	border: 1px solid $border;
+	border-radius: $radius-sm;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(56, 132, 200, 0.12);
+	transition: background $transition, border-color $transition;
+
+	// Water on the enemy board that I can still fire at.
+	&-target {
+		cursor: pointer;
+
+		&:hover:not(:disabled) {
+			background: $accent-muted;
+			border-color: $accent;
+		}
+	}
+
+	&-water:disabled { cursor: default; }
+
+	// A placed / own ship.
+	&-ship {
+		background: #6b7686;
+		border-color: #56606e;
+	}
+
+	// A miss — small dot on the water.
+	&-miss::after {
+		content: '';
+		width: 28%;
+		height: 28%;
+		border-radius: 50%;
+		background: $text-muted;
+	}
+
+	// A hit.
+	&-hit {
+		background: $color-danger;
+		border-color: $color-danger;
+	}
+
+	// A cell of a fully-sunk ship.
+	&-sunk {
+		background: #7a1220;
+		border-color: $color-danger;
+	}
+
+	// Placement drag preview — where the dragged ship would land.
+	&-preview-ok {
+		background: $color-success-bg;
+		border-color: $color-success;
+	}
+
+	&-preview-bad {
+		background: $color-danger-bg;
+		border-color: $color-danger;
+	}
+}
+
+button.bs-cell {
+	cursor: pointer;
+
+	&:disabled { cursor: default; }
+}

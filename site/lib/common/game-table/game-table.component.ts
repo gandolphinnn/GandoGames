@@ -1,7 +1,7 @@
 import { Component, computed, contentChild, input, output } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { GameTableEmptySeatDef, GameTableSeatDef } from './game-table-seat.directive';
-import { layoutSeats, TableFit, TableSeat, TableVariant } from './table-layout';
+import { layoutSeats, TableFit, TableSeat, TableShape, TableVariant } from './table-layout';
 
 /**
  * Presentational table: seats laid out around an oval with the hero pinned
@@ -18,6 +18,7 @@ import { layoutSeats, TableFit, TableSeat, TableVariant } from './table-layout';
 	host: {
 		'[class.table-variant-felt]': "variant() === 'felt'",
 		'[class.table-variant-neutral]': "variant() === 'neutral'",
+		'[class.table-shape-rectangle]': "shape() === 'rectangle'",
 		'[class.table-fit-fill]': "fit() === 'fill'",
 		'[class.table-fit-contain]': "fit() === 'contain'",
 	},
@@ -26,6 +27,8 @@ export class GameTableComponent {
 	/** Ordered seats — index 0 is the hero (bottom-centre); build with `buildTableSeats`. */
 	public readonly seats = input.required<TableSeat[]>();
 	public readonly variant = input<TableVariant>('neutral');
+	/** Felt silhouette — an oval ring (default) or a straight-edged rectangle. */
+	public readonly shape = input<TableShape>('oval');
 	public readonly fit = input<TableFit>('contain');
 	/** Faint label rendered on the felt (e.g. the game name). */
 	public readonly label = input<string | null>(null);

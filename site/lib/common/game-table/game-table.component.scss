@@ -53,6 +53,11 @@ $felt-ink-muted: rgba(244, 236, 216, 0.55);
 		inset 0 3px 16px rgba(0, 0, 0, 0.28);
 }
 
+// Rectangular silhouette (e.g. battleship): straight-edged felt + rail instead of the oval ring.
+:host(.table-shape-rectangle) .table-felt {
+	border-radius: $radius-lg;
+}
+
 :host(.table-variant-felt) .table-felt {
 	background: $felt-green;
 	--table-rail: #{$bg-card};

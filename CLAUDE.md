@@ -54,7 +54,7 @@ npm run test:e2e  # Playwright E2E tests (starts ng serve automatically)
 
 **API (Jest):** `api/src/games/*.spec.ts` for game logic; `api/src/index.spec.ts` for `pfPromise` and `InnerFunctionNotifier`; `api/src/db/mockPlayFab.spec.ts` for the in-memory mock backend. Config in `api/package.json` (jest) + `api/tsconfig.spec.json`.
 
-**Site (Karma/Jasmine):** `site/src/app/services/*.spec.ts` for Angular services. Config via `angular.json` + `tsconfig.spec.json`. Run with `ng test`.
+**Site (Karma/Jasmine):** `site/src/app/services/test/*.spec.ts` for Angular services. Config via `angular.json` + `tsconfig.spec.json`. Run with `ng test`.
 
 **E2E (Playwright):** `site/e2e/*.spec.ts`. All API calls are route-intercepted — no live backend needed. Config in `site/playwright.config.ts`. Install browsers once with `npx playwright install chromium` from `site/`.
 
@@ -62,7 +62,7 @@ npm run test:e2e  # Playwright E2E tests (starts ng serve automatically)
 
 Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps `App` from `src/app/app.component.ts`.
 
-**UI:** Built with Ionic standalone components (imported per-component from `@ionic/angular/standalone`). Routed page components set `host: { class: 'ion-page' }`; the root `App` shell provides a side menu (`ion-menu`) + `ion-router-outlet`. Register `ion-icon` glyphs with `addIcons({ … })` from `ionicons`.
+**UI:** Built with Ionic standalone components (imported per-component from `@ionic/angular/standalone`). Routed page components set `host: { class: 'ion-page' }`; the root `App` shell provides a side menu (`ion-menu`, content in `gg-side-menu`) + `ion-router-outlet`. Register `ion-icon` glyphs with `addIcons({ … })` from `ionicons`.
 
 **Component prefix:** `gg-` (e.g. `gg-app`, `gg-login`). The root element in `src/index.html` must match the root component's selector.
 
@@ -75,19 +75,22 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 **Path aliases** (`site/tsconfig.json`):
 ```
 @gandogames/shared/dto  →  ../shared/index
+@gandogames/shared/*    →  ../shared/games/*
 @gandogames/lib/*       →  ./lib/*
-@gandogames/services/*  →  ./src/app/services/*
+@gandogames/services    →  ./src/app/services/_index   (barrel)
+@gandogames/components  →  ./src/app/components/index  (barrel)
 ```
 
 ### Services
 
-All in `src/app/services/`, imported via `@gandogames/services/<name>.service`.
+All in `src/app/services/`, imported via the `@gandogames/services` barrel (e.g. `import { RoomService } from '@gandogames/services'`). Every service — and any type its consumers need, re-exported with the `type` modifier (`isolatedModules`) — must be listed in `src/app/services/_index.ts`. Inside `src/app/services/` itself, services import each other with relative paths, never through the barrel (avoids import cycles).
 
 - `UserService` — `user` signal; login/register/guest/logout; session ticket persisted in `localStorage`; debounced profile updates
 - `BackendService` — `get()`, `post()`; surfaces any failed request's error message as a toast automatically before rethrowing
 - `RoomService` — `rooms`/`myRooms`/`browsableRooms` signals, CRUD methods, subscribes to SignalR events for reactive updates
 - `SignalRService` — manages HubConnection lifecycle (auto-connect on auth), exposes `events.roomUpsert`, `events.roomDeleted`, `events.gameStateUpdated`, `events.chatMessage`, `events.roomInvite`, `events.friendRequest`, `events.friendsChanged` as RxJS Subjects
 - `FriendService` — `friends`/`incoming`/`outgoing` signals + `pendingCount`; reacts to friend SignalR events
+- `UrlService` — the only place that touches `Router`/`ActivatedRoute`: never inject them elsewhere. `get(branch)` returns per-branch typed `navigate`/`urlTree`/`currentVariables` (derived from the `TREE` object); `current` url signal + `isActive(branch)`. New routes must be added to both `BranchName` and `TREE`
 - `StorageService` — typed `localStorage` wrapper; `ToastService` — toasts and confirm prompts
 
 **BackendService call pattern:** Always specify the return type generic and always declare a typed request variable — never pass an inline object literal as the body. The only exception to `const result = await` is when immediately returning the call result.

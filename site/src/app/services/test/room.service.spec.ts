@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
-import { RoomService } from './room.service';
-import { BackendService } from './backend.service';
-import { AuthUser, UserService } from './user.service';
-import { SignalRService } from './signalr.service';
+import { RoomService } from '../room.service';
+import { BackendService } from '../backend.service';
+import { AuthUser, UserService } from '../user.service';
+import { SignalRService } from '../signalr.service';
 import type { GamePlayer, RoomData } from '@gandogames/shared/dto';
 
 function makePlayer(id: string, name: string): GamePlayer {

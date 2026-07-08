@@ -2,9 +2,8 @@ import { Component, computed, effect, HostListener, inject, input, output, signa
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { BlindLevel, GameSettings, GameType, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { RoomService } from '@gandogames/services/room.service';
-import { ToastService } from '@gandogames/services/toast.service';
 import { BlindLevelsEditorComponent } from './blind-levels-editor.component';
+import { RoomService, ToastService } from '@gandogames/services';
 
 /**
  * Schema-driven editor for a room's game settings. Renders the fields declared by

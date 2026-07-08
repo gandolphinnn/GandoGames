@@ -2,8 +2,7 @@ import { Component, effect, HostListener, inject, input, output, signal } from '
 import { IonIcon } from '@ionic/angular/standalone';
 import { RoomAccessPolicy } from '@gandogames/shared/dto';
 import { ROOM_ACCESS_OPTIONS } from '@gandogames/lib/room-access';
-import { RoomService } from '@gandogames/services/room.service';
-import { ToastService } from '@gandogames/services/toast.service';
+import { RoomService, ToastService } from '@gandogames/services';
 
 /**
  * Lets the host pick a room's access policy (public / friends-only / with-link / closed).

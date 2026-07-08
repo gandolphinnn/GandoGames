@@ -4,9 +4,7 @@ import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonIcon, IonTextarea } from '@ionic/angular/standalone';
 import { ChatMessage } from '@gandogames/shared/dto';
-import { UserService } from '@gandogames/services/user.service';
-import { RoomService } from '@gandogames/services/room.service';
-import { SignalRService } from '@gandogames/services/signalr.service';
+import { RoomService, SignalRService, UserService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-chat',

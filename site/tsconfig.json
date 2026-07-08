@@ -8,7 +8,7 @@
 			"@gandogames/shared/dto": ["../shared/index"],
 			"@gandogames/shared/*": ["../shared/games/*"],
 			"@gandogames/lib/*": ["./lib/*"],
-			"@gandogames/services/*": ["./src/app/services/*"],
+			"@gandogames/services": ["./src/app/services/_index"],
 			"@gandogames/components": ["./src/app/components/index"],
 		},
 		"strict": true,

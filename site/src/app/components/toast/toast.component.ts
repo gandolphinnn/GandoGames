@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { Toast, ToastService } from '@gandogames/services/toast.service';
+import { Toast, ToastService } from '@gandogames/services';
 
 const ICONS: Record<string, string> = {
 	info: 'information-circle',

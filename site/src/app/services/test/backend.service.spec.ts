@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { BackendService } from './backend.service';
-import { ToastService } from './toast.service';
+import { BackendService } from '../backend.service';
+import { ToastService } from '../toast.service';
 
 const API_BASE = '/api'; // environment.apiBaseUrl in the dev/test build
 

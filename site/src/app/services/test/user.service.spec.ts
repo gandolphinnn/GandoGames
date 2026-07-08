@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { UserService } from './user.service';
-import { BackendService } from './backend.service';
-import { StorageService } from './storage.service';
-import { ToastService } from './toast.service';
+import { UserService } from '../user.service';
+import { BackendService } from '../backend.service';
+import { StorageService } from '../storage.service';
+import { ToastService } from '../toast.service';
 import type { AuthResponse } from '@gandogames/shared/dto';
 
 const MOCK_RESPONSE: AuthResponse = {

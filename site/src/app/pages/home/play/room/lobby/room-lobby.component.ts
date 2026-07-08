@@ -5,10 +5,7 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TablePreset, TableSeat } from '@gandogames/lib/common/game-table';
-import { FriendService } from '@gandogames/services/friend.service';
-import { RoomService } from '@gandogames/services/room.service';
-import { ToastService } from '@gandogames/services/toast.service';
-import { UserService } from '@gandogames/services/user.service';
+import { FriendService, RoomService, ToastService, UserService } from '@gandogames/services';
 import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 /** Lobby body for a waiting/ended room. Header, chat and layout are owned by RoomComponent. */

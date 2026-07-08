@@ -7,7 +7,7 @@ import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
-import { ToastService } from '@gandogames/services/toast.service';
+import { ToastService } from '@gandogames/services';
 
 /** Seconds each street lingers before the next one is revealed during an all-in run-out. */
 const REVEAL_DELAY_MS = 2000;

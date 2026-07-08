@@ -1,9 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Friend } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
-import { FriendService } from '@gandogames/services/friend.service';
-import { UserService } from '@gandogames/services/user.service';
-import { ToastService } from '@gandogames/services/toast.service';
+import { FriendService, UserService, ToastService } from '@gandogames/services';
 import { RefreshableContentComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 @Component({

@@ -1,14 +1,11 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
-import { RoomService } from '@gandogames/services/room.service';
-import { UserService } from '@gandogames/services/user.service';
-import { SignalRService } from '@gandogames/services/signalr.service';
-import { ToastService } from '@gandogames/services/toast.service';
+import { UrlService, RoomService, UserService, SignalRService, ToastService } from '@gandogames/services';
 import { ChatComponent, RefreshableContentComponent, RoomAccessModalComponent } from '@gandogames/components';
 import { RoomLobbyComponent } from './lobby/room-lobby.component';
 import { RoomGameComponent } from './game/room-game.component';
@@ -25,15 +22,15 @@ import { RoomGameComponent } from './game/room-game.component';
 	styleUrl: './room.component.scss',
 })
 export class RoomComponent implements OnInit {
-	private readonly route = inject(ActivatedRoute);
-	private readonly router = inject(Router);
+	private readonly urlService = inject(UrlService);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
 	private readonly destroyRef = inject(DestroyRef);
 
-	public readonly roomId = signal('');
+	private readonly playBranch = this.urlService.get('play');
+	public readonly roomId = computed(() => this.playBranch.currentVariables().roomId ?? '');
 	public readonly room = signal<RoomData | null>(null);
 	public readonly copied = signal(false);
 	public readonly showAccessModal = signal(false);
@@ -56,12 +53,16 @@ export class RoomComponent implements OnInit {
 			: async () => { await this.loadRoom(); }
 	);
 
-	public ngOnInit(): void {
-		this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-			this.roomId.set(params.get('roomId') ?? '');
+	constructor() {
+		// Reload whenever the roomId in the URL changes; it becomes '' while navigating away.
+		effect(() => {
+			if (!this.roomId()) return;
 			this.room.set(null);
 			void this.loadRoom();
 		});
+	}
+
+	public ngOnInit(): void {
 		this.subscribeToRoomEvents();
 	}
 
@@ -69,15 +70,15 @@ export class RoomComponent implements OnInit {
 		try {
 			const room = await this.roomService.getRoom(this.roomId());
 			if (room.kickedPlayers?.includes(this.myId())) {
-				void this.router.navigate(['/play']);
+				void this.urlService.get('play').navigate();
 				return;
 			}
 			this.room.set(room);
 			if (room.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
-				void this.router.navigate(['/play']);
+				void this.urlService.get('play').navigate();
 			}
 		} catch {
-			void this.router.navigate(['/play']);
+			void this.urlService.get('play').navigate();
 		}
 	}
 
@@ -86,7 +87,7 @@ export class RoomComponent implements OnInit {
 			if (room.id !== this.roomId()) return;
 			if (room.kickedPlayers?.includes(this.myId())) {
 				this.toast.show('You have been kicked from the room.', 'warning');
-				void this.router.navigate(['/play']);
+				void this.urlService.get('play').navigate();
 				return;
 			}
 			this.room.set(room);
@@ -96,7 +97,7 @@ export class RoomComponent implements OnInit {
 			if (!this.isHost()) {
 				this.toast.warning('The host has closed the room.');
 			}
-			void this.router.navigate(['/play']);
+			void this.urlService.get('play').navigate();
 		});
 	}
 
@@ -105,7 +106,7 @@ export class RoomComponent implements OnInit {
 		if (!confirmed) return;
 
 		await this.roomService.leaveRoom(this.roomId());
-		void this.router.navigate(['/play']);
+		void this.urlService.get('play').navigate();
 	}
 
 	public async closeRoom(): Promise<void> {
@@ -113,7 +114,7 @@ export class RoomComponent implements OnInit {
 		if (!confirmed) return;
 
 		await this.roomService.deleteRoom(this.roomId());
-		void this.router.navigate(['/play']);
+		void this.urlService.get('play').navigate();
 	}
 
 	public async copyCode(): Promise<void> {

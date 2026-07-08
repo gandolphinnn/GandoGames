@@ -30,7 +30,8 @@
 				</ion-item>
 			}
 
-			<ion-item routerDirection="root" routerLink="/play" detail="false" routerLinkActive="selected">
+			<ion-item routerDirection="root" routerLink="/play" detail="false" routerLinkActive="selected"
+				[routerLinkActiveOptions]="{ exact: true }">
 				<ion-icon name="game-controller" slot="start" />
 				<ion-label>Play</ion-label>
 			</ion-item>
@@ -45,7 +46,8 @@
 				<div class="menu-rooms">
 					<p class="menu-section-label">Active Rooms</p>
 					@for (room of myRooms(); track room.id) {
-						<button class="menu-room-item" (click)="goToRoom(room.id)">
+						<button class="menu-room-item" [class.selected]="room.id === activeRoomId()" (click)="goToRoom(room.id)">
+							<i [class]="'menu-room-icon ' + gameIcon(room.game)"></i>
 							<span class="menu-room-id">{{ room.id }}</span>
 							<span class="menu-room-game">{{ gameLabel(room.game) }}</span>
 							@if (room.phase === 'playing') {

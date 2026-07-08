@@ -1,8 +1,0 @@
-// When the split pane pins the menu (room list on desktop), make it look exactly like the
-// open overlay drawer: same 304px width (ion-menu's default --width) and no divider border —
-// the menu's own edge shadow provides the separation, just as it does for the drawer.
-ion-split-pane {
-	--side-width: 304px;
-	--side-max-width: 304px;
-	--border: none;
-}

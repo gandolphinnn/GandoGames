@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
 	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg,
@@ -12,8 +12,8 @@ import { UserService, RoomService, FriendService, UrlService } from '@gandogames
 
 /**
  * The app's side-menu content: brand header, profile shortcut, navigation and the caller's
- * active rooms. Rendered inside the shell's `ion-menu` (App owns the menu/split-pane chrome),
- * so it looks identical whether the menu is an overlay drawer or pinned on desktop.
+ * active rooms. Rendered inside the shell's overlay `ion-menu` (App owns the menu chrome).
+ * The item matching the current page — including the active room — is highlighted.
  */
 @Component({
 	selector: 'gg-side-menu',
@@ -33,12 +33,21 @@ export class SideMenuComponent {
 	private readonly urlService = inject(UrlService);
 	private readonly menuCtrl = inject(MenuController);
 
+	private readonly playBranch = this.urlService.get('play');
+
 	public readonly user = this.userService.user;
 	public readonly myRooms = this.roomService.myRooms;
 	public readonly pendingFriendRequests = this.friendService.pendingCount;
 
+	/** Room id in the current URL, to highlight the matching entry in the active-rooms list. */
+	public readonly activeRoomId = computed(() => this.playBranch.currentVariables().roomId ?? '');
+
 	public gameLabel(game: GameType): string {
 		return GAME_REGISTRY[game]?.name ?? game;
+	}
+
+	public gameIcon(game: GameType): string {
+		return GAME_REGISTRY[game]?.icon ?? '';
 	}
 
 	public async goToRoom(roomId: string): Promise<void> {

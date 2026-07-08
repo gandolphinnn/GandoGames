@@ -53,6 +53,21 @@ gg-player-avatar[slot="start"] {
 	margin-inline-end: $s2;
 }
 
+// Item matching the page currently open (routerLinkActive / active room).
+ion-item.selected {
+	--background: #{$accent-subtle};
+	color: $accent;
+	font-weight: 600;
+
+	ion-icon[slot="start"] {
+		color: $accent;
+	}
+}
+
+ion-button.selected {
+	--color: #{$accent};
+}
+
 .menu-section-label {
 	margin: 0;
 	padding: $s3 $s4 $s1;
@@ -86,6 +101,24 @@ gg-player-avatar[slot="start"] {
 	&:hover {
 		background: $hover-overlay;
 	}
+
+	&.selected {
+		background: $accent-subtle;
+		color: $accent;
+
+		.menu-room-icon,
+		.menu-room-game {
+			color: $accent;
+		}
+	}
+}
+
+.menu-room-icon {
+	width: 20px;
+	flex-shrink: 0;
+	text-align: center;
+	font-size: $text-sm;
+	color: $text-muted;
 }
 
 .menu-room-id {

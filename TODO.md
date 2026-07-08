@@ -1,6 +1,3 @@
-- Redo the UI for the room lobby and game
-	Display a table and sit players around with the active player in a fixed place (TBD where).
-	The table might change depending on the game, so create some presets or use a default and allow games to use overrides. 
 - Redo the behaviour when a user leave a room and when a game is over
 	Display who won and for what reason (game based win or forfeit)
 	BUG: If a player leaves and just one player remain, that player win the game and remove the room from its list but the room stays open for everyone else to see.

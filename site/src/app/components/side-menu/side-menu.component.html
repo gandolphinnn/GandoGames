@@ -51,7 +51,7 @@
 							<span class="menu-room-id">{{ room.id }}</span>
 							<span class="menu-room-game">{{ gameLabel(room.game) }}</span>
 							@if (room.phase === 'playing') {
-								<span class="menu-room-live">LIVE</span>
+								<span class="menu-room-live" aria-label="Live"></span>
 							}
 						</button>
 					}

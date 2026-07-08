@@ -134,11 +134,9 @@ ion-button.selected {
 }
 
 .menu-room-live {
-	font-size: 0.65em;
-	font-weight: 700;
-	letter-spacing: 0.05em;
+	width: 8px;
+	height: 8px;
+	flex-shrink: 0;
+	border-radius: $radius-full;
 	background: $color-success;
-	color: #fff;
-	border-radius: $radius-sm;
-	padding: 1px 5px;
 }

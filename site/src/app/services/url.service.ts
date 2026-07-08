@@ -146,7 +146,11 @@ export class UrlService {
 		const tree = this.router.parseUrl(this.current());
 		const segments = tree.root.children[PRIMARY_OUTLET]?.segments.map(s => s.path) ?? [];
 		const baseSegments = branch.url.split('/').filter(Boolean);
-		const onBranch = baseSegments.every((seg, i) => segments[i] === seg);
+		// A url that exactly matches another branch belongs to that branch: e.g. '/play/new'
+		// is the 'play/new' branch, not the 'play' branch with 'new' as its roomId segment.
+		const path = '/' + segments.join('/');
+		const isOtherBranchUrl = Object.entries(TREE).some(([name, b]) => name !== branchName && b.url === path);
+		const onBranch = !isOtherBranchUrl && baseSegments.every((seg, i) => segments[i] === seg);
 		const result: Record<string, string> = {};
 		let segmentIndex = baseSegments.length;
 

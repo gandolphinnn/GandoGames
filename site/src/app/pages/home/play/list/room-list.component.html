@@ -25,12 +25,28 @@
 				</ion-button>
 			</form>
 
+			@if (myRooms().length > 0) {
+				<div class="my-rooms">
+					<span class="my-rooms-label">Your rooms</span>
+					<div class="my-rooms-chips">
+						@for (room of myRooms(); track room.id) {
+							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.game)" (click)="navigateToRoom(room)">
+								<i [class]="'my-rooms-chip-icon ' + gameIcon(room.game)"></i>
+								<span class="my-rooms-chip-id">{{ room.id }}</span>
+								@if (room.phase === 'playing') {
+									<span class="my-rooms-chip-live" aria-label="Live"></span>
+								}
+							</button>
+						}
+					</div>
+				</div>
+			}
+
 			@if (filteredRooms().length === 0) {
 				<div class="empty-state">
 					<ion-icon name="game-controller" class="empty-icon" />
 					<p class="empty-title">No open rooms to join</p>
 					<p class="empty-subtitle">Create one and invite your friends.</p>
-					<p class="empty-subtitle">You can find rooms you already joined in the "Active Rooms" section of the menu.</p>
 					<ion-button (click)="goToCreate()">+ New Room</ion-button>
 				</div>
 			} @else {

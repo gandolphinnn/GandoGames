@@ -20,6 +20,7 @@ export class RoomListComponent implements OnInit {
 	public readonly allGames = Object.values(GAME_REGISTRY);
 	public readonly activeGames = signal<string[]>([]);
 	public readonly browsableRooms = this.roomService.browsableRooms;
+	public readonly myRooms = this.roomService.myRooms;
 	public readonly loading = signal(false);
 	public readonly joinCode = signal('');
 	public readonly checkingCode = signal(false);
@@ -35,6 +36,10 @@ export class RoomListComponent implements OnInit {
 
 	public gameLabel(id: string): string {
 		return this.allGames.find((g) => g.id === id)?.name ?? id;
+	}
+
+	public gameIcon(id: string): string {
+		return this.allGames.find((g) => g.id === id)?.icon ?? '';
 	}
 
 	public maxPlayers(id: string): number {

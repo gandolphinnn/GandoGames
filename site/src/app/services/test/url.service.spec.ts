@@ -140,6 +140,12 @@ describe('UrlService', () => {
 			expect(service.get('play').currentVariables()).toEqual({});
 		});
 
+		it('does not read a sibling branch url as a segment variable', async () => {
+			// '/play/new' is the 'play/new' branch — 'new' must not become the roomId of 'play'.
+			await router.navigateByUrl('/play/new');
+			expect(service.get('play').currentVariables()).toEqual({});
+		});
+
 		it('updates reactively across navigations', async () => {
 			const variables = service.get('play').currentVariables;
 

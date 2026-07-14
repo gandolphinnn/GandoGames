@@ -58,7 +58,7 @@
 		"DELETE_ACCOUNT": "Elimina account",
 		"LOGOUT_CONFIRM": "Vuoi davvero uscire?",
 		"DELETE_CONFIRM": "Questo eliminerà definitivamente il tuo account. L'operazione non può essere annullata.",
-		"UPDATE_FAILED": "Aggiornamento del profilo non riuscito",
+		"SAVED": "Profilo salvato",
 		"ICONS": {
 			"PROFILE": "Profilo",
 			"LUCK": "Quadrifoglio",

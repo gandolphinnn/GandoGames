@@ -58,7 +58,7 @@
 		"DELETE_ACCOUNT": "Delete account",
 		"LOGOUT_CONFIRM": "Are you sure you want to log out?",
 		"DELETE_CONFIRM": "This will permanently delete your account. This cannot be undone.",
-		"UPDATE_FAILED": "Failed to update profile",
+		"SAVED": "Profile saved",
 		"ICONS": {
 			"PROFILE": "Profile",
 			"LUCK": "Clover",

@@ -1,33 +1,50 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
+import { AuthResponse, BaseRequest, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
-import { ToastService } from './toast.service';
 
 export interface AuthUser extends AuthResponse {
 	isGuest: boolean;
 }
 
-const PROFILE_UPDATE_DEBOUNCE = 1000;
 @Injectable({ providedIn: 'root' })
 export class UserService {
 	private readonly backend = inject(BackendService);
 	private readonly storage = inject(StorageService);
-	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
 	private readonly _user = signal<AuthUser | null>(null);
 	public readonly user = this._user.asReadonly();
 	public readonly isLoggedIn = computed(() => this._user() !== null);
 
-	public readonly theme = computed(() => this.user()?.player.theme || 'dark');
-	public readonly isDarkTheme = computed(() => this.theme() !== 'light');
-	public readonly language = computed(() => this.user()?.player.language || 'en');
+	/**
+	 * Uncommitted profile changes (theme/language/icon), applied app-wide as a live
+	 * preview through the theme/language effects. Persisted only by `saveProfile()`;
+	 * `discardPreview()` reverts everything to the saved profile.
+	 */
+	private readonly _preview = signal<Partial<ProfileData> | null>(null);
 
-	private updateTimer: ReturnType<typeof setTimeout> | null = null;
-	private pendingUpdate: Partial<ProfileData> | null = null;
-	private preUpdateSnapshot: AuthUser | null = null;
+	public readonly theme = computed(() => this._preview()?.theme ?? this.user()?.player.theme ?? 'dark');
+	public readonly isDarkTheme = computed(() => this.theme() !== 'light');
+	public readonly language = computed(() => this._preview()?.language ?? this.user()?.player.language ?? 'en');
+
+	/** The player as it looks with the pending preview applied — what the profile UI renders. */
+	public readonly previewedPlayer = computed<GamePlayer | null>(() => {
+		const user = this.user();
+		if (!user) return null;
+		const preview = this._preview();
+		return preview ? { ...user.player, ...preview } : user.player;
+	});
+
+	/** True when the preview differs from the saved profile — enables the Save button. */
+	public readonly hasPendingChanges = computed(() => {
+		const user = this.user();
+		const preview = this._preview();
+		if (!user || !preview) return false;
+		return (Object.entries(preview) as [keyof ProfileData, ProfileData[keyof ProfileData]][])
+			.some(([key, value]) => user.player[key] !== value);
+	});
 
 	//#region Init
 	constructor() {
@@ -86,37 +103,35 @@ export class UserService {
 
 	public logout(): void {
 		this._user.set(null);
+		this._preview.set(null);
 		this.storage.remove('sessionTicket');
 	}
 	//#endregion Auth
 
-	public updateProfileData(data: Partial<ProfileData>): void {
-		const user = this._user();
-		if (!user) return;
-		if (!this.pendingUpdate) this.preUpdateSnapshot = user;
-		this.pendingUpdate = { ...this.pendingUpdate, ...data };
-		this._user.set({ ...user, player: { ...user.player, ...data } });
-		if (this.updateTimer !== null) clearTimeout(this.updateTimer);
-		this.updateTimer = setTimeout(() => void this.flushProfileUpdate(), PROFILE_UPDATE_DEBOUNCE);
+	//#region Profile preview
+	/** Stage profile changes as a live preview; nothing is sent to the API until `saveProfile()`. */
+	public previewProfileData(data: Partial<ProfileData>): void {
+		if (!this._user()) return;
+		this._preview.update(preview => ({ ...preview, ...data }));
 	}
 
-	private async flushProfileUpdate(): Promise<void> {
-		this.updateTimer = null;
-		const snapshot = { ... this.preUpdateSnapshot!};
-		const data = { ... this.pendingUpdate!};
-		this.pendingUpdate = null;
-		this.preUpdateSnapshot = null;
-		try {
-			const request: ProfileUpdateRequest = { sessionTicket: snapshot.sessionTicket, ...data };
-			const result = await this.backend.post<ProfileData>('/profile/update', request);
-			const current = this._user();
-			if (current) this._user.set({ ...current, player: { ...current.player, ...result } });
-		} catch (err) {
-			this._user.set(snapshot);
-			this.toast.warning(this.translate.instant('PROFILE.UPDATE_FAILED') as string);
-			console.error('Profile update error:', err);
-		}
+	/** Drop the pending preview, reverting theme/language/icon to the saved profile. */
+	public discardPreview(): void {
+		this._preview.set(null);
 	}
+
+	/** Persist the pending preview in a single API call. On failure the preview is kept, so it can be retried. */
+	public async saveProfile(): Promise<void> {
+		const user = this._user();
+		const preview = this._preview();
+		if (!user || !preview) return;
+		const request: ProfileUpdateRequest = { sessionTicket: user.sessionTicket, ...preview };
+		const result = await this.backend.post<ProfileData>('/profile/update', request);
+		const current = this._user();
+		if (current) this._user.set({ ...current, player: { ...current.player, ...result } });
+		this._preview.set(null);
+	}
+	//#endregion Profile preview
 
 	public async deleteAccount(): Promise<void> {
 		const user = this._user();

@@ -13,16 +13,16 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-	@if (user(); as u) {
+	@if (player(); as p) {
 		<div class="profile-wrap">
 			<ion-card class="profile-card">
 
 				<div class="profile-top">
 					<div class="avatar-wrapper">
-						<gg-player-avatar class="profile-avatar" [player]="u.player" />
+						<gg-player-avatar class="profile-avatar" [player]="p" />
 					</div>
-					<span class="profile-name">{{ u.player.name }}</span>
-					@if (u.isGuest) {
+					<span class="profile-name">{{ p.name }}</span>
+					@if (user()?.isGuest) {
 						<span class="guest-badge">{{ 'COMMON.GUEST' | translate }}</span>
 					}
 				</div>
@@ -47,7 +47,7 @@
 							<ion-icon name="language-outline" />
 							<span>{{ 'PROFILE.LANGUAGE' | translate }}</span>
 						</div>
-						<ion-select [value]="u.player.language" interface="popover" (ionChange)="setLanguage($event.detail.value)">
+						<ion-select [value]="p.language" interface="popover" (ionChange)="setLanguage($event.detail.value)">
 							@for (lang of languages; track lang.value) {
 								<ion-select-option [value]="lang.value">{{ lang.text }}</ion-select-option>
 							}
@@ -61,15 +61,21 @@
 							@for (icon of icons; track icon.id) {
 								<button
 									class="icon-btn"
-									[class.selected]="u.player.icon === icon.id"
+									[class.selected]="p.icon === icon.id"
 									type="button"
 									[attr.aria-label]="('PROFILE.ICONS.' + icon.id.toUpperCase()) | translate"
 									(click)="setIcon(icon.id)">
-									<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
+									<gg-player-avatar [player]="withIcon(p, icon.id)" />
 								</button>
 							}
 						</div>
 					</div>
+				</div>
+
+				<div class="save-section">
+					<ion-button expand="block" [disabled]="!hasPendingChanges() || saving()" (click)="save()">
+						{{ (saving() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}
+					</ion-button>
 				</div>
 
 				<div class="delete-section">

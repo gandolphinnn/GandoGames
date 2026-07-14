@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideTranslateService } from '@ngx-translate/core';
 import { UserService } from '../user.service';
 import { BackendService } from '../backend.service';
 import { StorageService } from '../storage.service';
@@ -24,6 +25,7 @@ describe('UserService', () => {
 			providers: [
 				UserService,
 				StorageService,
+				provideTranslateService(),
 				{ provide: BackendService, useValue: backendSpy },
 				{ provide: ToastService, useValue: toastSpy },
 			],

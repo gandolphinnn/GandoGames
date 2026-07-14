@@ -1,4 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
@@ -13,6 +14,7 @@ export class FriendService {
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly friends = signal<Friend[]>([]);
 	public readonly incoming = signal<Friend[]>([]);
@@ -40,7 +42,7 @@ export class FriendService {
 		});
 
 		this.signalR.events.friendRequest.subscribe(from => {
-			this.toast.show(`${from.name} sent you a friend request`, 'info');
+			this.toast.show(this.translate.instant('SOCIAL.REQUEST_RECEIVED', { name: from.name }) as string, 'info');
 			void this.loadFriends();
 		});
 		this.signalR.events.friendsChanged.subscribe(() => void this.loadFriends());

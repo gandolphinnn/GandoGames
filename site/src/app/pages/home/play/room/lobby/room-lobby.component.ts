@@ -1,5 +1,6 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
@@ -20,6 +21,7 @@ export class RoomLobbyComponent {
 	private readonly friendService = inject(FriendService);
 	private readonly auth = inject(UserService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly room = input.required<RoomData | null>();
 	public readonly roomAccessClass = computed(() => {
@@ -55,14 +57,14 @@ export class RoomLobbyComponent {
 		return r.players.length < maxPlayers;
 	});
 
-	/** Why a non-member can't join right now (empty when they can, or are already in). */
+	/** Why a non-member can't join right now, as a translation key (empty when they can, or are already in). */
 	public readonly joinBlockedReason = computed(() => {
 		const r = this.room();
 		if (!r || r.phase !== 'waiting' || this.isInRoom() || this.canJoin()) return '';
-		if (r.kickedPlayers?.includes(this.myId())) return 'You have been kicked from this room.';
-		if ((r.access ?? 'public') === 'closed') return 'This room is closed.';
-		if ((r.access ?? 'public') === 'friends' && !this.isHostFriend()) return "Only the host's friends can join this room.";
-		return 'This room is full.';
+		if (r.kickedPlayers?.includes(this.myId())) return 'LOBBY.BLOCKED_KICKED';
+		if ((r.access ?? 'public') === 'closed') return 'LOBBY.BLOCKED_CLOSED';
+		if ((r.access ?? 'public') === 'friends' && !this.isHostFriend()) return 'LOBBY.BLOCKED_FRIENDS';
+		return 'LOBBY.BLOCKED_FULL';
 	});
 
 	public readonly canStart = computed(() => {
@@ -128,7 +130,7 @@ export class RoomLobbyComponent {
 	}
 
 	public async kick(player: GamePlayer): Promise<void> {
-		const confirmed = await this.toast.yesNo(`Kick ${player.name} from the room?`);
+		const confirmed = await this.toast.yesNo(this.translate.instant('LOBBY.KICK_CONFIRM', { name: player.name }) as string);
 		if (!confirmed) return;
 
 		await this.roomService.kickPlayer(this.roomId(), player.id);
@@ -154,7 +156,7 @@ export class RoomLobbyComponent {
 		this.addingFriendId.set(slot.id);
 		try {
 			await this.friendService.sendRequest(slot.id);
-			this.toast.success(`Friend request sent to ${slot.name}`);
+			this.toast.success(this.translate.instant('SOCIAL.REQUEST_SENT', { name: slot.name }) as string);
 		} finally {
 			this.addingFriendId.set(null);
 		}

@@ -3,13 +3,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonIcon, IonTextarea } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ChatMessage } from '@gandogames/shared/dto';
 import { RoomService, SignalRService, UserService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-chat',
 	standalone: true,
-	imports: [DatePipe, FormsModule, IonIcon, IonTextarea, NgTemplateOutlet],
+	imports: [DatePipe, FormsModule, IonIcon, IonTextarea, NgTemplateOutlet, TranslatePipe],
 	templateUrl: './chat.component.html',
 	styleUrl: './chat.component.scss',
 })

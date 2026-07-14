@@ -25,7 +25,7 @@ export function createDeck(ranks: readonly Rank[] = RANKS): Card[] {
 	return deck;
 }
 
-/** Fisher–Yates shuffle returning a new array; the input is left untouched. */
+/** Fisher-Yates shuffle returning a new array; the input is left untouched. */
 export function shuffle<T>(arr: T[]): T[] {
 	const a = [...arr];
 	for (let i = a.length - 1; i > 0; i--) {

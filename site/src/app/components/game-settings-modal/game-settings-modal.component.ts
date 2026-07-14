@@ -1,5 +1,6 @@
 import { Component, computed, effect, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BlindLevel, GameSettings, GameType, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BlindLevelsEditorComponent } from './blind-levels-editor.component';
@@ -12,13 +13,14 @@ import { RoomService, ToastService } from '@gandogames/services';
  */
 @Component({
 	selector: 'gg-game-settings-modal',
-	imports: [IonIcon, IonToggle, BlindLevelsEditorComponent],
+	imports: [IonIcon, IonToggle, BlindLevelsEditorComponent, TranslatePipe],
 	templateUrl: './game-settings-modal.component.html',
 	styleUrl: './game-settings-modal.component.scss',
 })
 export class GameSettingsModalComponent {
 	private readonly roomService = inject(RoomService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly game = input.required<GameType>();
 	public readonly roomId = input.required<string>();
@@ -39,6 +41,12 @@ export class GameSettingsModalComponent {
 	constructor() {
 		// Re-seed whenever the game/settings inputs settle (e.g. a SignalR room update arrives).
 		effect(() => this.working.set(resolveSettings(this.schema(), this.settings())));
+	}
+
+	/** i18n key for a schema field's label/hint: GAME_SETTINGS.<GAME>.<FIELD_KEY>.<part> (field.key camelCase → UPPER_SNAKE). */
+	public fieldKey(field: SettingField, part: 'LABEL' | 'HINT'): string {
+		const fieldSegment = field.key.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
+		return `GAME_SETTINGS.${this.game().toUpperCase()}.${fieldSegment}.${part}`;
 	}
 
 	public num(key: string): number {
@@ -83,7 +91,7 @@ export class GameSettingsModalComponent {
 			// Clamp/normalize once more before sending; the server validates again against the schema.
 			const settings = resolveSettings(this.schema(), this.working());
 			await this.roomService.setGameSettings(this.game(), this.roomId(), settings);
-			this.toast.success('Game settings saved');
+			this.toast.success(this.translate.instant('SETTINGS_MODAL.SAVED') as string);
 			this.closed.emit();
 		} finally {
 			this.saving.set(false);

@@ -6,7 +6,7 @@
 				<ion-icon name="arrow-back" slot="icon-only" />
 			</ion-button>
 		</ion-buttons>
-		<ion-title>New Room</ion-title>
+		<ion-title>{{ 'ROOM_NEW.TITLE' | translate }}</ion-title>
 	</ion-toolbar>
 </ion-header>
 
@@ -22,15 +22,19 @@
 					>
 						<i [class]="'game-card-icon ' + game.icon"></i>
 						<span class="game-card-name">{{ game.name }}</span>
-						<span class="game-card-desc">{{ game.description }}</span>
-						<span class="game-card-players">{{ playerCountLabel(game) }}</span>
+						<span class="game-card-desc">{{ game.description | translate }}</span>
+						<span class="game-card-players">
+							{{ (game.minPlayers === game.maxPlayers
+								? ('GAMES.PLAYER_COUNT_FIXED' | translate: { count: game.minPlayers })
+								: ('GAMES.PLAYER_COUNT_RANGE' | translate: { min: game.minPlayers, max: game.maxPlayers })) }}
+						</span>
 					</button>
 				}
 			</div>
 
 			<div class="form-actions">
 				<ion-button [disabled]="!selectedGameId() || loading()" (click)="create()">
-					{{ loading() ? 'Creating…' : 'Create Room' }}
+					{{ (loading() ? 'ROOM_NEW.CREATING' : 'ROOM_NEW.CREATE') | translate }}
 				</ion-button>
 			</div>
 		</div>

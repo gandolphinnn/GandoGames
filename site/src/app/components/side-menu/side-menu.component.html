@@ -24,7 +24,7 @@
 					<gg-player-avatar slot="start" [player]="u.player" />
 					<ion-label>{{ u.player.name }}</ion-label>
 					@if (u.isGuest) {
-						<span slot="end" class="menu-user-badge">Guest</span>
+						<span slot="end" class="menu-user-badge">{{ 'COMMON.GUEST' | translate }}</span>
 					}
 					<!-- <ion-icon name="chevron-forward" slot="end" class="menu-user-chevron" /> -->
 				</ion-item>
@@ -33,18 +33,18 @@
 			<ion-item routerDirection="root" routerLink="/play" detail="false" routerLinkActive="selected"
 				[routerLinkActiveOptions]="{ exact: true }">
 				<ion-icon name="game-controller" slot="start" />
-				<ion-label>Play</ion-label>
+				<ion-label>{{ 'MENU.PLAY' | translate }}</ion-label>
 			</ion-item>
 			<ion-item routerDirection="root" routerLink="/social" detail="false" routerLinkActive="selected">
 				<ion-icon name="people" slot="start" />
-				<ion-label>Social</ion-label>
+				<ion-label>{{ 'MENU.SOCIAL' | translate }}</ion-label>
 				@if (pendingFriendRequests() > 0) {
 					<span slot="end" class="menu-badge">{{ pendingFriendRequests() }}</span>
 				}
 			</ion-item>
 			@if (myRooms().length > 0) {
 				<div class="menu-rooms">
-					<p class="menu-section-label">Active Rooms</p>
+					<p class="menu-section-label">{{ 'MENU.ACTIVE_ROOMS' | translate }}</p>
 					@for (room of myRooms(); track room.id) {
 						<button class="menu-room-item" [class.selected]="room.id === activeRoomId()" (click)="goToRoom(room.id)">
 							<i [class]="'menu-room-icon ' + gameIcon(room.game)"></i>

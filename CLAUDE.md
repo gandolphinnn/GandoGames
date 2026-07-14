@@ -72,6 +72,8 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 
 **Responsiveness:** All components must be mobile-first. Use `@media (min-width: $bp-sm)` (defined in `src/styles/_variables.scss`) to scale up for larger screens. Touch targets must be at least 44×44 px.
 
+**i18n (ngx-translate):** Every user-facing string is a translation key — never hardcode UI text. Languages: `en` (default/fallback) and `it`, in `src/i18n/en.json` + `src/i18n/it.json` (bundled at build time via `StaticTranslateLoader` — no HTTP fetch). Keep the two files' key sets identical. Keys are `UPPER_SNAKE` per dot-segment (`LOBBY.KICK_CONFIRM`). In templates use the `translate` pipe (`{{ 'LOBBY.JOIN' | translate }}`, params: `{{ 'LOBBY.KICK_CONFIRM' | translate: { name } }}`; `TranslatePipe` is already in `ION_IMPORTS`); in TS use `translate.instant('KEY', params) as string`. The active language follows the user profile (`UserService.language` effect). Deliberately NOT translated: API error messages, poker hand descriptions (`describeHand` is shared with the server's showdown results), and proper nouns (game names, "GandoGames").
+
 **Path aliases** (`site/tsconfig.json`):
 ```
 @gandogames/shared/dto  →  ../shared/index

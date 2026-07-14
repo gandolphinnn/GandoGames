@@ -1,5 +1,5 @@
 @if (!gameState()) {
-	<div class="game-loading"><p>Loading game…</p></div>
+	<div class="game-loading"><p>{{ 'COMMON.LOADING_GAME' | translate }}</p></div>
 } @else {
 	@let gs = gameState()!;
 
@@ -12,9 +12,9 @@
 		<!-- Centre: the current claim -->
 		<div table-center class="pv-center">
 			@if (gs.previousDeclaration !== null) {
-				<span class="pv-center-eyebrow">Current claim</span>
+				<span class="pv-center-eyebrow">{{ 'PANKOV.CURRENT_CLAIM' | translate }}</span>
 				<span class="pv-center-value">{{ formatValue(gs.previousDeclaration) }}</span>
-				<span class="pv-center-by">by {{ previousPlayer()?.name }}</span>
+				<span class="pv-center-by">{{ 'PANKOV.BY' | translate: { name: previousPlayer()?.name } }}</span>
 			} @else {
 				<span class="pv-center-value pv-center-value-idle">Pankov</span>
 			}
@@ -32,7 +32,7 @@
 					}
 				</span>
 			} @else {
-				<span class="pv-name pv-name-muted">Open</span>
+				<span class="pv-name pv-name-muted">{{ 'PANKOV.OPEN_SEAT' | translate }}</span>
 			}
 		</ng-template>
 
@@ -44,39 +44,41 @@
 					@if (isMyTurn()) {
 						<div class="panel">
 							@if (gs.previousDeclaration !== null) {
-								<p class="panel-eyebrow">Beat {{ formatValue(gs.previousDeclaration) }} or call the bluff</p>
+								<p class="panel-eyebrow">{{ 'PANKOV.BEAT_OR_CALL' | translate: { value: formatValue(gs.previousDeclaration) } }}</p>
 							} @else {
-								<p class="panel-eyebrow">Your turn — you go first</p>
+								<p class="panel-eyebrow">{{ 'PANKOV.YOUR_TURN_FIRST' | translate }}</p>
 							}
 							<div class="action-row">
 								@if (canRoll()) {
-									<ion-button [disabled]="loading()" (click)="roll()">Roll dice</ion-button>
+									<ion-button [disabled]="loading()" (click)="roll()">{{ 'PANKOV.ROLL_DICE' | translate }}</ion-button>
 								}
 								@if (gs.previousDeclaration !== null) {
 									<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="challenge()">
-										Challenge!{{ challengeStake() > 1 ? ' (−' + challengeStake() + ' lives)' : '' }}
+										{{ (challengeStake() > 1
+											? ('PANKOV.CHALLENGE_STAKE' | translate: { count: challengeStake() })
+											: ('PANKOV.CHALLENGE' | translate)) }}
 									</ion-button>
 								}
 							</div>
 							@if (challengeStake() > 1) {
-								<p class="hint">Sudden death — a wrong challenge now costs {{ challengeStake() }} lives.</p>
+								<p class="hint">{{ 'PANKOV.SUDDEN_DEATH_HINT' | translate: { count: challengeStake() } }}</p>
 							}
 							@if (error()) { <p class="action-error">{{ error() }}</p> }
 						</div>
 					} @else {
-						<p class="pv-waiting">Waiting for <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
+						<p class="pv-waiting">{{ 'COMMON.WAITING_FOR' | translate }} <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
 					}
 				}
 
 				@case ('rolled') {
 					@if (isMyTurn()) {
 						<div class="panel">
-							<p class="panel-eyebrow">You rolled</p>
+							<p class="panel-eyebrow">{{ 'PANKOV.YOU_ROLLED' | translate }}</p>
 							<p class="panel-claim panel-claim-roll">{{ gs.currentRoll !== null ? formatValue(gs.currentRoll) : '?' }}</p>
 							@if (gs.previousDeclaration !== null) {
-								<p class="hint">Must declare higher than {{ formatValue(gs.previousDeclaration) }}</p>
+								<p class="hint">{{ 'PANKOV.DECLARE_HIGHER' | translate: { value: formatValue(gs.previousDeclaration) } }}</p>
 							} @else {
-								<p class="hint">Choose what to declare</p>
+								<p class="hint">{{ 'PANKOV.CHOOSE_DECLARE' | translate }}</p>
 							}
 							<div class="declare-grid">
 								@for (v of validDeclarations(); track v) {
@@ -92,42 +94,42 @@
 							@if (error()) { <p class="action-error">{{ error() }}</p> }
 						</div>
 					} @else {
-						<p class="pv-waiting">{{ currentPlayer()?.name }} is rolling<span class="waiting-dots"> · · ·</span></p>
+						<p class="pv-waiting">{{ 'PANKOV.IS_ROLLING' | translate: { name: currentPlayer()?.name } }}<span class="waiting-dots"> · · ·</span></p>
 					}
 				}
 
 				@case ('result') {
 					@let r = gs.revealResult!;
 					<div class="panel">
-						<h2 class="panel-title">Reveal</h2>
+						<h2 class="panel-title">{{ 'PANKOV.REVEAL' | translate }}</h2>
 						<div class="reveal-panel">
 							<div class="reveal-row">
-								<span class="reveal-label">Claimed</span>
+								<span class="reveal-label">{{ 'PANKOV.CLAIMED' | translate }}</span>
 								<span class="reveal-value">{{ formatValue(r.declared) }}</span>
 							</div>
 							<div class="reveal-row">
-								<span class="reveal-label">Actual</span>
+								<span class="reveal-label">{{ 'PANKOV.ACTUAL' | translate }}</span>
 								<span class="reveal-value">{{ formatValue(r.actual) }}</span>
 							</div>
 						</div>
 						@if (r.wasLying) {
 							<p class="verdict verdict-lie">
-								{{ gs.players[r.loserIndex]?.name }} was lying — −{{ r.livesLost }} {{ r.livesLost === 1 ? 'life' : 'lives' }}
+								{{ (r.livesLost === 1 ? 'PANKOV.LYING_ONE' : 'PANKOV.LYING_MANY') | translate: { name: gs.players[r.loserIndex]?.name, count: r.livesLost } }}
 							</p>
 						} @else {
 							<p class="verdict verdict-honest">
-								Honest! {{ gs.players[r.loserIndex]?.name }} loses −{{ r.livesLost }} {{ r.livesLost === 1 ? 'life' : 'lives' }}
+								{{ (r.livesLost === 1 ? 'PANKOV.HONEST_ONE' : 'PANKOV.HONEST_MANY') | translate: { name: gs.players[r.loserIndex]?.name, count: r.livesLost } }}
 							</p>
 						}
-						<ion-button [disabled]="loading()" (click)="continueGame()">Continue</ion-button>
+						<ion-button [disabled]="loading()" (click)="continueGame()">{{ 'PANKOV.CONTINUE' | translate }}</ion-button>
 					</div>
 				}
 
 				@case ('game-over') {
 					<div class="panel panel-centered">
-						<p class="panel-eyebrow">Winner</p>
+						<p class="panel-eyebrow">{{ 'COMMON.WINNER' | translate }}</p>
 						<h2 class="panel-title winner-name">{{ gs.winnerName }}</h2>
-						<ion-button (click)="playAgain.emit()">Play Again</ion-button>
+						<ion-button (click)="playAgain.emit()">{{ 'COMMON.PLAY_AGAIN' | translate }}</ion-button>
 					</div>
 				}
 

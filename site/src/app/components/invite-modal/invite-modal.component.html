@@ -3,17 +3,17 @@
 <div class="modal" (click)="$event.stopPropagation()">
 
 	<header class="modal-header">
-		<h2 class="modal-title">Invite to Room</h2>
-		<button class="modal-close" (click)="closed.emit()" title="Close">
+		<h2 class="modal-title">{{ 'INVITE_MODAL.TITLE' | translate }}</h2>
+		<button class="modal-close" (click)="closed.emit()" [title]="'COMMON.CLOSE' | translate">
 			<ion-icon name="close" />
 		</button>
 	</header>
 
 	<div class="modal-body">
 		@if (!isHost()) {
-			<p class="empty-msg">Only the host can invite players to this room.</p>
+			<p class="empty-msg">{{ 'INVITE_MODAL.HOST_ONLY' | translate }}</p>
 		} @else if (isGuest()) {
-			<p class="empty-msg">Sign up for a full account to add friends and invite them.</p>
+			<p class="empty-msg">{{ 'INVITE_MODAL.GUEST_CTA' | translate }}</p>
 		} @else {
 			<div class="invite-section">
 				<input
@@ -21,17 +21,17 @@
 					class="invite-search"
 					type="search"
 					autocomplete="off"
-					placeholder="Search friends…"
+					[placeholder]="'INVITE_MODAL.SEARCH_PLACEHOLDER' | translate"
 					(input)="search.set(searchBox.value)" />
 
 				@if (isFull()) {
-					<p class="empty-msg">This room is full.</p>
+					<p class="empty-msg">{{ 'LOBBY.BLOCKED_FULL' | translate }}</p>
 				}
 
 				@if (!friends().length) {
-					<p class="empty-msg">You have no friends yet. Add players from a room's lobby.</p>
+					<p class="empty-msg">{{ 'INVITE_MODAL.NO_FRIENDS' | translate }}</p>
 				} @else if (!filteredFriends().length) {
-					<p class="empty-msg">No friends match your search.</p>
+					<p class="empty-msg">{{ 'INVITE_MODAL.NO_MATCH' | translate }}</p>
 				} @else {
 					<ul class="player-list">
 						@for (friend of filteredFriends(); track friend.id) {
@@ -39,18 +39,18 @@
 								<gg-player-avatar class="player-row-avatar" [player]="friend" />
 								<span class="player-row-name">{{ friend.name }}</span>
 								@if (isInRoom(friend.id)) {
-									<span class="player-row-status">In room</span>
+									<span class="player-row-status">{{ 'INVITE_MODAL.IN_ROOM' | translate }}</span>
 								} @else if (invited().includes(friend.id)) {
 									<button class="btn-row-action btn-row-action-done" disabled>
 										<ion-icon name="checkmark" />
-										Invited
+										{{ 'INVITE_MODAL.INVITED' | translate }}
 									</button>
 								} @else {
 									<button
 										class="btn-row-action"
 										[disabled]="isFull() || busyId() === friend.id"
 										(click)="invite(friend)">
-										Invite
+										{{ 'INVITE_MODAL.INVITE' | translate }}
 									</button>
 								}
 							</li>

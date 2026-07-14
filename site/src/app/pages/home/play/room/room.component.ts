@@ -1,6 +1,7 @@
 import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
@@ -27,6 +28,7 @@ export class RoomComponent implements OnInit {
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	private readonly playBranch = this.urlService.get('play');
@@ -86,7 +88,7 @@ export class RoomComponent implements OnInit {
 		this.signalR.events.roomUpsert.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((room) => {
 			if (room.id !== this.roomId()) return;
 			if (room.kickedPlayers?.includes(this.myId())) {
-				this.toast.show('You have been kicked from the room.', 'warning');
+				this.toast.show(this.translate.instant('ROOM.KICKED') as string, 'warning');
 				void this.urlService.get('play').navigate();
 				return;
 			}
@@ -95,14 +97,14 @@ export class RoomComponent implements OnInit {
 		this.signalR.events.roomDeleted.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((roomId) => {
 			if (roomId !== this.roomId()) return;
 			if (!this.isHost()) {
-				this.toast.warning('The host has closed the room.');
+				this.toast.warning(this.translate.instant('ROOM.HOST_CLOSED') as string);
 			}
 			void this.urlService.get('play').navigate();
 		});
 	}
 
 	public async leave(): Promise<void> {
-		const confirmed = await this.toast.yesNo('Are you sure you want to leave the room?');
+		const confirmed = await this.toast.yesNo(this.translate.instant('ROOM.LEAVE_CONFIRM') as string);
 		if (!confirmed) return;
 
 		await this.roomService.leaveRoom(this.roomId());
@@ -110,7 +112,7 @@ export class RoomComponent implements OnInit {
 	}
 
 	public async closeRoom(): Promise<void> {
-		const confirmed = await this.toast.yesNo('Close the room for everyone?');
+		const confirmed = await this.toast.yesNo(this.translate.instant('ROOM.CLOSE_CONFIRM') as string);
 		if (!confirmed) return;
 
 		await this.roomService.deleteRoom(this.roomId());

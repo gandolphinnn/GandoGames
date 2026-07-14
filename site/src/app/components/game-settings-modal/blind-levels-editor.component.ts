@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BlindLevel } from '@gandogames/shared/dto';
 
 /**
@@ -10,6 +11,7 @@ import { BlindLevel } from '@gandogames/shared/dto';
 @Component({
 	selector: 'gg-blind-levels-editor',
 	standalone: true,
+	imports: [TranslatePipe],
 	templateUrl: './blind-levels-editor.component.html',
 	styleUrl: './blind-levels-editor.component.scss',
 })

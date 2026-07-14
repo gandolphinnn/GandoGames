@@ -12,6 +12,7 @@
 			"@gandogames/components": ["./src/app/components/index"],
 		},
 		"strict": true,
+		"resolveJsonModule": true,
 		"noImplicitOverride": true,
 		"noPropertyAccessFromIndexSignature": true,
 		"noImplicitReturns": true,

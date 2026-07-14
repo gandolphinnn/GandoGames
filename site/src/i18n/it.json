@@ -1,0 +1,279 @@
+{
+	"COMMON": {
+		"YES": "Sì",
+		"NO": "No",
+		"CLOSE": "Chiudi",
+		"SAVE": "Salva",
+		"SAVING": "Salvataggio…",
+		"GUEST": "Ospite",
+		"LOADING_GAME": "Caricamento partita…",
+		"WAITING_FOR": "In attesa di",
+		"WINNER": "Vincitore",
+		"PLAY_AGAIN": "Gioca ancora"
+	},
+	"MENU": {
+		"PLAY": "Gioca",
+		"SOCIAL": "Social",
+		"ACTIVE_ROOMS": "Stanze attive"
+	},
+	"ABOUT": {
+		"TITLE": "Informazioni",
+		"HEADING": "Informazioni su GandoGames",
+		"TAGLINE": "Una piccola raccolta di party game multiplayer giocabili nel browser.",
+		"STACK": "Realizzato con Angular, Azure Functions e PlayFab."
+	},
+	"AUTH": {
+		"WELCOME_BACK": "Bentornato",
+		"LOGIN_SUBTITLE": "Accedi a GandoGames",
+		"EMAIL": "Email",
+		"PASSWORD": "Password",
+		"USERNAME": "Nome utente",
+		"USERNAME_PLACEHOLDER": "IlTuoNome",
+		"LOGIN": "Accedi",
+		"LOGGING_IN": "Accesso…",
+		"NO_ACCOUNT": "Non hai un account?",
+		"SIGN_UP": "Registrati",
+		"OR": "oppure",
+		"CONTINUE_AS_GUEST": "Continua come ospite",
+		"CREATE_ACCOUNT": "Crea account",
+		"CREATING_ACCOUNT": "Creazione account…",
+		"SIGNUP_SUBTITLE": "Unisciti a GandoGames",
+		"ALREADY_HAVE_ACCOUNT": "Hai già un account?",
+		"ERRORS": {
+			"EMAIL_REQUIRED": "L'email è obbligatoria",
+			"EMAIL_INVALID": "Inserisci un'email valida",
+			"PASSWORD_REQUIRED": "La password è obbligatoria",
+			"PASSWORD_MIN_LENGTH": "Almeno 6 caratteri",
+			"USERNAME_REQUIRED": "Il nome utente è obbligatorio",
+			"USERNAME_MIN_LENGTH": "Almeno 3 caratteri",
+			"USERNAME_MAX_LENGTH": "Al massimo 20 caratteri"
+		}
+	},
+	"PROFILE": {
+		"TITLE": "Profilo",
+		"LOGOUT": "Esci",
+		"THEME": "Tema",
+		"LANGUAGE": "Lingua",
+		"AVATAR": "Avatar",
+		"DELETE_ACCOUNT": "Elimina account",
+		"LOGOUT_CONFIRM": "Vuoi davvero uscire?",
+		"DELETE_CONFIRM": "Questo eliminerà definitivamente il tuo account. L'operazione non può essere annullata.",
+		"UPDATE_FAILED": "Aggiornamento del profilo non riuscito",
+		"ICONS": {
+			"PROFILE": "Profilo",
+			"LUCK": "Quadrifoglio",
+			"COOKIE": "Biscotto",
+			"PAW": "Zampa",
+			"PIZZA": "Pizza",
+			"BOT": "Bot"
+		}
+	},
+	"SOCIAL": {
+		"TITLE": "Social",
+		"GUEST_CTA": "Registra un account completo per aggiungere amici.",
+		"FRIEND_REQUESTS": "Richieste di amicizia",
+		"SENT": "Inviate",
+		"PENDING": "In attesa",
+		"ACCEPT": "Accetta",
+		"DECLINE": "Rifiuta",
+		"CANCEL_REQUEST": "Annulla richiesta",
+		"REMOVE_FRIEND": "Rimuovi amico",
+		"NO_PENDING": "Nessuna richiesta di amicizia in attesa",
+		"FRIENDS": "Amici",
+		"NO_FRIENDS": "Ancora nessun amico. Aggiungi giocatori dalla lobby di una stanza.",
+		"REMOVE_CONFIRM": "Rimuovere {{name}} dai tuoi amici?",
+		"REMOVED": "{{name}} rimosso dai tuoi amici",
+		"DECLINED": "Richiesta di amicizia di {{name}} rifiutata",
+		"CANCELLED": "Richiesta di amicizia a {{name}} annullata",
+		"REQUEST_RECEIVED": "{{name}} ti ha inviato una richiesta di amicizia",
+		"REQUEST_SENT": "Richiesta di amicizia inviata a {{name}}"
+	},
+	"ROOM_LIST": {
+		"TITLE": "Gioca",
+		"JOIN_PLACEHOLDER": "Hai un codice? Inseriscilo per entrare in una stanza privata",
+		"JOIN": "Entra",
+		"CHECKING": "Verifica…",
+		"YOUR_ROOMS": "Le tue stanze",
+		"EMPTY_TITLE": "Nessuna stanza aperta a cui unirsi",
+		"EMPTY_SUBTITLE": "Creane una e invita i tuoi amici.",
+		"NEW_ROOM": "+ Nuova stanza"
+	},
+	"ROOM_NEW": {
+		"TITLE": "Nuova stanza",
+		"CREATE": "Crea stanza",
+		"CREATING": "Creazione…"
+	},
+	"GAMES": {
+		"PLAYER_COUNT_FIXED": "{{count}} giocatori",
+		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} giocatori",
+		"PANKOV": {
+			"DESCRIPTION": "Tira due dadi e bleffa fino alla vittoria. Smaschera i bugiardi o perdi una vita."
+		},
+		"POKER": {
+			"DESCRIPTION": "Punta, bleffa e resisti più di tutti al tavolo."
+		}
+	},
+	"ROOM": {
+		"COPIED": "Copiato!",
+		"COPY_LINK": "Copia il link della stanza",
+		"ACCESS_TITLE": "Accesso alla stanza: {{label}}",
+		"CLOSE_ROOM": "Chiudi la stanza",
+		"LEAVE_ROOM": "Esci dalla stanza",
+		"KICKED": "Sei stato espulso dalla stanza.",
+		"HOST_CLOSED": "L'host ha chiuso la stanza.",
+		"LEAVE_CONFIRM": "Vuoi davvero uscire dalla stanza?",
+		"CLOSE_CONFIRM": "Chiudere la stanza per tutti?",
+		"INVITED": "Sei stato invitato a una partita di {{game}}!"
+	},
+	"LOBBY": {
+		"LOADING": "Caricamento stanza…",
+		"PLAYER_COUNT": "{{current}} / {{max}} giocatori",
+		"HOST": "Host",
+		"KICK_PLAYER": "Espelli giocatore",
+		"ADD_FRIEND": "Aggiungi amico",
+		"INVITE": "Invita",
+		"JOIN": "Entra nella stanza",
+		"JOINING": "Ingresso…",
+		"START": "Avvia partita",
+		"STARTING": "Avvio…",
+		"NEED_PLAYERS": "Servono almeno {{count}} giocatori per iniziare.",
+		"WAITING_FOR_HOST": "In attesa che l'host avvii…",
+		"GAME_SETTINGS": "Impostazioni di gioco",
+		"VIEW_SETTINGS": "Vedi impostazioni",
+		"GAME_OVER": "Partita finita",
+		"FIND_ANOTHER": "Trova un'altra stanza",
+		"BLOCKED_KICKED": "Sei stato espulso da questa stanza.",
+		"BLOCKED_CLOSED": "Questa stanza è chiusa.",
+		"BLOCKED_FRIENDS": "Solo gli amici dell'host possono entrare in questa stanza.",
+		"BLOCKED_FULL": "Questa stanza è piena.",
+		"KICK_CONFIRM": "Espellere {{name}} dalla stanza?"
+	},
+	"CHAT": {
+		"TITLE": "Chat",
+		"OPEN": "Apri chat",
+		"ROOM_CHAT": "Chat della stanza",
+		"EMPTY": "Ancora nessun messaggio.",
+		"PLACEHOLDER": "Messaggio…",
+		"SEND": "Invia"
+	},
+	"INVITE_MODAL": {
+		"TITLE": "Invita nella stanza",
+		"HOST_ONLY": "Solo l'host può invitare giocatori in questa stanza.",
+		"GUEST_CTA": "Registra un account completo per aggiungere amici e invitarli.",
+		"SEARCH_PLACEHOLDER": "Cerca amici…",
+		"NO_FRIENDS": "Ancora nessun amico. Aggiungi giocatori dalla lobby di una stanza.",
+		"NO_MATCH": "Nessun amico corrisponde alla ricerca.",
+		"IN_ROOM": "In stanza",
+		"INVITED": "Invitato",
+		"INVITE": "Invita",
+		"INVITE_SENT": "{{name}} invitato"
+	},
+	"ACCESS_MODAL": {
+		"TITLE": "Accesso alla stanza",
+		"HOST_ONLY": "Solo l'host può cambiare l'accesso alla stanza.",
+		"SAVED": "Accesso alla stanza aggiornato"
+	},
+	"ROOM_ACCESS": {
+		"PUBLIC": {
+			"LABEL": "Pubblica",
+			"DESCRIPTION": "Chiunque può trovare questa stanza ed entrarci."
+		},
+		"FRIENDS": {
+			"LABEL": "Solo amici",
+			"DESCRIPTION": "Solo i tuoi amici possono entrare — gli altri la vedono bloccata."
+		},
+		"LINK": {
+			"LABEL": "Con link",
+			"DESCRIPTION": "Nascosta dalla lista. Si entra solo con il codice della stanza o un invito."
+		},
+		"CLOSED": {
+			"LABEL": "Chiusa",
+			"DESCRIPTION": "Nessun altro può entrare."
+		}
+	},
+	"SETTINGS_MODAL": {
+		"TITLE": "Impostazioni {{game}}",
+		"HOST_ONLY": "Solo l'host può cambiare queste impostazioni.",
+		"RESET": "Ripristina predefinite",
+		"SAVED": "Impostazioni di gioco salvate",
+		"BIG_BLIND": "BB",
+		"DURATION": "Durata (min)",
+		"LAST_LEVEL_HINT": "L'ultimo livello dura fino alla fine della partita",
+		"REMOVE_LEVEL": "Rimuovi livello",
+		"ADD_LEVEL": "+ Aggiungi livello"
+	},
+	"GAME_SETTINGS": {
+		"PANKOV": {
+			"INITIAL_LIVES": {
+				"LABEL": "Vite",
+				"HINT": "Vite iniziali di ogni giocatore."
+			},
+			"SUDDEN_DEATH": {
+				"LABEL": "Morte improvvisa",
+				"HINT": "Durante una serie di Pankov, un challenge sbagliato costa il doppio a ogni turno consecutivo (1, 2, 4, …)."
+			}
+		},
+		"POKER": {
+			"STARTING_CHIPS": {
+				"LABEL": "Stack iniziale",
+				"HINT": "Fiches iniziali per giocatore."
+			},
+			"BLIND_LEVELS": {
+				"LABEL": "Livelli dei bui",
+				"HINT": "Programma del big blind; lo small blind è la metà. L'ultimo livello dura fino alla fine."
+			},
+			"SMALLER_DECK": {
+				"LABEL": "Mazzo ridotto",
+				"HINT": "La carta più bassa è (11 - giocatori)<br>Meno giocatori ⇒ Meno carte."
+			}
+		}
+	},
+	"PANKOV": {
+		"CURRENT_CLAIM": "Dichiarazione attuale",
+		"BY": "di {{name}}",
+		"OPEN_SEAT": "Libero",
+		"BEAT_OR_CALL": "Batti {{value}} o chiama il bluff",
+		"YOUR_TURN_FIRST": "Tocca a te — inizi tu",
+		"ROLL_DICE": "Tira i dadi",
+		"CHALLENGE": "Challenge!",
+		"CHALLENGE_STAKE": "Challenge! (-{{count}} vite)",
+		"SUDDEN_DEATH_HINT": "Morte improvvisa — un challenge sbagliato ora costa {{count}} vite.",
+		"YOU_ROLLED": "Hai tirato",
+		"DECLARE_HIGHER": "Devi dichiarare più di {{value}}",
+		"CHOOSE_DECLARE": "Scegli cosa dichiarare",
+		"IS_ROLLING": "{{name}} sta tirando",
+		"REVEAL": "Rivelazione",
+		"CLAIMED": "Dichiarato",
+		"ACTUAL": "Reale",
+		"LYING_ONE": "{{name}} mentiva — -1 vita",
+		"LYING_MANY": "{{name}} mentiva — -{{count}} vite",
+		"HONEST_ONE": "Era vero! {{name}} perde -1 vita",
+		"HONEST_MANY": "Era vero! {{name}} perde -{{count}} vite",
+		"CONTINUE": "Continua",
+		"VALUE_PANKOV": "Pankov!",
+		"VALUE_PAIR": "Coppia di {{n}}"
+	},
+	"POKER": {
+		"BIG_BLIND": "Big blind {{amount}}",
+		"LEVEL": "Liv {{current}}/{{total}}",
+		"BLINDS_UP_NEXT": "Bui su alla prossima mano",
+		"POT": "Piatto: {{amount}}",
+		"ALL_IN_TAG": "ALL-IN",
+		"FOLDED": "Foldato",
+		"WIN_PCT": "Vince {{pct}}%",
+		"SIT": "SIEDITI",
+		"FOLD": "Fold",
+		"CHECK": "Check",
+		"CALL": "Call {{amount}}",
+		"RAISE": "Raise",
+		"ALL_IN_BTN": "All In ({{amount}})",
+		"ALL_IN_CONFIRM": "Vai all-in con {{amount}} fiches? Punti l'intero stack.",
+		"RUNNING_OUT": "Run-out in corso",
+		"HAND_OVER": "Mano conclusa",
+		"WINS_POT": "{{name}} vince il piatto",
+		"EVERYONE_FOLDED": "Tutti gli altri hanno foldato — nessuna carta mostrata.",
+		"SHOWDOWN": "Showdown",
+		"NEXT_HAND": "Prossima mano",
+		"DEALER": "Dealer"
+	}
+}

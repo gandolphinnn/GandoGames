@@ -1,4 +1,5 @@
 import { Component, inject, signal, Signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutline, trashOutline } from 'ionicons/icons';
 import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, } from '@ionic/angular/standalone';
@@ -21,6 +22,7 @@ export class ProfileComponent {
 	private readonly userService = inject(UserService);
 	private readonly urlService = inject(UrlService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly user: Signal<AuthUser | null> = this.userService.user;
 	public readonly deleting = signal(false);
@@ -50,14 +52,14 @@ export class ProfileComponent {
 	}
 
 	public async logout(): Promise<void> {
-		const confirmed = await this.toast.yesNo('Are you sure you want to log out?');
+		const confirmed = await this.toast.yesNo(this.translate.instant('PROFILE.LOGOUT_CONFIRM') as string);
 		if (!confirmed) return;
 		this.userService.logout();
 		void this.urlService.get('login').navigate();
 	}
 
 	public async deleteAccount(): Promise<void> {
-		const confirmed = await this.toast.yesNo('This will permanently delete your account. This cannot be undone.');
+		const confirmed = await this.toast.yesNo(this.translate.instant('PROFILE.DELETE_CONFIRM') as string);
 		if (!confirmed) return;
 		this.deleting.set(true);
 		try {

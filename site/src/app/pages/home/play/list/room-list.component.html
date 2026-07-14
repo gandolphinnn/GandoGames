@@ -3,7 +3,7 @@
 		<ion-buttons slot="start">
 			<ion-menu-button />
 		</ion-buttons>
-		<ion-title>Play</ion-title>
+		<ion-title>{{ 'ROOM_LIST.TITLE' | translate }}</ion-title>
 	</ion-toolbar>
 </ion-header>
 
@@ -16,18 +16,18 @@
 					type="text"
 					inputmode="latin"
 					autocapitalize="characters"
-					placeholder="Have a code? Enter it to join a private room"
+					[placeholder]="'ROOM_LIST.JOIN_PLACEHOLDER' | translate"
 					[value]="joinCode()"
 					(input)="onCodeInput($event)"
 				/>
 				<ion-button type="submit" fill="outline" [disabled]="!joinCode().trim() || checkingCode()">
-					{{ checkingCode() ? 'Checking…' : 'Join' }}
+					{{ (checkingCode() ? 'ROOM_LIST.CHECKING' : 'ROOM_LIST.JOIN') | translate }}
 				</ion-button>
 			</form>
 
 			@if (myRooms().length > 0) {
 				<div class="my-rooms">
-					<span class="my-rooms-label">Your rooms</span>
+					<span class="my-rooms-label">{{ 'ROOM_LIST.YOUR_ROOMS' | translate }}</span>
 					<div class="my-rooms-chips">
 						@for (room of myRooms(); track room.id) {
 							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.game)" (click)="navigateToRoom(room)">
@@ -45,9 +45,9 @@
 			@if (filteredRooms().length === 0) {
 				<div class="empty-state">
 					<ion-icon name="game-controller" class="empty-icon" />
-					<p class="empty-title">No open rooms to join</p>
-					<p class="empty-subtitle">Create one and invite your friends.</p>
-					<ion-button (click)="goToCreate()">+ New Room</ion-button>
+					<p class="empty-title">{{ 'ROOM_LIST.EMPTY_TITLE' | translate }}</p>
+					<p class="empty-subtitle">{{ 'ROOM_LIST.EMPTY_SUBTITLE' | translate }}</p>
+					<ion-button (click)="goToCreate()">{{ 'ROOM_LIST.NEW_ROOM' | translate }}</ion-button>
 				</div>
 			} @else {
 				<ul class="room-list">
@@ -57,7 +57,7 @@
 								<span class="room-card-game">
 									{{ gameLabel(room.game) }}
 									@if (accessBadge(room); as badge) {
-										<span class="room-card-badge" [title]="badge.label">
+										<span class="room-card-badge" [title]="badge.label | translate">
 											<ion-icon [name]="badge.icon" />
 										</span>
 									}
@@ -70,7 +70,7 @@
 						</li>
 					}
 				</ul>
-				<ion-button (click)="goToCreate()">+ New Room</ion-button>
+				<ion-button (click)="goToCreate()">{{ 'ROOM_LIST.NEW_ROOM' | translate }}</ion-button>
 			}
 		</div>
 	</div>

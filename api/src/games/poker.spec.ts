@@ -154,7 +154,7 @@ describe('PokerGame settings', () => {
 		expect(game.state!.bigBlind).toBe(200);
 	});
 
-	it('scales the short deck to the table size — a 3-handed table starts at the 8 (11 − 3)', () => {
+	it('scales the short deck to the table size — a 3-handed table starts at the 8 (11 - 3)', () => {
 		const game = new PokerGame();
 		game.initialize([p1, p2, p3], { startingChips: 1000, blindLevels: [{ bigBlind: 100, durationMinutes: 0 }], smallerDeck: true });
 		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
@@ -247,9 +247,9 @@ describe('pokerDeckRanks', () => {
 		expect(pokerDeckRanks(2, false)[0]).toBe('2');
 	});
 
-	it('sets the lowest card to (11 − players) when the short deck is on', () => {
-		expect(pokerDeckRanks(5, true)[0]).toBe('6');  // 11 − 5 = 6
-		expect(pokerDeckRanks(3, true)[0]).toBe('8');  // 11 − 3 = 8
+	it('sets the lowest card to (11 - players) when the short deck is on', () => {
+		expect(pokerDeckRanks(5, true)[0]).toBe('6');  // 11 - 5 = 6
+		expect(pokerDeckRanks(3, true)[0]).toBe('8');  // 11 - 3 = 8
 		expect(pokerDeckRanks(2, true)[0]).toBe('9');  // heads-up → 9
 		expect(pokerDeckRanks(8, true)[0]).toBe('3');  // full ring → 3
 	});

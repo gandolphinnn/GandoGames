@@ -20,6 +20,7 @@ interface GameDescriptor {
 	id: GameType;
 	name: string;
 	icon: string;
+	/** Translation key: render with the `translate` pipe. */
 	description: string;
 	minPlayers: number;
 	maxPlayers: number;
@@ -30,19 +31,12 @@ interface GameDescriptor {
 	table: TablePreset;
 }
 
-/** Human label for a game's player count: "2 players" when fixed (min === max), else "2–6 players". */
-export function playerCountLabel(game: { minPlayers: number; maxPlayers: number }): string {
-	return game.minPlayers === game.maxPlayers
-		? `${game.minPlayers} players`
-		: `${game.minPlayers}–${game.maxPlayers} players`;
-}
-
 export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 	pankov: {
 		id: 'pankov',
 		name: 'Pankov',
 		icon: 'fa-solid fa-dice',
-		description: 'Roll two dice and bluff your way to victory. Call out liars or lose a life.',
+		description: 'GAMES.PANKOV.DESCRIPTION',
 		...GAMES_CONFIG.pankov,
 		component: PankovGameComponent,
 		settingsSchema: PANKOV_SETTINGS_SCHEMA,
@@ -52,7 +46,7 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 		id: 'poker',
 		name: 'Texas Hold\'em',
 		icon: 'fa-solid fa-hat-cowboy',
-		description: 'Bet, bluff, and outlast everyone at the table.',
+		description: 'GAMES.POKER.DESCRIPTION',
 		...GAMES_CONFIG.poker,
 		component: PokerGameComponent,
 		settingsSchema: POKER_SETTINGS_SCHEMA,

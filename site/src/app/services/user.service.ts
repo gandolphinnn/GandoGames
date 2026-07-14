@@ -1,4 +1,5 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthResponse, BaseRequest, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
@@ -14,13 +15,15 @@ export class UserService {
 	private readonly backend = inject(BackendService);
 	private readonly storage = inject(StorageService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	private readonly _user = signal<AuthUser | null>(null);
 	public readonly user = this._user.asReadonly();
 	public readonly isLoggedIn = computed(() => this._user() !== null);
-	
+
 	public readonly theme = computed(() => this.user()?.player.theme || 'dark');
 	public readonly isDarkTheme = computed(() => this.theme() !== 'light');
+	public readonly language = computed(() => this.user()?.player.language || 'en');
 
 	private updateTimer: ReturnType<typeof setTimeout> | null = null;
 	private pendingUpdate: Partial<ProfileData> | null = null;
@@ -29,6 +32,7 @@ export class UserService {
 	//#region Init
 	constructor() {
 		effect(() => this.applyThemeToDom(this.theme()));
+		effect(() => this.translate.use(this.language()));
 	}
 
 	public async init(): Promise<void> {
@@ -109,7 +113,7 @@ export class UserService {
 			if (current) this._user.set({ ...current, player: { ...current.player, ...result } });
 		} catch (err) {
 			this._user.set(snapshot);
-			this.toast.warning('Failed to update profile');
+			this.toast.warning(this.translate.instant('PROFILE.UPDATE_FAILED') as string);
 			console.error('Profile update error:', err);
 		}
 	}

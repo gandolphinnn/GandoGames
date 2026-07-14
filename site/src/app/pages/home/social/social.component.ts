@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Friend } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { FriendService, UserService, ToastService } from '@gandogames/services';
@@ -15,6 +16,7 @@ export class SocialComponent {
 	private readonly friendService = inject(FriendService);
 	private readonly auth = inject(UserService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly isGuest = computed(() => this.auth.user()?.isGuest ?? false);
 	public readonly friends = this.friendService.friends;
@@ -38,16 +40,17 @@ export class SocialComponent {
 	}
 
 	public async remove(friend: Friend, kind: 'decline' | 'cancel' | 'unfriend'): Promise<void> {
-		if (kind === 'unfriend' && !(await this.toast.yesNo(`Remove ${friend.name} from your friends?`))) return;
+		const params = { name: friend.name };
+		if (kind === 'unfriend' && !(await this.toast.yesNo(this.translate.instant('SOCIAL.REMOVE_CONFIRM', params) as string))) return;
 		this.busyId.set(friend.id);
 		try {
 			await this.friendService.removeFriend(friend.id);
-			const message = kind === 'unfriend'
-				? `Removed ${friend.name} from your friends`
+			const messageKey = kind === 'unfriend'
+				? 'SOCIAL.REMOVED'
 				: kind === 'decline'
-					? `Declined ${friend.name}'s friend request`
-					: `Cancelled friend request to ${friend.name}`;
-			this.toast.show(message, 'success');
+					? 'SOCIAL.DECLINED'
+					: 'SOCIAL.CANCELLED';
+			this.toast.show(this.translate.instant(messageKey, params) as string, 'success');
 		} finally {
 			this.busyId.set(null);
 		}

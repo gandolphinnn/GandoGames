@@ -3,24 +3,24 @@
 <div class="modal" (click)="$event.stopPropagation()">
 
 	<header class="modal-header">
-		<h2 class="modal-title">{{ gameName() }} settings</h2>
-		<button class="modal-close" (click)="closed.emit()" title="Close">
+		<h2 class="modal-title">{{ 'SETTINGS_MODAL.TITLE' | translate: { game: gameName() } }}</h2>
+		<button class="modal-close" (click)="closed.emit()" [title]="'COMMON.CLOSE' | translate">
 			<ion-icon name="close" />
 		</button>
 	</header>
 
 	<div class="modal-body">
 		@if (!editable()) {
-			<p class="empty-msg">Only the host can change these settings.</p>
+			<p class="empty-msg">{{ 'SETTINGS_MODAL.HOST_ONLY' | translate }}</p>
 		}
 
 		<ul class="settings-list">
 			@for (field of schema(); track field.key) {
 				<li class="setting-row" [class.setting-row-block]="field.type === 'blind-levels'">
 					<div class="setting-label">
-						<span class="setting-name">{{ field.label }}</span>
+						<span class="setting-name">{{ fieldKey(field, 'LABEL') | translate }}</span>
 						@if (field.hint) {
-							<span class="setting-hint" [innerHTML]="field.hint"></span>
+							<span class="setting-hint" [innerHTML]="fieldKey(field, 'HINT') | translate"></span>
 						}
 					</div>
 					@if (field.type === 'blind-levels') {
@@ -59,8 +59,8 @@
 
 	@if (editable()) {
 		<footer class="modal-footer">
-			<button class="btn-secondary" [disabled]="saving()" (click)="resetDefaults()">Reset to defaults</button>
-			<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+			<button class="btn-secondary" [disabled]="saving()" (click)="resetDefaults()">{{ 'SETTINGS_MODAL.RESET' | translate }}</button>
+			<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ (saving() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}</button>
 		</footer>
 	}
 

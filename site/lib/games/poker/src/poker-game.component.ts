@@ -7,6 +7,7 @@ import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '@gandogames/services';
 
 /** Seconds each street lingers before the next one is revealed during an all-in run-out. */
@@ -15,7 +16,7 @@ const REVEAL_DELAY_MS = 2000;
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, IonInput],
+	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, IonInput, TranslatePipe],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })
@@ -28,6 +29,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	public readonly playAgain = output<void>();
 
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	/** Raise amount ("raise by"); always defaults to the table minimum at the start of each of my turns. */
 	protected readonly raiseAmount = signal(MIN_RAISE);
@@ -282,7 +284,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	protected async allIn(): Promise<void> {
 		const me = this.myPlayer();
 		if (!me || me.chips <= 0) return;
-		const confirmed = await this.toast.yesNo(`Go all in with ${me.chips} chips? This bets your entire stack.`);
+		const confirmed = await this.toast.yesNo(this.translate.instant('POKER.ALL_IN_CONFIRM', { amount: me.chips }) as string);
 		if (confirmed) this.gameAction.emit({ action: 'all-in' });
 	}
 }

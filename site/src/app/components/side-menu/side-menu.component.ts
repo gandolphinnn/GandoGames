@@ -5,6 +5,7 @@ import {
 	IonItem, IonLabel, IonList, IonMenuToggle, IonTitle, IonToolbar,
 	MenuController,
 } from '@ionic/angular/standalone';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GameType } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
@@ -21,7 +22,7 @@ import { UserService, RoomService, FriendService, UrlService } from '@gandogames
 	imports: [
 		IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg,
 		IonItem, IonLabel, IonList, IonMenuToggle, IonTitle, IonToolbar,
-		PlayerAvatarComponent, RouterLink, RouterLinkActive,
+		PlayerAvatarComponent, RouterLink, RouterLinkActive, TranslatePipe,
 	],
 	templateUrl: './side-menu.component.html',
 	styleUrl: './side-menu.component.scss',

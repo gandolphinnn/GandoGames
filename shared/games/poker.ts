@@ -27,7 +27,7 @@ export interface PokerSettings {
 	blindLevels: BlindLevel[];
 	/**
 	 * Short deck: strip the lowest cards so the deck scales with the table. The lowest rank in play
-	 * has value (11 − number of players) — e.g. 5 players → the 6, heads-up → the 9. Hand rankings
+	 * has value (11 - number of players) — e.g. 5 players → the 6, heads-up → the 9. Hand rankings
 	 * stay standard.
 	 */
 	smallerDeck: boolean;
@@ -77,9 +77,9 @@ export function smallBlindFor(bigBlind: number): number {
 
 /**
  * The ranks in play for a hand. Full 52-card deck normally; with the short deck on, the lowest rank
- * scales with the table — its value is (11 − numPlayers), so fewer players means a higher low card
+ * scales with the table — its value is (11 - numPlayers), so fewer players means a higher low card
  * (5-handed → the 6, heads-up → the 9, 8-handed → the 3). RANKS is ascending 2→A, so index i holds
- * value i+2; the lowest included index is therefore (11 − numPlayers) − 2 = 9 − numPlayers.
+ * value i+2; the lowest included index is therefore (11 - numPlayers) - 2 = 9 - numPlayers.
  */
 export function pokerDeckRanks(numPlayers: number, smallerDeck: boolean): Rank[] {
 	if (!smallerDeck) return [...RANKS];
@@ -135,7 +135,7 @@ export function compareHandRanks(a: HandRank, b: HandRank): number {
 	return 0;
 }
 
-/** All k-card subsets of `arr` — used to find the best 5-card hand among 5–7 cards. */
+/** All k-card subsets of `arr` — used to find the best 5-card hand among 5-7 cards. */
 function combinations(arr: Card[], k: number): Card[][] {
 	if (k === 0) return [[]];          // exactly one subset of size 0: the empty set
 	if (arr.length < k) return [];     // fewer cards left than needed → no subsets
@@ -184,7 +184,7 @@ function evaluateFiveCard(cards: Card[]): HandRank {
 	return { category: 0, tiebreakers: values, description: 'High Card' };
 }
 
-/** Best 5-card hand from 5–7 cards (picks the strongest 5-card combination). */
+/** Best 5-card hand from 5-7 cards (picks the strongest 5-card combination). */
 export function evaluateHand(cards: Card[]): HandRank {
 	if (cards.length <= 5) return evaluateFiveCard(cards);
 	let best: HandRank | null = null;
@@ -223,7 +223,7 @@ export function describeHand(rank: HandRank): string {
 
 /**
  * All-in equity for a showdown where every contender's hole cards are KNOWN (their hands are tabled).
- * Returns each hand's share of the pot (0–1, summing to ~1) given the current `community` cards, by
+ * Returns each hand's share of the pot (0-1, summing to ~1) given the current `community` cards, by
  * running out the remaining board. When the board is already complete the result is exact; otherwise
  * it's a Monte-Carlo estimate over the undealt board. Ties split the pot. Used to show the live win %
  * at each seat during an all-in run-out. `deck` lets short-deck games draw from the right card pool.

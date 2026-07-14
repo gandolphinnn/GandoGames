@@ -4,13 +4,13 @@
 	<div class="chat-panel">
 		<div class="chat-header">
 			<ion-icon name="chatbubbles" />
-			<span class="chat-header-title">Chat</span>
+			<span class="chat-header-title">{{ 'CHAT.TITLE' | translate }}</span>
 		</div>
 		<ng-container *ngTemplateOutlet="body" />
 	</div>
 
 	<!-- ── Mobile FAB ─────────────────────────────────────────────────────── -->
-	<button class="chat-fab" (click)="toggle()" type="button" title="Open chat">
+	<button class="chat-fab" (click)="toggle()" type="button" [title]="'CHAT.OPEN' | translate">
 		<ion-icon name="chatbubbles" />
 		@if (unread() > 0) {
 			<span class="chat-badge">{{ unread() }}</span>
@@ -22,7 +22,7 @@
 		<div class="chat-backdrop" (click)="close()"></div>
 		<aside class="chat-drawer">
 			<div class="chat-drawer-header">
-				<ion-icon name="chatbubbles" /> Room Chat
+				<ion-icon name="chatbubbles" /> {{ 'CHAT.ROOM_CHAT' | translate }}
 				<button class="chat-close" (click)="close()" type="button"><ion-icon name="close" /></button>
 			</div>
 			<ng-container *ngTemplateOutlet="body" />
@@ -39,7 +39,7 @@
 					<span class="chat-msg-time">{{ msg.timestamp | date:'HH:mm' }}</span>
 				</div>
 			} @empty {
-				<p class="chat-empty">No messages yet.</p>
+				<p class="chat-empty">{{ 'CHAT.EMPTY' | translate }}</p>
 			}
 		</div>
 		<div class="chat-input-row">
@@ -48,7 +48,7 @@
 				fill="outline"
 				[autoGrow]="true"
 				[rows]="1"
-				placeholder="Message…"
+				[placeholder]="'CHAT.PLACEHOLDER' | translate"
 				[ngModel]="text()"
 				(ngModelChange)="text.set($event)"
 				(keydown)="onKeydown($event)"
@@ -61,7 +61,7 @@
 				type="button"
 				(click)="send()"
 				[disabled]="sending() || !text().trim()"
-				title="Send"
+				[title]="'CHAT.SEND' | translate"
 			>
 				<ion-icon name="send" />
 			</button>

@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
-import { GAME_REGISTRY, playerCountLabel } from '@gandogames/lib/game-registry';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService, UrlService } from '@gandogames/services';
 
 @Component({
@@ -16,7 +16,6 @@ export class RoomNewComponent {
 	private readonly roomService = inject(RoomService);
 
 	public readonly allGames = Object.values(GAME_REGISTRY);
-	public readonly playerCountLabel = playerCountLabel;
 	public readonly selectedGameId = signal<string>(this.allGames[0]?.id ?? '');
 	public readonly loading = signal(false);
 

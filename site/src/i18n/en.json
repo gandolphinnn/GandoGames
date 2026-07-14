@@ -1,0 +1,279 @@
+{
+	"COMMON": {
+		"YES": "Yes",
+		"NO": "No",
+		"CLOSE": "Close",
+		"SAVE": "Save",
+		"SAVING": "Saving…",
+		"GUEST": "Guest",
+		"LOADING_GAME": "Loading game…",
+		"WAITING_FOR": "Waiting for",
+		"WINNER": "Winner",
+		"PLAY_AGAIN": "Play Again"
+	},
+	"MENU": {
+		"PLAY": "Play",
+		"SOCIAL": "Social",
+		"ACTIVE_ROOMS": "Active Rooms"
+	},
+	"ABOUT": {
+		"TITLE": "About",
+		"HEADING": "About GandoGames",
+		"TAGLINE": "A small collection of multiplayer party games playable in your browser.",
+		"STACK": "Built with Angular, Azure Functions, and PlayFab."
+	},
+	"AUTH": {
+		"WELCOME_BACK": "Welcome back",
+		"LOGIN_SUBTITLE": "Log in to GandoGames",
+		"EMAIL": "Email",
+		"PASSWORD": "Password",
+		"USERNAME": "Username",
+		"USERNAME_PLACEHOLDER": "YourName",
+		"LOGIN": "Log in",
+		"LOGGING_IN": "Logging in…",
+		"NO_ACCOUNT": "No account?",
+		"SIGN_UP": "Sign up",
+		"OR": "or",
+		"CONTINUE_AS_GUEST": "Continue as guest",
+		"CREATE_ACCOUNT": "Create account",
+		"CREATING_ACCOUNT": "Creating account…",
+		"SIGNUP_SUBTITLE": "Join GandoGames",
+		"ALREADY_HAVE_ACCOUNT": "Already have an account?",
+		"ERRORS": {
+			"EMAIL_REQUIRED": "Email is required",
+			"EMAIL_INVALID": "Enter a valid email",
+			"PASSWORD_REQUIRED": "Password is required",
+			"PASSWORD_MIN_LENGTH": "At least 6 characters",
+			"USERNAME_REQUIRED": "Username is required",
+			"USERNAME_MIN_LENGTH": "At least 3 characters",
+			"USERNAME_MAX_LENGTH": "At most 20 characters"
+		}
+	},
+	"PROFILE": {
+		"TITLE": "Profile",
+		"LOGOUT": "Logout",
+		"THEME": "Theme",
+		"LANGUAGE": "Language",
+		"AVATAR": "Avatar",
+		"DELETE_ACCOUNT": "Delete account",
+		"LOGOUT_CONFIRM": "Are you sure you want to log out?",
+		"DELETE_CONFIRM": "This will permanently delete your account. This cannot be undone.",
+		"UPDATE_FAILED": "Failed to update profile",
+		"ICONS": {
+			"PROFILE": "Profile",
+			"LUCK": "Clover",
+			"COOKIE": "Cookie",
+			"PAW": "Paw",
+			"PIZZA": "Pizza",
+			"BOT": "Bot"
+		}
+	},
+	"SOCIAL": {
+		"TITLE": "Social",
+		"GUEST_CTA": "Sign up for a full account to add friends.",
+		"FRIEND_REQUESTS": "Friend Requests",
+		"SENT": "Sent",
+		"PENDING": "Pending",
+		"ACCEPT": "Accept",
+		"DECLINE": "Decline",
+		"CANCEL_REQUEST": "Cancel request",
+		"REMOVE_FRIEND": "Remove friend",
+		"NO_PENDING": "No pending friend requests",
+		"FRIENDS": "Friends",
+		"NO_FRIENDS": "No friends yet. Add players from a room's lobby.",
+		"REMOVE_CONFIRM": "Remove {{name}} from your friends?",
+		"REMOVED": "Removed {{name}} from your friends",
+		"DECLINED": "Declined {{name}}'s friend request",
+		"CANCELLED": "Cancelled friend request to {{name}}",
+		"REQUEST_RECEIVED": "{{name}} sent you a friend request",
+		"REQUEST_SENT": "Friend request sent to {{name}}"
+	},
+	"ROOM_LIST": {
+		"TITLE": "Play",
+		"JOIN_PLACEHOLDER": "Have a code? Enter it to join a private room",
+		"JOIN": "Join",
+		"CHECKING": "Checking…",
+		"YOUR_ROOMS": "Your rooms",
+		"EMPTY_TITLE": "No open rooms to join",
+		"EMPTY_SUBTITLE": "Create one and invite your friends.",
+		"NEW_ROOM": "+ New Room"
+	},
+	"ROOM_NEW": {
+		"TITLE": "New Room",
+		"CREATE": "Create Room",
+		"CREATING": "Creating…"
+	},
+	"GAMES": {
+		"PLAYER_COUNT_FIXED": "{{count}} players",
+		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} players",
+		"PANKOV": {
+			"DESCRIPTION": "Roll two dice and bluff your way to victory. Call out liars or lose a life."
+		},
+		"POKER": {
+			"DESCRIPTION": "Bet, bluff, and outlast everyone at the table."
+		}
+	},
+	"ROOM": {
+		"COPIED": "Copied!",
+		"COPY_LINK": "Copy room link",
+		"ACCESS_TITLE": "Room access: {{label}}",
+		"CLOSE_ROOM": "Close room",
+		"LEAVE_ROOM": "Leave room",
+		"KICKED": "You have been kicked from the room.",
+		"HOST_CLOSED": "The host has closed the room.",
+		"LEAVE_CONFIRM": "Are you sure you want to leave the room?",
+		"CLOSE_CONFIRM": "Close the room for everyone?",
+		"INVITED": "You've been invited to a {{game}} game!"
+	},
+	"LOBBY": {
+		"LOADING": "Loading room…",
+		"PLAYER_COUNT": "{{current}} / {{max}} players",
+		"HOST": "Host",
+		"KICK_PLAYER": "Kick player",
+		"ADD_FRIEND": "Add friend",
+		"INVITE": "Invite",
+		"JOIN": "Join Room",
+		"JOINING": "Joining…",
+		"START": "Start Game",
+		"STARTING": "Starting…",
+		"NEED_PLAYERS": "Need at least {{count}} players to start.",
+		"WAITING_FOR_HOST": "Waiting for the host to start…",
+		"GAME_SETTINGS": "Game settings",
+		"VIEW_SETTINGS": "View settings",
+		"GAME_OVER": "Game Over",
+		"FIND_ANOTHER": "Find another room",
+		"BLOCKED_KICKED": "You have been kicked from this room.",
+		"BLOCKED_CLOSED": "This room is closed.",
+		"BLOCKED_FRIENDS": "Only the host's friends can join this room.",
+		"BLOCKED_FULL": "This room is full.",
+		"KICK_CONFIRM": "Kick {{name}} from the room?"
+	},
+	"CHAT": {
+		"TITLE": "Chat",
+		"OPEN": "Open chat",
+		"ROOM_CHAT": "Room Chat",
+		"EMPTY": "No messages yet.",
+		"PLACEHOLDER": "Message…",
+		"SEND": "Send"
+	},
+	"INVITE_MODAL": {
+		"TITLE": "Invite to Room",
+		"HOST_ONLY": "Only the host can invite players to this room.",
+		"GUEST_CTA": "Sign up for a full account to add friends and invite them.",
+		"SEARCH_PLACEHOLDER": "Search friends…",
+		"NO_FRIENDS": "You have no friends yet. Add players from a room's lobby.",
+		"NO_MATCH": "No friends match your search.",
+		"IN_ROOM": "In room",
+		"INVITED": "Invited",
+		"INVITE": "Invite",
+		"INVITE_SENT": "Invited {{name}}"
+	},
+	"ACCESS_MODAL": {
+		"TITLE": "Room access",
+		"HOST_ONLY": "Only the host can change room access.",
+		"SAVED": "Room access updated"
+	},
+	"ROOM_ACCESS": {
+		"PUBLIC": {
+			"LABEL": "Public",
+			"DESCRIPTION": "Anyone can find and join this room."
+		},
+		"FRIENDS": {
+			"LABEL": "Friends only",
+			"DESCRIPTION": "Only your friends can join — others see it locked."
+		},
+		"LINK": {
+			"LABEL": "With link",
+			"DESCRIPTION": "Hidden from the list. Joinable only with the room code or an invite."
+		},
+		"CLOSED": {
+			"LABEL": "Closed",
+			"DESCRIPTION": "No one new can join."
+		}
+	},
+	"SETTINGS_MODAL": {
+		"TITLE": "{{game}} settings",
+		"HOST_ONLY": "Only the host can change these settings.",
+		"RESET": "Reset to defaults",
+		"SAVED": "Game settings saved",
+		"BIG_BLIND": "BB",
+		"DURATION": "Duration (min)",
+		"LAST_LEVEL_HINT": "The last level runs until the game ends",
+		"REMOVE_LEVEL": "Remove level",
+		"ADD_LEVEL": "+ Add level"
+	},
+	"GAME_SETTINGS": {
+		"PANKOV": {
+			"INITIAL_LIVES": {
+				"LABEL": "Lives",
+				"HINT": "Lives each player starts with."
+			},
+			"SUDDEN_DEATH": {
+				"LABEL": "Sudden death",
+				"HINT": "On a Pankov run, a wrong challenge costs double each consecutive turn (1, 2, 4, …)."
+			}
+		},
+		"POKER": {
+			"STARTING_CHIPS": {
+				"LABEL": "Player pot",
+				"HINT": "Starting chips per player."
+			},
+			"BLIND_LEVELS": {
+				"LABEL": "Blind levels",
+				"HINT": "Big blind schedule; small blind is half. The last level runs to the end."
+			},
+			"SMALLER_DECK": {
+				"LABEL": "Smaller deck",
+				"HINT": "The lowest card is (11 - players)<br>Fewer players ⇒ Less cards."
+			}
+		}
+	},
+	"PANKOV": {
+		"CURRENT_CLAIM": "Current claim",
+		"BY": "by {{name}}",
+		"OPEN_SEAT": "Open",
+		"BEAT_OR_CALL": "Beat {{value}} or call the bluff",
+		"YOUR_TURN_FIRST": "Your turn — you go first",
+		"ROLL_DICE": "Roll dice",
+		"CHALLENGE": "Challenge!",
+		"CHALLENGE_STAKE": "Challenge! (-{{count}} lives)",
+		"SUDDEN_DEATH_HINT": "Sudden death — a wrong challenge now costs {{count}} lives.",
+		"YOU_ROLLED": "You rolled",
+		"DECLARE_HIGHER": "Must declare higher than {{value}}",
+		"CHOOSE_DECLARE": "Choose what to declare",
+		"IS_ROLLING": "{{name}} is rolling",
+		"REVEAL": "Reveal",
+		"CLAIMED": "Claimed",
+		"ACTUAL": "Actual",
+		"LYING_ONE": "{{name}} was lying — -1 life",
+		"LYING_MANY": "{{name}} was lying — -{{count}} lives",
+		"HONEST_ONE": "Honest! {{name}} loses -1 life",
+		"HONEST_MANY": "Honest! {{name}} loses -{{count}} lives",
+		"CONTINUE": "Continue",
+		"VALUE_PANKOV": "Pankov!",
+		"VALUE_PAIR": "Pair of {{n}}s"
+	},
+	"POKER": {
+		"BIG_BLIND": "Big blind {{amount}}",
+		"LEVEL": "Lv {{current}}/{{total}}",
+		"BLINDS_UP_NEXT": "Blinds up next hand",
+		"POT": "Pot: {{amount}}",
+		"ALL_IN_TAG": "ALL-IN",
+		"FOLDED": "Folded",
+		"WIN_PCT": "Win {{pct}}%",
+		"SIT": "SIT",
+		"FOLD": "Fold",
+		"CHECK": "Check",
+		"CALL": "Call {{amount}}",
+		"RAISE": "Raise",
+		"ALL_IN_BTN": "All In ({{amount}})",
+		"ALL_IN_CONFIRM": "Go all in with {{amount}} chips? This bets your entire stack.",
+		"RUNNING_OUT": "Running it out",
+		"HAND_OVER": "Hand over",
+		"WINS_POT": "{{name}} wins the pot",
+		"EVERYONE_FOLDED": "Everyone else folded — no cards shown.",
+		"SHOWDOWN": "Showdown",
+		"NEXT_HAND": "Next Hand",
+		"DEALER": "Dealer"
+	}
+}

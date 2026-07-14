@@ -10,22 +10,22 @@
 		@if (room()) {
 			<ion-buttons slot="end">
 				@if (!isPlaying()) {
-					<ion-button fill="clear" (click)="copyCode()" [title]="copied() ? 'Copied!' : 'Copy room link'">
+					<ion-button fill="clear" (click)="copyCode()" [title]="(copied() ? 'ROOM.COPIED' : 'ROOM.COPY_LINK') | translate">
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
 				}
 				@if (isHost() && room()!.phase === 'waiting') {
-					<ion-button fill="clear" (click)="openAccess()" [title]="'Room access: ' + accessBadge().label">
+					<ion-button fill="clear" (click)="openAccess()" [title]="'ROOM.ACCESS_TITLE' | translate: { label: (accessBadge().label | translate) }">
 						<ion-icon [name]="accessBadge().icon" slot="icon-only" />
 					</ion-button>
 				}
 				@if (isHost()) {
-					<ion-button fill="clear" color="danger" (click)="closeRoom()" title="Close room">
+					<ion-button fill="clear" color="danger" (click)="closeRoom()" [title]="'ROOM.CLOSE_ROOM' | translate">
 						<ion-icon name="trash" slot="icon-only" />
 					</ion-button>
 				}
 				@if (isInRoom()) {
-					<ion-button fill="clear" color="danger" (click)="leave()" title="Leave room">
+					<ion-button fill="clear" color="danger" (click)="leave()" [title]="'ROOM.LEAVE_ROOM' | translate">
 						<ion-icon name="close" />
 					</ion-button>
 				}

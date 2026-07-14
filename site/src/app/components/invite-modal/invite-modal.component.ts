@@ -1,12 +1,13 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Friend, GameType } from '@gandogames/shared/dto';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 import { FriendService, RoomService, UserService, ToastService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-invite-modal',
-	imports: [IonIcon, PlayerAvatarComponent],
+	imports: [IonIcon, PlayerAvatarComponent, TranslatePipe],
 	templateUrl: './invite-modal.component.html',
 	styleUrl: './invite-modal.component.scss',
 })
@@ -15,6 +16,7 @@ export class InviteModalComponent {
 	private readonly roomService = inject(RoomService);
 	private readonly userService = inject(UserService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly roomId = input.required<string>();
 	public readonly gameType = input.required<GameType>();
@@ -53,7 +55,7 @@ export class InviteModalComponent {
 		try {
 			await this.roomService.invitePlayer(this.roomId(), friend.id);
 			this.invited.update(ids => [...ids, friend.id]);
-			this.toast.success(`Invited ${friend.name}`);
+			this.toast.success(this.translate.instant('INVITE_MODAL.INVITE_SENT', { name: friend.name }) as string);
 		} finally {
 			this.busyId.set(null);
 		}

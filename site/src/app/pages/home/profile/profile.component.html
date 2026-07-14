@@ -3,9 +3,9 @@
 		<ion-buttons slot="start">
 			<ion-menu-button />
 		</ion-buttons>
-		<ion-title>Profile</ion-title>
+		<ion-title>{{ 'PROFILE.TITLE' | translate }}</ion-title>
 		<ion-buttons slot="end">
-			<ion-button title="Logout" (click)="logout()">
+			<ion-button [title]="'PROFILE.LOGOUT' | translate" (click)="logout()">
 				<ion-icon slot="icon-only" name="log-out-outline" />
 			</ion-button>
 		</ion-buttons>
@@ -23,7 +23,7 @@
 					</div>
 					<span class="profile-name">{{ u.player.name }}</span>
 					@if (u.isGuest) {
-						<span class="guest-badge">Guest</span>
+						<span class="guest-badge">{{ 'COMMON.GUEST' | translate }}</span>
 					}
 				</div>
 
@@ -31,7 +31,7 @@
 					<div class="setting-row">
 						<div class="setting-label">
 							<ion-icon name="contrast-outline" />
-							<span>Theme</span>
+							<span>{{ 'PROFILE.THEME' | translate }}</span>
 						</div>
 						<ion-segment [value]="isDark() ? 'dark' : 'light'" (ionChange)="setTheme($event.detail.value!)">
 							<ion-segment-button value="light">
@@ -45,7 +45,7 @@
 					<div class="setting-row">
 						<div class="setting-label">
 							<ion-icon name="language-outline" />
-							<span>Language</span>
+							<span>{{ 'PROFILE.LANGUAGE' | translate }}</span>
 						</div>
 						<ion-select [value]="u.player.language" interface="popover" (ionChange)="setLanguage($event.detail.value)">
 							@for (lang of languages; track lang.value) {
@@ -55,7 +55,7 @@
 					</div>
 					<div class="setting-row setting-row-stacked">
 						<div class="setting-label">
-							<span>Avatar</span>
+							<span>{{ 'PROFILE.AVATAR' | translate }}</span>
 						</div>
 						<div class="icon-picker">
 							@for (icon of icons; track icon.id) {
@@ -63,7 +63,7 @@
 									class="icon-btn"
 									[class.selected]="u.player.icon === icon.id"
 									type="button"
-									[attr.aria-label]="icon.label"
+									[attr.aria-label]="('PROFILE.ICONS.' + icon.id.toUpperCase()) | translate"
 									(click)="setIcon(icon.id)">
 									<gg-player-avatar [player]="withIcon(u.player, icon.id)" />
 								</button>
@@ -75,7 +75,7 @@
 				<div class="delete-section">
 					<ion-button fill="outline" color="danger" expand="block" [disabled]="deleting()" (click)="deleteAccount()">
 						<ion-icon name="trash-outline" slot="start" />
-						{{ 'Delete account' }}
+						{{ 'PROFILE.DELETE_ACCOUNT' | translate }}
 					</ion-button>
 				</div>
 

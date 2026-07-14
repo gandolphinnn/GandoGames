@@ -46,7 +46,7 @@ const DEG = Math.PI / 180;
 
 /**
  * Seat-centre positions (percent) around the table ellipse. Seat 0 is the hero,
- * pinned to bottom-centre (θ = 90°, screen y-down). The remaining `M = n − 1`
+ * pinned to bottom-centre (θ = 90°, screen y-down). The remaining `M = n - 1`
  * opponents spread across a top arc centred on 270° (top-centre) and never dip
  * into the bottom ±50°, so they can't crowd the hero seat or the footer/action bar.
  *

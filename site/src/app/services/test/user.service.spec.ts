@@ -4,11 +4,14 @@ import { UserService } from '../user.service';
 import { BackendService } from '../backend.service';
 import { StorageService } from '../storage.service';
 import { ToastService } from '../toast.service';
-import type { AuthResponse } from '@gandogames/shared/dto';
+import { API } from '@gandogames/shared/dto';
+import type { AnyEndpoint, AuthResponse, GamePlayer } from '@gandogames/shared/dto';
+
+const MOCK_PLAYER: GamePlayer = { id: 'player-1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
 
 const MOCK_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
-	player: { id: 'player-1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' },
+	player: MOCK_PLAYER,
 };
 
 const MOCK_GUEST_RESPONSE: AuthResponse = {
@@ -16,8 +19,12 @@ const MOCK_GUEST_RESPONSE: AuthResponse = {
 	player: { id: 'guest-1', name: 'Guest123456', isGuest: true, icon: 'profile', theme: 'dark', language: 'en' },
 };
 
+// jasmine derives a generic method's spy signature from its widest instantiation, where call()'s
+// options tuple collapses to [] — intersect with a plain Spy so matchers accept (endpoint, options).
+type BackendSpy = jasmine.SpyObj<BackendService> & { call: jasmine.Spy };
+
 describe('UserService', () => {
-	let backendSpy: jasmine.SpyObj<BackendService>;
+	let backendSpy: BackendSpy;
 	let toastSpy: jasmine.SpyObj<ToastService>;
 
 	function createService(): UserService {
@@ -35,13 +42,13 @@ describe('UserService', () => {
 
 	beforeEach(() => {
 		localStorage.clear();
-		backendSpy = jasmine.createSpyObj('BackendService', ['post']);
+		backendSpy = jasmine.createSpyObj('BackendService', ['call']) as BackendSpy;
 		toastSpy = jasmine.createSpyObj('ToastService', ['warning']);
 	});
 
 	describe('initial state', () => {
 		it('starts with null user and isLoggedIn false', () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			const service = createService();
 			expect(service.user()).toBeNull();
 			expect(service.isLoggedIn()).toBeFalse();
@@ -51,56 +58,56 @@ describe('UserService', () => {
 	describe('auth methods', () => {
 		let service: UserService;
 		beforeEach(() => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			service = createService();
 		});
 
-		it('login() calls backend and sets user with isGuest false', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+		it('login() calls the auth.login endpoint and sets user with isGuest false', async () => {
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.login('alice@example.com', 'pw');
-			expect(backendSpy.post).toHaveBeenCalledWith('/auth/login', { email: 'alice@example.com', password: 'pw' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.auth.login, { body: { email: 'alice@example.com', password: 'pw' } });
 			expect(service.user()?.sessionTicket).toBe('ticket-123');
 			expect(service.user()?.isGuest).toBeFalse();
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 
 		it('login() persists only the session ticket to localStorage', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.login('alice@example.com', 'pw');
 			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
 			expect(localStorage.getItem('gg_auth')).toBeNull();
 		});
 
 		it('register() sets user with isGuest false', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.register('alice@example.com', 'pw', 'Alice');
-			expect(backendSpy.post).toHaveBeenCalledWith('/auth/register', { email: 'alice@example.com', password: 'pw', username: 'Alice' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.auth.register, { body: { email: 'alice@example.com', password: 'pw', username: 'Alice' } });
 			expect(service.user()?.isGuest).toBeFalse();
 		});
 
 		it('loginAsGuest() sets user with isGuest true and persists ticket', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_GUEST_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_GUEST_RESPONSE));
 			await service.loginAsGuest();
 			expect(service.user()?.isGuest).toBeTrue();
 			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
 		});
 
 		it('loginAsGuest() creates a guest ID and reuses it across calls', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.loginAsGuest();
 			const firstId = localStorage.getItem('gg_guest_id');
 			expect(firstId).not.toBeNull();
 
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.loginAsGuest();
 			expect(localStorage.getItem('gg_guest_id')).toBe(firstId);
 
-			const [, body] = backendSpy.post.calls.mostRecent().args as [string, unknown];
-			expect((body as { customId: string }).customId).toBe(firstId!);
+			const [, options] = (backendSpy.call as jasmine.Spy).calls.mostRecent().args as [unknown, { body: { customId: string } }];
+			expect(options.body.customId).toBe(firstId!);
 		});
 
 		it('logout() clears user signal and removes session ticket', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.login('alice@example.com', 'pw');
 			service.logout();
 			expect(service.user()).toBeNull();
@@ -112,10 +119,10 @@ describe('UserService', () => {
 	describe('profile preview', () => {
 		let service: UserService;
 		beforeEach(async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			service = createService();
 			await service.login('alice@example.com', 'pw');
-			backendSpy.post.calls.reset();
+			backendSpy.call.calls.reset();
 		});
 
 		it('previewProfileData() applies changes to previewedPlayer/theme without calling the API', () => {
@@ -124,7 +131,7 @@ describe('UserService', () => {
 			expect(service.theme()).toBe('light');
 			expect(service.hasPendingChanges()).toBeTrue();
 			expect(service.user()?.player.icon).toBe('profile'); // saved profile untouched
-			expect(backendSpy.post).not.toHaveBeenCalled();
+			expect(backendSpy.call).not.toHaveBeenCalled();
 		});
 
 		it('discardPreview() reverts to the saved profile', () => {
@@ -140,18 +147,18 @@ describe('UserService', () => {
 			expect(service.hasPendingChanges()).toBeFalse();
 		});
 
-		it('saveProfile() posts the pending changes once and merges the result into the user', async () => {
+		it('saveProfile() sends the pending changes once and merges the result into the user', async () => {
 			service.previewProfileData({ icon: 'pizza' });
-			backendSpy.post.and.returnValue(Promise.resolve({ icon: 'pizza', theme: 'dark', language: 'en' }));
+			backendSpy.call.and.returnValue(Promise.resolve({ icon: 'pizza', theme: 'dark', language: 'en' }));
 			await service.saveProfile();
-			expect(backendSpy.post).toHaveBeenCalledOnceWith('/profile/update', { sessionTicket: 'ticket-123', icon: 'pizza' });
+			expect(backendSpy.call).toHaveBeenCalledOnceWith(API.profile.update, { body: { icon: 'pizza' } });
 			expect(service.user()?.player.icon).toBe('pizza');
 			expect(service.hasPendingChanges()).toBeFalse();
 		});
 
 		it('saveProfile() keeps the preview when the API call fails', async () => {
 			service.previewProfileData({ icon: 'pizza' });
-			backendSpy.post.and.returnValue(Promise.reject(new Error('boom')));
+			backendSpy.call.and.returnValue(Promise.reject(new Error('boom')));
 			await expectAsync(service.saveProfile()).toBeRejected();
 			expect(service.previewedPlayer()?.icon).toBe('pizza');
 			expect(service.hasPendingChanges()).toBeTrue();
@@ -160,32 +167,32 @@ describe('UserService', () => {
 
 		it('saveProfile() without a preview does not call the API', async () => {
 			await service.saveProfile();
-			expect(backendSpy.post).not.toHaveBeenCalled();
+			expect(backendSpy.call).not.toHaveBeenCalled();
 		});
 	});
 
 	describe('init() — session restore', () => {
 		it('does not call auth/check when no ticket is stored', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_PLAYER));
 			const service = createService();
 			await service.init();
-			expect(backendSpy.post).not.toHaveBeenCalled();
+			expect(backendSpy.call).not.toHaveBeenCalled();
 			expect(service.user()).toBeNull();
 		});
 
-		it('calls auth/check with stored ticket and sets user on success', async () => {
+		it('calls auth/check (the stored ticket rides in the auth header) and sets user on success', async () => {
 			localStorage.setItem('gg_session_ticket', 'ticket-123');
-			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			backendSpy.call.and.returnValue(Promise.resolve(MOCK_PLAYER));
 			const service = createService();
 			await service.init();
-			expect(backendSpy.post).toHaveBeenCalledWith('/auth/check', { sessionTicket: 'ticket-123' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.auth.check);
 			expect(service.user()?.sessionTicket).toBe('ticket-123');
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 
 		it('removes the ticket and leaves user null if auth/check fails and no guestId exists', async () => {
 			localStorage.setItem('gg_session_ticket', 'ticket-123');
-			backendSpy.post.and.returnValue(Promise.reject(new Error('Invalid session')));
+			backendSpy.call.and.returnValue(Promise.reject(new Error('Invalid session')));
 			const service = createService();
 			await service.init();
 			expect(service.user()).toBeNull();
@@ -195,13 +202,13 @@ describe('UserService', () => {
 		it('falls back to guestLogin if auth/check fails but guestId is stored', async () => {
 			localStorage.setItem('gg_session_ticket', 'expired-ticket');
 			localStorage.setItem('gg_guest_id', 'guest-uuid-123');
-			backendSpy.post.and.callFake((url: string) => {
-				if (url === '/auth/check') return Promise.reject(new Error('Expired'));
-				return Promise.resolve(MOCK_GUEST_RESPONSE) as Promise<any>;
+			backendSpy.call.and.callFake((endpoint: AnyEndpoint) => {
+				if (endpoint === API.auth.check) return Promise.reject(new Error('Expired'));
+				return Promise.resolve(MOCK_GUEST_RESPONSE);
 			});
 			const service = createService();
 			await service.init();
-			expect(backendSpy.post).toHaveBeenCalledWith('/auth/guestLogin', { customId: 'guest-uuid-123' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.auth.guestLogin, { body: { customId: 'guest-uuid-123' } });
 			expect(service.user()?.isGuest).toBeTrue();
 			expect(service.isLoggedIn()).toBeTrue();
 		});

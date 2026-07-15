@@ -1,4 +1,4 @@
-import { BaseRequest, IconType } from './auth';
+import { IconType } from './auth';
 
 /** A friend or pending friend-request counterpart (always a registered player). */
 export interface Friend {
@@ -15,9 +15,4 @@ export interface FriendsListResponse {
 	incoming: Friend[];
 	/** Requests the caller has sent, awaiting the other player's response. */
 	outgoing: Friend[];
-}
-
-/** Request carrying the target (registered) player's id. */
-export interface FriendBaseRequest extends BaseRequest {
-	friendId: string;
 }

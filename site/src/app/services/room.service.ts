@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameSettings, GameSettingsSetRequest, GameState, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
+import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameStateRequest, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 import { UserService } from './user.service';
@@ -31,10 +31,6 @@ export class RoomService {
 		});
 	});
 
-	private get ticket(): string {
-		return this.auth.user()!.sessionTicket;
-	}
-
 	private upsertIntoCache(room: RoomData): void {
 		this.rooms.update(rooms => {
 			const idx = rooms.findIndex(r => r.id === room.id);
@@ -55,80 +51,72 @@ export class RoomService {
 	}
 
 	public async loadRooms(): Promise<void> {
-		const request: BaseRequest = { sessionTicket: this.ticket };
-		const summaries = await this.backend.post<RoomSummary[]>('/rooms/list', request);
+		const summaries = await this.backend.call(API.rooms.list);
 		this.rooms.set(summaries);
 	}
 
 	public createRoom(game: GameType): Promise<RoomData> {
-		const request: RoomCreateRequest = { sessionTicket: this.ticket, game };
-		return this.backend.post<RoomData>('/rooms/create', request);
+		const request: RoomCreateRequest = { game };
+		return this.backend.call(API.rooms.create, { body: request });
 	}
 
 	public async getRoom(roomId: string): Promise<RoomData> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		const room = await this.backend.post<RoomData>('/rooms/get', request);
+		const room = await this.backend.call(API.rooms.get, { params: { roomId } });
 		this.upsertIntoCache(room);
 		return room;
 	}
 
 	public sendChat(roomId: string, text: string): Promise<void> {
-		const request: ChatSendRequest = { sessionTicket: this.ticket, roomId, text };
-		return this.backend.post<void>('/chat/send', request);
+		const request: ChatSendRequest = { text };
+		return this.backend.call(API.chat.send, { params: { roomId }, body: request });
 	}
 
 	public joinRoom(roomId: string): Promise<RoomData> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<RoomData>('/rooms/join', request);
+		return this.backend.call(API.rooms.join, { params: { roomId } });
 	}
 
 	public startRoom(roomId: string): Promise<RoomData> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<RoomData>('/rooms/start', request);
+		return this.backend.call(API.rooms.start, { params: { roomId } });
 	}
 
-	public resetRoom(roomId: string): Promise<void> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<void>('/rooms/reset', request);
+	public resetRoom(roomId: string): Promise<RoomData> {
+		return this.backend.call(API.rooms.reset, { params: { roomId } });
 	}
 
 	public setRoomAccess(roomId: string, access: RoomAccessPolicy): Promise<RoomData> {
-		const request: RoomAccessSetRequest = { sessionTicket: this.ticket, roomId, access };
-		return this.backend.post<RoomData>('/rooms/access', request);
+		const request: RoomAccessSetRequest = { access };
+		return this.backend.call(API.rooms.setAccess, { params: { roomId }, body: request });
 	}
 
-	public kickPlayer(roomId: string, playerId: string): Promise<void> {
-		const request: RoomKickRequest = { sessionTicket: this.ticket, roomId, playerId };
-		return this.backend.post<void>('/rooms/kick', request);
+	public kickPlayer(roomId: string, playerId: string): Promise<RoomData> {
+		return this.backend.call(API.rooms.kick, { params: { roomId, playerId } });
 	}
 
 	public leaveRoom(roomId: string): Promise<void> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<void>('/rooms/leave', request);
+		return this.backend.call(API.rooms.leave, { params: { roomId } });
 	}
 
 	public deleteRoom(roomId: string): Promise<void> {
-		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<void>('/rooms/delete', request);
+		return this.backend.call(API.rooms.delete, { params: { roomId } });
 	}
 
 	public invitePlayer(roomId: string, friendId: string): Promise<void> {
-		const request: RoomInviteRequest = { sessionTicket: this.ticket, roomId, friendId };
-		return this.backend.post<void>('/rooms/invite', request);
+		const request: RoomInviteRequest = { friendId };
+		return this.backend.call(API.rooms.invite, { params: { roomId }, body: request });
 	}
 
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {
-		const request: GameBaseRequest = { sessionTicket: this.ticket, game, roomId };
-		return this.backend.post<GameState | null>('/game/state', request);
+		const request: GameStateRequest = { game };
+		return this.backend.call(API.game.state, { params: { roomId }, body: request });
 	}
 
 	public gameAction(game: GameType, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
-		const request: GameActionRequest = { sessionTicket: this.ticket, game, roomId, action, data: data ?? null };
-		return this.backend.post<GameState | null>('/game/action', request);
+		const request: GameActionRequest = { game, action, data: data ?? null };
+		return this.backend.call(API.game.action, { params: { roomId }, body: request });
 	}
 
-	public setGameSettings(game: GameType, roomId: string, settings: GameSettings): Promise<RoomData> {
-		const request: GameSettingsSetRequest = { sessionTicket: this.ticket, game, roomId, settings };
-		return this.backend.post<RoomData>('/game/settings/set', request);
+	public setGameSettings(roomId: string, settings: GameSettings): Promise<RoomData> {
+		const request: GameSettingsSetRequest = { settings };
+		return this.backend.call(API.game.setSettings, { params: { roomId }, body: request });
 	}
 }

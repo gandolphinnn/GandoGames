@@ -1,8 +1,8 @@
-import { ChatMessage, ChatSendRequest } from '@gandogames/shared/dto';
-import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
+import { API, ChatMessage } from '@gandogames/shared/dto';
+import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
 
-const chatSendInner: InnerFunction<ChatSendRequest, void> = async (body, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(body.roomId);
+const chatSendInner: InnerFunction<typeof API.chat.send> = async (body, params, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
 	if (!room.players.some(p => p.id === player.id)) throw new Error('You are not in this room');
 
@@ -18,8 +18,8 @@ const chatSendInner: InnerFunction<ChatSendRequest, void> = async (body, notifie
 	};
 
 	room.chat = [...(room.chat ?? []), message];
-	await PlayfabCtx.rooms.upsert(body.roomId, room);
-	notifier.chatMessage(body.roomId, message);
+	await PlayfabCtx.rooms.upsert(params.roomId, room);
+	notifier.chatMessage(params.roomId, message);
 };
 
-registerFunction('chat_send', 'chat/send', chatSendInner);
+registerEndpoint(API.chat.send, chatSendInner);

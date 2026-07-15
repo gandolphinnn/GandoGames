@@ -5,6 +5,7 @@ import { RoomService } from '../room.service';
 import { BackendService } from '../backend.service';
 import { AuthUser, UserService } from '../user.service';
 import { SignalRService } from '../signalr.service';
+import { API } from '@gandogames/shared/dto';
 import type { GamePlayer, RoomData } from '@gandogames/shared/dto';
 
 function makePlayer(id: string, name: string): GamePlayer {
@@ -32,14 +33,18 @@ const MOCK_USER: AuthUser = {
 	isGuest: false,
 };
 
+// jasmine derives a generic method's spy signature from its widest instantiation, where call()'s
+// options tuple collapses to [] — intersect with a plain Spy so matchers accept (endpoint, options).
+type BackendSpy = jasmine.SpyObj<BackendService> & { call: jasmine.Spy };
+
 describe('RoomService', () => {
 	let service: RoomService;
-	let backendSpy: jasmine.SpyObj<BackendService>;
+	let backendSpy: BackendSpy;
 	let roomUpsert$: Subject<RoomData>;
 	let roomDeleted$: Subject<string>;
 
 	beforeEach(() => {
-		backendSpy = jasmine.createSpyObj('BackendService', ['post']);
+		backendSpy = jasmine.createSpyObj('BackendService', ['call']) as BackendSpy;
 		roomUpsert$ = new Subject<RoomData>();
 		roomDeleted$ = new Subject<string>();
 
@@ -68,11 +73,11 @@ describe('RoomService', () => {
 	});
 
 	describe('loadRooms()', () => {
-		it('calls POST /rooms/list and sets rooms signal', async () => {
+		it('calls the rooms.list endpoint and sets rooms signal', async () => {
 			const rooms = [makeRoom()];
-			backendSpy.post.and.returnValue(Promise.resolve(rooms));
+			backendSpy.call.and.returnValue(Promise.resolve(rooms));
 			await service.loadRooms();
-			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/list', { sessionTicket: 'ticket-abc' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.list);
 			expect(service.rooms()).toEqual(rooms);
 		});
 	});
@@ -109,45 +114,54 @@ describe('RoomService', () => {
 	});
 
 	describe('createRoom()', () => {
-		it('calls POST /rooms/create with game and ticket', async () => {
+		it('calls the rooms.create endpoint with the game in the body', async () => {
 			const room = makeRoom();
-			backendSpy.post.and.returnValue(Promise.resolve(room));
+			backendSpy.call.and.returnValue(Promise.resolve(room));
 			const result = await service.createRoom('pankov');
-			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/create', { sessionTicket: 'ticket-abc', game: 'pankov' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.create, { body: { game: 'pankov' } });
 			expect(result).toEqual(room);
 		});
 	});
 
 	describe('setRoomAccess()', () => {
-		it('calls POST /rooms/access with the access policy', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(makeRoom()));
+		it('calls the rooms.setAccess endpoint with the room in the path and the policy in the body', async () => {
+			backendSpy.call.and.returnValue(Promise.resolve(makeRoom()));
 			await service.setRoomAccess('room-1', 'friends');
-			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/access', { sessionTicket: 'ticket-abc', roomId: 'room-1', access: 'friends' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.setAccess, { params: { roomId: 'room-1' }, body: { access: 'friends' } });
 		});
 	});
 
 	describe('joinRoom()', () => {
-		it('calls POST /rooms/join', async () => {
+		it('calls the rooms.join endpoint with the room in the path', async () => {
 			const room = makeRoom();
-			backendSpy.post.and.returnValue(Promise.resolve(room));
+			backendSpy.call.and.returnValue(Promise.resolve(room));
 			await service.joinRoom('room-1');
-			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/join', { sessionTicket: 'ticket-abc', roomId: 'room-1' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.join, { params: { roomId: 'room-1' } });
 		});
 	});
 
 	describe('leaveRoom()', () => {
-		it('calls POST /rooms/leave', async () => {
-			backendSpy.post.and.returnValue(Promise.resolve(undefined));
+		it('calls the rooms.leave endpoint with the room in the path', async () => {
+			backendSpy.call.and.returnValue(Promise.resolve(undefined));
 			await service.leaveRoom('room-1');
-			expect(backendSpy.post).toHaveBeenCalledWith('/rooms/leave', { sessionTicket: 'ticket-abc', roomId: 'room-1' });
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.leave, { params: { roomId: 'room-1' } });
+		});
+	});
+
+	describe('getGameState()', () => {
+		it('calls the game.state QUERY endpoint with the game in the body', async () => {
+			backendSpy.call.and.returnValue(Promise.resolve(null));
+			await service.getGameState('pankov', 'room-1');
+			expect(backendSpy.call).toHaveBeenCalledWith(API.game.state, { params: { roomId: 'room-1' }, body: { game: 'pankov' } });
 		});
 	});
 
 	describe('getRoom()', () => {
 		it('fetches room and inserts it into rooms signal if not present', async () => {
 			const room = makeRoom();
-			backendSpy.post.and.returnValue(Promise.resolve(room));
+			backendSpy.call.and.returnValue(Promise.resolve(room));
 			await service.getRoom('room-1');
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.get, { params: { roomId: 'room-1' } });
 			expect(service.rooms()).toContain(room);
 		});
 
@@ -155,7 +169,7 @@ describe('RoomService', () => {
 			const original = makeRoom({ players: [makePlayer('player-1', 'Alice')] });
 			const updated = makeRoom({ players: [makePlayer('player-1', 'Alice'), makePlayer('player-2', 'Bob')] });
 			service.rooms.set([original]);
-			backendSpy.post.and.returnValue(Promise.resolve(updated));
+			backendSpy.call.and.returnValue(Promise.resolve(updated));
 			await service.getRoom('room-1');
 			expect(service.rooms()[0].players).toHaveSize(2);
 		});

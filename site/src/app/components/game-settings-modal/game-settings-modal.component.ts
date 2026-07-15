@@ -90,7 +90,7 @@ export class GameSettingsModalComponent {
 		try {
 			// Clamp/normalize once more before sending; the server validates again against the schema.
 			const settings = resolveSettings(this.schema(), this.working());
-			await this.roomService.setGameSettings(this.game(), this.roomId(), settings);
+			await this.roomService.setGameSettings(this.roomId(), settings);
 			this.toast.success(this.translate.instant('SETTINGS_MODAL.SAVED') as string);
 			this.closed.emit();
 		} finally {

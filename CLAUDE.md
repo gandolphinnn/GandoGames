@@ -8,12 +8,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 GandoGames/
 ├── shared/
 │   ├── index.ts               # Re-exports all shared types (imported as @gandogames/shared/dto)
-│   └── dto/                   # Shared HTTP/SignalR contract types used by both site/ and api/
+│   └── dto/                   # Shared HTTP/SignalR contract used by both site/ and api/
+│       ├── endpoints.ts       # THE API CONTRACT (SSOT): every endpoint's name, method, route + req/res/query types
 │       ├── auth.ts            # AuthResponse, GamePlayer, ProfileData, Login/Register/GuestLoginRequest
 │       ├── room.ts            # RoomData, RoomSummary, RoomCreateRequest, ChatMessage
-│       ├── game.ts            # GameType, GameState, GameBaseRequest, GameActionRequest
-│       ├── signalr.ts         # NegotiateResponse, SignalR event contract (SignalREventArgs)
-│       └── friends.ts         # Friend, FriendsListResponse, FriendBaseRequest
+│       ├── game.ts            # GameType, GameState, GameStateRequest, GameActionRequest
+│       ├── signalr.ts         # NegotiateResponse/NegotiateQuery, SignalR event contract (SignalREventArgs)
+│       └── friends.ts         # Friend, FriendsListResponse
 ├── site/                      # Angular 20 SPA + Ionic (Azure Static Web Apps)
 │   ├── src/app/               # pages, components, services, guards
 │   ├── lib/games/             # Self-contained game packages (pankov, poker)
@@ -88,25 +89,24 @@ Angular 20 standalone app (no NgModules). Entry point: `src/main.ts` bootstraps 
 All in `src/app/services/`, imported via the `@gandogames/services` barrel (e.g. `import { RoomService } from '@gandogames/services'`). Every service — and any type its consumers need, re-exported with the `type` modifier (`isolatedModules`) — must be listed in `src/app/services/_index.ts`. Inside `src/app/services/` itself, services import each other with relative paths, never through the barrel (avoids import cycles).
 
 - `UserService` — `user` signal; login/register/guest/logout; session ticket persisted in `localStorage`; debounced profile updates
-- `BackendService` — `get()`, `post()`; surfaces any failed request's error message as a toast automatically before rethrowing
+- `BackendService` — `call(endpoint, options?)`, typed end-to-end by the shared API contract; adds the `Authorization: Bearer` header from the stored session ticket; surfaces any failed request's error message as a toast automatically before rethrowing
 - `RoomService` — `rooms`/`myRooms`/`browsableRooms` signals, CRUD methods, subscribes to SignalR events for reactive updates
 - `SignalRService` — manages HubConnection lifecycle (auto-connect on auth), exposes `events.roomUpsert`, `events.roomDeleted`, `events.gameStateUpdated`, `events.chatMessage`, `events.roomInvite`, `events.friendRequest`, `events.friendsChanged` as RxJS Subjects
 - `FriendService` — `friends`/`incoming`/`outgoing` signals + `pendingCount`; reacts to friend SignalR events
 - `UrlService` — the only place that touches `Router`/`ActivatedRoute`: never inject them elsewhere. `get(branch)` returns per-branch typed `navigate`/`urlTree`/`currentVariables` (derived from the `TREE` object); `current` url signal + `isActive(branch)`. New routes must be added to both `BranchName` and `TREE`
 - `StorageService` — typed `localStorage` wrapper; `ToastService` — toasts and confirm prompts
 
-**BackendService call pattern:** Always specify the return type generic and always declare a typed request variable — never pass an inline object literal as the body. The only exception to `const result = await` is when immediately returning the call result.
+**BackendService call pattern:** Every request goes through `call()` with an endpoint from the shared `API` map (`shared/dto/endpoints.ts`) — never a hand-written URL or method string. Route, method, params, body and response types all come from the endpoint definition; `params`/`body`/`query` are required (and typed) only when the endpoint declares them. Bodies still use a typed request variable rather than an inline literal. Callers never touch the session ticket — `BackendService` adds the `Authorization` header itself.
 ```ts
 // correct
-const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-const result = await this.backend.post<RoomData>('/rooms/get', request);
+const request: ChatSendRequest = { text };
+return this.backend.call(API.chat.send, { params: { roomId }, body: request });
 
-// correct immediate return
-const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-return this.backend.post<void>('/rooms/leave', request);
+// correct — endpoint with no input
+const result = await this.backend.call(API.rooms.list);
 
-// wrong — no type generic, inline body
-await this.backend.post('/rooms/leave', { sessionTicket: this.ticket, roomId });
+// wrong — raw URL/method, inline body, hand-passed ticket
+await this.backend.post('/chat/send', { sessionTicket: this.ticket, roomId, text });
 ```
 
 **Error toasts:** `BackendService` already shows the API's error message as a toast on every failed call (before rethrowing). Never call `toast.error`/`warning`/`show` for the same error in a caller's `catch` — that double-toasts. In a `catch` after a backend call, only handle control flow (skip navigation, reset a loading flag). There is no per-call opt-out today; if a call must NOT toast on error, add that capability deliberately rather than working around it at the call site.
@@ -123,11 +123,13 @@ To add a new game: create `site/lib/games/<name>/index.ts` exporting the game co
 
 `api/` is an Azure Functions v4 TypeScript app. Secure proxy to PlayFab — `PLAYFAB_SECRET_KEY` never reaches the client.
 
+**API contract (`shared/dto/endpoints.ts`):** the single source of truth for every endpoint — Azure Function name, HTTP method, route template and request/response/query types. Both sides consume it: the api registers functions from it, the site calls through it. Method conventions: GET for safe reads (ids in the path), QUERY for safe reads carrying a JSON body (`game/state`), POST for creations/actions, PUT for idempotent sub-resource replacement, PATCH for partial updates, DELETE for removals. Authentication is the `Authorization: Bearer <sessionTicket>` header — bodies never carry the ticket, and ids travel as `{param}` path segments. Never give two functions overlapping route templates on the same method (e.g. `players/me` vs `players/{playerId}`): the Functions host resolves routes without literal-over-parameter precedence.
+
 **Barrel (`api/src/index.ts`):**
 
-- `registerPublicFunction<TReq, TRes>(name, route, fn)` — unauthenticated POST; includes SignalR output binding
-- `registerFunction<TReq extends BaseRequest, TRes>(name, route, fn)` — authenticates `sessionTicket` via PlayFab before calling `fn`; includes SignalR output binding
-- `registerBaseFunction(name, route, handler, extraInputs?)` — raw handler with the SignalR output binding; used for `signalr/negotiate` (with the `signalRConnectionInfo` input binding)
+- `registerPublicEndpoint(def, fn)` — unauthenticated endpoint built from a contract definition; includes SignalR output binding
+- `registerEndpoint(def, fn)` — authenticates the `Authorization: Bearer` ticket via PlayFab before calling `fn(body, params, notifier, player)`; unsafe methods (non GET/QUERY) on routes carrying `{roomId}` run under the per-room lock automatically
+- `registerBaseEndpoint(def, handler, extraInputs?)` — raw handler with the SignalR output binding; used for `signalr/negotiate` (with the `signalRConnectionInfo` input binding)
 - `registerTimeFunction(name, cron, runOnStartup, fn)` — timer-triggered (cron) function
 - `InnerFunctionNotifier` — passed to every handler; set `errorCode`/`errorMessage` to shape errors, and call its methods (`roomUpsert`, `gameStateUpdatedForPlayer`, `addToGroup`, …) to queue SignalR broadcasts sent after a successful response
 - `pfPromise<T>(call)` — wraps PlayFab SDK callbacks into Promises
@@ -135,7 +137,7 @@ To add a new game: create `site/lib/games/<name>/index.ts` exporting the game co
 
 **SignalR:** Azure SignalR Service in serverless mode. `signalROutput` output binding on all registered functions. Broadcast by calling `InnerFunctionNotifier` methods (e.g. `notifier.roomUpsert(room)`), which queue `SignalRMessage`s flushed to the binding after a successful response.
 
-**Shared types:** `shared/index.ts` (imported as `@gandogames/shared/dto`) is the single source of truth for all HTTP request/response shapes.
+**Shared types:** `shared/index.ts` (imported as `@gandogames/shared/dto`) is the single source of truth for all HTTP request/response shapes; `shared/dto/endpoints.ts` binds each shape to its endpoint (method + route).
 
 **Data storage:** PlayFab SharedGroups store room and game state. PlayFab is also used for auth.
 

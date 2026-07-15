@@ -1,5 +1,5 @@
 import { InvocationContext, Timer } from '@azure/functions';
-import { BaseRequest, ChatMessage, Friend, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/shared/dto';
+import { AnyEndpoint, ChatMessage, EndpointParams, EndpointRequest, EndpointResponse, Friend, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/shared/dto';
 import { signalROutput } from '.';
 
 export type SignalRMessage =
@@ -52,6 +52,8 @@ export class InnerFunctionNotifier {
 	}
 };
 
-export type InnerPublicFunction<TReq, TRes> = (body: TReq, notifier: InnerFunctionNotifier) => Promise<TRes>;
-export type InnerFunction<TReq extends BaseRequest, TRes> = (body: TReq, notifier: InnerFunctionNotifier, player: GamePlayer) => Promise<TRes>;
+// Handler signatures are derived from the endpoint definition (shared/dto/endpoints.ts):
+// the body, path params and return type all come from the same contract the site consumes.
+export type InnerPublicFunction<E extends AnyEndpoint> = (body: EndpointRequest<E>, notifier: InnerFunctionNotifier) => Promise<EndpointResponse<E>>;
+export type InnerFunction<E extends AnyEndpoint> = (body: EndpointRequest<E>, params: EndpointParams<E>, notifier: InnerFunctionNotifier, player: GamePlayer) => Promise<EndpointResponse<E>>;
 export type InnerTimeFunction = (timer: Timer, notifier: InnerFunctionNotifier) => Promise<void>;

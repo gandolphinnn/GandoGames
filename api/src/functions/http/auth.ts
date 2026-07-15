@@ -1,5 +1,5 @@
-import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
-import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
+import { API, AuthResponse, IconType, LangCode, Theme } from '@gandogames/shared/dto';
+import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerEndpoint, registerPublicEndpoint } from '../..';
 
 type LoginLike = {
 	PlayFabId?: string;
@@ -45,7 +45,7 @@ const guestUsername = (customId: string): string => {
 	return `Guest${String(hash).padStart(6, '0')}`;
 };
 
-const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = async (body, notifier) => {
+const guestLoginInner: InnerPublicFunction<typeof API.auth.guestLogin> = async (body, notifier) => {
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Invalid custom ID';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
@@ -75,7 +75,7 @@ const guestLoginInner: InnerPublicFunction<GuestLoginRequest, AuthResponse> = as
 	return toAuthResponse(result, name, true, result.InfoResultPayload?.UserData);
 };
 
-const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body, notifier) => {
+const loginInner: InnerPublicFunction<typeof API.auth.login> = async (body, notifier) => {
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Invalid email or password';
 	const infoRequestParameters = INFO_REQUEST_PARAMS;
@@ -85,7 +85,7 @@ const loginInner: InnerPublicFunction<LoginRequest, AuthResponse> = async (body,
 	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, false, result.InfoResultPayload?.UserData);
 };
 
-const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async (body, notifier) => {
+const registerInner: InnerPublicFunction<typeof API.auth.register> = async (body, notifier) => {
 	notifier.errorCode = 400;
 	notifier.errorMessage = 'Invalid registration data';
 	const result = await pfPromise<PlayFabClientModels.RegisterPlayFabUserResult>(
@@ -99,12 +99,10 @@ const registerInner: InnerPublicFunction<RegisterRequest, AuthResponse> = async 
 	return toAuthResponse(result, body.username, false);
 };
 
-const checkInner: InnerFunction<BaseRequest, AuthResponse> = async (body, _notifier, player) => ({
-	player,
-	sessionTicket: body.sessionTicket,
-});
+// The client already holds the ticket it authenticated with, so check returns just the player.
+const checkInner: InnerFunction<typeof API.auth.check> = async (_body, _params, _notifier, player) => player;
 
-registerPublicFunction('auth_guestLogin', 'auth/guestLogin', guestLoginInner);
-registerPublicFunction('auth_login', 'auth/login', loginInner);
-registerPublicFunction('auth_register', 'auth/register', registerInner);
-registerFunction('auth_check', 'auth/check', checkInner);
+registerPublicEndpoint(API.auth.guestLogin, guestLoginInner);
+registerPublicEndpoint(API.auth.login, loginInner);
+registerPublicEndpoint(API.auth.register, registerInner);
+registerEndpoint(API.auth.check, checkInner);

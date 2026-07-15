@@ -1,5 +1,5 @@
-import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
-import { InnerFunction, InnerFunctionNotifier, pfPromise, PlayFabServer, registerFunction } from '../..';
+import { API, Friend, FriendsListResponse } from '@gandogames/shared/dto';
+import { InnerFunction, InnerFunctionNotifier, pfPromise, PlayFabServer, registerEndpoint } from '../..';
 
 /**
  * PlayFab has no native friend-request/pending concept and friendships are one-directional, so we
@@ -71,7 +71,7 @@ async function removeEdge(owner: string, friend: string): Promise<void> {
 	}
 }
 
-const friendsListInner: InnerFunction<BaseRequest, FriendsListResponse> = async (_body, _notifier, player) => {
+const friendsListInner: InnerFunction<typeof API.friends.list> = async (_body, _params, _notifier, player) => {
 	const infos = await getFriendInfos(player.id);
 	const response: FriendsListResponse = { friends: [], incoming: [], outgoing: [] };
 	for (const info of infos) {
@@ -84,61 +84,61 @@ const friendsListInner: InnerFunction<BaseRequest, FriendsListResponse> = async 
 	return response;
 };
 
-const friendsRequestInner: InnerFunction<FriendBaseRequest, void> = async (body, notifier, player) => {
+const friendsRequestInner: InnerFunction<typeof API.friends.request> = async (_body, params, notifier, player) => {
 	if (player.isGuest) fail(notifier, 403, 'Guest accounts cannot add friends');
-	if (!body.friendId || body.friendId === player.id) fail(notifier, 400, 'Invalid friend');
+	if (params.friendId === player.id) fail(notifier, 400, 'Invalid friend');
 
 	notifier.errorCode = 404;
 	notifier.errorMessage = 'Player not found';
 	const account = await pfPromise<PlayFabServerModels.GetUserAccountInfoResult>(
-		cb => PlayFabServer.GetUserAccountInfo({ PlayFabId: body.friendId }, cb),
+		cb => PlayFabServer.GetUserAccountInfo({ PlayFabId: params.friendId }, cb),
 	);
 	notifier.errorCode = 500;
 	notifier.errorMessage = undefined;
 	// Only registered accounts have a Username; guests (custom-id login) cannot be befriended.
 	if (!account.UserInfo?.Username) fail(notifier, 400, 'You can only add registered players as friends');
 
-	const existing = (await getFriendInfos(player.id)).find(f => f.FriendPlayFabId === body.friendId);
+	const existing = (await getFriendInfos(player.id)).find(f => f.FriendPlayFabId === params.friendId);
 	const tag = tagOf(existing);
 	if (tag === ACCEPTED || tag === OUTGOING) return; // already friends / already requested
 
 	if (tag === INCOMING) {
 		// The target already requested the caller — treat this as accepting that request.
-		await setEdge(player.id, body.friendId, ACCEPTED);
-		await setEdge(body.friendId, player.id, ACCEPTED);
-		notifier.friendsChanged(body.friendId);
+		await setEdge(player.id, params.friendId, ACCEPTED);
+		await setEdge(params.friendId, player.id, ACCEPTED);
+		notifier.friendsChanged(params.friendId);
 		return;
 	}
 
-	await setEdge(player.id, body.friendId, OUTGOING);
+	await setEdge(player.id, params.friendId, OUTGOING);
 	try {
-		await setEdge(body.friendId, player.id, INCOMING);
+		await setEdge(params.friendId, player.id, INCOMING);
 	} catch (err) {
 		// Fail closed: don't leave a one-sided request the recipient never sees.
-		await removeEdge(player.id, body.friendId);
+		await removeEdge(player.id, params.friendId);
 		throw err;
 	}
 	const from: Friend = { id: player.id, name: player.name, icon: player.icon };
-	notifier.friendRequest(body.friendId, from);
+	notifier.friendRequest(params.friendId, from);
 };
 
-const friendsAcceptInner: InnerFunction<FriendBaseRequest, void> = async (body, notifier, player) => {
-	const existing = (await getFriendInfos(player.id)).find(f => f.FriendPlayFabId === body.friendId);
+const friendsAcceptInner: InnerFunction<typeof API.friends.accept> = async (_body, params, notifier, player) => {
+	const existing = (await getFriendInfos(player.id)).find(f => f.FriendPlayFabId === params.friendId);
 	if (tagOf(existing) !== INCOMING) fail(notifier, 400, 'No pending request from this player');
 
-	await setEdge(player.id, body.friendId, ACCEPTED);
-	await setEdge(body.friendId, player.id, ACCEPTED);
-	notifier.friendsChanged(body.friendId);
+	await setEdge(player.id, params.friendId, ACCEPTED);
+	await setEdge(params.friendId, player.id, ACCEPTED);
+	notifier.friendsChanged(params.friendId);
 };
 
-const friendsRemoveInner: InnerFunction<FriendBaseRequest, void> = async (body, notifier, player) => {
+const friendsRemoveInner: InnerFunction<typeof API.friends.remove> = async (_body, params, notifier, player) => {
 	// Covers declining an incoming request, cancelling an outgoing one, and unfriending.
-	await removeEdge(player.id, body.friendId);
-	await removeEdge(body.friendId, player.id);
-	notifier.friendsChanged(body.friendId);
+	await removeEdge(player.id, params.friendId);
+	await removeEdge(params.friendId, player.id);
+	notifier.friendsChanged(params.friendId);
 };
 
-registerFunction('friends_list', 'friends/list', friendsListInner);
-registerFunction('friends_request', 'friends/request', friendsRequestInner);
-registerFunction('friends_accept', 'friends/accept', friendsAcceptInner);
-registerFunction('friends_remove', 'friends/remove', friendsRemoveInner);
+registerEndpoint(API.friends.list, friendsListInner);
+registerEndpoint(API.friends.request, friendsRequestInner);
+registerEndpoint(API.friends.accept, friendsAcceptInner);
+registerEndpoint(API.friends.remove, friendsRemoveInner);

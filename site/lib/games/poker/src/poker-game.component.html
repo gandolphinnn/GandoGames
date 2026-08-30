@@ -44,19 +44,12 @@
 				} @else if (p.folded) {
 					<span class="pk-tag pk-tag-folded">{{ 'POKER.FOLDED' | translate }}</span>
 				}
-				@if (p.id !== myPlayFabId() && !p.folded) {
-					@if (isBettingPhase()) {
-						<div class="pk-hole">
-							<gg-french-card [faceDown]="true" size="sm" />
-							<gg-french-card [faceDown]="true" size="sm" />
-						</div>
-					} @else if (gs.gamePhase === 'showdown' && p.cards.length) {
-						<div class="pk-hole">
-							@for (c of p.cards; track c.rank + c.suit) {
-								<gg-french-card [card]="c" size="sm" />
-							}
-						</div>
-					}
+				@if (p.id !== myPlayFabId() && !p.folded && gs.gamePhase === 'showdown' && p.cards.length) {
+					<div class="pk-hole">
+						@for (c of p.cards; track c.rank + c.suit) {
+							<gg-french-card [card]="c" size="sm" />
+						}
+					</div>
 				}
 				@if (isAllInReveal() && equityPercent()[p.id] !== undefined) {
 					<span class="pk-equity">{{ 'POKER.WIN_PCT' | translate: { pct: equityPercent()[p.id] } }}</span>

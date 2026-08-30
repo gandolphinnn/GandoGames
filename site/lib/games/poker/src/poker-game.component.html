@@ -87,19 +87,27 @@
 			@if (isBettingPhase()) {
 				@if (isMyTurn()) {
 					<div class="pk-actions">
-						<div class="action-row">
-							<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">{{ 'POKER.FOLD' | translate }}</ion-button>
-							@if (canCheck()) {
-								<ion-button [disabled]="loading()" (click)="check()">{{ 'POKER.CHECK' | translate }}</ion-button>
-							} @else {
-								<ion-button [disabled]="loading()" (click)="call()">{{ 'POKER.CALL' | translate: { amount: callAmount() } }}</ion-button>
-							}
-						</div>
-						<div class="raise-row">
-							<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="minRaise()" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
-							<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">{{ 'POKER.RAISE' | translate }}</ion-button>
-						</div>
-						<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
+						@if (someoneAllIn()) {
+							<div class="action-row">
+								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">{{ 'POKER.FOLD' | translate }}</ion-button>
+								<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
+							</div>
+						}
+						@else {
+							<div class="action-row">
+								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">{{ 'POKER.FOLD' | translate }}</ion-button>
+								@if (canCheck()) {
+									<ion-button [disabled]="loading()" (click)="check()">{{ 'POKER.CHECK' | translate }}</ion-button>
+								} @else {
+									<ion-button [disabled]="loading()" (click)="call()">{{ 'POKER.CALL' | translate: { amount: callAmount() } }}</ion-button>
+								}
+							</div>
+							<div class="raise-row">
+								<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="10" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
+								<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">{{ 'POKER.RAISE' | translate }}</ion-button>
+							</div>
+							<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
+						}
 						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				} @else {

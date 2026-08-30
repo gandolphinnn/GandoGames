@@ -47,7 +47,7 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	protected readonly challengeStake = computed(() => {
 		const gs = this.gameState();
 		if (!gs || !gs.settings.suddenDeath) return 1;
-		if (gs.previousDeclaration !== PANKOV_VALUE || gs.pankovStreak < 1) return 1;
+		if (gs.previousTurn?.declaration !== PANKOV_VALUE || gs.pankovStreak < 1) return 1;
 		return Math.pow(2, gs.pankovStreak - 1);
 	});
 
@@ -76,8 +76,8 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 
 	protected readonly previousPlayer = computed(() => {
 		const gs = this.gameState();
-		if (!gs || gs.previousPlayerIndex === null) return null;
-		return gs.players[gs.previousPlayerIndex] ?? null;
+		if (!gs || gs.previousTurn === null) return null;
+		return gs.players[gs.previousTurn.playerIndex] ?? null;
 	});
 
 	protected readonly isMyTurn = computed(() => this.currentPlayer()?.id === this.myPlayFabId());
@@ -85,7 +85,7 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	protected readonly validDeclarations = computed((): RollValue[] => {
 		const gs = this.gameState();
 		if (!gs) return [];
-		const minRank = gs.previousDeclaration !== null ? getRank(gs.previousDeclaration) : 0;
+		const minRank = gs.previousTurn !== null ? getRank(gs.previousTurn.declaration) : 0;
 		return (ROLL_VALUES as readonly RollValue[]).filter(v => getRank(v) >= minRank);
 	});
 

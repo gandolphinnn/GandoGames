@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { BackendService } from '../backend.service';
 import { ToastService } from '../toast.service';
@@ -20,7 +20,7 @@ describe('BackendService', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				BackendService,
-				provideHttpClient(),
+				provideHttpClient(withXhr()),
 				provideHttpClientTesting(),
 				{ provide: ToastService, useValue: toastSpy },
 			],

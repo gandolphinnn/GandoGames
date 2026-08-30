@@ -11,10 +11,10 @@
 
 		<!-- Centre: the current claim -->
 		<div table-center class="pv-center">
-			@if (gs.previousDeclaration !== null) {
+			@if (gs.previousTurn !== null) {
 				<span class="pv-center-eyebrow">{{ 'PANKOV.CURRENT_CLAIM' | translate }}</span>
-				<span class="pv-center-value">{{ formatValue(gs.previousDeclaration) }}</span>
-				<span class="pv-center-by">{{ 'PANKOV.BY' | translate: { name: previousPlayer()?.name } }}</span>
+				<span class="pv-center-value">{{ formatValue(gs.previousTurn.declaration) }}</span>
+				<span class="pv-center-by">{{ 'PANKOV.BY' | translate: { name: previousPlayer()!.name } }}</span>
 			} @else {
 				<span class="pv-center-value pv-center-value-idle">Pankov</span>
 			}
@@ -43,8 +43,8 @@
 				@case ('turn-start') {
 					@if (isMyTurn()) {
 						<div class="panel">
-							@if (gs.previousDeclaration !== null) {
-								<p class="panel-eyebrow">{{ 'PANKOV.BEAT_OR_CALL' | translate: { value: formatValue(gs.previousDeclaration) } }}</p>
+							@if (gs.previousTurn !== null) {
+								<p class="panel-eyebrow">{{ 'PANKOV.BEAT_OR_CALL' | translate: { value: formatValue(gs.previousTurn.declaration) } }}</p>
 							} @else {
 								<p class="panel-eyebrow">{{ 'PANKOV.YOUR_TURN_FIRST' | translate }}</p>
 							}
@@ -52,7 +52,7 @@
 								@if (canRoll()) {
 									<ion-button [disabled]="loading()" (click)="roll()">{{ 'PANKOV.ROLL_DICE' | translate }}</ion-button>
 								}
-								@if (gs.previousDeclaration !== null) {
+								@if (gs.previousTurn !== null) {
 									<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="challenge()">
 										{{ (challengeStake() > 1
 											? ('PANKOV.CHALLENGE_STAKE' | translate: { count: challengeStake() })
@@ -75,8 +75,8 @@
 						<div class="panel">
 							<p class="panel-eyebrow">{{ 'PANKOV.YOU_ROLLED' | translate }}</p>
 							<p class="panel-claim panel-claim-roll">{{ gs.currentRoll !== null ? formatValue(gs.currentRoll) : '?' }}</p>
-							@if (gs.previousDeclaration !== null) {
-								<p class="hint">{{ 'PANKOV.DECLARE_HIGHER' | translate: { value: formatValue(gs.previousDeclaration) } }}</p>
+							@if (gs.previousTurn !== null) {
+								<p class="hint">{{ 'PANKOV.DECLARE_HIGHER' | translate: { value: formatValue(gs.previousTurn.declaration) } }}</p>
 							} @else {
 								<p class="hint">{{ 'PANKOV.CHOOSE_DECLARE' | translate }}</p>
 							}
@@ -94,7 +94,7 @@
 							@if (error()) { <p class="action-error">{{ error() }}</p> }
 						</div>
 					} @else {
-						<p class="pv-waiting">{{ 'PANKOV.IS_ROLLING' | translate: { name: currentPlayer()?.name } }}<span class="waiting-dots"> · · ·</span></p>
+						<p class="pv-waiting">{{ 'PANKOV.IS_ROLLING' | translate: { name: currentPlayer()!.name } }}<span class="waiting-dots"> · · ·</span></p>
 					}
 				}
 

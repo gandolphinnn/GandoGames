@@ -99,7 +99,7 @@
 							<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="minRaise()" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
 							<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">{{ 'POKER.RAISE' | translate }}</ion-button>
 						</div>
-						<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me?.chips } }}</ion-button>
+						<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
 						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				} @else {
@@ -112,7 +112,7 @@
 					<div class="pk-result">
 						@if (wonByFold()) {
 							<p class="panel-eyebrow">{{ 'POKER.HAND_OVER' | translate }}</p>
-							<h2 class="pk-result-title">{{ 'POKER.WINS_POT' | translate: { name: showdownPlayers()[0]?.name } }}</h2>
+							<h2 class="pk-result-title">{{ 'POKER.WINS_POT' | translate: { name: showdownPlayers()[0]!.name } }}</h2>
 							<p class="hint">{{ 'POKER.EVERYONE_FOLDED' | translate }}</p>
 						} @else {
 							<h2 class="pk-result-title">{{ 'POKER.SHOWDOWN' | translate }}</h2>

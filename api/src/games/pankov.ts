@@ -10,13 +10,11 @@ export class PankovGame extends Game<PankovGameState> {
 			gamePhase: 'turn-start',
 			players: players.map(p => ({ ...p, lives: resolved.initialLives })),
 			currentPlayerIndex: 0,
-			previousPlayerIndex: null,
-			previousDeclaration: null,
-			previousActualRoll: null,
+			previousTurn: null,
 			currentRoll: null,
 			settings: resolved,
 			pankovStreak: 0,
-		};
+		} as PankovGameState;
 	}
 
 	public override getPublicState(playerId: string): PankovGameState {
@@ -25,8 +23,8 @@ export class PankovGame extends Game<PankovGameState> {
 		return {
 			...this.state,
 			currentRoll: currentPlayer?.id === playerId ? this.state.currentRoll : null,
-			previousActualRoll: null,
-		};
+			previousTurn: null,
+		} as PankovGameState;
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): PankovGameState {
@@ -58,11 +56,13 @@ export class PankovGame extends Game<PankovGameState> {
 		const current = state.players[state.currentPlayerIndex];
 		if (!current || current.id !== playerId) return state;
 		if (!(ROLL_VALUES as readonly number[]).includes(declaration)) return state;
-		if (state.previousDeclaration !== null && getRank(declaration) < getRank(state.previousDeclaration)) return state;
+		if (state.previousTurn !== null && getRank(declaration) < getRank(state.previousTurn.declaration)) return state;
 
-		state.previousActualRoll = state.currentRoll;
-		state.previousPlayerIndex = state.currentPlayerIndex;
-		state.previousDeclaration = declaration;
+		state.previousTurn = {
+			playerIndex: state.currentPlayerIndex,
+			declaration: declaration,
+			actualRoll: state.currentRoll,
+		};
 		// Track the run of consecutive Pankov declarations that drives sudden-death stakes; any
 		// lower declaration breaks it. (Once Pankov is declared, only Pankov can legally follow.)
 		state.pankovStreak = declaration === PANKOV_VALUE ? state.pankovStreak + 1 : 0;
@@ -76,22 +76,22 @@ export class PankovGame extends Game<PankovGameState> {
 	private applyChallenge(playerId: string): PankovGameState {
 		const state = this.state!;
 		if (state.gamePhase !== 'turn-start') return state;
-		if (state.previousDeclaration === null || state.previousPlayerIndex === null || state.previousActualRoll === null) return state;
+		if (state.previousTurn === null) return state;
 		const current = state.players[state.currentPlayerIndex];
 		if (!current || current.id !== playerId) return state;
 
-		const wasLying = getRank(state.previousDeclaration) > getRank(state.previousActualRoll);
-		const loserIndex = wasLying ? state.previousPlayerIndex : state.currentPlayerIndex;
+		const wasLying = getRank(state.previousTurn.declaration) > getRank(state.previousTurn!.actualRoll!);
+		const loserIndex = wasLying ? state.previousTurn.playerIndex : state.currentPlayerIndex;
 		// Sudden death: a wrong challenge during a Pankov run costs double for each consecutive
 		// Pankov (1, 2, 4, …). Only the losing *challenger* pays it — a caught liar still loses one.
 		let livesLost = 1;
-		if (state.settings.suddenDeath && !wasLying && state.previousDeclaration === PANKOV_VALUE) {
+		if (state.settings.suddenDeath && !wasLying && state.previousTurn.declaration === PANKOV_VALUE) {
 			livesLost = Math.pow(2, state.pankovStreak - 1);
 		}
 		state.players[loserIndex].lives = Math.max(0, state.players[loserIndex].lives - livesLost);
 		state.revealResult = {
-			declared: state.previousDeclaration,
-			actual: state.previousActualRoll,
+			declared: state.previousTurn.declaration,
+			actual: state.previousTurn.actualRoll!,
 			wasLying,
 			loserIndex,
 			livesLost,
@@ -113,9 +113,7 @@ export class PankovGame extends Game<PankovGameState> {
 			const loserIndex = state.revealResult!.loserIndex;
 			const loser = state.players[loserIndex];
 			state.currentPlayerIndex = loser.lives > 0 ? loserIndex : this.nextAliveIndex(loserIndex);
-			state.previousPlayerIndex = null;
-			state.previousDeclaration = null;
-			state.previousActualRoll = null;
+			state.previousTurn = null;
 			state.currentRoll = null;
 			state.pankovStreak = 0;
 			state.revealResult = undefined;

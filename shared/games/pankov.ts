@@ -25,14 +25,18 @@ export interface PankovSettings {
 	suddenDeath: boolean;
 }
 
+export interface PankovTurn {
+	playerIndex: number,
+	declaration: RollValue,
+	/** Hidden: actual roll of the previous declarer. Always null in public state. */
+	actualRoll: RollValue | null,
+}
+
 export interface PankovGameState extends GameState {
 	gamePhase: 'turn-start' | 'rolled' | 'result' | 'game-over',
 	players: PankovPlayer[],
 	currentPlayerIndex: number,
-	previousPlayerIndex: number | null,
-	previousDeclaration: RollValue | null,
-	/** Hidden: actual roll of the previous declarer. Always null in public state. */
-	previousActualRoll: RollValue | null,
+	previousTurn: PankovTurn | null,
 	/** Hidden: current player's roll. Null for all other players. */
 	currentRoll: RollValue | null,
 	settings: PankovSettings,

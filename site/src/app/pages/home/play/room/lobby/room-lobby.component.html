@@ -13,7 +13,7 @@
 
 			<div table-center class="lobby-meta">
 				<span class="lobby-meta-game"><i [class]="gameInfo()?.icon"></i> {{ gameInfo()?.name }}</span>
-				<span class="lobby-meta-count">{{ 'LOBBY.PLAYER_COUNT' | translate: { current: room()!.players.length, max: gameInfo()?.maxPlayers } }}</span>
+				<span class="lobby-meta-count">{{ 'LOBBY.PLAYER_COUNT' | translate: { current: room()!.players.length, max: gameInfo()!.maxPlayers } }}</span>
 				<span class="room-access-badge"
 					[class.room-access-badge-closed]="room()!.access === 'closed'"
 					[class.room-access-badge-restricted]="room()!.access === 'link' || room()!.access === 'friends'"
@@ -66,7 +66,7 @@
 									{{ (loading() ? 'LOBBY.STARTING' : 'LOBBY.START') | translate }}
 								</ion-button>
 							} @else {
-								<p class="hint">{{ 'LOBBY.NEED_PLAYERS' | translate: { count: gameInfo()?.minPlayers } }}</p>
+								<p class="hint">{{ 'LOBBY.NEED_PLAYERS' | translate: { count: gameInfo()!.minPlayers } }}</p>
 							}
 						} @else {
 							<p class="status-msg">{{ 'LOBBY.WAITING_FOR_HOST' | translate }}</p>

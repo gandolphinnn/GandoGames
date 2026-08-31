@@ -84,7 +84,7 @@
 					@case ('ended') {
 						<div class="game-over">
 							<h2>{{ 'LOBBY.GAME_OVER' | translate }}</h2>
-							<ion-button [routerLink]="['/play']">{{ 'LOBBY.FIND_ANOTHER' | translate }}</ion-button>
+							<ion-button (click)="leaveRoom()">{{ 'LOBBY.FIND_ANOTHER' | translate }}</ion-button>
 						</div>
 					}
 				}

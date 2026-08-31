@@ -20,11 +20,12 @@ export class PankovGame extends Game<PankovGameState> {
 	public override getPublicState(playerId: string): PankovGameState {
 		if (!this.state) throw new Error('Game not initialized');
 		const currentPlayer = this.state.players[this.state.currentPlayerIndex];
-		return {
+		const state: PankovGameState = {
 			...this.state,
 			currentRoll: currentPlayer?.id === playerId ? this.state.currentRoll : null,
-			previousTurn: null,
-		} as PankovGameState;
+		};
+		if (state.previousTurn) state.previousTurn.actualRoll = null;
+		return state;
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): PankovGameState {

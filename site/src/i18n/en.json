@@ -180,7 +180,7 @@
 		},
 		"FRIENDS": {
 			"LABEL": "Friends only",
-			"DESCRIPTION": "Only your friends can join — others see it locked."
+			"DESCRIPTION": "Only your friends can join, others see it locked."
 		},
 		"LINK": {
 			"LABEL": "With link",
@@ -233,20 +233,20 @@
 		"BY": "by {{name}}",
 		"OPEN_SEAT": "Open",
 		"BEAT_OR_CALL": "Beat {{value}} or call the bluff",
-		"YOUR_TURN_FIRST": "Your turn — you go first",
+		"YOUR_TURN_FIRST": "Your turn, go first",
 		"ROLL_DICE": "Roll dice",
 		"CHALLENGE": "Challenge!",
 		"CHALLENGE_STAKE": "Challenge! (-{{count}} lives)",
-		"SUDDEN_DEATH_HINT": "Sudden death — a wrong challenge now costs {{count}} lives.",
+		"SUDDEN_DEATH_HINT": "Sudden death! a wrong challenge now costs {{count}} lives.",
 		"YOU_ROLLED": "You rolled",
-		"DECLARE_HIGHER": "Must declare higher than {{value}}",
+		"DECLARE_HIGHER": "Must beat or equal {{value}}",
 		"CHOOSE_DECLARE": "Choose what to declare",
 		"IS_ROLLING": "{{name}} is rolling",
 		"REVEAL": "Reveal",
 		"CLAIMED": "Claimed",
 		"ACTUAL": "Actual",
-		"LYING_ONE": "{{name}} was lying — -1 life",
-		"LYING_MANY": "{{name}} was lying — -{{count}} lives",
+		"LYING_ONE": "{{name}} was lying! -1 life",
+		"LYING_MANY": "{{name}} was lying! -{{count}} lives",
 		"HONEST_ONE": "Honest! {{name}} loses -1 life",
 		"HONEST_MANY": "Honest! {{name}} loses -{{count}} lives",
 		"CONTINUE": "Continue",
@@ -271,7 +271,7 @@
 		"RUNNING_OUT": "Running it out",
 		"HAND_OVER": "Hand over",
 		"WINS_POT": "{{name}} wins the pot",
-		"EVERYONE_FOLDED": "Everyone else folded — no cards shown.",
+		"EVERYONE_FOLDED": "Everyone else folded, no cards shown.",
 		"SHOWDOWN": "Showdown",
 		"NEXT_HAND": "Next Hand",
 		"DEALER": "Dealer"

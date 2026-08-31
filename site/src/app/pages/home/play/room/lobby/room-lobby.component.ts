@@ -1,5 +1,4 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
@@ -12,7 +11,7 @@ import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent
 /** Lobby body for a waiting/ended room. Header, chat and layout are owned by RoomComponent. */
 @Component({
 	selector: 'gg-room-lobby',
-	imports: [...ION_IMPORTS, GameTableComponent, GameTableSeatDef, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent, RouterLink],
+	imports: [...ION_IMPORTS, GameTableComponent, GameTableSeatDef, GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent],
 	templateUrl: './room-lobby.component.html',
 	styleUrl: './room-lobby.component.scss',
 })
@@ -160,5 +159,9 @@ export class RoomLobbyComponent {
 		} finally {
 			this.addingFriendId.set(null);
 		}
+	}
+
+	public leaveRoom() {
+		this.roomService.leaveRoom(this.roomId());
 	}
 }

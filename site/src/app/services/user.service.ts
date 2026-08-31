@@ -1,8 +1,7 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthResponse, BaseRequest, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { StorageService } from './storage.service';
+import { BackendService, StorageService } from '@gandogames/services';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

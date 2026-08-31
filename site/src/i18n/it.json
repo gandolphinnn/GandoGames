@@ -180,7 +180,7 @@
 		},
 		"FRIENDS": {
 			"LABEL": "Solo amici",
-			"DESCRIPTION": "Solo i tuoi amici possono entrare — gli altri la vedono bloccata."
+			"DESCRIPTION": "Solo i tuoi amici possono entrare, gli altri la vedono bloccata."
 		},
 		"LINK": {
 			"LABEL": "Con link",
@@ -233,20 +233,20 @@
 		"BY": "di {{name}}",
 		"OPEN_SEAT": "Libero",
 		"BEAT_OR_CALL": "Batti {{value}} o chiama il bluff",
-		"YOUR_TURN_FIRST": "Tocca a te — inizi tu",
+		"YOUR_TURN_FIRST": "Tocca a te, inizi tu",
 		"ROLL_DICE": "Tira i dadi",
 		"CHALLENGE": "Challenge!",
 		"CHALLENGE_STAKE": "Challenge! (-{{count}} vite)",
-		"SUDDEN_DEATH_HINT": "Morte improvvisa — un challenge sbagliato ora costa {{count}} vite.",
+		"SUDDEN_DEATH_HINT": "Morte improvvisa! un challenge sbagliato ora costa {{count}} vite.",
 		"YOU_ROLLED": "Hai tirato",
-		"DECLARE_HIGHER": "Devi dichiarare più di {{value}}",
+		"DECLARE_HIGHER": "Devi battere o pareggiare {{value}}",
 		"CHOOSE_DECLARE": "Scegli cosa dichiarare",
 		"IS_ROLLING": "{{name}} sta tirando",
 		"REVEAL": "Rivelazione",
 		"CLAIMED": "Dichiarato",
 		"ACTUAL": "Reale",
-		"LYING_ONE": "{{name}} mentiva — -1 vita",
-		"LYING_MANY": "{{name}} mentiva — -{{count}} vite",
+		"LYING_ONE": "{{name}} mentiva! -1 vita",
+		"LYING_MANY": "{{name}} mentiva! -{{count}} vite",
 		"HONEST_ONE": "Era vero! {{name}} perde -1 vita",
 		"HONEST_MANY": "Era vero! {{name}} perde -{{count}} vite",
 		"CONTINUE": "Continua",
@@ -271,7 +271,7 @@
 		"RUNNING_OUT": "Run-out in corso",
 		"HAND_OVER": "Mano conclusa",
 		"WINS_POT": "{{name}} vince il piatto",
-		"EVERYONE_FOLDED": "Tutti gli altri hanno foldato — nessuna carta mostrata.",
+		"EVERYONE_FOLDED": "Tutti gli altri hanno foldato, nessuna carta mostrata.",
 		"SHOWDOWN": "Showdown",
 		"NEXT_HAND": "Prossima mano",
 		"DEALER": "Dealer"

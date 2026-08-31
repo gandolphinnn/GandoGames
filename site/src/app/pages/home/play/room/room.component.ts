@@ -108,7 +108,6 @@ export class RoomComponent implements OnInit {
 		if (!confirmed) return;
 
 		await this.roomService.leaveRoom(this.roomId());
-		void this.urlService.get('play').navigate();
 	}
 
 	public async closeRoom(): Promise<void> {

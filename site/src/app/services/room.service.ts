@@ -1,19 +1,18 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameSettings, GameSettingsSetRequest, GameState, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { SignalRService } from './signalr.service';
-import { UserService } from './user.service';
+import { BackendService, SignalRService, UrlService, UserService } from '@gandogames/services';
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
 	private readonly backend = inject(BackendService);
-	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
+	private readonly url = inject(UrlService);
+	private readonly user = inject(UserService);
 
 	public readonly rooms = signal<RoomSummary[]>([]);
 
 	public readonly myRooms = computed(() => {
-		const userId = this.auth.user()?.player.id;
+		const userId = this.user.user()?.player.id;
 		if (!userId) return [];
 		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
@@ -23,7 +22,7 @@ export class RoomService {
 	 *  (link/closed), which are reachable only by code or invite. The cache can receive an unlisted
 	 *  room via the global roomUpsert broadcast, so we filter here too, not just on the server list. */
 	public readonly browsableRooms = computed(() => {
-		const userId = this.auth.user()?.player.id;
+		const userId = this.user.user()?.player.id;
 		return this.rooms().filter(r => {
 			const access = r.access ?? 'public';
 			const notInRoom = !userId || !r.players.some(p => p.id === userId);
@@ -32,7 +31,7 @@ export class RoomService {
 	});
 
 	private get ticket(): string {
-		return this.auth.user()!.sessionTicket;
+		return this.user.user()!.sessionTicket;
 	}
 
 	private upsertIntoCache(room: RoomData): void {
@@ -102,9 +101,10 @@ export class RoomService {
 		return this.backend.post<void>('/rooms/kick', request);
 	}
 
-	public leaveRoom(roomId: string): Promise<void> {
+	public async leaveRoom(roomId: string): Promise<void> {
 		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
-		return this.backend.post<void>('/rooms/leave', request);
+		await this.backend.post<void>('/rooms/leave', request);
+		void this.url.get('play').navigate();
 	}
 
 	public deleteRoom(roomId: string): Promise<void> {

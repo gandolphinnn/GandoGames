@@ -4,17 +4,13 @@ import { AuthResponse, BaseRequest, GamePlayer, GuestLoginRequest, LoginRequest,
 import { BackendService } from './backend.service';
 import { StorageService } from './storage.service';
 
-export interface AuthUser extends AuthResponse {
-	isGuest: boolean;
-}
-
 @Injectable({ providedIn: 'root' })
 export class UserService {
 	private readonly backend = inject(BackendService);
 	private readonly storage = inject(StorageService);
 	private readonly translate = inject(TranslateService);
 
-	private readonly _user = signal<AuthUser | null>(null);
+	private readonly _user = signal<AuthResponse | null>(null);
 	public readonly user = this._user.asReadonly();
 	public readonly isLoggedIn = computed(() => this._user() !== null);
 
@@ -144,9 +140,8 @@ export class UserService {
 	private setSession(response: AuthResponse): void {
 		// player.isGuest is the server's authoritative guest flag; derive AuthUser.isGuest from it
 		// so the two never diverge (e.g. a guest restored via /auth/check stays a guest).
-		const user: AuthUser = { ...response, isGuest: response.player.isGuest ?? false };
-		this._user.set(user);
-		this.storage.setString('sessionTicket', user.sessionTicket);
+		this._user.set(response);
+		this.storage.setString('sessionTicket', response.sessionTicket);
 	}
 
 	private applyThemeToDom(theme: Theme): void {

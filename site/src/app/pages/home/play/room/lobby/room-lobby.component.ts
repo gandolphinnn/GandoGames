@@ -146,8 +146,8 @@ export class RoomLobbyComponent {
 
 	/** Friend requests target registered players only, and never yourself or existing friends/requests. */
 	public canAddFriend(slot: GamePlayer): boolean {
-		if (this.auth.user()?.isGuest) return false;
-		if (slot.id === this.myId() || slot.isGuest) return false;
+		if (this.auth.user()?.player.type === 'guest') return false;
+		if (slot.id === this.myId() || slot.type === 'guest') return false;
 		return this.friendService.relationship(slot.id) === 'none';
 	}
 

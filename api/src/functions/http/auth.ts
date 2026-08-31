@@ -29,7 +29,7 @@ const toAuthResponse = (
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
-		isGuest,
+		type: isGuest ? 'guest' : 'user',
 		icon: (userData?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (userData?.['theme']?.Value as Theme) ?? 'dark',
 		language: (userData?.['language']?.Value as LangCode) ?? 'en',

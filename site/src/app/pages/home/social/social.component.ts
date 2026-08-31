@@ -18,7 +18,7 @@ export class SocialComponent {
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
-	public readonly isGuest = computed(() => this.auth.user()?.isGuest ?? false);
+	public readonly isGuest = computed(() => this.auth.user()?.player.type === 'guest');
 	public readonly friends = this.friendService.friends;
 	public readonly incoming = this.friendService.incoming;
 	public readonly outgoing = this.friendService.outgoing;

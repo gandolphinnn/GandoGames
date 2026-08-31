@@ -117,6 +117,11 @@ export class RoomService {
 		return this.backend.post<void>('/rooms/invite', request);
 	}
 
+	public addBot(roomId: string): Promise<void> {
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<void>('/rooms/add-bot', request);
+	}
+
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {
 		const request: GameBaseRequest = { sessionTicket: this.ticket, game, roomId };
 		return this.backend.post<GameState | null>('/game/state', request);

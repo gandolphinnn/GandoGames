@@ -34,7 +34,7 @@ export class FriendService {
 		// Friends are a registered-user feature: load on login, clear on logout / for guests.
 		effect(() => {
 			const user = this.auth.user();
-			const userId = user && !user.isGuest ? user.player.id : null;
+			const userId = user && user.player.type !== 'guest' ? user.player.id : null;
 			if (userId === this.loadedForUserId) return;
 			this.loadedForUserId = userId;
 			if (userId) void this.loadFriends();

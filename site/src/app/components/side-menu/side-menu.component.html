@@ -23,7 +23,7 @@
 					routerLinkActive="selected">
 					<gg-player-avatar slot="start" [player]="u.player" />
 					<ion-label>{{ u.player.name }}</ion-label>
-					@if (u.isGuest) {
+					@if (u.player.type === 'guest') {
 						<span slot="end" class="menu-user-badge">{{ 'COMMON.GUEST' | translate }}</span>
 					}
 					<!-- <ion-icon name="chevron-forward" slot="end" class="menu-user-chevron" /> -->

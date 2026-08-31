@@ -6,7 +6,7 @@ import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
 
-const player = (id: string, name: string): GamePlayer => ({ id, name, isGuest: false, icon: 'profile', theme: 'dark', language: 'en' });
+const player = (id: string, name: string): GamePlayer => ({ id, name, type: 'user', icon: 'profile', theme: 'dark', language: 'en' });
 
 describe('evaluateHand', () => {
 	it('detects a royal flush', () => {

@@ -5,4 +5,4 @@ export { SignalRService } from './signalr.service';
 export { StorageService } from './storage.service';
 export { type Toast, ToastService } from './toast.service';
 export { type BranchName, UrlService } from './url.service';
-export { type AuthUser, UserService } from './user.service';
+export { UserService } from './user.service';

@@ -23,10 +23,12 @@ export interface GuestLoginRequest {
 	customId: string;
 }
 
+export type PlayerType = 'guest' | 'user' | 'bot';
+
 export interface GamePlayer extends ProfileData {
 	id: string;
 	name: string;
-	isGuest: boolean;
+	type: PlayerType;
 }
 
 /** Minimal player shape needed to render an avatar (id drives the colour hash, icon the glyph). */

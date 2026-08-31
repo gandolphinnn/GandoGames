@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, resolveAccessPolicy } from '@gandogames/shared/dto';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, resolveAccessPolicy, GamePlayer } from '@gandogames/shared/dto';
 import { Game, GAMES_CONFIG } from '../../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 import { areFriends } from './friends';
@@ -190,6 +190,29 @@ const roomInviteInner: InnerFunction<RoomInviteRequest, void> = async (body, not
 	notifier.roomInviteForPlayer(body.friendId, body.roomId, room.game);
 };
 
+const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('Only the host can add bots');
+	if (room.phase !== 'waiting') throw new Error('Cannot add bots after game has started');
+	const gameConfig = GAMES_CONFIG[room.game];
+	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
+	
+	const bot: GamePlayer = {
+		icon: 'bot',
+		id: `bot-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+		language: 'en',
+		name: `Bot ${room.players.length + 1}`,
+		theme: 'light',
+		type: 'bot',
+	}
+	room.players.push(bot);
+	await PlayfabCtx.rooms.upsert(body.roomId, room);
+
+	notifier.roomUpsert(room);
+	return room;
+};
+
 const roomDeleteInner: InnerFunction<RoomBaseRequest, void> = async (body, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(body.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -213,4 +236,5 @@ registerFunction('room_access', 'rooms/access', roomAccessSetInner);
 registerFunction('room_kick', 'rooms/kick', roomKickInner);
 registerFunction('room_leave', 'rooms/leave', roomLeaveInner);
 registerFunction('room_invite', 'rooms/invite', roomInviteInner);
+registerFunction('room_add_bot', 'rooms/add-bot', roomAddBotInner);
 registerFunction('room_delete', 'rooms/delete', roomDeleteInner);

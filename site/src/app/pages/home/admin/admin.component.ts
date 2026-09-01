@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { ToastService, AdminService, UserService } from '@gandogames/services';
@@ -20,7 +20,16 @@ export class AdminComponent {
 
 	public readonly locale = this.user.locale;
 	public readonly loading = signal(false);
-	public readonly rooms = this.admin.rooms;
+	public readonly rooms = computed(() => this.admin.rooms().map(room => {
+		const host = room.players.find(u => u.id === room.hostId);
+		return {
+			id: room.id,
+			host: host?.name ?? room.hostId,
+			game: room.game,
+			phase: room.phase,
+			lastUpdate: room.lastUpdate
+		}
+	}));
 
 	public ngOnInit(): void {
 		void this.fetchRooms();
@@ -34,6 +43,15 @@ export class AdminComponent {
 		try {
 			this.loading.set(true);
 			await this.admin.loadRooms();
+		} finally {
+			this.loading.set(false);
+		}
+	}
+	
+	public async deleteRoom(roomId: string) {
+		try {
+			this.loading.set(true);
+			await this.admin.deleteRoom(roomId);
 		} finally {
 			this.loading.set(false);
 		}

@@ -35,10 +35,6 @@ export class ProfileComponent implements ViewDidLeave {
 	public readonly icons: PlayerIcon[] = PLAYER_ICONS.filter(i => !i.reserved);
 	public readonly languages = LANGUAGES;
 
-	constructor() {
-		addIcons({ contrastOutline, sunnyOutline, moonOutline, languageOutline, logOutOutline, trashOutline });
-	}
-
 	/** Leaving the page drops any unsaved preview, restoring the saved settings. */
 	public ionViewDidLeave(): void {
 		this.userService.discardPreview();

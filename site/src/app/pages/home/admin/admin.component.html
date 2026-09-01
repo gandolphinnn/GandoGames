@@ -12,18 +12,24 @@
 		<thead>
 			<tr>
 				<th>{{ 'ADMIN.ROOMS.ID' | translate }}</th>
+				<th>{{ 'ADMIN.ROOMS.HOST' | translate }}</th>
 				<th>{{ 'ADMIN.ROOMS.GAME' | translate }}</th>
 				<th>{{ 'ADMIN.ROOMS.PHASE' | translate }}</th>
 				<th>{{ 'ADMIN.ROOMS.LAST_UPDATED' | translate }}</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			@for (room of rooms(); track room.id) {
 				<tr>
 					<td>{{ room.id }}</td>
+					<td>{{ room.host }}</td>
 					<td>{{ room.game }}</td>
 					<td>{{ room.phase }}</td>
 					<td>{{ room.lastUpdate| date:'short':'':locale() }}</td>
+					<td><ion-button [disabled]="loading()" (click)="deleteRoom(room.id)" fill="clear">
+						<ion-icon name="trash"></ion-icon>
+					</ion-button></td>
 				</tr>
 			}
 		</tbody>

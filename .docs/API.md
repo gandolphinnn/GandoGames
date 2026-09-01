@@ -35,7 +35,7 @@ Unauthenticated except `/auth/check`. Successful responses are an `AuthResponse`
 ```json
 { "customId": "string" }
 ```
-Logs in (creating the account on first use) as a guest. `player.isGuest` is `true`.
+Logs in (creating the account on first use) as a guest. `player.type` is `guest`.
 
 ### `POST /auth/check`
 ```json
@@ -210,7 +210,7 @@ type IconType = 'profile' | 'luck' | 'cookie' | 'paw' | 'pizza' | 'bot'
 interface ProfileData { theme: Theme; icon: IconType; language: LangCode }
 
 interface GamePlayer extends ProfileData {
-  id: string; name: string; isGuest: boolean
+  id: string; name: string;
 }
 
 interface RoomSummary {

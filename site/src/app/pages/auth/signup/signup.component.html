@@ -1,48 +1,48 @@
 <ion-content [fullscreen]="true">
 	<div class="auth-page">
 		<div class="auth-card">
-			<h1 class="auth-title">Create account</h1>
-			<p class="auth-subtitle">Join GandoGames</p>
+			<h1 class="auth-title">{{ 'AUTH.CREATE_ACCOUNT' | translate }}</h1>
+			<p class="auth-subtitle">{{ 'AUTH.SIGNUP_SUBTITLE' | translate }}</p>
 
 			<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
 				<div class="field">
-					<label class="field-label">Username</label>
+					<label class="field-label">{{ 'AUTH.USERNAME' | translate }}</label>
 					<ion-input fill="outline" type="text" formControlName="username"
-						placeholder="YourName" autocomplete="username" />
+						[placeholder]="'AUTH.USERNAME_PLACEHOLDER' | translate" autocomplete="username" />
 					@if (form.controls.username.touched && form.controls.username.hasError('required')) {
-						<span class="field-error">Username is required</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.USERNAME_REQUIRED' | translate }}</span>
 					} @else if (form.controls.username.touched && form.controls.username.hasError('minlength')) {
-						<span class="field-error">At least 3 characters</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.USERNAME_MIN_LENGTH' | translate }}</span>
 					} @else if (form.controls.username.touched && form.controls.username.hasError('maxlength')) {
-						<span class="field-error">At most 20 characters</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.USERNAME_MAX_LENGTH' | translate }}</span>
 					}
 				</div>
 				<div class="field">
-					<label class="field-label">Email</label>
+					<label class="field-label">{{ 'AUTH.EMAIL' | translate }}</label>
 					<ion-input fill="outline" type="email" formControlName="email"
 						placeholder="you@example.com" autocomplete="email" />
 					@if (form.controls.email.touched && form.controls.email.hasError('required')) {
-						<span class="field-error">Email is required</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.EMAIL_REQUIRED' | translate }}</span>
 					} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
-						<span class="field-error">Enter a valid email</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.EMAIL_INVALID' | translate }}</span>
 					}
 				</div>
 				<div class="field">
-					<label class="field-label">Password</label>
+					<label class="field-label">{{ 'AUTH.PASSWORD' | translate }}</label>
 					<ion-input fill="outline" type="password" formControlName="password"
 						placeholder="••••••••" autocomplete="new-password" />
 					@if (form.controls.password.touched && form.controls.password.hasError('required')) {
-						<span class="field-error">Password is required</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.PASSWORD_REQUIRED' | translate }}</span>
 					} @else if (form.controls.password.touched && form.controls.password.hasError('minlength')) {
-						<span class="field-error">At least 6 characters</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.PASSWORD_MIN_LENGTH' | translate }}</span>
 					}
 				</div>
 				<ion-button type="submit" expand="block" [disabled]="loading()">
-					{{ loading() ? 'Creating account…' : 'Create account' }}
+					{{ (loading() ? 'AUTH.CREATING_ACCOUNT' : 'AUTH.CREATE_ACCOUNT') | translate }}
 				</ion-button>
 			</form>
 
-			<p class="auth-footer">Already have an account? <a class="auth-link" routerLink="/login">Log in</a></p>
+			<p class="auth-footer">{{ 'AUTH.ALREADY_HAVE_ACCOUNT' | translate }} <a class="auth-link" routerLink="/login">{{ 'AUTH.LOGIN' | translate }}</a></p>
 		</div>
 	</div>
 </ion-content>

@@ -65,6 +65,64 @@
 	}
 }
 
+.my-rooms {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+
+	&-label {
+		font-size: $text-sm;
+		font-weight: 600;
+		color: $text-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	&-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $s2;
+	}
+
+	&-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: $s2;
+		padding: $s1 $s4;
+		min-height: 44px;
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-full;
+		color: $text;
+		font-size: $text-sm;
+		cursor: pointer;
+		transition: border-color $transition, background $transition;
+
+		&:hover {
+			border-color: $accent;
+			background: $accent-tint;
+		}
+
+		&-icon {
+			color: $text-muted;
+			font-size: $text-sm;
+		}
+
+		&-id {
+			font-family: monospace;
+			font-weight: 600;
+		}
+
+		&-live {
+			width: 8px;
+			height: 8px;
+			flex-shrink: 0;
+			border-radius: $radius-full;
+			background: $color-success;
+		}
+	}
+}
+
 .room {
 	&-list {
 		list-style: none;

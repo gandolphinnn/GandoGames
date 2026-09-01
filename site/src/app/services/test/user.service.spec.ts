@@ -1,8 +1,9 @@
 import { TestBed } from '@angular/core/testing';
-import { UserService } from './user.service';
-import { BackendService } from './backend.service';
-import { StorageService } from './storage.service';
-import { ToastService } from './toast.service';
+import { provideTranslateService } from '@ngx-translate/core';
+import { UserService } from '../user.service';
+import { BackendService } from '../backend.service';
+import { StorageService } from '../storage.service';
+import { ToastService } from '../toast.service';
 import type { AuthResponse } from '@gandogames/shared/dto';
 
 const MOCK_RESPONSE: AuthResponse = {
@@ -24,6 +25,7 @@ describe('UserService', () => {
 			providers: [
 				UserService,
 				StorageService,
+				provideTranslateService(),
 				{ provide: BackendService, useValue: backendSpy },
 				{ provide: ToastService, useValue: toastSpy },
 			],
@@ -105,12 +107,60 @@ describe('UserService', () => {
 			expect(localStorage.getItem('gg_session_ticket')).toBeNull();
 		});
 
-		it('updateProfileData({ icon }) optimistically updates the icon in the session', async () => {
+	});
+
+	describe('profile preview', () => {
+		let service: UserService;
+		beforeEach(async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
+			service = createService();
 			await service.login('alice@example.com', 'pw');
+			backendSpy.post.calls.reset();
+		});
+
+		it('previewProfileData() applies changes to previewedPlayer/theme without calling the API', () => {
+			service.previewProfileData({ icon: 'pizza', theme: 'light' });
+			expect(service.previewedPlayer()?.icon).toBe('pizza');
+			expect(service.theme()).toBe('light');
+			expect(service.hasPendingChanges()).toBeTrue();
+			expect(service.user()?.player.icon).toBe('profile'); // saved profile untouched
+			expect(backendSpy.post).not.toHaveBeenCalled();
+		});
+
+		it('discardPreview() reverts to the saved profile', () => {
+			service.previewProfileData({ theme: 'light' });
+			service.discardPreview();
+			expect(service.theme()).toBe('dark');
+			expect(service.previewedPlayer()?.icon).toBe('profile');
+			expect(service.hasPendingChanges()).toBeFalse();
+		});
+
+		it('hasPendingChanges() is false when the preview matches the saved profile', () => {
+			service.previewProfileData({ theme: 'dark' }); // same as saved
+			expect(service.hasPendingChanges()).toBeFalse();
+		});
+
+		it('saveProfile() posts the pending changes once and merges the result into the user', async () => {
+			service.previewProfileData({ icon: 'pizza' });
 			backendSpy.post.and.returnValue(Promise.resolve({ icon: 'pizza', theme: 'dark', language: 'en' }));
-			await service.updateProfileData({ icon: 'pizza' });
+			await service.saveProfile();
+			expect(backendSpy.post).toHaveBeenCalledOnceWith('/profile/update', { sessionTicket: 'ticket-123', icon: 'pizza' });
 			expect(service.user()?.player.icon).toBe('pizza');
+			expect(service.hasPendingChanges()).toBeFalse();
+		});
+
+		it('saveProfile() keeps the preview when the API call fails', async () => {
+			service.previewProfileData({ icon: 'pizza' });
+			backendSpy.post.and.returnValue(Promise.reject(new Error('boom')));
+			await expectAsync(service.saveProfile()).toBeRejected();
+			expect(service.previewedPlayer()?.icon).toBe('pizza');
+			expect(service.hasPendingChanges()).toBeTrue();
+			expect(service.user()?.player.icon).toBe('profile');
+		});
+
+		it('saveProfile() without a preview does not call the API', async () => {
+			await service.saveProfile();
+			expect(backendSpy.post).not.toHaveBeenCalled();
 		});
 	});
 

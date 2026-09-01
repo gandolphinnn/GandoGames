@@ -1,18 +1,17 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { SignalRService } from './signalr.service';
-import { ToastService } from './toast.service';
-import { UserService } from './user.service';
+import { BackendService, SignalRService, ToastService, UserService } from '@gandogames/services';
 
 export type FriendRelationship = 'none' | 'incoming' | 'outgoing' | 'accepted';
 
 @Injectable({ providedIn: 'root' })
 export class FriendService {
 	private readonly backend = inject(BackendService);
-	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
+	private readonly user = inject(UserService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly friends = signal<Friend[]>([]);
 	public readonly incoming = signal<Friend[]>([]);
@@ -22,7 +21,7 @@ export class FriendService {
 	public readonly pendingCount = computed(() => this.incoming().length);
 
 	private get ticket(): string {
-		return this.auth.user()!.sessionTicket;
+		return this.user.user()!.sessionTicket;
 	}
 
 	/** Id we last loaded friends for, so profile tweaks (which replace the user object) don't re-fetch. */
@@ -31,8 +30,8 @@ export class FriendService {
 	constructor() {
 		// Friends are a registered-user feature: load on login, clear on logout / for guests.
 		effect(() => {
-			const user = this.auth.user();
-			const userId = user && !user.isGuest ? user.player.id : null;
+			const user = this.user.user();
+			const userId = user && user.player.type !== 'guest' ? user.player.id : null;
 			if (userId === this.loadedForUserId) return;
 			this.loadedForUserId = userId;
 			if (userId) void this.loadFriends();
@@ -40,7 +39,7 @@ export class FriendService {
 		});
 
 		this.signalR.events.friendRequest.subscribe(from => {
-			this.toast.show(`${from.name} sent you a friend request`, 'info');
+			this.toast.show(this.translate.instant('SOCIAL.REQUEST_RECEIVED', { name: from.name }) as string, 'info');
 			void this.loadFriends();
 		});
 		this.signalR.events.friendsChanged.subscribe(() => void this.loadFriends());
@@ -61,7 +60,7 @@ export class FriendService {
 	}
 
 	public async loadFriends(): Promise<void> {
-		if (!this.auth.user()) return;
+		if (!this.user.user()) return;
 		const request: BaseRequest = { sessionTicket: this.ticket };
 		const result = await this.backend.post<FriendsListResponse>('/friends/list', request);
 		this.friends.set(result.friends);

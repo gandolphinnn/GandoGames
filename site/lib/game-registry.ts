@@ -1,6 +1,6 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
 import { GameSettingsSchema, GameState, GameType } from "@gandogames/shared/dto";
-import { GAMES_CONFIG } from '@gandogames/shared/config';
+import { BaseGameDescriptor, GAMES_CONFIG } from '@gandogames/shared/config';
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
 import { TablePreset } from '@gandogames/lib/common/game-table';
@@ -16,13 +16,12 @@ export interface GameComponent<TState extends GameState = GameState> {
 	playAgain: OutputEmitterRef<void>;
 }
 
-interface GameDescriptor {
+interface GameDescriptor extends BaseGameDescriptor {
 	id: GameType;
 	name: string;
 	icon: string;
+	/** Translation key: render with the `translate` pipe. */
 	description: string;
-	minPlayers: number;
-	maxPlayers: number;
 	component: Type<unknown>;
 	/** Declarative schema for the per-room game-settings editor. */
 	settingsSchema: GameSettingsSchema;
@@ -30,19 +29,12 @@ interface GameDescriptor {
 	table: TablePreset;
 }
 
-/** Human label for a game's player count: "2 players" when fixed (min === max), else "2–6 players". */
-export function playerCountLabel(game: { minPlayers: number; maxPlayers: number }): string {
-	return game.minPlayers === game.maxPlayers
-		? `${game.minPlayers} players`
-		: `${game.minPlayers}–${game.maxPlayers} players`;
-}
-
 export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 	pankov: {
 		id: 'pankov',
 		name: 'Pankov',
 		icon: 'fa-solid fa-dice',
-		description: 'Roll two dice and bluff your way to victory. Call out liars or lose a life.',
+		description: 'GAMES.PANKOV.DESCRIPTION',
 		...GAMES_CONFIG.pankov,
 		component: PankovGameComponent,
 		settingsSchema: PANKOV_SETTINGS_SCHEMA,
@@ -52,7 +44,7 @@ export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
 		id: 'poker',
 		name: 'Texas Hold\'em',
 		icon: 'fa-solid fa-hat-cowboy',
-		description: 'Bet, bluff, and outlast everyone at the table.',
+		description: 'GAMES.POKER.DESCRIPTION',
 		...GAMES_CONFIG.poker,
 		component: PokerGameComponent,
 		settingsSchema: POKER_SETTINGS_SCHEMA,

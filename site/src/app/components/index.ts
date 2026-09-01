@@ -4,4 +4,5 @@ export { InviteModalComponent } from './invite-modal/invite-modal.component';
 export { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 export { RefreshableContentComponent } from './refreshable-content/refreshable-content.component';
 export { RoomAccessModalComponent } from './room-access-modal/room-access-modal.component';
+export { SideMenuComponent } from './side-menu/side-menu.component';
 export { ToastComponent } from './toast/toast.component';

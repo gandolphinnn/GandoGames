@@ -1,9 +1,9 @@
 import { Component, effect, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RoomAccessPolicy } from '@gandogames/shared/dto';
 import { ROOM_ACCESS_OPTIONS } from '@gandogames/lib/room-access';
-import { RoomService } from '@gandogames/services/room.service';
-import { ToastService } from '@gandogames/services/toast.service';
+import { RoomService, ToastService } from '@gandogames/services';
 
 /**
  * Lets the host pick a room's access policy (public / friends-only / with-link / closed).
@@ -11,13 +11,14 @@ import { ToastService } from '@gandogames/services/toast.service';
  */
 @Component({
 	selector: 'gg-room-access-modal',
-	imports: [IonIcon],
+	imports: [IonIcon, TranslatePipe],
 	templateUrl: './room-access-modal.component.html',
 	styleUrl: './room-access-modal.component.scss',
 })
 export class RoomAccessModalComponent {
 	private readonly roomService = inject(RoomService);
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	public readonly roomId = input.required<string>();
 	public readonly access = input<RoomAccessPolicy>('public');
@@ -45,7 +46,7 @@ export class RoomAccessModalComponent {
 		this.saving.set(true);
 		try {
 			await this.roomService.setRoomAccess(this.roomId(), this.selected());
-			this.toast.success('Room access updated');
+			this.toast.success(this.translate.instant('ACCESS_MODAL.SAVED') as string);
 			this.closed.emit();
 		} finally {
 			this.saving.set(false);

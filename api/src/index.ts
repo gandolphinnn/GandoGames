@@ -175,14 +175,15 @@ export async function authenticateSession(request: BaseRequest, notifier: InnerF
 		cb => PlayFabServer.GetUserData({ PlayFabId: id, Keys: ['icon', 'theme', 'language'] }, cb),
 	);
 	const data = profileResult.Data;
-	return {
+	const player: GamePlayer = {
 		id,
 		name,
-		isGuest,
 		icon: (data?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (data?.['theme']?.Value as Theme) ?? 'dark',
 		language: (data?.['language']?.Value as LangCode) ?? 'en',
+		type: isGuest ? 'guest' : 'user',
 	};
+	return player;
 }
 
 /** Wraps a PlayFab SDK callback call into a Promise. */

@@ -28,7 +28,7 @@ export class PokerGame extends Game<PokerGameState> {
 			startedAt: new Date(),
 			blindLevel: 0,
 			bigBlind: resolved.blindLevels[0]!.bigBlind,
-		};
+		} as PokerGameState;
 		this.startNewHand();
 	}
 

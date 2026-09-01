@@ -1,10 +1,9 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { RoomSummary } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { roomAccessOption } from '@gandogames/lib/room-access';
-import { RoomService } from '@gandogames/services/room.service';
+import { RoomService, UrlService } from '@gandogames/services';
 import { RefreshableContentComponent } from '@gandogames/components';
 
 @Component({
@@ -15,13 +14,13 @@ import { RefreshableContentComponent } from '@gandogames/components';
 	styleUrl: './room-list.component.scss',
 })
 export class RoomListComponent implements OnInit {
-	private readonly route = inject(ActivatedRoute);
-	private readonly router = inject(Router);
+	private readonly urlService = inject(UrlService);
 	private readonly roomService = inject(RoomService);
 
 	public readonly allGames = Object.values(GAME_REGISTRY);
 	public readonly activeGames = signal<string[]>([]);
 	public readonly browsableRooms = this.roomService.browsableRooms;
+	public readonly myRooms = this.roomService.myRooms;
 	public readonly loading = signal(false);
 	public readonly joinCode = signal('');
 	public readonly checkingCode = signal(false);
@@ -37,6 +36,10 @@ export class RoomListComponent implements OnInit {
 
 	public gameLabel(id: string): string {
 		return this.allGames.find((g) => g.id === id)?.name ?? id;
+	}
+
+	public gameIcon(id: string): string {
+		return this.allGames.find((g) => g.id === id)?.icon ?? '';
 	}
 
 	public maxPlayers(id: string): number {
@@ -65,15 +68,14 @@ export class RoomListComponent implements OnInit {
 		this.checkingCode.set(true);
 		try {
 			await this.roomService.getRoom(code);
-			void this.router.navigate(['/play', code]);
+			void this.urlService.get('play').navigate({ roomId: code });
 		} finally {
 			this.checkingCode.set(false);
 		}
 	}
 
 	public ngOnInit(): void {
-		const paramGameId = this.route.snapshot.params['gameId'] as string | undefined;
-		this.activeGames.set(paramGameId ? [paramGameId] : this.allGames.map((g) => g.id));
+		this.activeGames.set(this.allGames.map((g) => g.id));
 		void this.fetchRooms();
 	}
 
@@ -97,10 +99,10 @@ export class RoomListComponent implements OnInit {
 	}
 
 	public navigateToRoom(room: RoomSummary): void {
-		void this.router.navigate(['/play', room.id]);
+		void this.urlService.get('play').navigate({ roomId: room.id });
 	}
 
 	public goToCreate(): void {
-		void this.router.navigate(['/play/new']);
+		void this.urlService.get('play/new').navigate();
 	}
 }

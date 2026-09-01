@@ -85,7 +85,7 @@ const friendsListInner: InnerFunction<BaseRequest, FriendsListResponse> = async 
 };
 
 const friendsRequestInner: InnerFunction<FriendBaseRequest, void> = async (body, notifier, player) => {
-	if (player.isGuest) fail(notifier, 403, 'Guest accounts cannot add friends');
+	if (player.type === 'guest') fail(notifier, 403, 'Guest accounts cannot add friends');
 	if (!body.friendId || body.friendId === player.id) fail(notifier, 400, 'Invalid friend');
 
 	notifier.errorCode = 404;

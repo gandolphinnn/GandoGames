@@ -1,7 +1,7 @@
 <div class="lobby">
 
 	@if (!room()) {
-		<p class="status-msg">Loading room…</p>
+		<p class="status-msg">{{ 'LOBBY.LOADING' | translate }}</p>
 	} @else {
 		<gg-game-table
 			class="lobby-table"
@@ -13,29 +13,29 @@
 
 			<div table-center class="lobby-meta">
 				<span class="lobby-meta-game"><i [class]="gameInfo()?.icon"></i> {{ gameInfo()?.name }}</span>
-				<span class="lobby-meta-count">{{ room()!.players.length }}&thinsp;/&thinsp;{{ gameInfo()?.maxPlayers }} players</span>
+				<span class="lobby-meta-count">{{ 'LOBBY.PLAYER_COUNT' | translate: { current: room()!.players.length, max: gameInfo()!.maxPlayers } }}</span>
 				<span class="room-access-badge"
 					[class.room-access-badge-closed]="room()!.access === 'closed'"
 					[class.room-access-badge-restricted]="room()!.access === 'link' || room()!.access === 'friends'"
-					[title]="accessBadge().description">
+					[title]="accessBadge().description | translate">
 					<ion-icon [name]="accessBadge().icon" />
-					{{ accessBadge().label }}
+					{{ accessBadge().label | translate }}
 				</span>
 			</div>
 
 			<ng-template ggTableSeat let-seat>
 				@if (seat.player; as p) {
 					@if (p.id === room()!.hostId) {
-						<ion-icon name="ribbon" class="seat-crown" title="Host" />
+						<ion-icon name="ribbon" class="seat-crown" [title]="'LOBBY.HOST' | translate" />
 					}
 					@if (isHost() && p.id !== myId() && room()!.phase === 'waiting') {
-						<button class="seat-btn seat-kick" (click)="kick(p); $event.stopPropagation()" title="Kick player">
+						<button class="seat-btn seat-kick" (click)="kick(p); $event.stopPropagation()" [title]="'LOBBY.KICK_PLAYER' | translate">
 							<ion-icon name="close" />
 						</button>
 					}
 					@if (canAddFriend(p)) {
 						<button class="seat-btn seat-friend" [disabled]="addingFriendId() === p.id"
-							(click)="addFriend(p); $event.stopPropagation()" title="Add friend">
+							(click)="addFriend(p); $event.stopPropagation()" [title]="'LOBBY.ADD_FRIEND' | translate">
 							<ion-icon name="person-add" />
 						</button>
 					}
@@ -45,7 +45,7 @@
 					<div class="seat-avatar seat-avatar-empty">
 						<ion-icon name="add" />
 					</div>
-					<span class="seat-name seat-name-muted">Invite</span>
+					<span class="seat-name seat-name-muted">{{ 'LOBBY.INVITE' | translate }}</span>
 				}
 			</ng-template>
 
@@ -55,36 +55,36 @@
 						@if (!isInRoom()) {
 							@if (canJoin()) {
 								<ion-button expand="block" [disabled]="loading()" (click)="join()">
-									{{ loading() ? 'Joining…' : 'Join Room' }}
+									{{ (loading() ? 'LOBBY.JOINING' : 'LOBBY.JOIN') | translate }}
 								</ion-button>
 							} @else if (joinBlockedReason()) {
-								<p class="status-msg">{{ joinBlockedReason() }}</p>
+								<p class="status-msg">{{ joinBlockedReason() | translate }}</p>
 							}
 						} @else if (isHost()) {
 							@if (canStart()) {
 								<ion-button expand="block" [disabled]="loading()" (click)="start()">
-									{{ loading() ? 'Starting…' : 'Start Game' }}
+									{{ (loading() ? 'LOBBY.STARTING' : 'LOBBY.START') | translate }}
 								</ion-button>
 							} @else {
-								<p class="hint">Need at least {{ gameInfo()?.minPlayers }} players to start.</p>
+								<p class="hint">{{ 'LOBBY.NEED_PLAYERS' | translate: { count: gameInfo()!.minPlayers } }}</p>
 							}
 						} @else {
-							<p class="status-msg">Waiting for the host to start…</p>
+							<p class="status-msg">{{ 'LOBBY.WAITING_FOR_HOST' | translate }}</p>
 						}
 
 						@if (hasSettings()) {
 							<div class="lobby-config-actions">
 								<ion-button fill="outline" size="small" (click)="openSettings()">
 									<ion-icon name="settings-outline" slot="start" />
-									{{ isHost() ? 'Game settings' : 'View settings' }}
+									{{ (isHost() ? 'LOBBY.GAME_SETTINGS' : 'LOBBY.VIEW_SETTINGS') | translate }}
 								</ion-button>
 							</div>
 						}
 					}
 					@case ('ended') {
 						<div class="game-over">
-							<h2>Game Over</h2>
-							<ion-button [routerLink]="['/play']">Find another room</ion-button>
+							<h2>{{ 'LOBBY.GAME_OVER' | translate }}</h2>
+							<ion-button (click)="leaveRoom()">{{ 'LOBBY.FIND_ANOTHER' | translate }}</ion-button>
 						</div>
 					}
 				}
@@ -93,7 +93,7 @@
 
 		@if (showInviteModal() && room()) {
 			<gg-invite-modal
-				[roomId]="roomId()"
+				[room]="room()"
 				[gameType]="room()!.game"
 				[isHost]="isHost()"
 				[playerCount]="room()!.players.length"

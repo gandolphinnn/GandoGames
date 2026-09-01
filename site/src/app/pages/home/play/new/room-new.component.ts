@@ -1,8 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
-import { GAME_REGISTRY, playerCountLabel } from '@gandogames/lib/game-registry';
-import { RoomService } from '@gandogames/services/room.service';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
+import { RoomService, UrlService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-room-new',
@@ -12,11 +12,10 @@ import { RoomService } from '@gandogames/services/room.service';
 	styleUrl: './room-new.component.scss',
 })
 export class RoomNewComponent {
-	private readonly router = inject(Router);
+	private readonly urlService = inject(UrlService);
 	private readonly roomService = inject(RoomService);
 
 	public readonly allGames = Object.values(GAME_REGISTRY);
-	public readonly playerCountLabel = playerCountLabel;
 	public readonly selectedGameId = signal<string>(this.allGames[0]?.id ?? '');
 	public readonly loading = signal(false);
 
@@ -29,7 +28,7 @@ export class RoomNewComponent {
 		try {
 			this.loading.set(true);
 			const room = await this.roomService.createRoom(this.selectedGameId() as any);
-			void this.router.navigate(['/play', room.id]);
+			void this.urlService.get('play').navigate({ roomId: room.id });
 		} finally {
 			this.loading.set(false);
 		}

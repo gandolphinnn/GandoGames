@@ -5,10 +5,10 @@
 		@if (toast.yesno) {
 			<div class="toast-actions">
 				<button class="btn-yes" (click)="doYes(toast)">
-					<ion-icon name="checkmark" /> Yes
+					<ion-icon name="checkmark" /> {{ 'COMMON.YES' | translate }}
 				</button>
 				<button class="btn-no" (click)="doNo(toast)">
-					<ion-icon name="close" /> No
+					<ion-icon name="close" /> {{ 'COMMON.NO' | translate }}
 				</button>
 			</div>
 		}

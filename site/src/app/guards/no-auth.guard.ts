@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
+import { UserService, UrlService } from '@gandogames/services';
 
-import { UserService } from '@gandogames/services/user.service';
 
 export const noAuthGuard: CanActivateFn = () => {
 	const auth = inject(UserService);
-	const router = inject(Router);
-	return !auth.isLoggedIn() || router.createUrlTree(['/']);
+	const urlService = inject(UrlService);
+	return !auth.isLoggedIn() || urlService.get('').urlTree();
 };

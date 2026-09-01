@@ -3,15 +3,15 @@
 <div class="modal" (click)="$event.stopPropagation()">
 
 	<header class="modal-header">
-		<h2 class="modal-title">Room access</h2>
-		<button class="modal-close" (click)="closed.emit()" title="Close">
+		<h2 class="modal-title">{{ 'ACCESS_MODAL.TITLE' | translate }}</h2>
+		<button class="modal-close" (click)="closed.emit()" [title]="'COMMON.CLOSE' | translate">
 			<ion-icon name="close" />
 		</button>
 	</header>
 
 	<div class="modal-body">
 		@if (!editable()) {
-			<p class="empty-msg">Only the host can change room access.</p>
+			<p class="empty-msg">{{ 'ACCESS_MODAL.HOST_ONLY' | translate }}</p>
 		}
 
 		<ul class="access-list">
@@ -25,8 +25,8 @@
 						(click)="choose(opt.value)">
 						<ion-icon class="access-option-icon" [name]="opt.icon" />
 						<span class="access-option-text">
-							<span class="access-option-label">{{ opt.label }}</span>
-							<span class="access-option-desc">{{ opt.description }}</span>
+							<span class="access-option-label">{{ opt.label | translate }}</span>
+							<span class="access-option-desc">{{ opt.description | translate }}</span>
 						</span>
 						@if (selected() === opt.value) {
 							<ion-icon class="access-option-check" name="checkmark" />
@@ -39,7 +39,7 @@
 
 	@if (editable()) {
 		<footer class="modal-footer">
-			<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ saving() ? 'Saving…' : 'Save' }}</button>
+			<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ (saving() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}</button>
 		</footer>
 	}
 

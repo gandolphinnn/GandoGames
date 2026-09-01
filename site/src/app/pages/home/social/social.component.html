@@ -3,7 +3,7 @@
 		<ion-buttons slot="start">
 			<ion-menu-button />
 		</ion-buttons>
-		<ion-title>Social</ion-title>
+		<ion-title>{{ 'SOCIAL.TITLE' | translate }}</ion-title>
 	</ion-toolbar>
 </ion-header>
 
@@ -15,7 +15,7 @@
 				<div class="social-section">
 					<div class="empty-state">
 						<ion-icon name="person-circle" class="empty-state-icon" />
-						<p class="empty-state-text">Sign up for a full account to add friends.</p>
+						<p class="empty-state-text">{{ 'SOCIAL.GUEST_CTA' | translate }}</p>
 					</div>
 				</div>
 			} @else {
@@ -23,7 +23,7 @@
 				<div class="social-section">
 					<h2 class="section-title">
 						<ion-icon name="person-add" />
-						Friend Requests
+						{{ 'SOCIAL.FRIEND_REQUESTS' | translate }}
 						@if (incoming().length) {
 							<span class="section-count">{{ incoming().length }}</span>
 						}
@@ -35,24 +35,24 @@
 								<gg-player-avatar class="friend-row-avatar" [player]="f" />
 								<span class="friend-row-name">{{ f.name }}</span>
 								<div class="friend-row-actions">
-									<button class="friend-action friend-action-accept" [disabled]="busyId() === f.id" (click)="accept(f.id)" title="Accept">
+									<button class="friend-action friend-action-accept" [disabled]="busyId() === f.id" (click)="accept(f.id)" [title]="'SOCIAL.ACCEPT' | translate">
 										<ion-icon name="checkmark" />
 									</button>
-									<button class="friend-action friend-action-danger" [disabled]="busyId() === f.id" (click)="remove(f, 'decline')" title="Decline">
+									<button class="friend-action friend-action-danger" [disabled]="busyId() === f.id" (click)="remove(f, 'decline')" [title]="'SOCIAL.DECLINE' | translate">
 										<ion-icon name="close" />
 									</button>
 								</div>
 							</div>
 						}
 						@if (outgoing().length) {
-							<p class="friend-subheading">Sent</p>
+							<p class="friend-subheading">{{ 'SOCIAL.SENT' | translate }}</p>
 							@for (f of outgoing(); track f.id) {
 								<div class="friend-row">
 									<gg-player-avatar class="friend-row-avatar" [player]="f" />
 									<span class="friend-row-name">{{ f.name }}</span>
-									<span class="friend-row-pending">Pending</span>
+									<span class="friend-row-pending">{{ 'SOCIAL.PENDING' | translate }}</span>
 									<div class="friend-row-actions">
-										<button class="friend-action friend-action-danger" [disabled]="busyId() === f.id" (click)="remove(f, 'cancel')" title="Cancel request">
+										<button class="friend-action friend-action-danger" [disabled]="busyId() === f.id" (click)="remove(f, 'cancel')" [title]="'SOCIAL.CANCEL_REQUEST' | translate">
 											<ion-icon name="close" />
 										</button>
 									</div>
@@ -62,7 +62,7 @@
 					} @else {
 						<div class="empty-state">
 							<ion-icon name="file-tray" class="empty-state-icon" />
-							<p class="empty-state-text">No pending friend requests</p>
+							<p class="empty-state-text">{{ 'SOCIAL.NO_PENDING' | translate }}</p>
 						</div>
 					}
 				</div>
@@ -70,7 +70,7 @@
 				<div class="social-section">
 					<h2 class="section-title">
 						<ion-icon name="people" />
-						Friends
+						{{ 'SOCIAL.FRIENDS' | translate }}
 					</h2>
 					@if (friends().length) {
 						@for (f of friends(); track f.id) {
@@ -78,7 +78,7 @@
 								<gg-player-avatar class="friend-row-avatar" [player]="f" />
 								<span class="friend-row-name">{{ f.name }}</span>
 								<div class="friend-row-actions">
-									<button class="friend-action friend-action-danger" [disabled]="busyId() === f.id" (click)="remove(f, 'unfriend')" title="Remove friend">
+									<button class="friend-action friend-action-danger" [disabled]="busyId() === f.id" (click)="remove(f, 'unfriend')" [title]="'SOCIAL.REMOVE_FRIEND' | translate">
 										<ion-icon name="person-remove" />
 									</button>
 								</div>
@@ -87,7 +87,7 @@
 					} @else {
 						<div class="empty-state">
 							<ion-icon name="people" class="empty-state-icon" />
-							<p class="empty-state-text">No friends yet. Add players from a room's lobby.</p>
+							<p class="empty-state-text">{{ 'SOCIAL.NO_FRIENDS' | translate }}</p>
 						</div>
 					}
 				</div>

@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ToastService } from './toast.service';
+import { ToastService } from '@gandogames/services';
 
 @Injectable({
 	providedIn: 'root',

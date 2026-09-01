@@ -22,7 +22,7 @@
 				<ng-container *ngTemplateOutlet="def.template; context: { $implicit: seat, index: i }" />
 			}
 			@if (showDealerChip() && seat.isDealer) {
-				<span class="dealer-chip" title="Dealer">D</span>
+				<span class="dealer-chip" [title]="'POKER.DEALER' | translate">D</span>
 			}
 		</div>
 	}

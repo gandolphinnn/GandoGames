@@ -1,19 +1,21 @@
 import { RoomAccessPolicy } from '@gandogames/shared/dto';
 
-/** UI metadata for an access policy — label, ionicon glyph and a one-line explanation. */
+/** UI metadata for an access policy — i18n label/description keys and an ionicon glyph. */
 export interface RoomAccessOption {
 	value: RoomAccessPolicy;
+	/** Translation key: render with the `translate` pipe. */
 	label: string;
 	/** ionicon name (registered in main.ts). */
 	icon: string;
+	/** Translation key: render with the `translate` pipe. */
 	description: string;
 }
 
 export const ROOM_ACCESS_OPTIONS: readonly RoomAccessOption[] = [
-	{ value: 'public', label: 'Public', icon: 'globe', description: 'Anyone can find and join this room.' },
-	{ value: 'friends', label: 'Friends only', icon: 'people', description: 'Only your friends can join — others see it locked.' },
-	{ value: 'link', label: 'With link', icon: 'link', description: 'Hidden from the list. Joinable only with the room code or an invite.' },
-	{ value: 'closed', label: 'Closed', icon: 'lock-closed', description: 'No one new can join.' },
+	{ value: 'public', label: 'ROOM_ACCESS.PUBLIC.LABEL', icon: 'globe', description: 'ROOM_ACCESS.PUBLIC.DESCRIPTION' },
+	{ value: 'friends', label: 'ROOM_ACCESS.FRIENDS.LABEL', icon: 'people', description: 'ROOM_ACCESS.FRIENDS.DESCRIPTION' },
+	{ value: 'link', label: 'ROOM_ACCESS.LINK.LABEL', icon: 'link', description: 'ROOM_ACCESS.LINK.DESCRIPTION' },
+	{ value: 'closed', label: 'ROOM_ACCESS.CLOSED.LABEL', icon: 'lock-closed', description: 'ROOM_ACCESS.CLOSED.DESCRIPTION' },
 ];
 
 export function roomAccessOption(value: RoomAccessPolicy): RoomAccessOption {

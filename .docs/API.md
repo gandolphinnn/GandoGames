@@ -137,7 +137,7 @@ Applies the action and returns the caller's `GameState | null`. Broadcasts a per
 ```json
 { "sessionTicket": "string", "roomId": "string", "text": "string" }
 ```
-Returns `void`. Appends the message to the room and broadcasts `chatMessage` to the room group. Caller must be in the room; text is 1–500 chars.
+Returns `void`. Appends the message to the room and broadcasts `chatMessage` to the room group. Caller must be in the room; text is 1-500 chars.
 
 ---
 

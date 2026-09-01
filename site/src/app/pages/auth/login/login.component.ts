@@ -1,21 +1,21 @@
 import { Component, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
+import { BranchName, UserService, UrlService } from '@gandogames/services';
 import { IonButton, IonContent, IonInput } from '@ionic/angular/standalone';
 
-import { UserService } from '@gandogames/services/user.service';
 
 @Component({
 	selector: 'gg-login',
 	host: { class: 'ion-page' },
-	imports: [IonButton, IonContent, IonInput, ReactiveFormsModule, RouterLink],
+	imports: [IonButton, IonContent, IonInput, ReactiveFormsModule, RouterLink, TranslatePipe],
 	templateUrl: './login.component.html',
 	styleUrl: './login.component.scss',
 })
 export class LoginComponent {
 	private readonly auth = inject(UserService);
-	private readonly router = inject(Router);
-	private readonly route = inject(ActivatedRoute);
+	private readonly urlService = inject(UrlService);
 
 	public readonly form = new FormGroup({
 		email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
@@ -38,8 +38,8 @@ export class LoginComponent {
 		this.loading.set(true);
 		try {
 			await fn();
-			const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/';
-			await this.router.navigateByUrl(returnUrl);
+			const returnUrl = this.urlService.get('login').currentVariables().returnUrl?.substring(1) ?? '';
+			await this.urlService.get(returnUrl as BranchName).navigate();
 		} finally {
 			this.loading.set(false);
 		}

@@ -7,7 +7,8 @@ import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
-import { ToastService } from '@gandogames/services/toast.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ToastService } from '@gandogames/services';
 
 /** Seconds each street lingers before the next one is revealed during an all-in run-out. */
 const REVEAL_DELAY_MS = 2000;
@@ -15,7 +16,7 @@ const REVEAL_DELAY_MS = 2000;
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, IonInput],
+	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, IonInput, TranslatePipe],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })
@@ -28,6 +29,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	public readonly playAgain = output<void>();
 
 	private readonly toast = inject(ToastService);
+	private readonly translate = inject(TranslateService);
 
 	/** Raise amount ("raise by"); always defaults to the table minimum at the start of each of my turns. */
 	protected readonly raiseAmount = signal(MIN_RAISE);
@@ -184,6 +186,12 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		if (!gs || !me || me.folded || me.cards.length < 2 || !this.boardRevealed()) return null;
 		return describeHand(evaluateHand([...me.cards, ...gs.communityCards]));
 	});
+	
+	protected readonly someoneAllIn = computed<boolean>(() => {
+		const gs = this.gameState();
+		if (!gs) return false;
+		return gs.players.some(p => !p.folded && p.isAllIn);
+	});
 
 	/**
 	 * Tabled contenders in an all-in showdown — the only situation win % is shown. Empty unless the hand
@@ -276,13 +284,19 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	protected fold(): void { this.gameAction.emit({ action: 'fold' }); }
 	protected check(): void { this.gameAction.emit({ action: 'check' }); }
 	protected call(): void { this.gameAction.emit({ action: 'call' }); }
-	protected raise(amount: number): void { this.gameAction.emit({ action: 'raise', data: { amount } }); }
+	protected raise(amount: number): void {
+		const me = this.myPlayer();
+		if (!me || me.chips <= 0 || amount < this.minRaise()) return;
+		if (amount < me.chips) return this.gameAction.emit({ action: 'raise', data: { amount } });
+		// If the raise amount is equal to or greater than my chips, treat it as an all-in.
+		this.allIn();
+	}
 	protected nextHand(): void { this.gameAction.emit({ action: 'next-hand' }); }
 
 	protected async allIn(): Promise<void> {
 		const me = this.myPlayer();
 		if (!me || me.chips <= 0) return;
-		const confirmed = await this.toast.yesNo(`Go all in with ${me.chips} chips? This bets your entire stack.`);
+		const confirmed = await this.toast.yesNo(this.translate.instant('POKER.ALL_IN_CONFIRM', { amount: me.chips }) as string);
 		if (confirmed) this.gameAction.emit({ action: 'all-in' });
 	}
 }

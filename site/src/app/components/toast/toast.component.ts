@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
-import { Toast, ToastService } from '@gandogames/services/toast.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import { Toast, ToastService } from '@gandogames/services';
 
 const ICONS: Record<string, string> = {
 	info: 'information-circle',
@@ -11,7 +12,7 @@ const ICONS: Record<string, string> = {
 
 @Component({
 	selector: 'gg-toast',
-	imports: [IonIcon],
+	imports: [IonIcon, TranslatePipe],
 	templateUrl: './toast.component.html',
 	styleUrl: './toast.component.scss',
 	standalone: true,

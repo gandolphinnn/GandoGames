@@ -2,8 +2,8 @@
 
 	<div class="bl-row bl-head" aria-hidden="true">
 		<span class="bl-idx"></span>
-		<span class="bl-col">BB</span>
-		<span class="bl-col">Duration (min)</span>
+		<span class="bl-col">{{ 'SETTINGS_MODAL.BIG_BLIND' | translate }}</span>
+		<span class="bl-col">{{ 'SETTINGS_MODAL.DURATION' | translate }}</span>
 		<span class="bl-remove-slot"></span>
 	</div>
 
@@ -23,7 +23,7 @@
 				(input)="onBigBlind(i, $event)" />
 
 			@if (last) {
-				<span class="bl-infinite" title="The last level runs until the game ends">∞</span>
+				<span class="bl-infinite" [title]="'SETTINGS_MODAL.LAST_LEVEL_HINT' | translate">∞</span>
 			} @else {
 				<input
 					class="bl-input"
@@ -37,7 +37,7 @@
 			}
 
 			@if (editable() && i > 0) {
-				<button type="button" class="bl-remove" title="Remove level" (click)="removeLevel(i)">✕</button>
+				<button type="button" class="bl-remove" [title]="'SETTINGS_MODAL.REMOVE_LEVEL' | translate" (click)="removeLevel(i)">✕</button>
 			} @else {
 				<span class="bl-remove-slot"></span>
 			}
@@ -45,7 +45,7 @@
 	}
 
 	@if (editable()) {
-		<button type="button" class="bl-add" (click)="addLevel()">+ Add level</button>
+		<button type="button" class="bl-add" (click)="addLevel()">{{ 'SETTINGS_MODAL.ADD_LEVEL' | translate }}</button>
 	}
 
 </div>

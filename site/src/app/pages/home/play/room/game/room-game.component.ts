@@ -1,11 +1,8 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { GameState, GameType } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { UserService } from '@gandogames/services/user.service';
-import { RoomService } from '@gandogames/services/room.service';
-import { SignalRService } from '@gandogames/services/signalr.service';
+import { SignalRService, RoomService, UserService, UrlService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-room-game',
@@ -24,7 +21,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	private readonly signalR = inject(SignalRService);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(UserService);
-	private readonly router = inject(Router);
+	private readonly urlService = inject(UrlService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	private readonly gameState = signal<GameState | null>(null);
@@ -92,7 +89,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	private async resetRoom(): Promise<void> {
 		try {
 			await this.roomService.resetRoom(this.roomId());
-			void this.router.navigate(['/play', this.roomId()]);
+			void this.urlService.get('play').navigate({ roomId: this.roomId() });
 		} catch (err) {
 			this.error.set((err as Error).message);
 		}

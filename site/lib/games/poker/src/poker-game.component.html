@@ -1,5 +1,5 @@
 @if (!gameState()) {
-	<div class="game-loading"><p>Loading game…</p></div>
+	<div class="game-loading"><p>{{ 'COMMON.LOADING_GAME' | translate }}</p></div>
 } @else {
 	@let gs = gameState()!;
 
@@ -13,17 +13,17 @@
 		<!-- Centre: blinds + pot + community cards -->
 		<div table-center class="pk-center">
 			<div class="pk-blinds">
-				<span class="pk-blinds-amount">Big blind {{ bigBlind() }}</span>
+				<span class="pk-blinds-amount">{{ 'POKER.BIG_BLIND' | translate: { amount: bigBlind() } }}</span>
 				@if (hasBlindSchedule()) {
-					<span class="pk-blinds-level">Lv {{ gs.blindLevel + 1 }}/{{ gs.settings.blindLevels.length }}</span>
+					<span class="pk-blinds-level">{{ 'POKER.LEVEL' | translate: { current: gs.blindLevel + 1, total: gs.settings.blindLevels.length } }}</span>
 					@if (blindsUpNextHand()) {
-						<span class="pk-blinds-next pk-blinds-next-due">Blinds up next hand</span>
+						<span class="pk-blinds-next pk-blinds-next-due">{{ 'POKER.BLINDS_UP_NEXT' | translate }}</span>
 					} @else if (blindCountdownLabel()) {
 						<span class="pk-blinds-next">↑ {{ blindCountdownLabel() }}</span>
 					}
 				}
 			</div>
-			<span class="pk-pot">Pot: {{ gs.pot }}</span>
+			<span class="pk-pot">{{ 'POKER.POT' | translate: { amount: gs.pot } }}</span>
 			<div class="pk-community">
 				@for (slot of communitySlots(); track $index) {
 					<gg-french-card [card]="slot" [faceDown]="!slot" size="sm" />
@@ -40,29 +40,22 @@
 				<gg-chip-count [amount]="p.chips" />
 				@if (p.streetBet > 0) { <span class="pk-bet">+{{ p.streetBet }}</span> }
 				@if (p.isAllIn) {
-					<span class="pk-tag pk-tag-allin">ALL-IN</span>
+					<span class="pk-tag pk-tag-allin">{{ 'POKER.ALL_IN_TAG' | translate }}</span>
 				} @else if (p.folded) {
-					<span class="pk-tag pk-tag-folded">Folded</span>
+					<span class="pk-tag pk-tag-folded">{{ 'POKER.FOLDED' | translate }}</span>
 				}
-				@if (p.id !== myPlayFabId() && !p.folded) {
-					@if (isBettingPhase()) {
-						<div class="pk-hole">
-							<gg-french-card [faceDown]="true" size="sm" />
-							<gg-french-card [faceDown]="true" size="sm" />
-						</div>
-					} @else if (gs.gamePhase === 'showdown' && p.cards.length) {
-						<div class="pk-hole">
-							@for (c of p.cards; track c.rank + c.suit) {
-								<gg-french-card [card]="c" size="sm" />
-							}
-						</div>
-					}
+				@if (p.id !== myPlayFabId() && !p.folded && gs.gamePhase === 'showdown' && p.cards.length) {
+					<div class="pk-hole">
+						@for (c of p.cards; track c.rank + c.suit) {
+							<gg-french-card [card]="c" size="sm" />
+						}
+					</div>
 				}
 				@if (isAllInReveal() && equityPercent()[p.id] !== undefined) {
-					<span class="pk-equity">Win {{ equityPercent()[p.id] }}%</span>
+					<span class="pk-equity">{{ 'POKER.WIN_PCT' | translate: { pct: equityPercent()[p.id] } }}</span>
 				}
 			} @else {
-				<span class="pk-name pk-name-muted">SIT</span>
+				<span class="pk-name pk-name-muted">{{ 'POKER.SIT' | translate }}</span>
 			}
 		</ng-template>
 
@@ -87,35 +80,43 @@
 			@if (isBettingPhase()) {
 				@if (isMyTurn()) {
 					<div class="pk-actions">
-						<div class="action-row">
-							<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">Fold</ion-button>
-							@if (canCheck()) {
-								<ion-button [disabled]="loading()" (click)="check()">Check</ion-button>
-							} @else {
-								<ion-button [disabled]="loading()" (click)="call()">Call {{ callAmount() }}</ion-button>
-							}
-						</div>
-						<div class="raise-row">
-							<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="minRaise()" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
-							<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">Raise</ion-button>
-						</div>
-						<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">All In ({{ me?.chips }})</ion-button>
+						@if (someoneAllIn()) {
+							<div class="action-row">
+								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">{{ 'POKER.FOLD' | translate }}</ion-button>
+								<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
+							</div>
+						}
+						@else {
+							<div class="action-row">
+								<ion-button fill="outline" color="danger" [disabled]="loading()" (click)="fold()">{{ 'POKER.FOLD' | translate }}</ion-button>
+								@if (canCheck()) {
+									<ion-button [disabled]="loading()" (click)="check()">{{ 'POKER.CHECK' | translate }}</ion-button>
+								} @else {
+									<ion-button [disabled]="loading()" (click)="call()">{{ 'POKER.CALL' | translate: { amount: callAmount() } }}</ion-button>
+								}
+							</div>
+							<div class="raise-row">
+								<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="10" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
+								<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">{{ 'POKER.RAISE' | translate }}</ion-button>
+							</div>
+							<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
+						}
 						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				} @else {
-					<p class="pk-waiting">Waiting for <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
+					<p class="pk-waiting">{{ 'COMMON.WAITING_FOR' | translate }} <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
 				}
 			} @else if (gs.gamePhase === 'showdown') {
 				@if (!revealComplete()) {
-					<p class="pk-waiting">Running it out<span class="waiting-dots"> · · ·</span></p>
+					<p class="pk-waiting">{{ 'POKER.RUNNING_OUT' | translate }}<span class="waiting-dots"> · · ·</span></p>
 				} @else {
 					<div class="pk-result">
 						@if (wonByFold()) {
-							<p class="panel-eyebrow">Hand over</p>
-							<h2 class="pk-result-title">{{ showdownPlayers()[0]?.name }} wins the pot</h2>
-							<p class="hint">Everyone else folded — no cards shown.</p>
+							<p class="panel-eyebrow">{{ 'POKER.HAND_OVER' | translate }}</p>
+							<h2 class="pk-result-title">{{ 'POKER.WINS_POT' | translate: { name: showdownPlayers()[0]!.name } }}</h2>
+							<p class="hint">{{ 'POKER.EVERYONE_FOLDED' | translate }}</p>
 						} @else {
-							<h2 class="pk-result-title">Showdown</h2>
+							<h2 class="pk-result-title">{{ 'POKER.SHOWDOWN' | translate }}</h2>
 							<div class="showdown-rows">
 								@for (p of showdownPlayers(); track p.id) {
 									<div class="showdown-row" [class.showdown-row-winner]="gs.result?.winners?.includes(p.id)">
@@ -125,15 +126,15 @@
 								}
 							</div>
 						}
-						<ion-button [disabled]="loading()" (click)="nextHand()">Next Hand</ion-button>
+						<ion-button [disabled]="loading()" (click)="nextHand()">{{ 'POKER.NEXT_HAND' | translate }}</ion-button>
 						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				}
 			} @else if (gs.gamePhase === 'game-over') {
 				<div class="pk-result">
-					<p class="panel-eyebrow">Winner</p>
+					<p class="panel-eyebrow">{{ 'COMMON.WINNER' | translate }}</p>
 					<h2 class="pk-result-title winner-name">{{ gs.winnerName }}</h2>
-					<ion-button (click)="playAgain.emit()">Play Again</ion-button>
+					<ion-button (click)="playAgain.emit()">{{ 'COMMON.PLAY_AGAIN' | translate }}</ion-button>
 				</div>
 			}
 		</div>

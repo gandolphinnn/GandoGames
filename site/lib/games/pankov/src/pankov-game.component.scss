@@ -25,6 +25,7 @@ gg-game-table {
 		font-weight: 800;
 		color: $accent;
 		line-height: 1;
+		margin: 0 10px;
 
 		&-idle { color: $text-muted; opacity: 0.6; }
 	}

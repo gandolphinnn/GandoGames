@@ -70,6 +70,15 @@
 		gap: $s6;
 	}
 
+	&-footer {
+		padding: $s4 $s6 $s6;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: $s6;
+		border-top: 1px solid $border;
+	}
+
 	&-error {
 		font-size: $text-sm; color: $color-danger;
 	}

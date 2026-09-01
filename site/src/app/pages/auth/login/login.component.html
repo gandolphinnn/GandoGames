@@ -1,39 +1,39 @@
 <ion-content [fullscreen]="true">
 	<div class="auth-page">
 		<div class="auth-card">
-			<h1 class="auth-title">Welcome back</h1>
-			<p class="auth-subtitle">Log in to GandoGames</p>
+			<h1 class="auth-title">{{ 'AUTH.WELCOME_BACK' | translate }}</h1>
+			<p class="auth-subtitle">{{ 'AUTH.LOGIN_SUBTITLE' | translate }}</p>
 
 			<form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
 				<div class="field">
-					<label class="field-label">Email</label>
+					<label class="field-label">{{ 'AUTH.EMAIL' | translate }}</label>
 					<ion-input fill="outline" type="email" formControlName="email"
 						placeholder="you@example.com" autocomplete="email" />
 					@if (form.controls.email.touched && form.controls.email.hasError('required')) {
-						<span class="field-error">Email is required</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.EMAIL_REQUIRED' | translate }}</span>
 					} @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
-						<span class="field-error">Enter a valid email</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.EMAIL_INVALID' | translate }}</span>
 					}
 				</div>
 				<div class="field">
-					<label class="field-label">Password</label>
+					<label class="field-label">{{ 'AUTH.PASSWORD' | translate }}</label>
 					<ion-input fill="outline" type="password" formControlName="password"
 						placeholder="••••••••" autocomplete="current-password" />
 					@if (form.controls.password.touched && form.controls.password.hasError('required')) {
-						<span class="field-error">Password is required</span>
+						<span class="field-error">{{ 'AUTH.ERRORS.PASSWORD_REQUIRED' | translate }}</span>
 					}
 				</div>
 				<ion-button type="submit" expand="block" [disabled]="loading()">
-					{{ loading() ? 'Logging in…' : 'Log in' }}
+					{{ (loading() ? 'AUTH.LOGGING_IN' : 'AUTH.LOGIN') | translate }}
 				</ion-button>
 			</form>
 
-			<p class="auth-footer">No account? <a class="auth-link" routerLink="/signup">Sign up</a></p>
+			<p class="auth-footer">{{ 'AUTH.NO_ACCOUNT' | translate }} <a class="auth-link" routerLink="/signup">{{ 'AUTH.SIGN_UP' | translate }}</a></p>
 
-			<div class="auth-divider"><span>or</span></div>
+			<div class="auth-divider"><span>{{ 'AUTH.OR' | translate }}</span></div>
 
 			<ion-button fill="outline" expand="block" type="button" [disabled]="loading()" (click)="continueAsGuest()">
-				Continue as guest
+				{{ 'AUTH.CONTINUE_AS_GUEST' | translate }}
 			</ion-button>
 		</div>
 	</div>

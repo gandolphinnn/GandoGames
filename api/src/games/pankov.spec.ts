@@ -2,9 +2,9 @@ import type { GamePlayer } from '@gandogames/shared/dto';
 import type { RollValue } from '@gandogames/shared/pankov';
 import { PankovGame } from './pankov';
 
-const p1: GamePlayer = { id: 'p1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
-const p2: GamePlayer = { id: 'p2', name: 'Bob', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
-const p3: GamePlayer = { id: 'p3', name: 'Charlie', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' };
+const p1: GamePlayer = { id: 'p1', name: 'Alice', type: 'user', icon: 'profile', theme: 'dark', language: 'en' };
+const p2: GamePlayer = { id: 'p2', name: 'Bob', type: 'user', icon: 'profile', theme: 'dark', language: 'en' };
+const p3: GamePlayer = { id: 'p3', name: 'Charlie', type: 'user', icon: 'profile', theme: 'dark', language: 'en' };
 
 // Forces Math.random so Math.ceil(random*6) = d1 then d2, producing rollToValue(d1,d2).
 function rollTo(game: PankovGame, player: GamePlayer, value: number): void {
@@ -32,7 +32,7 @@ describe('PankovGame', () => {
 			const state = game.state!;
 			expect(state.gamePhase).toBe('turn-start');
 			expect(state.currentPlayerIndex).toBe(0);
-			expect(state.previousDeclaration).toBeNull();
+			expect(state.previousTurn?.declaration).toBeFalsy();
 		});
 
 		it('assigns 8 lives to each player', () => {
@@ -69,16 +69,16 @@ describe('PankovGame', () => {
 			rollTo(game, p1, 31); // rank 0
 		});
 
-		it('advances to next player and records previousDeclaration', () => {
+		it('advances to next player and records previousTurn?.declaration', () => {
 			game.action(p1, 'declare', { declaration: 32 as RollValue });
 			expect(game.state!.gamePhase).toBe('turn-start');
 			expect(game.state!.currentPlayerIndex).toBe(1);
-			expect(game.state!.previousDeclaration).toBe(32);
+			expect(game.state!.previousTurn?.declaration).toBe(32);
 		});
 
 		it('saves actual roll as previousActualRoll (hidden from others)', () => {
 			game.action(p1, 'declare', { declaration: 32 as RollValue });
-			expect(game.state!.previousActualRoll).toBe(31); // internal state
+			expect(game.state!.previousTurn?.actualRoll).toBe(31); // internal state
 		});
 
 		it('is rejected when declaration rank is lower than previous', () => {
@@ -160,9 +160,9 @@ describe('PankovGame', () => {
 
 		it('resets previous declaration fields', () => {
 			game.action(p1, 'continue', {});
-			expect(game.state!.previousDeclaration).toBeNull();
-			expect(game.state!.previousPlayerIndex).toBeNull();
-			expect(game.state!.previousActualRoll).toBeNull();
+			expect(game.state!.previousTurn?.declaration).toBeFalsy();
+			expect(game.state!.previousTurn?.playerIndex).toBeFalsy();
+			expect(game.state!.previousTurn?.actualRoll).toBeFalsy();
 		});
 
 		it('transitions to game-over when loser reaches 0 lives', () => {
@@ -193,8 +193,8 @@ describe('PankovGame', () => {
 		it('always nullifies previousActualRoll in public state', () => {
 			rollTo(game, p1, 31);
 			game.action(p1, 'declare', { declaration: 31 as RollValue });
-			expect(game.getPublicState('p1').previousActualRoll).toBeNull();
-			expect(game.getPublicState('p2').previousActualRoll).toBeNull();
+			expect(game.getPublicState('p1').previousTurn?.actualRoll).toBeFalsy();
+			expect(game.getPublicState('p2').previousTurn?.actualRoll).toBeFalsy();
 		});
 
 		it('throws when game not initialized', () => {

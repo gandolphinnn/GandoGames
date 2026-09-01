@@ -1,5 +1,6 @@
 import { Component, computed, contentChild, input, output } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { GameTableSeatDef } from './game-table-seat.directive';
 import { layoutSeats, TableFit, TableSeat, TableVariant } from './table-layout';
 
@@ -12,7 +13,7 @@ import { layoutSeats, TableFit, TableSeat, TableVariant } from './table-layout';
 @Component({
 	selector: 'gg-game-table',
 	standalone: true,
-	imports: [NgTemplateOutlet],
+	imports: [NgTemplateOutlet, TranslatePipe],
 	templateUrl: './game-table.component.html',
 	styleUrl: './game-table.component.scss',
 	host: {

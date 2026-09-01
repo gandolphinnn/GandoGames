@@ -37,6 +37,7 @@ export class SideMenuComponent {
 	private readonly playBranch = this.urlService.get('play');
 
 	public readonly user = this.userService.user;
+	public readonly isAdmin = this.userService.isAdmin;
 	public readonly myRooms = this.roomService.myRooms;
 	public readonly pendingFriendRequests = this.friendService.pendingCount;
 

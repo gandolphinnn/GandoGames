@@ -10,7 +10,6 @@ import { PokerGameComponent, POKER_TABLE_PRESET } from '@gandogames/lib/games/po
 export interface GameComponent<TState extends GameState = GameState> {
 	gameState: InputSignal<TState | null>;
 	loading: InputSignal<boolean>;
-	error: InputSignal<string | null>;
 	myPlayFabId: InputSignal<string | null>;
 	gameAction: OutputEmitterRef<{ action: string; data?: unknown }>;
 	playAgain: OutputEmitterRef<void>;

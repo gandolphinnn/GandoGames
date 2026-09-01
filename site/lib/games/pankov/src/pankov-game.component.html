@@ -63,7 +63,6 @@
 							@if (challengeStake() > 1) {
 								<p class="hint">{{ 'PANKOV.SUDDEN_DEATH_HINT' | translate: { count: challengeStake() } }}</p>
 							}
-							@if (error()) { <p class="action-error">{{ error() }}</p> }
 						</div>
 					} @else {
 						<p class="pv-waiting">{{ 'COMMON.WAITING_FOR' | translate }} <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
@@ -91,7 +90,6 @@
 									</button>
 								}
 							</div>
-							@if (error()) { <p class="action-error">{{ error() }}</p> }
 						</div>
 					} @else {
 						<p class="pv-waiting">{{ 'PANKOV.IS_ROLLING' | translate: { name: currentPlayer()!.name } }}<span class="waiting-dots"> · · ·</span></p>

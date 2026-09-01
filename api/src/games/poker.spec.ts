@@ -1,12 +1,10 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
-import { resolveSettings } from '@gandogames/shared/dto';
+import { buildPlayer, resolveSettings } from '@gandogames/shared/dto';
 import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
-
-const player = (id: string, name: string): GamePlayer => ({ id, name, type: 'user', icon: 'profile', theme: 'dark', language: 'en' });
 
 describe('evaluateHand', () => {
 	it('detects a royal flush', () => {
@@ -59,7 +57,7 @@ describe('PokerGame all-in', () => {
 		// 3 players (avoids the heads-up special case). Default settings → 500 chips, BB=20, SB=10.
 		// Dealer=p1, SB=p2 (10), BB=p3 (20), so UTG p1 is first to act with currentBet=20 and pot=30.
 		game = new PokerGame();
-		game.initialize([player('p1', 'Alice'), player('p2', 'Bob'), player('p3', 'Charlie')]);
+		game.initialize([buildPlayer('p1', 'Alice'), buildPlayer('p2', 'Bob'), buildPlayer('p3', 'Charlie')]);
 	});
 
 	it('pushes the whole stack in and, when over the bet, raises to that amount', () => {
@@ -94,9 +92,9 @@ describe('PokerGame all-in', () => {
 
 describe('PokerGame getPublicState (hole-card visibility)', () => {
 	let game: PokerGame;
-	const p1 = player('p1', 'Alice');
-	const p2 = player('p2', 'Bob');
-	const p3 = player('p3', 'Charlie');
+	const p1 = buildPlayer('p1', 'Alice');
+	const p2 = buildPlayer('p2', 'Bob');
+	const p3 = buildPlayer('p3', 'Charlie');
 
 	beforeEach(() => {
 		game = new PokerGame();
@@ -132,9 +130,9 @@ describe('PokerGame getPublicState (hole-card visibility)', () => {
 });
 
 describe('PokerGame settings', () => {
-	const p1 = player('p1', 'Alice');
-	const p2 = player('p2', 'Bob');
-	const p3 = player('p3', 'Charlie');
+	const p1 = buildPlayer('p1', 'Alice');
+	const p2 = buildPlayer('p2', 'Bob');
+	const p3 = buildPlayer('p3', 'Charlie');
 
 	it('seeds stacks from startingChips and blinds from the first blind level', () => {
 		const game = new PokerGame();

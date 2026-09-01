@@ -8,6 +8,13 @@ import { routes } from './app.routes';
 import { StaticTranslateLoader } from '../i18n/translate-loader';
 import { UserService } from './services/user.service';
 import { RoomService } from './services/room.service';
+import { registerLocaleData } from '@angular/common';
+
+import localeIt from '@angular/common/locales/it';
+import localeEn from '@angular/common/locales/en';
+
+registerLocaleData(localeIt, 'it-IT');
+registerLocaleData(localeEn, 'en-US');
 
 export const appConfig: ApplicationConfig = {
 	providers: [

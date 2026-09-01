@@ -1,3 +1,4 @@
+export { AdminService } from './admin.service';
 export { BackendService } from './backend.service';
 export { FriendService } from './friend.service';
 export { RoomService } from './room.service';

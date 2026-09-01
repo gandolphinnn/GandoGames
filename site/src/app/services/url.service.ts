@@ -8,6 +8,7 @@ import { filter, map } from 'rxjs';
  */
 export type BranchName = ''
 	| 'about'
+	| 'admin'
 	| 'login'
 	| 'play'
 	| 'play/new'
@@ -29,6 +30,7 @@ type UrlTreeBranch = {
 const TREE = {
 	'': { url: '' },
 	'about': { url: '/about' },
+	'admin': { url: '/admin' },
 	'login': { url: '/login', variables: { returnUrl: { type: 'queryParam', mandatory: false } } },
 	'signup': { url: '/signup', variables: { returnUrl: { type: 'queryParam', mandatory: false } } },
 	'profile': { url: '/profile' },

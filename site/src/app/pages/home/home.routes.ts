@@ -1,10 +1,16 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '../../guards/admin.guard';
 
 export const HOME_ROUTES: Routes = [
 	{
 		path: '',
 		redirectTo: 'play',
 		pathMatch: 'full',
+	},
+	{
+		path: 'admin',
+		loadComponent: () => import('./admin/admin.component').then((m) => m.AdminComponent),
+		canActivate: [adminGuard],
 	},
 	{
 		path: 'profile',

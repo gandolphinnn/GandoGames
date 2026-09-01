@@ -196,13 +196,15 @@ const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, n
 	if (room.hostId !== player.id) throw new Error('Only the host can add bots');
 	if (room.phase !== 'waiting') throw new Error('Cannot add bots after game has started');
 	const gameConfig = GAMES_CONFIG[room.game];
+	if (!gameConfig.supportsBots) throw new Error('Bots are not supported in this game');
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
-	
+
+	const botsInRoom = room.players.filter(p => p.type === 'bot').length;
 	const bot: GamePlayer = {
 		icon: 'bot',
-		id: `bot-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+		id: Math.random().toString(36).substring(2, 8).toUpperCase(),
 		language: 'en',
-		name: `Bot ${room.players.length + 1}`,
+		name: `Bot ${botsInRoom + 1}`,
 		theme: 'light',
 		type: 'bot',
 	}

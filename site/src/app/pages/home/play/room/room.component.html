@@ -34,25 +34,27 @@
 	</ion-toolbar>
 </ion-header>
 
-<div class="room-layout">
-	@if (isInRoom()) {
-		<div class="room-layout-left">
-			<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
-		</div>
-	}
-	<gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
-		@if (isPlaying()) {
-			<gg-room-game [roomId]="roomId()" [gameType]="room()!.game" />
-		} @else {
-			<gg-room-lobby
-				[room]="room()"
-				[roomId]="roomId()"
-				[isHost]="isHost()"
-				[isInRoom]="isInRoom()"
-				[myId]="myId()" />
+@if (room() != null) {
+	<div class="room-layout">
+		@if (isInRoom()) {
+			<div class="room-layout-left">
+				<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
+			</div>
 		}
-	</gg-refreshable-content>
-</div>
+		<gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
+			@if (isPlaying()) {
+				<gg-room-game [roomId]="roomId()" [gameType]="room()!.game" />
+			} @else {
+				<gg-room-lobby
+					[room]="room()!"
+					[roomId]="roomId()"
+					[isHost]="isHost()"
+					[isInRoom]="isInRoom()"
+					[myId]="myId()" />
+			}
+		</gg-refreshable-content>
+	</div>
+}
 
 @if (showAccessModal() && room()) {
 	<gg-room-access-modal

@@ -1,9 +1,10 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Friend, GameType } from '@gandogames/shared/dto';
+import { Friend, GameType, RoomData } from '@gandogames/shared/dto';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 import { FriendService, RoomService, UserService, ToastService } from '@gandogames/services';
+import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 
 @Component({
 	selector: 'gg-invite-modal',
@@ -18,7 +19,7 @@ export class InviteModalComponent {
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 	
-	public readonly roomId = input.required<string>();
+	public readonly room = input.required<RoomData>();
 	public readonly gameType = input.required<GameType>();
 	public readonly isHost = input.required<boolean>();
 	public readonly playerCount = input.required<number>();
@@ -37,6 +38,10 @@ export class InviteModalComponent {
 
 	public readonly isGuest = computed(() => this.userService.user()?.player.type === 'guest');
 	public readonly isFull = computed(() => this.playerCount() >= this.maxPlayers());
+	public readonly gameInfo = computed(() => {
+		const g = this.room().game;
+		return g ? GAME_REGISTRY[g] : undefined;
+	});
 
 	public readonly friends = this.friendService.friends;
 	public readonly filteredFriends = computed(() => {
@@ -54,7 +59,7 @@ export class InviteModalComponent {
 		if (this.busyId() || this.isFull() || this.isInRoom(friend.id) || this.invited().includes(friend.id)) return;
 		this.busyId.set(friend.id);
 		try {
-			await this.roomService.invitePlayer(this.roomId(), friend.id);
+			await this.roomService.invitePlayer(this.room().id, friend.id);
 			this.invited.update(ids => [...ids, friend.id]);
 			this.toast.success(this.translate.instant('INVITE_MODAL.INVITE_SENT', { name: friend.name }) as string);
 		} finally {
@@ -64,7 +69,7 @@ export class InviteModalComponent {
 
 	public async addBot(): Promise<void> {
 		this.loading.set(true);
-		await this.roomService.addBot(this.roomId());
+		await this.roomService.addBot(this.room().id);
 		this.loading.set(false);
 		this.closed.emit();
 	}

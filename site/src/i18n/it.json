@@ -157,6 +157,7 @@
 		"SEND": "Invia"
 	},
 	"INVITE_MODAL": {
+		"ADD_BOT": "Aggiungi bot",
 		"TITLE": "Invita nella stanza",
 		"HOST_ONLY": "Solo l'host può invitare giocatori in questa stanza.",
 		"GUEST_CTA": "Registra un account completo per aggiungere amici e invitarli.",

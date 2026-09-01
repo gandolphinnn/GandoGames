@@ -1,6 +1,6 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
 import { GameSettingsSchema, GameState, GameType } from "@gandogames/shared/dto";
-import { GAMES_CONFIG } from '@gandogames/shared/config';
+import { BaseGameDescriptor, GAMES_CONFIG } from '@gandogames/shared/config';
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
 import { TablePreset } from '@gandogames/lib/common/game-table';
@@ -16,14 +16,12 @@ export interface GameComponent<TState extends GameState = GameState> {
 	playAgain: OutputEmitterRef<void>;
 }
 
-interface GameDescriptor {
+interface GameDescriptor extends BaseGameDescriptor {
 	id: GameType;
 	name: string;
 	icon: string;
 	/** Translation key: render with the `translate` pipe. */
 	description: string;
-	minPlayers: number;
-	maxPlayers: number;
 	component: Type<unknown>;
 	/** Declarative schema for the per-room game-settings editor. */
 	settingsSchema: GameSettingsSchema;

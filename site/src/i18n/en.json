@@ -157,6 +157,7 @@
 		"SEND": "Send"
 	},
 	"INVITE_MODAL": {
+		"ADD_BOT": "Add bot",
 		"TITLE": "Invite to Room",
 		"HOST_ONLY": "Only the host can invite players to this room.",
 		"GUEST_CTA": "Sign up for a full account to add friends and invite them.",

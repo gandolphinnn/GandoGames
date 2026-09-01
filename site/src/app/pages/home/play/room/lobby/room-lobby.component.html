@@ -93,7 +93,7 @@
 
 		@if (showInviteModal() && room()) {
 			<gg-invite-modal
-				[roomId]="roomId()"
+				[room]="room()"
 				[gameType]="room()!.game"
 				[isHost]="isHost()"
 				[playerCount]="room()!.players.length"

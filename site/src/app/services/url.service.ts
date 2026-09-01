@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal } from '@angular/core';
+import { computed, inject, Service, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationExtras, Params, PRIMARY_OUTLET, Router, UrlTree } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -8,6 +8,7 @@ import { filter, map } from 'rxjs';
  */
 export type BranchName = ''
 	| 'about'
+	| 'admin'
 	| 'login'
 	| 'play'
 	| 'play/new'
@@ -29,6 +30,7 @@ type UrlTreeBranch = {
 const TREE = {
 	'': { url: '' },
 	'about': { url: '/about' },
+	'admin': { url: '/admin' },
 	'login': { url: '/login', variables: { returnUrl: { type: 'queryParam', mandatory: false } } },
 	'signup': { url: '/signup', variables: { returnUrl: { type: 'queryParam', mandatory: false } } },
 	'profile': { url: '/profile' },
@@ -61,9 +63,7 @@ type TreeObject<B extends BranchName> = UrlTreeBranch & {
 	currentVariables: Signal<Partial<BranchVariables<B>>>;
 };
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class UrlService {
 	private readonly router = inject(Router);
 	/**

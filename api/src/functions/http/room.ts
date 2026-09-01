@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, resolveAccessPolicy, GamePlayer } from '@gandogames/shared/dto';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, resolveAccessPolicy, GamePlayer, buildBot } from '@gandogames/shared/dto';
 import { Game, GAMES_CONFIG } from '../../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 import { areFriends } from './friends';
@@ -200,14 +200,8 @@ const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, n
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
 
 	const botsInRoom = room.players.filter(p => p.type === 'bot').length;
-	const bot: GamePlayer = {
-		icon: 'bot',
-		id: Math.random().toString(36).substring(2, 8).toUpperCase(),
-		language: 'en',
-		name: `Bot ${botsInRoom + 1}`,
-		theme: 'light',
-		type: 'bot',
-	}
+	const id = Math.random().toString(36).substring(2, 8).toUpperCase();
+	const bot = buildBot(id, `Bot ${botsInRoom + 1}`);
 	room.players.push(bot);
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 

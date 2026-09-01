@@ -1,8 +1,8 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { BaseRequest, ChatSendRequest, GameActionRequest, GameBaseRequest, GameSettings, GameSettingsSetRequest, GameState, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomBaseRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomKickRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService, SignalRService, UrlService, UserService } from '@gandogames/services';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class RoomService {
 	private readonly backend = inject(BackendService);
 	private readonly signalR = inject(SignalRService);

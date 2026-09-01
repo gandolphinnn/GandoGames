@@ -101,7 +101,6 @@
 							</div>
 							<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
 						}
-						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				} @else {
 					<p class="pk-waiting">{{ 'COMMON.WAITING_FOR' | translate }} <strong>{{ currentPlayer()?.name }}</strong><span class="waiting-dots"> · · ·</span></p>
@@ -127,7 +126,6 @@
 							</div>
 						}
 						<ion-button [disabled]="loading()" (click)="nextHand()">{{ 'POKER.NEXT_HAND' | translate }}</ion-button>
-						@if (error()) { <p class="action-error">{{ error() }}</p> }
 					</div>
 				}
 			} @else if (gs.gamePhase === 'game-over') {

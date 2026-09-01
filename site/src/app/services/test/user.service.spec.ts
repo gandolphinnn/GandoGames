@@ -8,12 +8,12 @@ import type { AuthResponse } from '@gandogames/shared/dto';
 
 const MOCK_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
-	player: { id: 'player-1', name: 'Alice', isGuest: false, icon: 'profile', theme: 'dark', language: 'en' },
+	player: { id: 'player-1', name: 'Alice', type: 'user', icon: 'profile', theme: 'dark', language: 'en', role: '' },
 };
 
 const MOCK_GUEST_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
-	player: { id: 'guest-1', name: 'Guest123456', isGuest: true, icon: 'profile', theme: 'dark', language: 'en' },
+	player: { id: 'guest-1', name: 'Guest123456', type: 'guest', icon: 'profile', theme: 'dark', language: 'en', role: '' },
 };
 
 describe('UserService', () => {
@@ -55,12 +55,12 @@ describe('UserService', () => {
 			service = createService();
 		});
 
-		it('login() calls backend and sets user with isGuest false', async () => {
+		it('login() calls backend and sets user with type "user"', async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.login('alice@example.com', 'pw');
 			expect(backendSpy.post).toHaveBeenCalledWith('/auth/login', { email: 'alice@example.com', password: 'pw' });
 			expect(service.user()?.sessionTicket).toBe('ticket-123');
-			expect(service.user()?.isGuest).toBeFalse();
+			expect(service.user()?.player.type).toBe('user');
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 
@@ -71,17 +71,17 @@ describe('UserService', () => {
 			expect(localStorage.getItem('gg_auth')).toBeNull();
 		});
 
-		it('register() sets user with isGuest false', async () => {
+		it('register() sets user with type "player"', async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_RESPONSE));
 			await service.register('alice@example.com', 'pw', 'Alice');
 			expect(backendSpy.post).toHaveBeenCalledWith('/auth/register', { email: 'alice@example.com', password: 'pw', username: 'Alice' });
-			expect(service.user()?.isGuest).toBeFalse();
+			expect(service.user()?.player.type).toBe('user');
 		});
 
-		it('loginAsGuest() sets user with isGuest true and persists ticket', async () => {
+		it('loginAsGuest() sets user with type "guest" and persists ticket', async () => {
 			backendSpy.post.and.returnValue(Promise.resolve(MOCK_GUEST_RESPONSE));
 			await service.loginAsGuest();
-			expect(service.user()?.isGuest).toBeTrue();
+			expect(service.user()?.player.type).toBe('guest');
 			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
 		});
 
@@ -202,7 +202,7 @@ describe('UserService', () => {
 			const service = createService();
 			await service.init();
 			expect(backendSpy.post).toHaveBeenCalledWith('/auth/guestLogin', { customId: 'guest-uuid-123' });
-			expect(service.user()?.isGuest).toBeTrue();
+			expect(service.user()?.player.type).toBe('guest');
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 	});

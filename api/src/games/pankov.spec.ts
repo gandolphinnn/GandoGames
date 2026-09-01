@@ -1,10 +1,10 @@
-import type { GamePlayer } from '@gandogames/shared/dto';
+import { buildPlayer, type GamePlayer } from '@gandogames/shared/dto';
 import type { RollValue } from '@gandogames/shared/pankov';
 import { PankovGame } from './pankov';
 
-const p1: GamePlayer = { id: 'p1', name: 'Alice', type: 'user', icon: 'profile', theme: 'dark', language: 'en' };
-const p2: GamePlayer = { id: 'p2', name: 'Bob', type: 'user', icon: 'profile', theme: 'dark', language: 'en' };
-const p3: GamePlayer = { id: 'p3', name: 'Charlie', type: 'user', icon: 'profile', theme: 'dark', language: 'en' };
+const p1: GamePlayer = buildPlayer('p1', 'Alice');
+const p2: GamePlayer = buildPlayer('p2', 'Bob');
+const p3: GamePlayer = buildPlayer('p3', 'Charlie');
 
 // Forces Math.random so Math.ceil(random*6) = d1 then d2, producing rollToValue(d1,d2).
 function rollTo(game: PankovGame, player: GamePlayer, value: number): void {

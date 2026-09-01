@@ -1,10 +1,10 @@
-import { effect, inject, Injectable } from '@angular/core';
+import { effect, inject, Service } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
 import { BackendService, UserService } from '@gandogames/services';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class SignalRService {
 	private readonly backend = inject(BackendService);
 	private readonly userService = inject(UserService);

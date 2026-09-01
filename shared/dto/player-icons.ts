@@ -15,8 +15,3 @@ export const PLAYER_ICONS: PlayerIcon[] = [
 	{ id: 'pizza',   label: 'Pizza',   class: 'fas fa-pizza-slice' },
 	{ id: 'bot',     label: 'Bot',     class: 'fas fa-robot', reserved: true },
 ];
-
-export const LANGUAGES = [
-	{ value: 'en', text: 'English' },
-	{ value: 'it', text: 'Italiano' },
-];

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 
 export type StorageKey = 'sessionTicket' | 'guestId';
 
@@ -7,7 +7,7 @@ const KEY_MAP: Record<StorageKey, string> = {
 	guestId: 'gg_guest_id',
 };
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class StorageService {
 	public getString(key: StorageKey): string | null {
 		return localStorage.getItem(KEY_MAP[key]);

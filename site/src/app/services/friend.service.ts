@@ -1,11 +1,11 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Service, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
 import { BackendService, SignalRService, ToastService, UserService } from '@gandogames/services';
 
 export type FriendRelationship = 'none' | 'incoming' | 'outgoing' | 'accepted';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FriendService {
 	private readonly backend = inject(BackendService);
 	private readonly signalR = inject(SignalRService);

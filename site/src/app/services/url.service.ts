@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Signal } from '@angular/core';
+import { computed, inject, Service, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationExtras, Params, PRIMARY_OUTLET, Router, UrlTree } from '@angular/router';
 import { filter, map } from 'rxjs';
@@ -61,9 +61,7 @@ type TreeObject<B extends BranchName> = UrlTreeBranch & {
 	currentVariables: Signal<Partial<BranchVariables<B>>>;
 };
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class UrlService {
 	private readonly router = inject(Router);
 	/**

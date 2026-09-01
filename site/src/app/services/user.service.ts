@@ -1,9 +1,9 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Service, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthResponse, BaseRequest, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
 import { BackendService, StorageService } from '@gandogames/services';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class UserService {
 	private readonly backend = inject(BackendService);
 	private readonly storage = inject(StorageService);

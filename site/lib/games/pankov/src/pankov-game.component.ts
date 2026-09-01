@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { PankovGameState, type PankovPlayer, getRank, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
+import { PankovGameState, type PankovPlayer, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue, getValidDeclarations } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
@@ -85,8 +85,7 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	protected readonly validDeclarations = computed((): RollValue[] => {
 		const gs = this.gameState();
 		if (!gs) return [];
-		const minRank = gs.previousTurn !== null ? getRank(gs.previousTurn.declaration) : 0;
-		return (ROLL_VALUES as readonly RollValue[]).filter(v => getRank(v) >= minRank);
+		return getValidDeclarations(gs.previousTurn?.declaration || null);
 	});
 
 	protected readonly canRoll = computed(() => this.validDeclarations().length > 0);

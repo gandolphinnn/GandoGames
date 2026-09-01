@@ -1,4 +1,5 @@
 import { getRank, PankovTurn, RollValue, successProbability } from "@gandogames/shared/pankov";
+import { Randomizer } from "../../randomizer";
 
 /*
  * BEHAVIOUR PARAMETERS:
@@ -37,10 +38,12 @@ export class PankovBot {
 	public lieDecisionAggressiveness: number;
 
 	public constructor(public playerId: string) {
-		this.distrust = Math.random();
-		this.cockiness = Math.random();
-		this.lieDecisionConsistency = Math.random();
-		this.lieDecisionAggressiveness = Math.random();
+		const seed: number = parseInt(playerId, 36) % 2 ** 32;
+		const random = new Randomizer(seed);
+		this.distrust = random.next();
+		this.cockiness = random.next();
+		this.lieDecisionConsistency = random.next();
+		this.lieDecisionAggressiveness = random.next();
 	}
 
 	/**
@@ -49,10 +52,6 @@ export class PankovBot {
 	public isChallenging(previousTurn: PankovTurn): boolean {
 		const declaration = previousTurn.declaration;
 		const beatedRoll = previousTurn.beatedRoll ?? 31;
-
-		const probabilityOfLying = 1 - successProbability(declaration, beatedRoll);
-
-		const suspicion = this.distrust * probabilityOfLying;
 
 		/*
 		 * A risky declaration deserves additional scrutiny.
@@ -64,10 +63,10 @@ export class PankovBot {
 		 * A non-cocky bot challenges them more readily.
 		 */
 		const risk = 1 - successProbability(declaration, beatedRoll);
-
+		
+		const suspicion = this.distrust * risk;
 		const riskModifier = 1 - risk * this.cockiness;
-
-		const challengeProbability = suspicion * riskModifier;
+		const challengeProbability = (suspicion + riskModifier) / 2;
 
 		return Math.random() < challengeProbability;
 	}
@@ -76,7 +75,15 @@ export class PankovBot {
 	 * The bot CAN be honest but might lie.
 	 */
 	public decideDeclaration(currentRoll: RollValue, validDeclarations: RollValue[]): RollValue {
-		if (Math.random() >= this.cockiness) {
+		const rank = getRank(currentRoll);
+
+		// The bot only considers lying when its actual roll is relatively low.
+		// Higher rolls are valuable enough to declare honestly.
+		// 4 = with max cockiness, the highest roll the bot will lie with is 43
+		const HIGH_ROLL_CAP = 4; 
+		const rankThreshold = Math.round(this.cockiness * HIGH_ROLL_CAP);
+
+		if (rank >= rankThreshold) {
 			return currentRoll;
 		}
 

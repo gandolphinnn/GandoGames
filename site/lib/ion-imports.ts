@@ -14,6 +14,6 @@ import { TranslatePipe } from '@ngx-translate/core';
  * imports: [...ION_IMPORTS, IonCard, IonSegment],
  * ```
  */
-export const ION_IMPORTS = [
+export const BASE_IMPORTS = [
 	IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonIcon, IonButton, IonContent, TranslatePipe,
 ] as const;

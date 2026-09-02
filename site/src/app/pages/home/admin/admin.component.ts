@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { ToastService, AdminService, UserService } from '@gandogames/services';
 import { RefreshableContentComponent } from '@gandogames/components';
 import { DatePipe } from '@angular/common';
@@ -8,7 +8,7 @@ import { DatePipe } from '@angular/common';
 @Component({
 	selector: 'gg-admin',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, RefreshableContentComponent, DatePipe],
+	imports: [...BASE_IMPORTS, RefreshableContentComponent, DatePipe],
 	templateUrl: './admin.component.html',
 	styleUrl: './admin.component.scss',
 })

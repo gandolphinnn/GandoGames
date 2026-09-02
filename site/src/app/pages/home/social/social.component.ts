@@ -1,14 +1,14 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Friend } from '@gandogames/shared/dto';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { FriendService, UserService, ToastService } from '@gandogames/services';
 import { RefreshableContentComponent, PlayerAvatarComponent } from '@gandogames/components';
 
 @Component({
 	selector: 'gg-social',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, PlayerAvatarComponent, RefreshableContentComponent],
+	imports: [...BASE_IMPORTS, PlayerAvatarComponent, RefreshableContentComponent],
 	templateUrl: './social.component.html',
 	styleUrl: './social.component.scss',
 })

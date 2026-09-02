@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
 import { UrlService, RoomService, UserService, SignalRService, ToastService } from '@gandogames/services';
 import { ChatComponent, RefreshableContentComponent, RoomAccessModalComponent } from '@gandogames/components';
@@ -18,7 +18,7 @@ import { RoomGameComponent } from './game/room-game.component';
 @Component({
 	selector: 'gg-room',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, ChatComponent, RefreshableContentComponent, RoomAccessModalComponent, RoomGameComponent, RoomLobbyComponent, RouterLink],
+	imports: [...BASE_IMPORTS, ChatComponent, RefreshableContentComponent, RoomAccessModalComponent, RoomGameComponent, RoomLobbyComponent, RouterLink],
 	templateUrl: './room.component.html',
 	styleUrl: './room.component.scss',
 })

@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RoomSummary } from '@gandogames/shared/dto';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { roomAccessOption } from '@gandogames/lib/room-access';
 import { RoomService, UrlService } from '@gandogames/services';
@@ -9,7 +9,7 @@ import { RefreshableContentComponent } from '@gandogames/components';
 @Component({
 	selector: 'gg-room-list',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, RefreshableContentComponent],
+	imports: [...BASE_IMPORTS, RefreshableContentComponent],
 	templateUrl: './room-list.component.html',
 	styleUrl: './room-list.component.scss',
 })

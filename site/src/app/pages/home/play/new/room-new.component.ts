@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { RoomService, UrlService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-room-new',
 	host: { class: 'ion-page' },
-	imports: [...ION_IMPORTS, RouterLink],
+	imports: [...BASE_IMPORTS, RouterLink],
 	templateUrl: './room-new.component.html',
 	styleUrl: './room-new.component.scss',
 })

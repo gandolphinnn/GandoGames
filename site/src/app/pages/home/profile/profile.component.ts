@@ -4,7 +4,7 @@ import { addIcons } from 'ionicons';
 import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutline, trashOutline } from 'ionicons/icons';
 import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, ViewDidLeave, } from '@ionic/angular/standalone';
 import { GamePlayer, IconType, LangCode, LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/shared/dto';
-import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { UserService, ToastService, UrlService } from '@gandogames/services';
 import { PlayerAvatarComponent } from '@gandogames/components';
 
@@ -12,7 +12,7 @@ import { PlayerAvatarComponent } from '@gandogames/components';
 	selector: 'gg-profile',
 	host: { class: 'ion-page' },
 	imports: [
-		...ION_IMPORTS,
+		...BASE_IMPORTS,
 		IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, PlayerAvatarComponent,
 	],
 	templateUrl: './profile.component.html',

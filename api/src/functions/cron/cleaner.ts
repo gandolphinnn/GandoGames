@@ -1,4 +1,5 @@
-import { InnerTimeFunction, PlayFabAdmin, PlayFabServer, PlayfabCtx, pfPromise, registerTimeFunction } from '../../';
+import { PlayFabAdmin, PlayFabServer } from 'playfab-sdk';
+import { InnerTimeFunction, PlayfabCtx, pfPromise } from '../../';
 
 const DAYS = 1;
 

@@ -1,14 +1,13 @@
 import { HttpHandler, InvocationContext } from '@azure/functions';
-import { BaseRequest } from '@gandogames/shared/dto';
-import { authenticateSession, InnerFunctionNotifier, registerBaseFunction, signalRInput } from '../..';
+import { API } from '@gandogames/shared/dto';
+import { authenticateSession, extractSessionTicket, InnerFunctionNotifier, registerBaseEndpoint, signalRInput } from '../..';
 
 const negotiateHandler: HttpHandler = async (request, context: InvocationContext) => {
 	try {
-		const body = await request.json().catch(() => undefined) as BaseRequest;
 		const notifier = new InnerFunctionNotifier();
 		notifier.errorCode = 401;
 		notifier.errorMessage = 'Unauthorized';
-		const player = await authenticateSession(body, notifier);
+		const player = await authenticateSession(extractSessionTicket(request), notifier);
 		if (player.id !== request.query.get('userId')) {
 			return { status: 401, jsonBody: { error: 'Unauthorized' } };
 		}
@@ -18,4 +17,4 @@ const negotiateHandler: HttpHandler = async (request, context: InvocationContext
 	}
 };
 
-registerBaseFunction('signalr_negotiate', 'signalr/negotiate', negotiateHandler, [signalRInput]);
+registerBaseEndpoint(API.signalr.negotiate, negotiateHandler, [signalRInput]);

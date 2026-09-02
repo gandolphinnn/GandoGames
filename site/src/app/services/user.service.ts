@@ -1,6 +1,6 @@
 import { computed, effect, inject, Service, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { AuthResponse, BaseRequest, GamePlayer, GuestLoginRequest, LANGUAGES, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
+import { API, AuthResponse, GamePlayer, GuestLoginRequest, LANGUAGES, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
 import { BackendService, StorageService } from '@gandogames/services';
 
 @Service()
@@ -55,16 +55,15 @@ export class UserService {
 			const ticket = this.storage.getString('sessionTicket');
 			if (!ticket) return; //! If there is not the sesssion ticket, don't log automatically as guest.
 
-			const request: BaseRequest = { sessionTicket: ticket };
-			const result = await this.backend.post<AuthResponse>('/auth/check', request);
-			this.setSession(result);
+			const player = await this.backend.call(API.auth.check);
+			this.setSession({ player, sessionTicket: ticket });
 		} catch {
 			this.storage.remove('sessionTicket');
 			const guestId = this.storage.getString('guestId');
 			if (!guestId) return;
 			try {
 				const request: GuestLoginRequest = { customId: guestId };
-				const result = await this.backend.post<AuthResponse>('/auth/guestLogin', request);
+				const result = await this.backend.call(API.auth.guestLogin, { body: request });
 				this.setSession(result);
 			} catch {
 				this.storage.remove('guestId');
@@ -76,13 +75,13 @@ export class UserService {
 	//#region Auth
 	public async login(email: string, password: string): Promise<void> {
 		const request: LoginRequest = { email, password };
-		const result = await this.backend.post<AuthResponse>('/auth/login', request);
+		const result = await this.backend.call(API.auth.login, { body: request });
 		this.setSession(result);
 	}
 
 	public async register(email: string, password: string, username: string): Promise<void> {
 		const request: RegisterRequest = { email, password, username };
-		const result = await this.backend.post<AuthResponse>('/auth/register', request);
+		const result = await this.backend.call(API.auth.register, { body: request });
 		this.setSession(result);
 	}
 
@@ -95,7 +94,7 @@ export class UserService {
 			this.storage.setString('guestId', customId);
 		}
 		const request: GuestLoginRequest = { customId };
-		const result = await this.backend.post<AuthResponse>('/auth/guestLogin', request);
+		const result = await this.backend.call(API.auth.guestLogin, { body: request });
 		this.setSession(result);
 	}
 
@@ -123,8 +122,8 @@ export class UserService {
 		const user = this._user();
 		const preview = this._preview();
 		if (!user || !preview) return;
-		const request: ProfileUpdateRequest = { sessionTicket: user.sessionTicket, ...preview };
-		const result = await this.backend.post<ProfileData>('/profile/update', request);
+		const request: ProfileUpdateRequest = { ...preview };
+		const result = await this.backend.call(API.profile.update, { body: request });
 		const current = this._user();
 		if (current) this._user.set({ ...current, player: { ...current.player, ...result } });
 		this._preview.set(null);
@@ -132,10 +131,8 @@ export class UserService {
 	//#endregion Profile preview
 
 	public async deleteAccount(): Promise<void> {
-		const user = this._user();
-		if (!user) return;
-		const request: BaseRequest = { sessionTicket: user.sessionTicket };
-		await this.backend.post<void>('/profile/delete', request);
+		if (!this._user()) return;
+		await this.backend.call(API.profile.delete);
 		this.logout();
 	}
 

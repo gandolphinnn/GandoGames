@@ -1,4 +1,5 @@
 export * from './dto/auth';
+export * from './dto/endpoints';
 export * from './dto/friends';
 export * from './dto/game';
 export * from './dto/languages';

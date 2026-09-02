@@ -1,3 +1,5 @@
+- The game should not end if a player leaves and there are still 2 or more players.
+- If a player is alone with a bot and leaves the room, the room should be deleted.
 - Redo the behaviour when a user leave a room and when a game is over
 	Display who won and for what reason (game based win or forfeit)
 	BUG: If a player leaves and just one player remain, that player win the game and remove the room from its list but the room stays open for everyone else to see.

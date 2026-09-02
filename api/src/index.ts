@@ -1,5 +1,5 @@
-import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput } from '@azure/functions';
-import { BaseRequest, GamePlayer, IconType, LangCode, PlayerRole, Theme } from '@gandogames/shared/dto';
+import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput, HttpMethod as AzureHttpMethod } from '@azure/functions';
+import { AnyEndpoint, EndpointParams, GamePlayer, HttpMethod, IconType, LangCode, METHODS_WITH_BODY, PlayerRole, SAFE_METHODS, Theme } from '@gandogames/shared/dto';
 import { PlayFab, PlayFabServer } from 'playfab-sdk';
 import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';
 import { withRoomLock } from './lock';
@@ -25,39 +25,53 @@ export const signalROutput = output.generic({
 	connectionStringSetting: 'AzureSignalRConnectionString',
 });
 
-export function registerBaseFunction(
-	name: string,
-	route: string,
+// Every function's name, HTTP method, route and request/response types come from its endpoint
+// definition in the shared contract (shared/dto/endpoints.ts) — the single source of truth the
+// site's BackendService consumes too, so the two sides cannot drift.
+
+/**
+ * The @azure/functions HttpMethod union does not include QUERY (the IETF safe-method-with-body
+ * draft) yet; the Functions host itself routes custom verbs fine, so widen the type here.
+ */
+const azureMethods = (method: HttpMethod): AzureHttpMethod[] => [method as AzureHttpMethod];
+
+/** Parse the JSON body for body-carrying methods; GET/DELETE requests have no body by contract. */
+async function readBody<E extends AnyEndpoint>(def: E, request: HttpRequest): Promise<Parameters<InnerFunction<E>>[0]> {
+	const body = METHODS_WITH_BODY.includes(def.method) ? await request.json().catch(() => undefined) : undefined;
+	return body as Parameters<InnerFunction<E>>[0];
+}
+
+/** Register a raw handler on an endpoint definition; used for signalr/negotiate, which needs the connection-info input binding. */
+export function registerBaseEndpoint(
+	def: AnyEndpoint,
 	innerHandler: HttpHandler,
 	extraInputs?: FunctionInput[],
 ) {
-	app.http(name, {
-		methods: ['POST'],
+	app.http(def.name, {
+		methods: azureMethods(def.method),
 		authLevel: 'anonymous',
-		route: route,
+		route: def.path,
 		extraInputs: extraInputs,
 		extraOutputs: [signalROutput],
 		handler: innerHandler,
 	});
 }
 
-export function registerPublicFunction<TReq, TRes>(
-	name: string,
-	route: string,
-	innerPublicFunction: InnerPublicFunction<TReq, TRes>,
-	extraInputs?: FunctionInput[],
+/** Register an unauthenticated endpoint (login, register, guest login). */
+export function registerPublicEndpoint<E extends AnyEndpoint>(
+	def: E,
+	innerPublicFunction: InnerPublicFunction<E>,
 ) {
-	app.http(name, {
-		methods: ['POST'],
+	app.http(def.name, {
+		methods: azureMethods(def.method),
 		authLevel: 'anonymous',
-		route: route,
-		extraInputs: extraInputs,
+		route: def.path,
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
 			const notifier = new InnerFunctionNotifier();
 			try {
-				const body = await request.json().catch(() => undefined) as TReq;
+				const body = await readBody(def, request);
 				const result = await innerPublicFunction(body, notifier);
 				notifier.prepareContext(context);
 				toRet.jsonBody = result;
@@ -72,40 +86,30 @@ export function registerPublicFunction<TReq, TRes>(
 	});
 }
 
-export interface RegisterFunctionOptions {
-	/**
-	 * Skip the automatic per-room lock even when the request carries a roomId. Use for read-only
-	 * handlers — reads can't lose data, so locking them would only add latency and contention.
-	 */
-	skipLock?: boolean;
-	extraInputs?: FunctionInput[];
-}
-
-export function registerFunction<TReq extends BaseRequest, TRes>(
-	name: string,
-	route: string,
-	innerFunction: InnerFunction<TReq, TRes>,
-	options: RegisterFunctionOptions = {},
+/** Register an authenticated endpoint: the session ticket in `Authorization: Bearer` is validated against PlayFab before `innerFunction` runs. */
+export function registerEndpoint<E extends AnyEndpoint>(
+	def: E,
+	innerFunction: InnerFunction<E>,
 ) {
-	app.http(name, {
-		methods: ['POST'],
+	app.http(def.name, {
+		methods: azureMethods(def.method),
 		authLevel: 'anonymous',
-		route: route,
-		extraInputs: options.extraInputs,
+		route: def.path,
 		extraOutputs: [signalROutput],
 		handler: async (request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> => {
 			const toRet = {} as HttpResponseInit;
 			const notifier = new InnerFunctionNotifier();
 			try {
-				const body = await request.json().catch(() => undefined) as TReq;
-				const player = await authenticateSession(body, notifier);
+				const body = await readBody(def, request);
+				const params = request.params as unknown as EndpointParams<E>;
+				const player = await authenticateSession(extractSessionTicket(request), notifier);
 				// Handlers do load → mutate → save against storage with no compare-and-set, so two
-				// concurrent calls on the same room can clobber each other. Any request carrying a
-				// roomId is therefore serialized per room automatically; read-only handlers opt out
-				// via skipLock.
-				const roomId = (body as { roomId?: unknown })?.roomId;
-				const runInner = () => innerFunction(body, notifier, player);
-				const result = !options.skipLock && typeof roomId === 'string' && roomId.length > 0
+				// concurrent calls on the same room can clobber each other. Any unsafe call on a
+				// route carrying a {roomId} is therefore serialized per room automatically; safe
+				// methods (GET/QUERY) are read-only by contract, so they never take the lock.
+				const roomId = request.params['roomId'];
+				const runInner = () => innerFunction(body, params, notifier, player);
+				const result = roomId && !SAFE_METHODS.includes(def.method)
 					? await withRoomLock(roomId, runInner)
 					: await runInner();
 				notifier.prepareContext(context);
@@ -146,12 +150,19 @@ export function registerTimeFunction(
 	});
 }
 
-export async function authenticateSession(request: BaseRequest, notifier: InnerFunctionNotifier): Promise<GamePlayer> {
+/** Extract the PlayFab session ticket from the `Authorization: Bearer <ticket>` header. */
+export function extractSessionTicket(request: HttpRequest): string | undefined {
+	const header = request.headers.get('authorization');
+	return header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : undefined;
+}
+
+export async function authenticateSession(sessionTicket: string | undefined, notifier: InnerFunctionNotifier): Promise<GamePlayer> {
 	const { errorCode, errorMessage } = notifier;
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Session expired';
+	if (!sessionTicket) throw new Error('Missing session ticket');
 	const authResult = await pfPromise<PlayFabServerModels.AuthenticateSessionTicketResult>(
-		cb => PlayFabServer.AuthenticateSessionTicket({ SessionTicket: request.sessionTicket }, cb),
+		cb => PlayFabServer.AuthenticateSessionTicket({ SessionTicket: sessionTicket }, cb),
 	);
 	notifier.errorCode = errorCode;
 	notifier.errorMessage = errorMessage;

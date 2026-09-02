@@ -23,7 +23,6 @@ export interface RegisterRequest {
 export interface GuestLoginRequest {
 	customId: string;
 }
-
 export type PlayerType = 'guest' | 'user' | 'bot';
 export type PlayerRole = 'admin' | 'moderator' | '';
 
@@ -66,9 +65,5 @@ export interface AuthResponse {
 	sessionTicket: string;
 }
 
-/** Base request for logged users */
-export interface BaseRequest {
-	sessionTicket: string;
-}
-
-export interface ProfileUpdateRequest extends BaseRequest, Partial<ProfileData> { }
+/** Partial profile update — only the provided fields change. */
+export type ProfileUpdateRequest = Partial<ProfileData>;

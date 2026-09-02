@@ -1,9 +1,4 @@
-import { BaseRequest, GamePlayer, GameSettings, GameType } from "..";
-
-/** Base request for logged users in a room */
-export interface RoomBaseRequest extends BaseRequest {
-	roomId: string;
-}
+import { GamePlayer, GameSettings, GameType } from "..";
 
 export interface ChatMessage {
 	playerId: string;
@@ -20,6 +15,13 @@ export interface ChatMessage {
  * - `closed`  — unlisted and frozen; no one new may join.
  */
 export type RoomAccessPolicy = 'public' | 'friends' | 'link' | 'closed';
+
+export const ROOM_ACCESS_POLICIES: readonly RoomAccessPolicy[] = ['public', 'friends', 'link', 'closed'];
+
+/** Coerce an untrusted value to a valid access policy, defaulting to `public`. */
+export function resolveAccessPolicy(value: unknown): RoomAccessPolicy {
+	return ROOM_ACCESS_POLICIES.includes(value as RoomAccessPolicy) ? value as RoomAccessPolicy : 'public';
+}
 
 export interface RoomSummary {
 	id: string;
@@ -39,23 +41,19 @@ export interface RoomData extends RoomSummary {
 	lastUpdate: Date;
 }
 
-export interface RoomCreateRequest extends BaseRequest {
+export interface RoomCreateRequest {
 	game: GameType;
 }
 
-export interface RoomAccessSetRequest extends RoomBaseRequest {
+export interface RoomAccessSetRequest {
 	access: RoomAccessPolicy;
 }
 
-export interface RoomKickRequest extends RoomBaseRequest {
-	playerId: string;
-}
-
-export interface RoomInviteRequest extends RoomBaseRequest {
+export interface RoomInviteRequest {
 	/** PlayFab id of the friend being invited. */
 	friendId: string;
 }
 
-export interface ChatSendRequest extends RoomBaseRequest {
+export interface ChatSendRequest {
 	text: string;
 }

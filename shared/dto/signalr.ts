@@ -8,6 +8,11 @@ export interface NegotiateResponse {
 	accessToken: string;
 }
 
+/** Query-string parameters of the negotiate call — read by the signalRConnectionInfo input binding before the handler runs. */
+export interface NegotiateQuery {
+	userId: string;
+}
+
 /**
  * The contract for every server→client SignalR event. Each event name maps to the exact
  * positional argument tuple that the API broadcasts (via `InnerFunctionNotifier`) and the

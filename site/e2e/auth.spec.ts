@@ -6,10 +6,12 @@ const MOCK_AUTH = {
 };
 
 async function mockApiDefaults(page: Page): Promise<void> {
-	await page.route('**/api/auth/check', route => route.fulfill({ json: MOCK_AUTH }));
+	// GET auth/check returns just the player (the ticket travels in the Authorization header).
+	await page.route('**/api/auth/check', route => route.fulfill({ json: MOCK_AUTH.player }));
 	await page.route('**/api/auth/guestLogin', route => route.fulfill({ json: MOCK_AUTH }));
 	await page.route('**/api/auth/login', route => route.fulfill({ json: MOCK_AUTH }));
-	await page.route('**/api/rooms/list', route => route.fulfill({ json: [] }));
+	// GET rooms (the list endpoint).
+	await page.route('**/api/rooms', route => route.fulfill({ json: [] }));
 	// SignalR negotiate returns empty — prevents connection attempts in tests.
 	await page.route('**/api/signalr/negotiate**', route =>
 		route.fulfill({ json: { url: '', accessToken: '' } }),

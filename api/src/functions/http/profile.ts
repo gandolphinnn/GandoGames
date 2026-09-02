@@ -1,5 +1,6 @@
-import { BaseRequest, IconType, LangCode, ProfileUpdateRequest, ProfileData, Theme } from '@gandogames/shared/dto';
-import { InnerFunction, pfPromise, PlayFabAdmin, PlayFabServer, registerFunction } from '../..';
+import { PlayFabAdmin, PlayFabServer } from 'playfab-sdk';
+import { API, IconType, LangCode, ProfileData, Theme } from '@gandogames/shared/dto';
+import { InnerFunction, pfPromise, registerEndpoint } from '../..';
 
 const DEFAULT_PROFILE_DATA: ProfileData = {
 	theme: 'light',
@@ -19,11 +20,11 @@ async function readProfile(id: string): Promise<ProfileData> {
 	};
 }
 
-const profileGetInner: InnerFunction<BaseRequest, ProfileData> = async (_body, _notifier, player) => {
+const profileGetInner: InnerFunction<typeof API.profile.get> = async (_body, _params, _notifier, player) => {
 	return readProfile(player.id);
 };
 
-const profileUpdateInner: InnerFunction<ProfileUpdateRequest, ProfileData> = async (body, _notifier, player) => {
+const profileUpdateInner: InnerFunction<typeof API.profile.update> = async (body, _params, _notifier, player) => {
 	const data: Record<string, string> = {};
 	if (body.icon) data['icon'] = body.icon;
 	if (body.theme) data['theme'] = body.theme;
@@ -37,12 +38,12 @@ const profileUpdateInner: InnerFunction<ProfileUpdateRequest, ProfileData> = asy
 	return readProfile(player.id);
 };
 
-const profileDeleteInner: InnerFunction<BaseRequest, void> = async (_body, _notifier, player) => {
+const profileDeleteInner: InnerFunction<typeof API.profile.delete> = async (_body, _params, _notifier, player) => {
 	await pfPromise<PlayFabAdminModels.DeletePlayerResult>(
 		cb => PlayFabAdmin.DeletePlayer({ PlayFabId: player.id }, cb),
 	);
 };
 
-registerFunction('profile_get', 'profile/get', profileGetInner);
-registerFunction('profile_update', 'profile/update', profileUpdateInner);
-registerFunction('profile_delete', 'profile/delete', profileDeleteInner);
+registerEndpoint(API.profile.get, profileGetInner);
+registerEndpoint(API.profile.update, profileUpdateInner);
+registerEndpoint(API.profile.delete, profileDeleteInner);

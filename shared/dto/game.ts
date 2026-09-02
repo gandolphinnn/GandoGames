@@ -1,16 +1,16 @@
-import { RoomBaseRequest } from "./room";
-
 export type GameType = 'pankov' | 'poker';
 
 export interface GameState {
 	lastUpdate: Date;
 }
 
-export interface GameBaseRequest extends RoomBaseRequest {
+/** Which game's state to load (the room travels as the `{roomId}` path segment). */
+export interface GameStateRequest {
 	game: GameType,
 }
 
-export interface GameActionRequest extends GameBaseRequest {
+export interface GameActionRequest {
+	game: GameType,
 	action: string,
 	data: any,
 }
@@ -50,7 +50,7 @@ export interface SettingField {
 
 export type GameSettingsSchema = readonly SettingField[];
 
-export interface GameSettingsSetRequest extends GameBaseRequest {
+export interface GameSettingsSetRequest {
 	settings: GameSettings;
 }
 

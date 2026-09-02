@@ -1,8 +1,9 @@
 import { effect, inject, Service } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
-import { BackendService, UserService } from '@gandogames/services';
+import { API, ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
+import { BackendService } from './backend.service';
+import { UserService } from './user.service';
 
 @Service()
 export class SignalRService {
@@ -34,7 +35,7 @@ export class SignalRService {
 		if (this.negotiateCache && now < this.negotiateCache.expiresAt) return this.negotiateCache.response;
 		const user = this.userService.user();
 		if (!user) throw new Error('Not authenticated');
-		const res = await this.backend.post<NegotiateResponse>(`/signalr/negotiate?userId=${encodeURIComponent(user.player.id)}`, { sessionTicket: user.sessionTicket });
+		const res = await this.backend.call(API.signalr.negotiate, { query: { userId: user.player.id } });
 		if (!res.url || !res.accessToken) throw new Error('SignalR negotiate failed');
 		this.negotiateCache = { response: res, expiresAt: now + 30_000 };
 		return res;

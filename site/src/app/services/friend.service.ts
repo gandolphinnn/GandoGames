@@ -1,16 +1,19 @@
 import { computed, effect, inject, Service, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { BaseRequest, Friend, FriendBaseRequest, FriendsListResponse } from '@gandogames/shared/dto';
-import { BackendService, SignalRService, ToastService, UserService } from '@gandogames/services';
+import { API, Friend } from '@gandogames/shared/dto';
+import { BackendService } from './backend.service';
+import { SignalRService } from './signalr.service';
+import { ToastService } from './toast.service';
+import { UserService } from './user.service';
 
 export type FriendRelationship = 'none' | 'incoming' | 'outgoing' | 'accepted';
 
 @Service()
 export class FriendService {
 	private readonly backend = inject(BackendService);
+	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
-	private readonly user = inject(UserService);
 	private readonly translate = inject(TranslateService);
 
 	public readonly friends = signal<Friend[]>([]);
@@ -20,17 +23,13 @@ export class FriendService {
 	/** Count of pending incoming requests, surfaced as a menu badge. */
 	public readonly pendingCount = computed(() => this.incoming().length);
 
-	private get ticket(): string {
-		return this.user.user()!.sessionTicket;
-	}
-
 	/** Id we last loaded friends for, so profile tweaks (which replace the user object) don't re-fetch. */
 	private loadedForUserId: string | null = null;
 
 	constructor() {
 		// Friends are a registered-user feature: load on login, clear on logout / for guests.
 		effect(() => {
-			const user = this.user.user();
+			const user = this.auth.user();
 			const userId = user && user.player.type !== 'guest' ? user.player.id : null;
 			if (userId === this.loadedForUserId) return;
 			this.loadedForUserId = userId;
@@ -60,28 +59,25 @@ export class FriendService {
 	}
 
 	public async loadFriends(): Promise<void> {
-		if (!this.user.user()) return;
-		const request: BaseRequest = { sessionTicket: this.ticket };
-		const result = await this.backend.post<FriendsListResponse>('/friends/list', request);
+		if (!this.auth.user()) return;
+		const result = await this.backend.call(API.friends.list);
 		this.friends.set(result.friends);
 		this.incoming.set(result.incoming);
 		this.outgoing.set(result.outgoing);
 	}
 
 	public async sendRequest(friendId: string): Promise<void> {
-		const request: FriendBaseRequest = { sessionTicket: this.ticket, friendId };
 		// Reload even on failure: a non-atomic two-edge write may have partially committed.
 		try {
-			await this.backend.post<void>('/friends/request', request);
+			await this.backend.call(API.friends.request, { params: { friendId } });
 		} finally {
 			await this.loadFriends();
 		}
 	}
 
 	public async acceptRequest(friendId: string): Promise<void> {
-		const request: FriendBaseRequest = { sessionTicket: this.ticket, friendId };
 		try {
-			await this.backend.post<void>('/friends/accept', request);
+			await this.backend.call(API.friends.accept, { params: { friendId } });
 		} finally {
 			await this.loadFriends();
 		}
@@ -89,9 +85,8 @@ export class FriendService {
 
 	/** Decline an incoming request, cancel an outgoing one, or unfriend an accepted friend. */
 	public async removeFriend(friendId: string): Promise<void> {
-		const request: FriendBaseRequest = { sessionTicket: this.ticket, friendId };
 		try {
-			await this.backend.post<void>('/friends/remove', request);
+			await this.backend.call(API.friends.remove, { params: { friendId } });
 		} finally {
 			await this.loadFriends();
 		}

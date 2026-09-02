@@ -1,13 +1,29 @@
 import { inject, Service } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
+import { AnyEndpoint, EndpointParams, EndpointQuery, EndpointRequest, EndpointResponse, METHODS_WITH_BODY } from '@gandogames/shared/dto';
 import { environment } from '../../environments/environment';
-import { ToastService } from '@gandogames/services';
+import { StorageService } from './storage.service';
+import { ToastService } from './toast.service';
+
+/**
+ * Options for a call, derived from its endpoint definition: `params` is present (and typed)
+ * only when the route template has `{param}` segments, `body` only when the endpoint declares
+ * a request type, `query` only when it declares a query-string type.
+ */
+type CallOptions<E extends AnyEndpoint> =
+	(keyof EndpointParams<E> extends never ? unknown : { params: EndpointParams<E> }) &
+	([EndpointRequest<E>] extends [void] ? unknown : { body: EndpointRequest<E> }) &
+	([EndpointQuery<E>] extends [void] ? unknown : { query: EndpointQuery<E> });
+
+/** `call(endpoint)` when the endpoint needs no input, `call(endpoint, options)` otherwise. */
+type CallArgs<E extends AnyEndpoint> = unknown extends CallOptions<E> ? [] : [CallOptions<E>];
 
 @Service()
 export class BackendService {
 	private readonly http = inject(HttpClient);
 	private readonly toast = inject(ToastService);
+	private readonly storage = inject(StorageService);
 
 	private readonly primaryUrl = environment.apiBaseUrl;
 	private readonly fallbackUrl = environment.apiFallbackUrl;
@@ -19,12 +35,31 @@ export class BackendService {
 		return this.useFallback && this.fallbackUrl ? this.fallbackUrl : this.primaryUrl;
 	}
 
-	public get<T>(url: string): Promise<T> {
-		return this.send(base => this.http.get<T>(base + url));
+	/**
+	 * Execute an API call as described by its endpoint definition (shared/dto/endpoints.ts):
+	 * the HTTP method, the route — with `{param}` segments filled from `options.params` — and
+	 * the request/response types all come from the shared contract. The session ticket, when
+	 * one is stored, rides in the `Authorization: Bearer` header of every request.
+	 */
+	public call<E extends AnyEndpoint>(endpoint: E, ...args: CallArgs<E>): Promise<EndpointResponse<E>> {
+		const options = (args[0] ?? {}) as { params?: Record<string, string>; body?: unknown; query?: Record<string, string> };
+		const url = this.buildUrl(endpoint.path, options.params, options.query);
+		const body = METHODS_WITH_BODY.includes(endpoint.method) ? options.body ?? null : null;
+		return this.send(base => this.http.request<EndpointResponse<E>>(endpoint.method, base + url, {
+			body,
+			headers: this.authHeaders(),
+		}));
 	}
 
-	public post<T>(url: string, body: any): Promise<T> {
-		return this.send(base => this.http.post<T>(base + url, body));
+	private buildUrl(path: string, params?: Record<string, string>, query?: Record<string, string>): string {
+		const resolved = path.replace(/\{(\w+)\}/g, (_, name: string) => encodeURIComponent(params?.[name] ?? ''));
+		const search = new URLSearchParams(query).toString();
+		return `/${resolved}${search ? `?${search}` : ''}`;
+	}
+
+	private authHeaders(): Record<string, string> {
+		const ticket = this.storage.getString('sessionTicket');
+		return ticket ? { Authorization: `Bearer ${ticket}` } : {};
 	}
 
 	private async send<T>(request: (base: string) => Observable<T>): Promise<T> {

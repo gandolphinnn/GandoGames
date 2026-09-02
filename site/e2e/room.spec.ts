@@ -22,8 +22,10 @@ async function loginAs(page: Page, rooms: object[] = []): Promise<void> {
 		localStorage.setItem('gg_session_ticket', ticket);
 	}, MOCK_AUTH.sessionTicket);
 
-	await page.route('**/api/auth/check', route => route.fulfill({ json: MOCK_AUTH }));
-	await page.route('**/api/rooms/list', route => route.fulfill({ json: rooms }));
+	// GET auth/check returns just the player (the ticket travels in the Authorization header).
+	await page.route('**/api/auth/check', route => route.fulfill({ json: MOCK_AUTH.player }));
+	// GET rooms (the list endpoint).
+	await page.route('**/api/rooms', route => route.fulfill({ json: rooms }));
 	await page.route('**/api/signalr/negotiate**', route =>
 		route.fulfill({ json: { url: '', accessToken: '' } }),
 	);
@@ -37,10 +39,10 @@ test.describe('Room list (/play)', () => {
 		await expect(page).toHaveURL(/\/play/, { timeout: 10_000 });
 	});
 
-	test('calls /rooms/list API on page load', async ({ page }) => {
+	test('calls GET /rooms on page load', async ({ page }) => {
 		let listCalled = false;
 		await loginAs(page, [MOCK_ROOM]);
-		await page.route('**/api/rooms/list', route => {
+		await page.route('**/api/rooms', route => {
 			listCalled = true;
 			return route.fulfill({ json: [MOCK_ROOM] });
 		});
@@ -58,16 +60,20 @@ test.describe('Room list (/play)', () => {
 });
 
 test.describe('Room creation', () => {
-	test('POST /rooms/create is called when create button is clicked', async ({ page }) => {
+	test('POST /rooms is called when create button is clicked', async ({ page }) => {
 		let createCalled = false;
 		await loginAs(page, []);
-		await page.route('**/api/rooms/create', route => {
-			createCalled = true;
-			return route.fulfill({ json: MOCK_ROOM });
+		// List and create share the /rooms route; the HTTP method tells them apart.
+		await page.route('**/api/rooms', route => {
+			if (route.request().method() === 'POST') {
+				createCalled = true;
+				return route.fulfill({ json: MOCK_ROOM });
+			}
+			return route.fulfill({ json: [] });
 		});
-		// Room detail also fetches the room state
-		await page.route('**/api/rooms/get', route => route.fulfill({ json: MOCK_ROOM }));
-		await page.route('**/api/game/state', route => route.fulfill({ json: null }));
+		// Room detail also fetches the room and its game state (a QUERY read).
+		await page.route(`**/api/rooms/${MOCK_ROOM.id}`, route => route.fulfill({ json: MOCK_ROOM }));
+		await page.route('**/api/rooms/*/game/state', route => route.fulfill({ json: null }));
 
 		await page.goto('/play');
 		// Look for a create / new room button
@@ -93,11 +99,11 @@ test.describe('Two-player lobby (multiplayer context)', () => {
 
 		for (const [p, auth] of [[page1, auth1], [page2, auth2]] as const) {
 			await p.addInitScript((ticket: string) => localStorage.setItem('gg_session_ticket', ticket), auth.sessionTicket);
-			await p.route('**/api/auth/check', r => r.fulfill({ json: auth }));
-			await p.route('**/api/rooms/list', r => r.fulfill({ json: [room] }));
-			await p.route('**/api/rooms/get', r => r.fulfill({ json: room }));
+			await p.route('**/api/auth/check', r => r.fulfill({ json: auth.player }));
+			await p.route('**/api/rooms', r => r.fulfill({ json: [room] }));
+			await p.route(`**/api/rooms/${room.id}`, r => r.fulfill({ json: room }));
 			await p.route('**/api/signalr/negotiate**', r => r.fulfill({ json: { url: '', accessToken: '' } }));
-			await p.route('**/api/game/state', r => r.fulfill({ json: null }));
+			await p.route('**/api/rooms/*/game/state', r => r.fulfill({ json: null }));
 		}
 
 		await page1.goto('/play');

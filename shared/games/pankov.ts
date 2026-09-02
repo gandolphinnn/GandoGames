@@ -25,21 +25,27 @@ export interface PankovSettings {
 	suddenDeath: boolean;
 }
 
+export interface PankovTurn {
+	playerIndex: number,
+	declaration: RollValue,
+	/** The roll that was beaten by the current declaration. Null if this is the first declaration of the turn. */
+	beatedRoll: RollValue | null,
+	/** Hidden: actual roll of the previous declarer. Always null in public state. */
+	actualRoll: RollValue | null,
+}
+
 export interface PankovGameState extends GameState {
 	gamePhase: 'turn-start' | 'rolled' | 'result' | 'game-over',
 	players: PankovPlayer[],
 	currentPlayerIndex: number,
-	previousPlayerIndex: number | null,
-	previousDeclaration: RollValue | null,
-	/** Hidden: actual roll of the previous declarer. Always null in public state. */
-	previousActualRoll: RollValue | null,
+	previousTurn: PankovTurn | null,
 	/** Hidden: current player's roll. Null for all other players. */
 	currentRoll: RollValue | null,
 	settings: PankovSettings,
 	/** Count of consecutive Pankov (21) declarations in the current run; drives sudden-death stakes. */
 	pankovStreak: number,
-	winnerName?: string,
 	revealResult?: RevealResult,
+	winnerName?: string,
 }
 
 export const INITIAL_LIVES = 8;
@@ -71,8 +77,16 @@ export function getRank(value: number): number {
 	return RANK_MAP.get(value) ?? -1;
 }
 
+/** Get all valid declarations exluding the ones below the declaration to beat */
+export function getValidDeclarations(previousDeclaration: RollValue | null): RollValue[] {
+	const minRank = previousDeclaration? getRank(previousDeclaration) : 0;
+	return (ROLL_VALUES as readonly RollValue[]).filter(v => getRank(v) >= minRank);
+}
+
 /** Combine two dice into the canonical roll value (higher die first). */
-export function rollToValue(d1: number, d2: number): RollValue {
+export function rollPankovDices(): RollValue {
+	const d1 = Math.ceil(Math.random() * 6);
+	const d2 = Math.ceil(Math.random() * 6);
 	const high = Math.max(d1, d2);
 	const low = Math.min(d1, d2);
 	return (high * 10 + low) as RollValue;
@@ -85,4 +99,29 @@ export function formatValue(value: RollValue): string {
 	const low = value % 10;
 	if (high === low) return `Pair of ${high}s`;
 	return `${high}-${low}`;
+}
+
+/**
+ * The probability of rolling a specific declared value, given the previous declaration to beat.
+ */
+export function successProbability(roll: RollValue, toBeat: RollValue): number {
+	const previousIndex = ROLL_VALUES.indexOf(toBeat);
+
+	// Probabilità di ottenere ogni valore
+	// 2/36 per i valori normali, 1/36 per le coppie
+	const probabilityOf = (value: RollValue): number => {
+		const isPair = value >= 11 && value % 11 === 0;
+		return isPair? 1/36 : 2/36;
+	};
+
+	// Probabilità di ottenere un tiro >= previous
+	const probabilityOfBeatingPrevious =
+		ROLL_VALUES
+		.slice(previousIndex)
+		.reduce((sum, value) => sum + probabilityOf(value), 0);
+
+	// Probabilità di ottenere esattamente declared
+	const probabilityOfDeclared = probabilityOf(roll);
+
+	return probabilityOfDeclared / probabilityOfBeatingPrevious;
 }

@@ -3,13 +3,13 @@ import { signal, computed } from '@angular/core';
 import { Subject } from 'rxjs';
 import { RoomService } from '../room.service';
 import { BackendService } from '../backend.service';
-import { AuthUser, UserService } from '../user.service';
+import { UserService } from '../user.service';
 import { SignalRService } from '../signalr.service';
 import { API } from '@gandogames/shared/dto';
-import type { GamePlayer, RoomData } from '@gandogames/shared/dto';
+import type { AuthResponse, GamePlayer, RoomData } from '@gandogames/shared/dto';
 
 function makePlayer(id: string, name: string): GamePlayer {
-	return { id, name, icon: 'profile', theme: 'dark', language: 'en', isGuest: false };
+	return { id, name, icon: 'profile', theme: 'dark', language: 'en', type: 'user', role: '' };
 }
 
 function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
@@ -27,10 +27,9 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 	};
 }
 
-const MOCK_USER: AuthUser = {
+const MOCK_USER: AuthResponse = {
 	sessionTicket: 'ticket-abc',
 	player: makePlayer('player-1', 'Alice'),
-	isGuest: false,
 };
 
 // jasmine derives a generic method's spy signature from its widest instantiation, where call()'s
@@ -48,7 +47,7 @@ describe('RoomService', () => {
 		roomUpsert$ = new Subject<RoomData>();
 		roomDeleted$ = new Subject<string>();
 
-		const userSignal = signal<AuthUser | null>(MOCK_USER);
+		const userSignal = signal<AuthResponse | null>(MOCK_USER);
 		const mockAuth = {
 			user: userSignal.asReadonly(),
 			isLoggedIn: computed(() => userSignal() !== null),

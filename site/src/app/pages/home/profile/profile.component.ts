@@ -5,7 +5,7 @@ import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutl
 import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, ViewDidLeave, } from '@ionic/angular/standalone';
 import { GamePlayer, IconType, LangCode, LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/shared/dto';
 import { ION_IMPORTS } from '@gandogames/lib/ion-imports';
-import { AuthUser, UserService, ToastService, UrlService } from '@gandogames/services';
+import { UserService, ToastService, UrlService } from '@gandogames/services';
 import { PlayerAvatarComponent } from '@gandogames/components';
 
 @Component({
@@ -24,7 +24,7 @@ export class ProfileComponent implements ViewDidLeave {
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
-	public readonly user: Signal<AuthUser | null> = this.userService.user;
+	public readonly user = this.userService.user;
 	/** The player with the pending preview applied — everything on this page renders from it. */
 	public readonly player = this.userService.previewedPlayer;
 	public readonly hasPendingChanges = this.userService.hasPendingChanges;
@@ -34,10 +34,6 @@ export class ProfileComponent implements ViewDidLeave {
 
 	public readonly icons: PlayerIcon[] = PLAYER_ICONS.filter(i => !i.reserved);
 	public readonly languages = LANGUAGES;
-
-	constructor() {
-		addIcons({ contrastOutline, sunnyOutline, moonOutline, languageOutline, logOutOutline, trashOutline });
-	}
 
 	/** Leaving the page drops any unsaved preview, restoring the saved settings. */
 	public ionViewDidLeave(): void {

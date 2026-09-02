@@ -23,13 +23,20 @@
 					routerLinkActive="selected">
 					<gg-player-avatar slot="start" [player]="u.player" />
 					<ion-label>{{ u.player.name }}</ion-label>
-					@if (u.isGuest) {
+					@if (u.player.type === 'guest') {
 						<span slot="end" class="menu-user-badge">{{ 'COMMON.GUEST' | translate }}</span>
 					}
 					<!-- <ion-icon name="chevron-forward" slot="end" class="menu-user-chevron" /> -->
 				</ion-item>
 			}
 
+			@if (isAdmin()) {
+				<ion-item routerDirection="root" routerLink="/admin" detail="false" routerLinkActive="selected"
+					[routerLinkActiveOptions]="{ exact: true }">
+					<ion-icon name="flash" slot="start" />
+					<ion-label>{{ 'MENU.ADMIN' | translate }}</ion-label>
+				</ion-item>
+			}
 			<ion-item routerDirection="root" routerLink="/play" detail="false" routerLinkActive="selected"
 				[routerLinkActiveOptions]="{ exact: true }">
 				<ion-icon name="game-controller" slot="start" />

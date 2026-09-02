@@ -23,7 +23,6 @@ const REVEAL_DELAY_MS = 2000;
 export class PokerGameComponent implements GameComponent<PokerGameState> {
 	public readonly gameState = input.required<PokerGameState | null>();
 	public readonly loading = input.required<boolean>();
-	public readonly error = input.required<string | null>();
 	public readonly myPlayFabId = input.required<string | null>();
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
 	public readonly playAgain = output<void>();
@@ -186,6 +185,12 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		if (!gs || !me || me.folded || me.cards.length < 2 || !this.boardRevealed()) return null;
 		return describeHand(evaluateHand([...me.cards, ...gs.communityCards]));
 	});
+	
+	protected readonly someoneAllIn = computed<boolean>(() => {
+		const gs = this.gameState();
+		if (!gs) return false;
+		return gs.players.some(p => !p.folded && p.isAllIn);
+	});
 
 	/**
 	 * Tabled contenders in an all-in showdown — the only situation win % is shown. Empty unless the hand
@@ -278,7 +283,13 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	protected fold(): void { this.gameAction.emit({ action: 'fold' }); }
 	protected check(): void { this.gameAction.emit({ action: 'check' }); }
 	protected call(): void { this.gameAction.emit({ action: 'call' }); }
-	protected raise(amount: number): void { this.gameAction.emit({ action: 'raise', data: { amount } }); }
+	protected raise(amount: number): void {
+		const me = this.myPlayer();
+		if (!me || me.chips <= 0 || amount < this.minRaise()) return;
+		if (amount < me.chips) return this.gameAction.emit({ action: 'raise', data: { amount } });
+		// If the raise amount is equal to or greater than my chips, treat it as an all-in.
+		this.allIn();
+	}
 	protected nextHand(): void { this.gameAction.emit({ action: 'next-hand' }); }
 
 	protected async allIn(): Promise<void> {

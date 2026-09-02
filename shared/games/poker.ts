@@ -57,12 +57,11 @@ export const STARTING_CHIPS = 500;
 export const MIN_RAISE = 20;
 
 /** Default schedule: a single terminal level at the base big blind — i.e. blinds never escalate. */
-export const DEFAULT_BLIND_LEVELS: BlindLevel[] = [{ bigBlind: MIN_RAISE, durationMinutes: 0 }];
+export const DEFAULT_BLIND_LEVELS: BlindLevel[] = [{ bigBlind: MIN_RAISE, durationMinutes: 10 }, { bigBlind: MIN_RAISE * 2, durationMinutes: 0 }];
 
 export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
 	{ key: 'startingChips', type: 'number', label: 'Player pot', default: STARTING_CHIPS, min: 100, max: 100000, step: 100, hint: 'Starting chips per player.' },
 	{ key: 'blindLevels', type: 'blind-levels', label: 'Blind levels', default: DEFAULT_BLIND_LEVELS, min: 10, max: 5000, step: 10, hint: 'Big blind schedule; small blind is half. The last level runs to the end.' },
-	{ key: 'smallerDeck', type: 'toggle', label: 'Smaller deck', default: false, hint: 'The lowest card is (11 - players)<br>Fewer players ⇒ Lowest card is higher.' },
 ];
 
 /** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */

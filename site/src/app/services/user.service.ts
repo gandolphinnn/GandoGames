@@ -1,22 +1,19 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Service, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { API, AuthResponse, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { StorageService } from './storage.service';
+import { API, AuthResponse, GamePlayer, GuestLoginRequest, LANGUAGES, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest, Theme } from '@gandogames/shared/dto';
+import { BackendService, StorageService } from '@gandogames/services';
 
-export interface AuthUser extends AuthResponse {
-	isGuest: boolean;
-}
-
-@Injectable({ providedIn: 'root' })
+@Service()
 export class UserService {
 	private readonly backend = inject(BackendService);
 	private readonly storage = inject(StorageService);
 	private readonly translate = inject(TranslateService);
 
-	private readonly _user = signal<AuthUser | null>(null);
+	private readonly _user = signal<AuthResponse | null>(null);
 	public readonly user = this._user.asReadonly();
 	public readonly isLoggedIn = computed(() => this._user() !== null);
+	public readonly role = computed(() => this.user()?.player.role ?? '');
+	public readonly isAdmin = computed(() => this.role() === 'admin');
 
 	/**
 	 * Uncommitted profile changes (theme/language/icon), applied app-wide as a live
@@ -28,6 +25,7 @@ export class UserService {
 	public readonly theme = computed(() => this._preview()?.theme ?? this.user()?.player.theme ?? 'dark');
 	public readonly isDarkTheme = computed(() => this.theme() !== 'light');
 	public readonly language = computed(() => this._preview()?.language ?? this.user()?.player.language ?? 'en');
+	public readonly locale = computed(() => LANGUAGES.find(l => l.value === this.language())?.locale ?? 'en-US');
 
 	/** The player as it looks with the pending preview applied — what the profile UI renders. */
 	public readonly previewedPlayer = computed<GamePlayer | null>(() => {
@@ -141,9 +139,8 @@ export class UserService {
 	private setSession(response: AuthResponse): void {
 		// player.isGuest is the server's authoritative guest flag; derive AuthUser.isGuest from it
 		// so the two never diverge (e.g. a guest restored via /auth/check stays a guest).
-		const user: AuthUser = { ...response, isGuest: response.player.isGuest ?? false };
-		this._user.set(user);
-		this.storage.setString('sessionTicket', user.sessionTicket);
+		this._user.set(response);
+		this.storage.setString('sessionTicket', response.sessionTicket);
 	}
 
 	private applyThemeToDom(theme: Theme): void {

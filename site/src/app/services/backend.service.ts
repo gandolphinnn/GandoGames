@@ -1,10 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Service } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 import { AnyEndpoint, EndpointParams, EndpointQuery, EndpointRequest, EndpointResponse, METHODS_WITH_BODY } from '@gandogames/shared/dto';
 import { environment } from '../../environments/environment';
 import { StorageService } from './storage.service';
-import { ToastService } from './toast.service';
+import { ToastService } from '@gandogames/services';
 
 /**
  * Options for a call, derived from its endpoint definition: `params` is present (and typed)
@@ -19,9 +19,7 @@ type CallOptions<E extends AnyEndpoint> =
 /** `call(endpoint)` when the endpoint needs no input, `call(endpoint, options)` otherwise. */
 type CallArgs<E extends AnyEndpoint> = unknown extends CallOptions<E> ? [] : [CallOptions<E>];
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class BackendService {
 	private readonly http = inject(HttpClient);
 	private readonly toast = inject(ToastService);

@@ -1,4 +1,4 @@
-import { API, RoomData, resolveAccessPolicy } from '@gandogames/shared/dto';
+import { API, RoomData, buildBot } from '@gandogames/shared/dto';
 import { Game, GAMES_CONFIG } from '../../games';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
 import { areFriends } from './friends';
@@ -145,7 +145,7 @@ const roomAccessSetInner: InnerFunction<typeof API.rooms.setAccess> = async (bod
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
 	if (room.phase !== 'waiting') throw new Error('Cannot change access after the game has started');
 
-	room.access = resolveAccessPolicy(body.access);
+	room.access = body.access;
 	await PlayfabCtx.rooms.upsert(params.roomId, room);
 	notifier.roomUpsert(room);
 	return room;
@@ -188,6 +188,25 @@ const roomInviteInner: InnerFunction<typeof API.rooms.invite> = async (body, par
 	}
 
 	notifier.roomInviteForPlayer(body.friendId, params.roomId, room.game);
+};
+
+const roomAddBotInner: InnerFunction<RoomBaseRequest, RoomData> = async (body, notifier, player) => {
+	const room = await PlayfabCtx.rooms.get(body.roomId);
+	if (room == null) throw new Error('Room not found');
+	if (room.hostId !== player.id) throw new Error('Only the host can add bots');
+	if (room.phase !== 'waiting') throw new Error('Cannot add bots after game has started');
+	const gameConfig = GAMES_CONFIG[room.game];
+	if (!gameConfig.supportsBots) throw new Error('Bots are not supported in this game');
+	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
+
+	const botsInRoom = room.players.filter(p => p.type === 'bot').length;
+	const id = Math.random().toString(36).substring(2, 8).toUpperCase();
+	const bot = buildBot(id, `Bot ${botsInRoom + 1}`);
+	room.players.push(bot);
+	await PlayfabCtx.rooms.upsert(body.roomId, room);
+
+	notifier.roomUpsert(room);
+	return room;
 };
 
 const roomDeleteInner: InnerFunction<typeof API.rooms.delete> = async (_body, params, notifier, player) => {

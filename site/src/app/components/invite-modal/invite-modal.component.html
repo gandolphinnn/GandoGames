@@ -61,4 +61,12 @@
 		}
 	</div>
 
+	@if (gameInfo()?.supportsBots) {
+		<div class="modal-footer">
+			<ion-button [disabled]="loading()" (click)="addBot()">
+				<!-- <i class="fas fa-robot"></i> -->
+				{{ 'INVITE_MODAL.ADD_BOT' | translate }}
+			</ion-button>
+		</div>
+	}
 </div>

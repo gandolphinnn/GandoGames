@@ -1,5 +1,7 @@
 import { API, AuthResponse, IconType, LangCode, Theme } from '@gandogames/shared/dto';
 import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerEndpoint, registerPublicEndpoint } from '../..';
+import { AuthResponse, BaseRequest, GuestLoginRequest, IconType, LangCode, LoginRequest, PlayerRole, RegisterRequest, Theme } from '@gandogames/shared/dto';
+import { InnerFunction, InnerPublicFunction, pfPromise, PlayFabClient, PlayFabServer, registerFunction, registerPublicFunction } from '../..';
 
 type LoginLike = {
 	PlayFabId?: string;
@@ -14,7 +16,7 @@ const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParam
 	GetTitleData: false,
 	GetUserAccountInfo: true,
 	GetUserData: true,
-	UserDataKeys: ['icon', 'theme', 'language'],
+	UserDataKeys: ['icon', 'theme', 'language', 'role'],
 	GetUserInventory: false,
 	GetUserReadOnlyData: false,
 	GetUserVirtualCurrency: false,
@@ -29,10 +31,11 @@ const toAuthResponse = (
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
-		isGuest,
+		type: isGuest ? 'guest' : 'user',
 		icon: (userData?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (userData?.['theme']?.Value as Theme) ?? 'dark',
 		language: (userData?.['language']?.Value as LangCode) ?? 'en',
+		role: (userData?.['role']?.Value as PlayerRole) ?? '',
 	},
 	sessionTicket: response.SessionTicket!,
 });

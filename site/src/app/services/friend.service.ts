@@ -1,19 +1,16 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Service, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { API, Friend } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { SignalRService } from './signalr.service';
-import { ToastService } from './toast.service';
-import { UserService } from './user.service';
+import { BackendService, SignalRService, ToastService, UserService } from '@gandogames/services';
 
 export type FriendRelationship = 'none' | 'incoming' | 'outgoing' | 'accepted';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FriendService {
 	private readonly backend = inject(BackendService);
-	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 	private readonly toast = inject(ToastService);
+	private readonly user = inject(UserService);
 	private readonly translate = inject(TranslateService);
 
 	public readonly friends = signal<Friend[]>([]);
@@ -23,14 +20,18 @@ export class FriendService {
 	/** Count of pending incoming requests, surfaced as a menu badge. */
 	public readonly pendingCount = computed(() => this.incoming().length);
 
+	private get ticket(): string {
+		return this.user.user()!.sessionTicket;
+	}
+
 	/** Id we last loaded friends for, so profile tweaks (which replace the user object) don't re-fetch. */
 	private loadedForUserId: string | null = null;
 
 	constructor() {
 		// Friends are a registered-user feature: load on login, clear on logout / for guests.
 		effect(() => {
-			const user = this.auth.user();
-			const userId = user && !user.isGuest ? user.player.id : null;
+			const user = this.user.user();
+			const userId = user && user.player.type !== 'guest' ? user.player.id : null;
 			if (userId === this.loadedForUserId) return;
 			this.loadedForUserId = userId;
 			if (userId) void this.loadFriends();

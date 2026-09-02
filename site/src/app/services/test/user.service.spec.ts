@@ -16,7 +16,7 @@ const MOCK_RESPONSE: AuthResponse = {
 
 const MOCK_GUEST_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
-	player: { id: 'guest-1', name: 'Guest123456', isGuest: true, icon: 'profile', theme: 'dark', language: 'en' },
+	player: { id: 'guest-1', name: 'Guest123456', type: 'guest', icon: 'profile', theme: 'dark', language: 'en', role: '' },
 };
 
 // jasmine derives a generic method's spy signature from its widest instantiation, where call()'s
@@ -67,7 +67,7 @@ describe('UserService', () => {
 			await service.login('alice@example.com', 'pw');
 			expect(backendSpy.call).toHaveBeenCalledWith(API.auth.login, { body: { email: 'alice@example.com', password: 'pw' } });
 			expect(service.user()?.sessionTicket).toBe('ticket-123');
-			expect(service.user()?.isGuest).toBeFalse();
+			expect(service.user()?.player.type).toBe('user');
 			expect(service.isLoggedIn()).toBeTrue();
 		});
 
@@ -88,7 +88,7 @@ describe('UserService', () => {
 		it('loginAsGuest() sets user with isGuest true and persists ticket', async () => {
 			backendSpy.call.and.returnValue(Promise.resolve(MOCK_GUEST_RESPONSE));
 			await service.loginAsGuest();
-			expect(service.user()?.isGuest).toBeTrue();
+			expect(service.user()?.player.type).toBe('guest');
 			expect(localStorage.getItem('gg_session_ticket')).toBe('ticket-123');
 		});
 

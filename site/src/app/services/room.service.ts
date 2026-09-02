@@ -1,19 +1,18 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameStateRequest, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { SignalRService } from './signalr.service';
-import { UserService } from './user.service';
+import { BackendService, SignalRService, UrlService, UserService } from '@gandogames/services';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class RoomService {
 	private readonly backend = inject(BackendService);
-	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
+	private readonly url = inject(UrlService);
+	private readonly user = inject(UserService);
 
 	public readonly rooms = signal<RoomSummary[]>([]);
 
 	public readonly myRooms = computed(() => {
-		const userId = this.auth.user()?.player.id;
+		const userId = this.user.user()?.player.id;
 		if (!userId) return [];
 		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
@@ -23,13 +22,17 @@ export class RoomService {
 	 *  (link/closed), which are reachable only by code or invite. The cache can receive an unlisted
 	 *  room via the global roomUpsert broadcast, so we filter here too, not just on the server list. */
 	public readonly browsableRooms = computed(() => {
-		const userId = this.auth.user()?.player.id;
+		const userId = this.user.user()?.player.id;
 		return this.rooms().filter(r => {
 			const access = r.access ?? 'public';
 			const notInRoom = !userId || !r.players.some(p => p.id === userId);
 			return notInRoom && (access === 'public' || access === 'friends');
 		});
 	});
+
+	private get ticket(): string {
+		return this.user.user()!.sessionTicket;
+	}
 
 	private upsertIntoCache(room: RoomData): void {
 		this.rooms.update(rooms => {
@@ -92,8 +95,9 @@ export class RoomService {
 		return this.backend.call(API.rooms.kick, { params: { roomId, playerId } });
 	}
 
-	public leaveRoom(roomId: string): Promise<void> {
-		return this.backend.call(API.rooms.leave, { params: { roomId } });
+	public async leaveRoom(roomId: string): Promise<void> {
+		await this.backend.call(API.rooms.leave, { params: { roomId } });
+		void this.url.get('play').navigate();
 	}
 
 	public deleteRoom(roomId: string): Promise<void> {
@@ -103,6 +107,11 @@ export class RoomService {
 	public invitePlayer(roomId: string, friendId: string): Promise<void> {
 		const request: RoomInviteRequest = { friendId };
 		return this.backend.call(API.rooms.invite, { params: { roomId }, body: request });
+	}
+
+	public addBot(roomId: string): Promise<void> {
+		const request: RoomBaseRequest = { sessionTicket: this.ticket, roomId };
+		return this.backend.post<void>('/rooms/add-bot', request);
 	}
 
 	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {

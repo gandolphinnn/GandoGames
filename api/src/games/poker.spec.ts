@@ -1,12 +1,11 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
-import { resolveSettings } from '@gandogames/shared/dto';
+import { buildPlayer, resolveSettings } from '@gandogames/shared/dto';
 import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
-
-const player = (id: string, name: string): GamePlayer => ({ id, name, isGuest: false, icon: 'profile', theme: 'dark', language: 'en' });
+const DEFAULT_BLINDS = [{ bigBlind: 20, durationMinutes: 10 }, { bigBlind: 40, durationMinutes: 0 }]
 
 describe('evaluateHand', () => {
 	it('detects a royal flush', () => {
@@ -59,7 +58,7 @@ describe('PokerGame all-in', () => {
 		// 3 players (avoids the heads-up special case). Default settings → 500 chips, BB=20, SB=10.
 		// Dealer=p1, SB=p2 (10), BB=p3 (20), so UTG p1 is first to act with currentBet=20 and pot=30.
 		game = new PokerGame();
-		game.initialize([player('p1', 'Alice'), player('p2', 'Bob'), player('p3', 'Charlie')]);
+		game.initialize([buildPlayer('p1', 'Alice'), buildPlayer('p2', 'Bob'), buildPlayer('p3', 'Charlie')]);
 	});
 
 	it('pushes the whole stack in and, when over the bet, raises to that amount', () => {
@@ -94,9 +93,9 @@ describe('PokerGame all-in', () => {
 
 describe('PokerGame getPublicState (hole-card visibility)', () => {
 	let game: PokerGame;
-	const p1 = player('p1', 'Alice');
-	const p2 = player('p2', 'Bob');
-	const p3 = player('p3', 'Charlie');
+	const p1 = buildPlayer('p1', 'Alice');
+	const p2 = buildPlayer('p2', 'Bob');
+	const p3 = buildPlayer('p3', 'Charlie');
 
 	beforeEach(() => {
 		game = new PokerGame();
@@ -132,14 +131,14 @@ describe('PokerGame getPublicState (hole-card visibility)', () => {
 });
 
 describe('PokerGame settings', () => {
-	const p1 = player('p1', 'Alice');
-	const p2 = player('p2', 'Bob');
-	const p3 = player('p3', 'Charlie');
+	const p1 = buildPlayer('p1', 'Alice');
+	const p2 = buildPlayer('p2', 'Bob');
+	const p3 = buildPlayer('p3', 'Charlie');
 
 	it('seeds stacks from startingChips and blinds from the first blind level', () => {
 		const game = new PokerGame();
 		// Dealer=p1, SB=p2, BB=p3. Big blind = first level (200), small blind = half (100).
-		game.initialize([p1, p2, p3], { startingChips: 5000, blindLevels: [{ bigBlind: 200, durationMinutes: 0 }], smallerDeck: false });
+		game.initialize([p1, p2, p3], { startingChips: 5000, blindLevels: [{ bigBlind: 200, durationMinutes: 0 }]});
 		const sb = game.state!.players.find(p => p.id === 'p2')!;
 		const bb = game.state!.players.find(p => p.id === 'p3')!;
 		const utg = game.state!.players.find(p => p.id === 'p1')!;
@@ -152,16 +151,6 @@ describe('PokerGame settings', () => {
 		expect(game.state!.pot).toBe(300);
 		expect(game.state!.blindLevel).toBe(0);
 		expect(game.state!.bigBlind).toBe(200);
-	});
-
-	it('scales the short deck to the table size — a 3-handed table starts at the 8 (11 - 3)', () => {
-		const game = new PokerGame();
-		game.initialize([p1, p2, p3], { startingChips: 1000, blindLevels: [{ bigBlind: 100, durationMinutes: 0 }], smallerDeck: true });
-		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
-		expect(game.state!.deck.length + dealt).toBe(28); // ranks 8..A = 7 ranks × 4 suits
-		const all = [...game.state!.deck, ...game.state!.players.flatMap(p => p.cards)];
-		expect(all.some(card => ['2', '3', '4', '5', '6', '7'].includes(card.rank))).toBe(false);
-		expect(all.some(card => card.rank === '8')).toBe(true);
 	});
 
 	it('defaults to a 52-card deck and 500 chips when no settings are given', () => {
@@ -177,20 +166,14 @@ describe('resolveSettings', () => {
 	it('fills defaults for missing keys', () => {
 		const s = resolveSettings(POKER_SETTINGS_SCHEMA, {});
 		expect(s['startingChips']).toBe(500);
-		expect(s['blindLevels']).toEqual([{ bigBlind: 20, durationMinutes: 0 }]);
-		expect(s['smallerDeck']).toBe(false);
-		expect(Object.keys(s).sort()).toEqual(['blindLevels', 'smallerDeck', 'startingChips']);
+		expect(s['blindLevels']).toEqual(DEFAULT_BLINDS);
+		expect(Object.keys(s).sort()).toEqual(['blindLevels', 'startingChips']);
 	});
 
 	it('clamps numbers into range and drops unknown keys', () => {
 		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { startingChips: 9_999_999, bogus: 5 });
 		expect(s['startingChips']).toBe(100000); // clamped to max
 		expect('bogus' in s).toBe(false);        // unknown key dropped
-	});
-
-	it('coerces toggles to booleans', () => {
-		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { smallerDeck: true });
-		expect(s['smallerDeck']).toBe(true);
 	});
 
 	it('normalizes a blind-levels schedule: clamps big blinds, forces whole-minute durations, and makes the last level unlimited', () => {
@@ -210,7 +193,7 @@ describe('resolveSettings', () => {
 
 	it('falls back to the default schedule when blind-levels is missing or empty', () => {
 		expect(resolveSettings(POKER_SETTINGS_SCHEMA, { blindLevels: [] })['blindLevels'])
-			.toEqual([{ bigBlind: 20, durationMinutes: 0 }]);
+			.toEqual(DEFAULT_BLINDS);
 	});
 });
 

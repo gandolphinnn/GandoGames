@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 import { IonButton } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { PankovGameState, type PankovPlayer, getRank, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue } from '@gandogames/shared/pankov';
+import { PankovGameState, type PankovPlayer, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue, getValidDeclarations } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
@@ -18,7 +18,6 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 
 	public readonly gameState = input.required<PankovGameState | null>();
 	public readonly loading = input.required<boolean>();
-	public readonly error = input.required<string | null>();
 	public readonly myPlayFabId = input.required<string | null>();
 	public readonly gameAction = output<{ action: string; data?: unknown }>();
 	public readonly playAgain = output<void>();
@@ -47,7 +46,7 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	protected readonly challengeStake = computed(() => {
 		const gs = this.gameState();
 		if (!gs || !gs.settings.suddenDeath) return 1;
-		if (gs.previousDeclaration !== PANKOV_VALUE || gs.pankovStreak < 1) return 1;
+		if (gs.previousTurn?.declaration !== PANKOV_VALUE || gs.pankovStreak < 1) return 1;
 		return Math.pow(2, gs.pankovStreak - 1);
 	});
 
@@ -76,8 +75,8 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 
 	protected readonly previousPlayer = computed(() => {
 		const gs = this.gameState();
-		if (!gs || gs.previousPlayerIndex === null) return null;
-		return gs.players[gs.previousPlayerIndex] ?? null;
+		if (!gs || gs.previousTurn === null) return null;
+		return gs.players[gs.previousTurn.playerIndex] ?? null;
 	});
 
 	protected readonly isMyTurn = computed(() => this.currentPlayer()?.id === this.myPlayFabId());
@@ -85,8 +84,7 @@ export class PankovGameComponent implements GameComponent<PankovGameState> {
 	protected readonly validDeclarations = computed((): RollValue[] => {
 		const gs = this.gameState();
 		if (!gs) return [];
-		const minRank = gs.previousDeclaration !== null ? getRank(gs.previousDeclaration) : 0;
-		return (ROLL_VALUES as readonly RollValue[]).filter(v => getRank(v) >= minRank);
+		return getValidDeclarations(gs.previousTurn?.declaration || null);
 	});
 
 	protected readonly canRoll = computed(() => this.validDeclarations().length > 0);

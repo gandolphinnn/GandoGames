@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { API } from '@gandogames/shared/dto';
 import { BackendService } from '../backend.service';
@@ -24,7 +24,7 @@ describe('BackendService', () => {
 			providers: [
 				BackendService,
 				StorageService,
-				provideHttpClient(),
+				provideHttpClient(withXhr()),
 				provideHttpClientTesting(),
 				{ provide: ToastService, useValue: toastSpy },
 			],

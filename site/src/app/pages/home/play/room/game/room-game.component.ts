@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, i
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GameState, GameType } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { SignalRService, RoomService, UserService, UrlService } from '@gandogames/services';
+import { SignalRService, RoomService, UserService, UrlService, ToastService } from '@gandogames/services';
 
 @Component({
 	selector: 'gg-room-game',
@@ -23,10 +23,10 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	private readonly auth = inject(UserService);
 	private readonly urlService = inject(UrlService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly toast = inject(ToastService);
 
 	private readonly gameState = signal<GameState | null>(null);
 	private readonly loading = signal(false);
-	private readonly error = signal<string | null>(null);
 	private readonly myPlayFabId = computed(() => this.auth.user()?.player.id ?? null);
 	private readonly gameRef = signal<ComponentRef<unknown> | null>(null);
 
@@ -36,7 +36,6 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 			if (!ref) return;
 			ref.setInput('gameState', this.gameState());
 			ref.setInput('loading', this.loading());
-			ref.setInput('error', this.error());
 			ref.setInput('myPlayFabId', this.myPlayFabId());
 		});
 	}
@@ -76,11 +75,10 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 
 	private async sendAction(action: string, data?: unknown): Promise<void> {
 		this.loading.set(true);
-		this.error.set(null);
 		try {
 			await this.roomService.gameAction(this.gameType(), this.roomId(), action, data);
 		} catch (err) {
-			this.error.set((err as Error).message);
+			this.toast.error((err as Error).message);
 		} finally {
 			this.loading.set(false);
 		}
@@ -91,7 +89,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 			await this.roomService.resetRoom(this.roomId());
 			void this.urlService.get('play').navigate({ roomId: this.roomId() });
 		} catch (err) {
-			this.error.set((err as Error).message);
+			this.toast.error((err as Error).message);
 		}
 	}
 }

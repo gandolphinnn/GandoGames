@@ -12,6 +12,7 @@
 		"PLAY_AGAIN": "Play Again"
 	},
 	"MENU": {
+		"ADMIN": "Admin",
 		"PLAY": "Play",
 		"SOCIAL": "Social",
 		"ACTIVE_ROOMS": "Active Rooms"
@@ -47,6 +48,18 @@
 			"USERNAME_REQUIRED": "Username is required",
 			"USERNAME_MIN_LENGTH": "At least 3 characters",
 			"USERNAME_MAX_LENGTH": "At most 20 characters"
+		}
+	},
+	"ADMIN": {
+		"TITLE": "Admin",
+		"ROOMS": {
+			"ID": "Room id",
+			"HOST": "Host",
+			"GAME": "Game",
+			"PLAYERS": "Players",
+			"ACCESS": "Access",
+			"PHASE": "Phase",
+			"LAST_UPDATED": "Last update"
 		}
 	},
 	"PROFILE": {

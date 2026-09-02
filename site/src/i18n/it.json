@@ -12,6 +12,7 @@
 		"PLAY_AGAIN": "Gioca ancora"
 	},
 	"MENU": {
+		"ADMIN": "Admin",
 		"PLAY": "Gioca",
 		"SOCIAL": "Social",
 		"ACTIVE_ROOMS": "Stanze attive"
@@ -47,6 +48,18 @@
 			"USERNAME_REQUIRED": "Il nome utente è obbligatorio",
 			"USERNAME_MIN_LENGTH": "Almeno 3 caratteri",
 			"USERNAME_MAX_LENGTH": "Al massimo 20 caratteri"
+		}
+	},
+	"ADMIN": {
+		"TITLE": "Admin",
+		"ROOMS": {
+			"ID": "Id stanza",
+			"HOST": "Host",
+			"GAME": "Gioco",
+			"PLAYERS": "Giocatori",
+			"ACCESS": "Accesso",
+			"PHASE": "Fase",
+			"LAST_UPDATED": "Ultimo aggiornamento"
 		}
 	},
 	"PROFILE": {

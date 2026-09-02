@@ -1,27 +1,14 @@
 import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput } from '@azure/functions';
 import { BaseRequest, GamePlayer, IconType, LangCode, PlayerRole, Theme } from '@gandogames/shared/dto';
-import { PlayFab, PlayFabAdmin as RealPlayFabAdmin, PlayFabClient as RealPlayFabClient, PlayFabServer as RealPlayFabServer } from 'playfab-sdk';
-import { mockPlayFabAdmin, mockPlayFabClient, mockPlayFabServer } from './db/mockPlayFab';
+import { PlayFab, PlayFabServer } from 'playfab-sdk';
 import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';
 import { withRoomLock } from './lock';
 
-// MOCK_BACKEND swaps the PlayFab SDK clients for an in-memory simulation so collaborators can
-// run the full API locally with no secrets. Opt-in only: production never sets it, so the real
-// PlayFab clients (and the secret-key settings below) are always used there.
-const USE_MOCK_BACKEND = process.env['MOCK_BACKEND'] === 'true';
-
-export const PlayFabClient = (USE_MOCK_BACKEND ? mockPlayFabClient : RealPlayFabClient) as unknown as typeof RealPlayFabClient;
-export const PlayFabServer = (USE_MOCK_BACKEND ? mockPlayFabServer : RealPlayFabServer) as unknown as typeof RealPlayFabServer;
-export const PlayFabAdmin = (USE_MOCK_BACKEND ? mockPlayFabAdmin : RealPlayFabAdmin) as unknown as typeof RealPlayFabAdmin;
 export { PlayfabCtx } from './db/playfabCtx';
 export * from './types';
 
-if (USE_MOCK_BACKEND) {
-	console.log('[MOCK_BACKEND] PlayFab is served from an in-memory simulation — no secrets required.');
-} else {
-	PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
-	PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
-}
+PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
+PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
 
 export const signalRInput = input.generic({
 	type: 'signalRConnectionInfo',

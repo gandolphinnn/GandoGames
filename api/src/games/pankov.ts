@@ -46,7 +46,6 @@ export class PankovGame extends Game<PankovGameState> {
 
 		state.currentRoll = rollPankovDices();
 		state.gamePhase = 'rolled';
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -70,7 +69,6 @@ export class PankovGame extends Game<PankovGameState> {
 		state.currentRoll = null;
 		state.currentPlayerIndex = this.nextAliveIndex(state.currentPlayerIndex);
 		state.gamePhase = 'turn-start';
-		state.lastUpdate = new Date();
 
 		if (state.players[state.currentPlayerIndex].type === 'bot')
 			return this.performBotAction();
@@ -102,7 +100,6 @@ export class PankovGame extends Game<PankovGameState> {
 			livesLost,
 		};
 		state.gamePhase = 'result';
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -128,7 +125,6 @@ export class PankovGame extends Game<PankovGameState> {
 		if (state.players[state.currentPlayerIndex].type === 'bot')
 			return this.performBotAction();
 
-		state.lastUpdate = new Date();
 		return state;
 	}
 

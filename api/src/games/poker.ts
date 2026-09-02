@@ -72,7 +72,6 @@ export class PokerGame extends Game<PokerGameState> {
 		player.folded = true;
 		player.hasActed = true;
 		this.advanceAfterAction();
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -82,7 +81,6 @@ export class PokerGame extends Game<PokerGameState> {
 		if (player.streetBet !== state.currentBet) return state;
 		player.hasActed = true;
 		this.advanceAfterAction();
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -97,7 +95,6 @@ export class PokerGame extends Game<PokerGameState> {
 		if (player.chips === 0) player.isAllIn = true;
 		player.hasActed = true;
 		this.advanceAfterAction();
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -118,7 +115,6 @@ export class PokerGame extends Game<PokerGameState> {
 			if (p.id !== playerId && !p.folded && !p.isAllIn) p.hasActed = false;
 		}
 		this.advanceAfterAction();
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -141,7 +137,6 @@ export class PokerGame extends Game<PokerGameState> {
 			}
 		}
 		this.advanceAfterAction();
-		state.lastUpdate = new Date();
 		return state;
 	}
 
@@ -166,7 +161,6 @@ export class PokerGame extends Game<PokerGameState> {
 		} else {
 			this.startNewHand();
 		}
-		state.lastUpdate = new Date();
 		return state;
 	}
 

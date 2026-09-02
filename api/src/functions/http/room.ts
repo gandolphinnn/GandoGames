@@ -1,4 +1,4 @@
-import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, resolveAccessPolicy, GamePlayer, buildBot } from '@gandogames/shared/dto';
+import { RoomCreateRequest, RoomBaseRequest, RoomKickRequest, RoomInviteRequest, RoomData, RoomSummary, RoomAccessSetRequest, BaseRequest, buildBot } from '@gandogames/shared/dto';
 import { Game, GAMES_CONFIG } from '../../games';
 import { InnerFunction, PlayfabCtx, registerFunction } from '../..';
 import { areFriends } from './friends';
@@ -145,7 +145,7 @@ const roomAccessSetInner: InnerFunction<RoomAccessSetRequest, RoomData> = async 
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
 	if (room.phase !== 'waiting') throw new Error('Cannot change access after the game has started');
 
-	room.access = resolveAccessPolicy(body.access);
+	room.access = body.access;
 	await PlayfabCtx.rooms.upsert(body.roomId, room);
 	notifier.roomUpsert(room);
 	return room;

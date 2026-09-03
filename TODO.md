@@ -1,8 +1,5 @@
-- The game should not end if a player leaves and there are still 2 or more players.
-- If a player is alone with a bot and leaves the room, the room should be deleted.
-- Redo the behaviour when a user leave a room and when a game is over
-	Display who won and for what reason (game based win or forfeit)
-	BUG: If a player leaves and just one player remain, that player win the game and remove the room from its list but the room stays open for everyone else to see.
+- ReturnUrl BUG when the url included the room code
+- API middleware to apply DRY on api methods for checks early returns
 - Save/import game settings presets:
 	Let a player save a favourite combination of game settings and import them into a room in one click.
 	(The per-room Game settings editor — game/settings/get & set, schema-driven modal, pankov & poker settings — is already implemented; this presets feature was deferred.)
@@ -22,6 +19,7 @@
 - Guest login with custom displayName
 	Still need to decide if i want to implement this
 - Profile page enhancement
+	Export user info (GDPR)
 	Ability to change display name
 	Ability to change password
 	Ability to convert a guest user to a logged one

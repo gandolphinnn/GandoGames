@@ -1,6 +1,7 @@
 import { InvocationContext, Timer } from '@azure/functions';
 import { AnyEndpoint, ChatMessage, EndpointParams, EndpointRequest, EndpointResponse, Friend, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/shared/dto';
 import { signalROutput } from '.';
+import { Game } from './games';
 
 export type SignalRMessage =
 	| { target: SignalREventType; arguments: unknown[]; }
@@ -18,36 +19,40 @@ export class InnerFunctionNotifier {
 	private signalR: SignalRMessage[] = [];
 
 	//#region SignalR methods
-	addToGroup(userId: string, groupName: string) {
+	public addToGroup(userId: string, groupName: string) {
 		this.signalR.push({ action: 'add', userId, groupName: `room-${groupName}`});
 	}
-	removeFromGroup(userId: string, groupName: string) {
+	public removeFromGroup(userId: string, groupName: string) {
 		this.signalR.push({ action: 'remove', userId, groupName: `room-${groupName}`});
 	}
-	roomUpsert(room: RoomData) {
+	public roomUpsert(room: RoomData) {
 		this.signalR.push({ target: 'roomUpsert', arguments: [room] });
 	}
-	roomDeleted(roomId: string) {
+	public roomDeleted(roomId: string) {
 		this.signalR.push({ target: 'roomDeleted', arguments: [roomId] });
 	}
-	gameStateUpdatedForPlayer(userId: string, roomId: string, state: GameState) {
+	public gameStateUpdatedForAll(room: RoomData, game: Game) {
+		for (const p of room.players)
+			this.gameStateUpdatedForPlayer(p.id, room.id, game.getPublicState(p.id))
+	}
+	public gameStateUpdatedForPlayer(userId: string, roomId: string, state: GameState) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], userId });
 	}
-	chatMessage(roomId: string, message: ChatMessage) {
+	public chatMessage(roomId: string, message: ChatMessage) {
 		this.signalR.push({ target: 'chatMessage', arguments: [roomId, message], groupName: `room-${roomId}` });
 	}
-	roomInviteForPlayer(userId: string, roomId: string, game: string) {
+	public roomInviteForPlayer(userId: string, roomId: string, game: string) {
 		this.signalR.push({ target: 'roomInvite', arguments: [roomId, game], userId });
 	}
-	friendRequest(userId: string, from: Friend) {
+	public friendRequest(userId: string, from: Friend) {
 		this.signalR.push({ target: 'friendRequest', arguments: [from], userId });
 	}
-	friendsChanged(userId: string) {
+	public friendsChanged(userId: string) {
 		this.signalR.push({ target: 'friendsChanged', arguments: [], userId });
 	}
 	//#endregion SignalR methods
 
-	prepareContext(context: InvocationContext) {
+	public prepareContext(context: InvocationContext) {
 		if (this.signalR.length) context.extraOutputs.set(signalROutput, this.signalR);
 	}
 };

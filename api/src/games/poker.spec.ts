@@ -57,7 +57,7 @@ describe('PokerGame all-in', () => {
 	beforeEach(() => {
 		// 3 players (avoids the heads-up special case). Default settings → 500 chips, BB=20, SB=10.
 		// Dealer=p1, SB=p2 (10), BB=p3 (20), so UTG p1 is first to act with currentBet=20 and pot=30.
-		game = new PokerGame();
+		game = new PokerGame('poker');
 		game.initialize([buildPlayer('p1', 'Alice'), buildPlayer('p2', 'Bob'), buildPlayer('p3', 'Charlie')]);
 	});
 
@@ -98,7 +98,7 @@ describe('PokerGame getPublicState (hole-card visibility)', () => {
 	const p3 = buildPlayer('p3', 'Charlie');
 
 	beforeEach(() => {
-		game = new PokerGame();
+		game = new PokerGame('poker');
 		game.initialize([p1, p2, p3]); // dealer=p1, SB=p2, BB=p3, UTG p1 acts first
 	});
 
@@ -136,7 +136,7 @@ describe('PokerGame settings', () => {
 	const p3 = buildPlayer('p3', 'Charlie');
 
 	it('seeds stacks from startingChips and blinds from the first blind level', () => {
-		const game = new PokerGame();
+		const game = new PokerGame('poker');
 		// Dealer=p1, SB=p2, BB=p3. Big blind = first level (200), small blind = half (100).
 		game.initialize([p1, p2, p3], { startingChips: 5000, blindLevels: [{ bigBlind: 200, durationMinutes: 0 }]});
 		const sb = game.state!.players.find(p => p.id === 'p2')!;
@@ -154,7 +154,7 @@ describe('PokerGame settings', () => {
 	});
 
 	it('defaults to a 52-card deck and 500 chips when no settings are given', () => {
-		const game = new PokerGame();
+		const game = new PokerGame('poker');
 		game.initialize([p1, p2, p3]);
 		const dealt = game.state!.players.reduce((n, p) => n + p.cards.length, 0);
 		expect(game.state!.deck.length + dealt).toBe(52);

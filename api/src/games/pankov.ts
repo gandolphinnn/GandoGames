@@ -6,16 +6,19 @@ import { PankovBot } from './bots/pankov';
 export class PankovGame extends Game<PankovGameState> {
 	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
 		const resolved = resolvePankovSettings(settings);
+		const firstPlayerToGo = Math.floor(Math.random() * players.length);
 		this.state = {
 			lastUpdate: new Date(),
 			gamePhase: 'turn-start',
 			players: players.map(p => ({ ...p, lives: resolved.initialLives })),
-			currentPlayerIndex: 0,
+			currentPlayerIndex: firstPlayerToGo,
 			previousTurn: null,
 			currentRoll: null,
 			settings: resolved,
 			pankovStreak: 0,
 		} as PankovGameState;
+
+		this.botAction();
 	}
 
 	public override getPublicState(playerId: string): PankovGameState {
@@ -70,10 +73,7 @@ export class PankovGame extends Game<PankovGameState> {
 		state.currentPlayerIndex = this.nextAliveIndex(state.currentPlayerIndex);
 		state.gamePhase = 'turn-start';
 
-		if (state.players[state.currentPlayerIndex].type === 'bot')
-			return this.performBotAction();
-
-		return state;
+		return this.botAction();
 	}
 
 	private applyChallenge(playerId: string): PankovGameState {
@@ -122,10 +122,7 @@ export class PankovGame extends Game<PankovGameState> {
 			state.gamePhase = 'turn-start';
 		}
 
-		if (state.players[state.currentPlayerIndex].type === 'bot')
-			return this.performBotAction();
-
-		return state;
+		return this.botAction();
 	}
 
 	private nextAliveIndex(fromIndex: number): number {
@@ -139,8 +136,12 @@ export class PankovGame extends Game<PankovGameState> {
 	}
 
 	// Returns the game state after performing the bot's action
-	private performBotAction(): PankovGameState {
+	public botAction(): PankovGameState {
 		const state = this.state!;
+
+		if (!this.shouldBotPlay())
+			return state;
+
 		const bot = new PankovBot(state.players[state.currentPlayerIndex].id);
 		if (state.previousTurn !== null && bot.isChallenging(state.previousTurn) )
 			return this.applyChallenge(bot.playerId);

@@ -4,8 +4,8 @@ import { PokerGame } from './poker';
 
 Game.Factory = (type) => {
 	switch (type) {
-		case 'pankov': return new PankovGame();
-		case 'poker': return new PokerGame();
+		case 'pankov': return new PankovGame(type);
+		case 'poker': return new PokerGame(type);
 	}
 };
 

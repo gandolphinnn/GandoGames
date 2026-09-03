@@ -315,4 +315,8 @@ export class PokerGame extends Game<PokerGameState> {
 		state.currentPlayerIndex = n === 2 ? sbIdx : (bbIdx + 1) % n;
 		state.gamePhase = 'pre-flop';
 	}
+
+	public botAction(): PokerGameState {
+		throw new Error('Not implemented');
+	}
 }

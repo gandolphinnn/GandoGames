@@ -1,7 +1,12 @@
+import { GamePlayer } from "./auth";
+
 export type GameType = 'pankov' | 'poker';
 
-export interface GameState {
+export interface GameState<T extends GamePlayer = GamePlayer> {
 	lastUpdate: Date;
+	players: T[];
+	currentPlayerIndex: number;
+	winnerName?: string;
 }
 
 /** Which game's state to load (the room travels as the `{roomId}` path segment). */

@@ -27,9 +27,8 @@ const gameActionInner: InnerFunction<typeof API.game.action> = async (body, para
 		PlayfabCtx.rooms.upsert(params.roomId, room),
 	]);
 
-	for (const p of room.players) {
-		notifier.gameStateUpdatedForPlayer(p.id, params.roomId, game.getPublicState(p.id));
-	}
+	notifier.gameStateUpdatedForAll(room, game);
+
 	notifier.roomUpsert(room);
 
 	return game.getPublicState(player.id);

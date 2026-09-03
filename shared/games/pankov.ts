@@ -6,16 +6,16 @@ export type RollValue =
 	| 21;
 
 export interface PankovPlayer extends GamePlayer {
-	lives: number,
+	lives: number;
 }
 
 export interface RevealResult {
-	declared: RollValue,
-	actual: RollValue,
-	wasLying: boolean,
-	loserIndex: number,
+	declared: RollValue;
+	actual: RollValue;
+	wasLying: boolean;
+	loserIndex: number;
 	/** Lives the loser lost — 1 normally, doubled under the sudden-death Pankov run. */
-	livesLost: number,
+	livesLost: number;
 }
 
 export interface PankovSettings {
@@ -26,26 +26,23 @@ export interface PankovSettings {
 }
 
 export interface PankovTurn {
-	playerIndex: number,
-	declaration: RollValue,
+	playerIndex: number;
+	declaration: RollValue;
 	/** The roll that was beaten by the current declaration. Null if this is the first declaration of the turn. */
-	beatedRoll: RollValue | null,
+	beatedRoll: RollValue | null;
 	/** Hidden: actual roll of the previous declarer. Always null in public state. */
-	actualRoll: RollValue | null,
+	actualRoll: RollValue | null;
 }
 
-export interface PankovGameState extends GameState {
-	gamePhase: 'turn-start' | 'rolled' | 'result' | 'game-over',
-	players: PankovPlayer[],
-	currentPlayerIndex: number,
-	previousTurn: PankovTurn | null,
+export interface PankovGameState extends GameState<PankovPlayer> {
+	gamePhase: 'turn-start' | 'rolled' | 'result' | 'game-over';
+	previousTurn: PankovTurn | null;
 	/** Hidden: current player's roll. Null for all other players. */
-	currentRoll: RollValue | null,
-	settings: PankovSettings,
+	currentRoll: RollValue | null;
+	settings: PankovSettings;
 	/** Count of consecutive Pankov (21) declarations in the current run; drives sudden-death stakes. */
-	pankovStreak: number,
-	revealResult?: RevealResult,
-	winnerName?: string,
+	pankovStreak: number;
+	revealResult?: RevealResult;
 }
 
 export const INITIAL_LIVES = 8;

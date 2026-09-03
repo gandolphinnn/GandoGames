@@ -33,14 +33,12 @@ export interface PokerSettings {
 	smallerDeck: boolean;
 }
 
-export interface PokerGameState extends GameState {
+export interface PokerGameState extends GameState<PokerPlayer> {
 	gamePhase: 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown' | 'game-over';
-	players: PokerPlayer[];
 	communityCards: Card[];
 	deck: Card[];
 	pot: number;
 	currentBet: number;
-	currentPlayerIndex: number;
 	dealerIndex: number;
 	settings: PokerSettings;
 	/** When the blind clock started (game start); blinds escalate on real elapsed time from here. */
@@ -50,7 +48,6 @@ export interface PokerGameState extends GameState {
 	/** Big blind for the in-progress hand — settings.blindLevels[blindLevel].bigBlind. */
 	bigBlind: number;
 	result?: PokerHandResult;
-	winnerName?: string;
 }
 
 export const STARTING_CHIPS = 500;

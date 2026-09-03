@@ -26,15 +26,16 @@ const roomCreateInner: InnerFunction<typeof API.rooms.create> = async (body, _pa
 const roomListInner: InnerFunction<typeof API.rooms.list> = async (_body, _params, _notifier, player) => {
 	const rooms = await PlayfabCtx.rooms.list();
 	const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+
 	return rooms
-		// Include the caller's own rooms: the client splits them into the menu's "Active Rooms"
-		// (myRooms) vs the browsable list (browsableRooms). Only hide rooms they were kicked from.
-		// Only public/friends rooms are listed to non-members; link & closed rooms are unlisted
-		// (surfaced only to members, who reached them via code/invite).
 		.filter(r =>
-			!(r.kickedPlayers ?? []).includes(player.id) &&
-			new Date(r.lastUpdate) >= oneHourAgo &&
-			(r.access === 'public' || r.access === 'friends' || r.players.some(p => p.id === player.id))
+			r.players.some(p => p.id === player.id) // Caller is in the room
+			|| (
+				r.access == 'public'
+				&& r.phase == 'waiting'
+				&& new Date(r.lastUpdate) >= oneHourAgo // Only recent rooms
+				&& !(r.kickedPlayers ?? []).includes(player.id) // Caller is not kicked
+			)
 		)
 		.map(({ chat: _c, kickedPlayers: _k, ...summary }) => summary);
 };
@@ -94,9 +95,7 @@ const roomStartInner: InnerFunction<typeof API.rooms.start> = async (_body, para
 	const game = Game.Factory(room.game);
 	game.initialize(room.players, room.settings);
 	await PlayfabCtx.game[room.game].upsert(params.roomId, game.state!);
-	for (const p of room.players) {
-		notifier.gameStateUpdatedForPlayer(p.id, params.roomId, game.getPublicState(p.id));
-	}
+	notifier.gameStateUpdatedForAll(room, game);
 
 	notifier.roomUpsert(room);
 	return room;
@@ -107,22 +106,37 @@ const roomLeaveInner: InnerFunction<typeof API.rooms.leave> = async (_body, para
 	if (room == null) throw new Error('Room not found');
 	if (!room.players.some(p => p.id === player.id)) throw new Error('You are not in this room');
 
-	notifier.removeFromGroup(player.id, params.roomId);
+	notifier.removeFromGroup(player.id, room.id);
 
-	if (room.players.length === 1) {
-		await PlayfabCtx.rooms.delete(params.roomId);
-		notifier.roomDeleted(params.roomId);
+	//? If the host is leaving, assign the host to the first human
+	room.players = room.players.filter(p => p.id !== player.id);
+	const nonBotPlayers = room.players.filter(p => p.type != 'bot');
+
+	//? If there are not other non-bot players close the room
+	if (nonBotPlayers.length == 0) {
+		await PlayfabCtx.rooms.delete(room.id);
+		notifier.roomDeleted(room.id);
 		return;
 	}
+	
+	if (room.hostId == player.id) {
+		room.hostId = nonBotPlayers[0].id;
+		await PlayfabCtx.rooms.upsert(room.id, room);
+	}
 
-	room.players = room.players.filter(p => p.id !== player.id);
-	if (room.hostId === player.id) {
-		room.hostId = room.players[0].id;
-	}
 	if (room.phase === 'playing') {
-		room.phase = 'ended';
+		const gameState = await PlayfabCtx.game[room.game].get(room.id);
+		if (!gameState || !room) throw new Error('Game not found');
+
+		const game = Game.Factory(room.game);
+		game.state = gameState;
+		gameState.players = gameState.players.filter(p => p.id !== player.id);
+		gameState.currentPlayerIndex = gameState.currentPlayerIndex % gameState.players.length;
+		const postBotGameState = game.botAction();
+		
+		await PlayfabCtx.game[room.game].upsert(room.id, postBotGameState);
+		notifier.gameStateUpdatedForAll(room, game);
 	}
-	await PlayfabCtx.rooms.upsert(params.roomId, room);
 	notifier.roomUpsert(room);
 };
 

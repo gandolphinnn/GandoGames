@@ -21,7 +21,7 @@ describe('PankovGame', () => {
 	let game: PankovGame;
 
 	beforeEach(() => {
-		game = new PankovGame();
+		game = new PankovGame('pankov');
 		game.initialize([p1, p2]);
 	});
 
@@ -60,7 +60,7 @@ describe('PankovGame', () => {
 		});
 
 		it('throws when game not initialized', () => {
-			expect(() => new PankovGame().action(p1, 'roll', {})).toThrow('Game not initialized');
+			expect(() => new PankovGame('pankov').action(p1, 'roll', {})).toThrow('Game not initialized');
 		});
 	});
 
@@ -198,7 +198,7 @@ describe('PankovGame', () => {
 		});
 
 		it('throws when game not initialized', () => {
-			expect(() => new PankovGame().getPublicState('p1')).toThrow('Game not initialized');
+			expect(() => new PankovGame('pankov').getPublicState('p1')).toThrow('Game not initialized');
 		});
 	});
 

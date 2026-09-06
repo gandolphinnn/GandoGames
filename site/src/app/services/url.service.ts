@@ -22,6 +22,23 @@ type UrlTreeBranch = {
 	variables?: Record<string, { type: 'segment' | 'queryParam'; mandatory: boolean }>,
 };
 
+const BRANCHES = {
+	about: {},
+	games: {},
+	login: {},
+	signup: {},
+	admin: {},
+	profile: {},
+	social: {},
+	play: {
+		ffa: {},
+		room: {
+			
+		}
+	},
+	rooms: {},
+}
+
 /**
  * `as const` keeps the literal keys and `mandatory` flags of each branch's `variables`,
  * so `BranchVariables` can derive a per-branch typed params object; `satisfies` still
@@ -101,17 +118,6 @@ export class UrlService {
 			},
 			currentVariables: computed(() => this.readVariables(branchName)),
 		} as unknown as TreeObject<B>;
-	}
-
-	/**
-	 * True when the current URL (ignoring query params) is exactly the given branch's url.
-	 */
-	public isActive(branchName: BranchName): boolean {
-		return this.current().split('?')[0] === (TREE[branchName].url || '/');
-	}
-
-	public parse(url: string): UrlTree {
-		return this.router.parseUrl(url);
 	}
 
 	private resolve(branchName: BranchName, variables: Record<string, string | undefined>): { commands: string[]; queryParams: Params } {

@@ -24,10 +24,6 @@ export const routes: Routes = [
 		loadChildren: () => import('./pages/home/home.routes').then((m) => m.HOME_ROUTES),
 	},
 	{
-		path: 'test/palette',
-		loadComponent: () => import('./pages/test/palette/palette.component').then((m) => m.PaletteComponent),
-	},
-	{
 		path: '**',
 		redirectTo: '',
 	},

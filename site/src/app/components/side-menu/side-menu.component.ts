@@ -34,15 +34,13 @@ export class SideMenuComponent {
 	private readonly urlService = inject(UrlService);
 	private readonly menuCtrl = inject(MenuController);
 
-	private readonly playBranch = this.urlService.get('play');
-
 	public readonly user = this.userService.user;
 	public readonly isAdmin = this.userService.isAdmin;
 	public readonly myRooms = this.roomService.myRooms;
 	public readonly pendingFriendRequests = this.friendService.pendingCount;
 
 	/** Room id in the current URL, to highlight the matching entry in the active-rooms list. */
-	public readonly activeRoomId = computed(() => this.playBranch.currentVariables().roomId ?? '');
+	public readonly activeRoomId = computed(() => this.urlService.current().segments['roomId'] ?? '');
 
 	public gameLabel(game: GameType): string {
 		return GAME_REGISTRY[game]?.name ?? game;
@@ -54,6 +52,6 @@ export class SideMenuComponent {
 
 	public async goToRoom(roomId: string): Promise<void> {
 		await this.menuCtrl.close('main-menu');
-		void this.urlService.get('play').navigate({ roomId });
+		void this.urlService.buildState('play_room', { roomId: roomId }).navigate();
 	}
 }

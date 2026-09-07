@@ -31,8 +31,7 @@ export class RoomComponent implements OnInit {
 	private readonly translate = inject(TranslateService);
 	private readonly destroyRef = inject(DestroyRef);
 
-	private readonly playBranch = this.urlService.get('play');
-	public readonly roomId = computed(() => this.playBranch.currentVariables().roomId ?? '');
+	public readonly roomId = computed(() => this.urlService.current().segments['roomId'] ?? '');
 	public readonly room = signal<RoomData | null>(null);
 	public readonly copied = signal(false);
 	public readonly showAccessModal = signal(false);
@@ -72,15 +71,15 @@ export class RoomComponent implements OnInit {
 		try {
 			const room = await this.roomService.getRoom(this.roomId());
 			if (room.kickedPlayers?.includes(this.myId())) {
-				void this.urlService.get('play').navigate();
+				void this.urlService.buildState('play_room', { roomId: room.id}).navigate();
 				return;
 			}
 			this.room.set(room);
 			if (room.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
-				void this.urlService.get('play').navigate();
+				void this.urlService.buildState('play_room', { roomId: room.id}).navigate();
 			}
 		} catch {
-			void this.urlService.get('play').navigate();
+			this.navigateToRoomsList();
 		}
 	}
 
@@ -89,7 +88,7 @@ export class RoomComponent implements OnInit {
 			if (room.id !== this.roomId()) return;
 			if (room.kickedPlayers?.includes(this.myId())) {
 				this.toast.show(this.translate.instant('ROOM.KICKED') as string, 'warning');
-				void this.urlService.get('play').navigate();
+			this.navigateToRoomsList();
 				return;
 			}
 			this.room.set(room);
@@ -99,7 +98,7 @@ export class RoomComponent implements OnInit {
 			if (!this.isHost()) {
 				this.toast.warning(this.translate.instant('ROOM.HOST_CLOSED') as string);
 			}
-			void this.urlService.get('play').navigate();
+			this.navigateToRoomsList();
 		});
 	}
 
@@ -115,7 +114,7 @@ export class RoomComponent implements OnInit {
 		if (!confirmed) return;
 
 		await this.roomService.deleteRoom(this.roomId());
-		void this.urlService.get('play').navigate();
+		this.navigateToRoomsList();
 	}
 
 	public async copyCode(): Promise<void> {
@@ -126,5 +125,9 @@ export class RoomComponent implements OnInit {
 
 	public openAccess(): void {
 		this.showAccessModal.set(true);
+	}
+
+	private navigateToRoomsList() {
+		void this.urlService.buildState('rooms').navigate();
 	}
 }

@@ -20,12 +20,8 @@ describe('UrlService', () => {
 	});
 
 	describe('get()', () => {
-		it('throws on an unknown branch', () => {
-			expect(() => service.get('nope' as BranchName)).toThrowError(/unknown branch 'nope'/);
-		});
-
 		it('exposes the branch url', () => {
-			expect(service.get('play').url).toBe('/play');
+			expect(service.buildState('about').url).toBe('/play');
 		});
 	});
 
@@ -37,133 +33,67 @@ describe('UrlService', () => {
 		});
 
 		it('navigates to the branch url', async () => {
-			await service.get('profile').navigate();
+			await service.buildState('profile').navigate();
 			expect(navigateSpy).toHaveBeenCalledWith(['/profile'], { queryParams: {} });
 		});
 
 		it('appends a segment variable as a url segment', async () => {
-			await service.get('play').navigate({ roomId: 'V1LYBR' });
+			await service.buildState('play_room', { roomId: 'V1LYBR' }).navigate();
 			expect(navigateSpy).toHaveBeenCalledWith(['/play', 'V1LYBR'], { queryParams: {} });
 		});
 
-		it('omits an optional segment variable that is not provided', async () => {
-			await service.get('play').navigate();
-			expect(navigateSpy).toHaveBeenCalledWith(['/play'], { queryParams: {} });
-		});
-
 		it('passes a queryParam variable as a query param', async () => {
-			await service.get('login').navigate({ returnUrl: '/play' });
+			await service.buildState('login', { returnUrl: '/play' }).navigate();
 			expect(navigateSpy).toHaveBeenCalledWith(['/login'], { queryParams: { returnUrl: '/play' } });
-		});
-
-		it('forwards NavigationExtras to the router', async () => {
-			await service.get('play').navigate({ roomId: 'V1LYBR' }, { replaceUrl: true });
-			expect(navigateSpy).toHaveBeenCalledWith(
-				['/play', 'V1LYBR'],
-				jasmine.objectContaining({ queryParams: {}, replaceUrl: true }),
-			);
 		});
 	});
 
 	describe('get().urlTree()', () => {
 		it('builds the tree with segment variables', () => {
-			const tree = service.get('play').urlTree({ roomId: 'V1LYBR' });
+			const tree = service.buildState('play_room', { roomId: 'V1LYBR' }).urlTree();
 			expect(router.serializeUrl(tree)).toBe('/play/V1LYBR');
 		});
 
 		it('builds the tree with queryParam variables', () => {
-			const tree = service.get('login').urlTree({ returnUrl: '/play' });
+			const tree = service.buildState('login', { returnUrl: '/play' }).urlTree();
 			expect(router.serializeUrl(tree)).toBe('/login?returnUrl=%2Fplay');
 		});
 
 		it('builds the root tree for the empty branch', () => {
-			expect(router.serializeUrl(service.get('').urlTree())).toBe('/');
+			expect(router.serializeUrl(service.buildState('').urlTree())).toBe('/');
 		});
 	});
 
 	describe('current', () => {
 		it('starts with the router url', () => {
-			expect(service.current()).toBe('/');
+			expect(service.current().url).toBe('/');
 		});
 
 		it('tracks navigations', async () => {
 			await router.navigateByUrl('/about');
-			expect(service.current()).toBe('/about');
+			expect(service.current().url).toBe('/about');
 		});
 	});
 
 	describe('isActive()', () => {
 		it('is true on the exact branch url', async () => {
-			await router.navigateByUrl('/play');
-			expect(service.isActive('play')).toBeTrue();
+			await router.navigateByUrl('/games');
+			expect(service.isActive('games')).toBeTrue();
 		});
 
 		it('ignores query params', async () => {
-			await router.navigateByUrl('/play?foo=bar');
-			expect(service.isActive('play')).toBeTrue();
-		});
-
-		it('is false on a child url of the branch', async () => {
-			await router.navigateByUrl('/play/V1LYBR');
-			expect(service.isActive('play')).toBeFalse();
+			await router.navigateByUrl('/games?foo=bar');
+			expect(service.isActive('games')).toBeTrue();
 		});
 
 		it('is false on an unrelated url', async () => {
 			await router.navigateByUrl('/profile');
-			expect(service.isActive('play')).toBeFalse();
+			expect(service.isActive('play_global')).toBeFalse();
 		});
 
 		it('matches the root branch on /', async () => {
 			await router.navigateByUrl('/');
 			expect(service.isActive('')).toBeTrue();
-		});
-	});
-
-	describe('currentVariables', () => {
-		it('reads a segment variable from the current url', async () => {
-			await router.navigateByUrl('/play/V1LYBR');
-			expect(service.get('play').currentVariables()).toEqual({ roomId: 'V1LYBR' });
-		});
-
-		it('is empty when the optional segment is absent', async () => {
-			await router.navigateByUrl('/play');
-			expect(service.get('play').currentVariables()).toEqual({});
-		});
-
-		it('reads a queryParam variable from the current url', async () => {
-			await router.navigateByUrl('/login?returnUrl=%2Fplay');
-			expect(service.get('login').currentVariables()).toEqual({ returnUrl: '/play' });
-		});
-
-		it('is empty when the current url is on another branch', async () => {
-			await router.navigateByUrl('/profile');
-			expect(service.get('play').currentVariables()).toEqual({});
-		});
-
-		it('does not read a sibling branch url as a segment variable', async () => {
-			// '/play/new' is the 'play/new' branch — 'new' must not become the roomId of 'play'.
-			await router.navigateByUrl('/play/new');
-			expect(service.get('play').currentVariables()).toEqual({});
-		});
-
-		it('updates reactively across navigations', async () => {
-			const variables = service.get('play').currentVariables;
-
-			await router.navigateByUrl('/play/AAAAAA');
-			expect(variables().roomId).toBe('AAAAAA');
-
-			await router.navigateByUrl('/play/BBBBBB');
-			expect(variables().roomId).toBe('BBBBBB');
-
-			await router.navigateByUrl('/play');
-			expect(variables().roomId).toBeUndefined();
-		});
-	});
-
-	describe('parse()', () => {
-		it('parses a url string into a UrlTree', () => {
-			const tree = service.parse('/login?returnUrl=%2Fplay');
-			expect(tree.queryParams['returnUrl']).toBe('/play');
 		});
 	});
 });

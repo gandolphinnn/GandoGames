@@ -25,7 +25,7 @@ export class HomeComponent implements OnInit {
 			.subscribe(async ({ roomId, game }) => {
 				const gameName = GAME_REGISTRY[game]?.name ?? game;
 				const accepted = await this.toast.yesNo(this.translate.instant('ROOM.INVITED', { game: gameName }) as string);
-				if (accepted) void this.urlService.get('play').navigate({ roomId });
+				if (accepted) void this.urlService.buildState('play').navigate({ roomId });
 			});
 	}
 }

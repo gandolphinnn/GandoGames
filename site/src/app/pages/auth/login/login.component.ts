@@ -38,8 +38,8 @@ export class LoginComponent {
 		this.loading.set(true);
 		try {
 			await fn();
-			const returnUrl = this.urlService.get('login').currentVariables().returnUrl?.substring(1) ?? '';
-			await this.urlService.get(returnUrl as BranchName).navigate();
+			const returnUrl = this.urlService.current().queryParams['returnUrl'] ?? '';
+			this.urlService.getState(returnUrl).navigate();
 		} finally {
 			this.loading.set(false);
 		}

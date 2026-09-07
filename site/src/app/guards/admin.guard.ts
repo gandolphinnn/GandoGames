@@ -5,5 +5,5 @@ import { UserService, UrlService } from '@gandogames/services';
 export const adminGuard: CanActivateFn = (_route: ActivatedRouteSnapshot) => {
 	const auth = inject(UserService);
 	const urlService = inject(UrlService);
-	return auth.isAdmin() || urlService.get('').urlTree();
+	return auth.isAdmin() || urlService.buildState('').urlTree();
 };

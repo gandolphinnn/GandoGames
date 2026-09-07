@@ -68,7 +68,7 @@ export class RoomListComponent implements OnInit {
 		this.checkingCode.set(true);
 		try {
 			await this.roomService.getRoom(code);
-			void this.urlService.get('play').navigate({ roomId: code });
+			void this.urlService.buildState('play').navigate({ roomId: code });
 		} finally {
 			this.checkingCode.set(false);
 		}
@@ -99,10 +99,10 @@ export class RoomListComponent implements OnInit {
 	}
 
 	public navigateToRoom(room: RoomSummary): void {
-		void this.urlService.get('play').navigate({ roomId: room.id });
+		void this.urlService.buildState('play').navigate({ roomId: room.id });
 	}
 
 	public goToCreate(): void {
-		void this.urlService.get('play/new').navigate();
+		void this.urlService.buildState('play/new').navigate();
 	}
 }

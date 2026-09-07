@@ -87,7 +87,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	private async resetRoom(): Promise<void> {
 		try {
 			await this.roomService.resetRoom(this.roomId());
-			void this.urlService.get('play').navigate({ roomId: this.roomId() });
+			void this.urlService.buildState('play_room', { roomId: this.roomId() }).navigate();
 		} catch (err) {
 			this.toast.error((err as Error).message);
 		}

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter, Router, UrlTree } from '@angular/router';
 import { BranchName, UrlService } from '../url.service';
 
 @Component({ template: '' })
@@ -29,22 +29,25 @@ describe('UrlService', () => {
 		let navigateSpy: jasmine.Spy;
 
 		beforeEach(() => {
-			navigateSpy = spyOn(router, 'navigate').and.resolveTo(true);
+			navigateSpy = spyOn(router, 'navigateByUrl').and.resolveTo(true);
 		});
 
 		it('navigates to the branch url', async () => {
 			await service.buildState('profile').navigate();
-			expect(navigateSpy).toHaveBeenCalledWith(['/profile'], { queryParams: {} });
+			const tree = router.createUrlTree(['profile'])
+			expect(navigateSpy).toHaveBeenCalledWith(tree);
 		});
 
 		it('appends a segment variable as a url segment', async () => {
 			await service.buildState('play_room', { roomId: 'V1LYBR' }).navigate();
-			expect(navigateSpy).toHaveBeenCalledWith(['/play', 'V1LYBR'], { queryParams: {} });
+			const tree = router.createUrlTree(['play', 'room', 'V1LYBR'])
+			expect(navigateSpy).toHaveBeenCalledWith(tree);
 		});
 
 		it('passes a queryParam variable as a query param', async () => {
 			await service.buildState('login', { returnUrl: '/play' }).navigate();
-			expect(navigateSpy).toHaveBeenCalledWith(['/login'], { queryParams: { returnUrl: '/play' } });
+			const tree = router.createUrlTree(['login'], { queryParams: { returnUrl: '/play' } })
+			expect(navigateSpy).toHaveBeenCalledWith(tree);
 		});
 	});
 

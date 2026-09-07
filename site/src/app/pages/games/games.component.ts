@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
+import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 
 @Component({
-  imports: [],
-  selector: 'gg-games',
-  styleUrl: './games.component.scss',
-  templateUrl: './games.component.html',
+	selector: 'gg-games',
+	host: { class: 'ion-page' },
+	imports: [...BASE_IMPORTS],
+	templateUrl: './games.component.html',
+	styleUrl: './games.component.scss',
 })
 export class GamesComponent {
 }

@@ -4,7 +4,7 @@ import { adminGuard } from '../../guards/admin.guard';
 export const HOME_ROUTES: Routes = [
 	{
 		path: '',
-		redirectTo: 'play',
+		redirectTo: 'games',
 		pathMatch: 'full',
 	},
 	{
@@ -21,10 +21,14 @@ export const HOME_ROUTES: Routes = [
 		loadComponent: () => import('./social/social.component').then((m) => m.SocialComponent),
 	},
 	{
+		path: 'rooms',
+		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
+	},
+	{
 		path: 'play',
 		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
 	},
-		{
+	{
 		path: 'test/palette',
 		loadComponent: () => import('./test/palette/palette.component').then((m) => m.PaletteComponent),
 	},

@@ -13,11 +13,15 @@ const BRANCHES: Record<BranchName, Branch> = Object.fromEntries(
 				/^(?<path>[^?:]+)(?<segments>(?::[^?:]+)*)(?:\?(?<queryParams>[^:]+(?:\?[^:]+)*))?$/
 			);
 
+			if (path === '') {
+				return [name, { url: '', segments: [], queryParams: []}]
+			}
+
 			if (!match?.groups)
 				throw new Error(`Invalid URL: ${path}`);
 
-			const branch = {
-				url: match.groups['path'].replace(/\/$/, ''),
+			const branch: Branch = {
+				url: match.groups['path'].replace(/\/$/, '').trim(),
 				segments: match.groups['segments'].split(/\/?:/).filter(Boolean) ?? [],
 				queryParams: match.groups['queryParams']?.split(/\/?\?/).filter(Boolean) ?? [],
 			};
@@ -41,9 +45,7 @@ export type BranchState = {
 
 @Service()
 export class UrlService {
-
 	private readonly router = inject(Router);
-
 
 	/**
 	 * Current application branch.
@@ -93,15 +95,17 @@ export class UrlService {
 	 * }
 	 */
 	public getState(url: string): BranchState {
+		url = url.replace(/\/$/, '').trim();
 		const urlTree = this.router.parseUrl(url);
 		const primary = urlTree.root.children['primary'];
+
+		if (url === '')
+			return this.createState('', {}, {});
 
 		if (!primary)
 			throw new Error(`Invalid URL: ${url}`);
 
-		const actualSegments = primary.segments.map(
-			segment => segment.path
-		);
+		const actualSegments = primary?.segments.map(segment => segment.path) ?? [];
 
 		const branchEntry = Object.entries(BRANCHES).find(
 			([, branch]) => this.matchesBranch(actualSegments, branch)
@@ -110,8 +114,7 @@ export class UrlService {
 		if (!branchEntry)
 			throw new Error(`Unknown branch URL: ${url}`);
 
-		const [branchName, branch] =
-			branchEntry as [BranchName, Branch];
+		const [branchName, branch] = branchEntry as [BranchName, Branch];
 
 
 		/* ----------------------------- Segments ----------------------------- */
@@ -123,15 +126,12 @@ export class UrlService {
 		const segments: Record<string, string> = {};
 
 		branch.segments.forEach((segmentName, index) => {
-			const actualIndex =
-				fixedPathSegments.length + index;
+			const actualIndex = fixedPathSegments.length + index;
 
 			const value = actualSegments[actualIndex];
 
 			if (value === undefined)
-				throw new Error(
-					`Missing segment '${segmentName}' in URL: ${url}`
-				);
+				throw new Error(`Missing segment '${segmentName}' in URL: ${url}`);
 
 			segments[segmentName] = value;
 		});
@@ -150,9 +150,7 @@ export class UrlService {
 
 			// This service only supports one string value per parameter.
 			if (Array.isArray(value))
-				throw new Error(
-					`Query parameter '${paramName}' has multiple values: ${url}`
-				);
+				throw new Error(`Query parameter '${paramName}' has multiple values: ${url}`);
 
 			queryParams[paramName] = String(value);
 		}
@@ -162,9 +160,7 @@ export class UrlService {
 
 		for (const paramName of Object.keys(urlTree.queryParams)) {
 			if (!branch.queryParams.includes(paramName))
-				throw new Error(
-					`Unexpected query parameter '${paramName}' in URL: ${url}`
-				);
+				throw new Error(`Unexpected query parameter '${paramName}' in URL: ${url}`);
 		}
 
 
@@ -191,30 +187,21 @@ export class UrlService {
 		name: Name,
 		...args: BuildStateArguments<Name>
 	): BranchState {
-		const params =
-			(args[0] ?? {}) as Record<string, string>;
+		const params = (args[0] ?? {}) as Record<string, string>;
 
 		const branch = BRANCHES[name];
 
 		const segments: Record<string, string> = {};
 		const queryParams: Record<string, string> = {};
 
-
-		/* ----------------------------- Segments ----------------------------- */
-
 		for (const segmentName of branch.segments) {
 			const value = params[segmentName];
 
 			if (value === undefined)
-				throw new Error(
-					`Missing segment '${segmentName}' for branch '${name}'`
-				);
+				throw new Error(`Missing segment '${segmentName}' for branch '${name}'`);
 
 			segments[segmentName] = value;
 		}
-
-
-		/* --------------------------- Query params --------------------------- */
 
 		for (const paramName of branch.queryParams) {
 			const value = params[paramName];
@@ -263,9 +250,7 @@ export class UrlService {
 			.split('/')
 			.filter(Boolean);
 
-		const expectedSegmentCount =
-			fixedPathSegments.length +
-			branch.segments.length;
+		const expectedSegmentCount = fixedPathSegments.length + branch.segments.length;
 
 		if (actualSegments.length !== expectedSegmentCount)
 			return false;
@@ -303,9 +288,7 @@ export class UrlService {
 					const value = segments[segmentName];
 
 					if (value === undefined)
-						throw new Error(
-							`Missing segment '${segmentName}'`
-						);
+						throw new Error(`Missing segment '${segmentName}'`);
 
 					return value;
 				},

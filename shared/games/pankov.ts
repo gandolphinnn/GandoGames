@@ -18,7 +18,7 @@ export interface RevealResult {
 	livesLost: number;
 }
 
-export interface PankovSettings {
+export interface PankovSettings extends GameSettings {
 	/** Lives each player starts with. */
 	initialLives: number;
 	/** When on, a wrongly-challenged player loses 2^(pankovStreak-1) lives during a Pankov run. */
@@ -36,12 +36,11 @@ export interface PankovTurn {
 	actualRoll: RollValue | null;
 }
 
-export interface PankovGameState extends GameState<PankovPlayer> {
+export interface PankovGameState extends GameState<PankovPlayer, PankovSettings> {
 	gamePhase: 'turn-start' | 'rolled' | 'result' | 'game-over';
 	previousTurn: PankovTurn | null;
 	/** Hidden: current player's roll. Null for all other players. */
 	currentRoll: RollValue | null;
-	settings: PankovSettings;
 	/** Count of consecutive Pankov (21) declarations in the current run; drives sudden-death stakes. */
 	pankovStreak: number;
 	revealResult?: RevealResult;

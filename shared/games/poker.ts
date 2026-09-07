@@ -16,7 +16,7 @@ export interface PokerHandResult {
 	potAmount: number;
 }
 
-export interface PokerSettings {
+export interface PokerSettings extends GameSettings {
 	/** Starting chip stack per player. */
 	startingChips: number;
 	/**
@@ -33,14 +33,13 @@ export interface PokerSettings {
 	smallerDeck: boolean;
 }
 
-export interface PokerGameState extends GameState<PokerPlayer> {
+export interface PokerGameState extends GameState<PokerPlayer, PokerSettings> {
 	gamePhase: 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown' | 'game-over';
 	communityCards: Card[];
 	deck: Card[];
 	pot: number;
 	currentBet: number;
 	dealerIndex: number;
-	settings: PokerSettings;
 	/** When the blind clock started (game start); blinds escalate on real elapsed time from here. */
 	startedAt: Date;
 	/** Index into settings.blindLevels in effect for the in-progress hand (locked at each hand start). */

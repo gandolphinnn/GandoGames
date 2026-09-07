@@ -4,7 +4,7 @@ Defined in `site/src/app/app.routes.ts`, with the authenticated area lazy-loaded
 
 ### Public
 - `/about` — project info
-- `/games?` — list of all the games availables
+- `/games` — list of all the games availables
 
 ### Auth — `noAuthGuard` (redirects to `/` if already logged in)
 - `/login`
@@ -17,6 +17,7 @@ Defined in `site/src/app/app.routes.ts`, with the authenticated area lazy-loaded
 - `/profile` — profile & preferences (icon, theme, language), logout, delete account
 - `/social` — friends list and requests
 - `/rooms` — room list (the caller's active rooms + browsable rooms, with a per-game filter)
+- `/play/local/:gameId` — play games that supports local
 - `/play/global/:gameId` — play in a single player game with global leaderboard
 - `/play/room/:roomId` — room detail: lobby while `waiting`, hosts the game while `playing`
 

@@ -31,8 +31,7 @@ export class SignupComponent {
 		this.loading.set(true);
 		try {
 			await this.auth.register(email, password, username);
-			const returnUrl = this.urlService.get('signup').currentVariables().returnUrl?.substring(1) ?? '';
-			await this.urlService.get(returnUrl as BranchName).navigate();
+			const returnUrl = this.urlService.current()!.queryParams['returnUrl'];
 		} finally {
 			this.loading.set(false);
 		}

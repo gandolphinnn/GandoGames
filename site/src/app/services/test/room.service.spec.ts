@@ -100,15 +100,14 @@ describe('RoomService', () => {
 	});
 
 	describe('browsableRooms (computed)', () => {
-		it('shows only public/friends rooms the player is not already in (link & closed are unlisted)', () => {
+		it('shows only public rooms the player is not already in (link & closed are unlisted)', () => {
 			const mine = makeRoom({ id: 'mine', players: [makePlayer('player-1', 'Alice')] });
 			const publicRoom = makeRoom({ id: 'pub', players: [makePlayer('other', 'X')] });
-			const friendsRoom = makeRoom({ id: 'fr', access: 'friends', players: [makePlayer('other', 'X')] });
 			const linkRoom = makeRoom({ id: 'link', access: 'link', players: [makePlayer('other', 'X')] });
 			const closedRoom = makeRoom({ id: 'closed', access: 'closed', players: [makePlayer('other', 'X')] });
-			service.rooms.set([mine, publicRoom, friendsRoom, linkRoom, closedRoom]);
+			service.rooms.set([mine, publicRoom, linkRoom, closedRoom]);
 
-			expect(service.browsableRooms().map(r => r.id)).toEqual(['pub', 'fr']);
+			expect(service.browsableRooms().map(r => r.id)).toEqual(['pub']);
 		});
 	});
 
@@ -125,8 +124,8 @@ describe('RoomService', () => {
 	describe('setRoomAccess()', () => {
 		it('calls the rooms.setAccess endpoint with the room in the path and the policy in the body', async () => {
 			backendSpy.call.and.returnValue(Promise.resolve(makeRoom()));
-			await service.setRoomAccess('room-1', 'friends');
-			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.setAccess, { params: { roomId: 'room-1' }, body: { access: 'friends' } });
+			await service.setRoomAccess('room-1', 'link');
+			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.setAccess, { params: { roomId: 'room-1' }, body: { access: 'link' } });
 		});
 	});
 

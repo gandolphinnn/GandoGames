@@ -38,7 +38,7 @@ export class LoginComponent {
 		this.loading.set(true);
 		try {
 			await fn();
-			const returnUrl = this.urlService.current().queryParams['returnUrl'] ?? '';
+			const returnUrl = this.urlService.current().queryParams['returnUrl'] ?? 'games';
 			this.urlService.getState(returnUrl).navigate();
 		} finally {
 			this.loading.set(false);

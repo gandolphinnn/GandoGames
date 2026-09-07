@@ -27,7 +27,7 @@ export class RoomService {
 		return this.rooms().filter(r => {
 			const access = r.access ?? 'public';
 			const notInRoom = !userId || !r.players.some(p => p.id === userId);
-			return notInRoom && (access === 'public' || access === 'friends');
+			return notInRoom && access === 'public';
 		});
 	});
 

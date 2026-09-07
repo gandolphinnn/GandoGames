@@ -66,12 +66,6 @@ const roomJoinInner: InnerFunction<typeof API.rooms.join> = async (_body, params
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max players for this game');
 
-	// Friends-only rooms admit only the host's accepted friends. Link rooms need no extra check:
-	// reaching join with the right room code is itself proof of access (the code is the room id).
-	if (room.access === 'friends' && !(await areFriends(room.hostId, player.id))) {
-		throw new Error("Only the host's friends can join this room");
-	}
-
 	room.players.push(player);
 	await PlayfabCtx.rooms.upsert(params.roomId, room);
 	notifier.addToGroup(player.id, params.roomId);

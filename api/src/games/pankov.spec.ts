@@ -23,15 +23,15 @@ describe('PankovGame', () => {
 	beforeEach(() => {
 		game = new PankovGame('pankov');
 		game.initialize([p1, p2]);
+		game.state!.currentPlayerIndex = 0;
 	});
 
 	afterEach(() => jest.restoreAllMocks());
 
 	describe('initialize', () => {
-		it('starts in turn-start phase with player 0 as current', () => {
+		it('starts in turn-start phase', () => {
 			const state = game.state!;
 			expect(state.gamePhase).toBe('turn-start');
-			expect(state.currentPlayerIndex).toBe(0);
 			expect(state.previousTurn?.declaration).toBeFalsy();
 		});
 

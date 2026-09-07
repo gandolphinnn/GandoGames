@@ -10,13 +10,12 @@ export interface ChatMessage {
 /**
  * Who may discover and join a room — a single axis from most open to fully closed.
  * - `public`  — listed in the browse list; anyone may join.
- * - `friends` — listed, but only the host's friends may join (others see it locked).
  * - `link`    — hidden from the browse list; joinable only via an invite or by entering the room code.
  * - `closed`  — unlisted and frozen; no one new may join.
  */
-export type RoomAccessPolicy = 'public' | 'friends' | 'link' | 'closed';
+export type RoomAccessPolicy = 'public' | 'link' | 'closed';
 
-export const ROOM_ACCESS_POLICIES: readonly RoomAccessPolicy[] = ['public', 'friends', 'link', 'closed'];
+export const ROOM_ACCESS_POLICIES: readonly RoomAccessPolicy[] = ['public', 'link', 'closed'];
 
 /** Coerce an untrusted value to a valid access policy, defaulting to `public`. */
 export function resolveAccessPolicy(value: unknown): RoomAccessPolicy {

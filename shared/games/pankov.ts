@@ -23,6 +23,8 @@ export interface PankovSettings {
 	initialLives: number;
 	/** When on, a wrongly-challenged player loses 2^(pankovStreak-1) lives during a Pankov run. */
 	suddenDeath: boolean;
+	/** When off, the first player is always the host */
+	randomStartingPlayer: boolean;
 }
 
 export interface PankovTurn {
@@ -53,6 +55,7 @@ export const PANKOV_VALUE: RollValue = 21;
 export const PANKOV_SETTINGS_SCHEMA: GameSettingsSchema = [
 	{ key: 'initialLives', type: 'number', label: 'Lives', default: INITIAL_LIVES, min: 1, max: 20, step: 1, hint: 'Lives each player starts with.' },
 	{ key: 'suddenDeath', type: 'toggle', label: 'Sudden death', default: false, hint: 'On a Pankov run, a wrong challenge costs double each consecutive turn (1, 2, 4, …).' },
+	{ key: 'randomStartingPlayer', type: 'toggle', label: 'Random starting player', default: false, hint: 'The first player to roll is chosen at random' },
 ];
 
 /** Normalize raw settings into a fully-typed, validated PankovSettings (defaults + clamping). */

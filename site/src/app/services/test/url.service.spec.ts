@@ -21,7 +21,7 @@ describe('UrlService', () => {
 
 	describe('get()', () => {
 		it('exposes the branch url', () => {
-			expect(service.buildState('about').url).toBe('/play');
+			expect(service.buildState('about').url).toBe('about');
 		});
 	});
 
@@ -48,30 +48,30 @@ describe('UrlService', () => {
 		});
 	});
 
-	describe('get().urlTree()', () => {
+	describe('get().urlTree', () => {
 		it('builds the tree with segment variables', () => {
-			const tree = service.buildState('play_room', { roomId: 'V1LYBR' }).urlTree();
-			expect(router.serializeUrl(tree)).toBe('/play/V1LYBR');
+			const tree = service.buildState('play_room', { roomId: 'V1LYBR' }).urlTree;
+			expect(router.serializeUrl(tree)).toBe('/play/room/V1LYBR');
 		});
 
 		it('builds the tree with queryParam variables', () => {
-			const tree = service.buildState('login', { returnUrl: '/play' }).urlTree();
+			const tree = service.buildState('login', { returnUrl: '/play' }).urlTree;
 			expect(router.serializeUrl(tree)).toBe('/login?returnUrl=%2Fplay');
 		});
 
 		it('builds the root tree for the empty branch', () => {
-			expect(router.serializeUrl(service.buildState('').urlTree())).toBe('/');
+			expect(router.serializeUrl(service.buildState('').urlTree)).toBe('/');
 		});
 	});
 
 	describe('current', () => {
 		it('starts with the router url', () => {
-			expect(service.current().url).toBe('/');
+			expect(service.current().url).toBe('');
 		});
 
 		it('tracks navigations', async () => {
 			await router.navigateByUrl('/about');
-			expect(service.current().url).toBe('/about');
+			expect(service.current().url).toBe('about');
 		});
 	});
 

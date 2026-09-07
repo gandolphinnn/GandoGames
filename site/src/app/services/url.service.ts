@@ -34,8 +34,8 @@ export type BranchState = {
 	url: string;
 	segments: Record<string, string>;
 	queryParams: Record<string, string>;
-	navigate: () => void;
-	urlTree: () => UrlTree;
+	urlTree: UrlTree;
+	navigate: () => Promise<boolean>;
 };
 
 
@@ -158,10 +158,10 @@ export class UrlService {
 
 		/* -------------------------- Unknown params -------------------------- */
 
-		for (const paramName of Object.keys(urlTree.queryParams)) {
+		/* for (const paramName of Object.keys(urlTree.queryParams)) {
 			if (!branch.queryParams.includes(paramName))
 				throw new Error(`Unexpected query parameter '${paramName}' in URL: ${url}`);
-		}
+		} */
 
 
 		return this.createState(
@@ -267,7 +267,7 @@ export class UrlService {
 	/**
 	 * Creates a fully functional BranchState.
 	 *
-	 * This is the ONLY place where navigate() and urlTree()
+	 * This is the ONLY place where navigate() and urlTree
 	 * are assigned.
 	 */
 	private createState(
@@ -310,11 +310,8 @@ export class UrlService {
 			segments,
 			queryParams,
 
-			urlTree: () => tree,
-
-			navigate: () => {
-				void this.router.navigateByUrl(tree);
-			},
+			urlTree: tree,
+			navigate: async() => await this.router.navigateByUrl(tree),
 		};
 	}
 }

@@ -51,7 +51,6 @@ export class RoomLobbyComponent {
 		if (room.phase !== 'waiting' || this.isInRoom()) return false;
 		if (room.kickedPlayers?.includes(this.myId())) return false;
 		if ((room.access ?? 'public') === 'closed') return false;
-		if ((room.access ?? 'public') === 'friends' && room.hostId !== this.myId() && !this.isHostFriend()) return false;
 		const maxPlayers = GAME_REGISTRY[room.game]?.maxPlayers ?? 0;
 		return room.players.length < maxPlayers;
 	});
@@ -62,7 +61,6 @@ export class RoomLobbyComponent {
 		if (room.phase !== 'waiting' || this.isInRoom() || this.canJoin()) return '';
 		if (room.kickedPlayers?.includes(this.myId())) return 'LOBBY.BLOCKED_KICKED';
 		if ((room.access ?? 'public') === 'closed') return 'LOBBY.BLOCKED_CLOSED';
-		if ((room.access ?? 'public') === 'friends' && !this.isHostFriend()) return 'LOBBY.BLOCKED_FRIENDS';
 		return 'LOBBY.BLOCKED_FULL';
 	});
 

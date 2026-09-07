@@ -16,7 +16,7 @@
 				<span class="lobby-meta-count">{{ 'LOBBY.PLAYER_COUNT' | translate: { current: room()!.players.length, max: gameInfo()!.maxPlayers } }}</span>
 				<span class="room-access-badge"
 					[class.room-access-badge-closed]="room()!.access === 'closed'"
-					[class.room-access-badge-restricted]="room()!.access === 'link' || room()!.access === 'friends'"
+					[class.room-access-badge-restricted]="room()!.access === 'link'"
 					[title]="accessBadge().description | translate">
 					<ion-icon [name]="accessBadge().icon" />
 					{{ accessBadge().label | translate }}

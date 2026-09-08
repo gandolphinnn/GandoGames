@@ -87,7 +87,7 @@ const friendsListInner: InnerFunction<typeof API.friends.list> = async (_body, _
 
 const friendsRequestInner: InnerFunction<typeof API.friends.request> = async (_body, params, notifier, player) => {
 	if (player.type === 'guest') fail(notifier, 403, 'Guest accounts cannot add friends');
-	if (params.friendId === player.id) fail(notifier, 400, 'Invalid friend');
+	if (params.friendId === player.id) fail(notifier, 400, 'You cannot befriend yourself');
 
 	notifier.errorCode = 404;
 	notifier.errorMessage = 'Player not found';

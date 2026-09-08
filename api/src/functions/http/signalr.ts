@@ -1,6 +1,14 @@
-import { HttpHandler, InvocationContext } from '@azure/functions';
+import { HttpHandler, input, InvocationContext } from '@azure/functions';
 import { API } from '@gandogames/shared/dto';
-import { authenticateSession, extractSessionTicket, InnerFunctionNotifier, registerBaseEndpoint, signalRInput } from '../..';
+import { authenticateSession, extractSessionTicket, InnerFunctionNotifier, registerBaseEndpoint } from '../..';
+
+const signalRInput = input.generic({
+	type: 'signalRConnectionInfo',
+	name: 'connectionInfo',
+	hubName: 'gameHub',
+	connectionStringSetting: 'AzureSignalRConnectionString',
+	userId: '{query.userId}',
+});
 
 const negotiateHandler: HttpHandler = async (request, context: InvocationContext) => {
 	try {

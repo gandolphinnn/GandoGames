@@ -4,6 +4,7 @@ import { Game } from './game';
 import { PankovBot } from './bots/pankov';
 
 export class PankovGame extends Game<PankovGameState> {
+	constructor() {super('pankov')}
 	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
 		const resolved = resolvePankovSettings(settings);
 		const firstPlayerToGo = resolved.randomStartingPlayer? Math.floor(Math.random() * players.length) : 0;

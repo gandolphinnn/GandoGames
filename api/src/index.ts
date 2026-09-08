@@ -1,4 +1,4 @@
-import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, input, HttpHandler, FunctionInput, HttpMethod as AzureHttpMethod } from '@azure/functions';
+import { app, output, HttpRequest, HttpResponseInit, InvocationContext, Timer, HttpHandler, FunctionInput, HttpMethod as AzureHttpMethod } from '@azure/functions';
 import { AnyEndpoint, EndpointParams, GamePlayer, HttpMethod, IconType, LangCode, METHODS_WITH_BODY, PlayerRole, SAFE_METHODS, Theme } from '@gandogames/shared/dto';
 import { PlayFab, PlayFabServer } from 'playfab-sdk';
 import { InnerPublicFunction, InnerFunctionNotifier, InnerFunction, InnerTimeFunction } from './types';
@@ -9,14 +9,6 @@ export * from './types';
 
 PlayFab.settings.titleId = process.env['PLAYFAB_TITLE_ID']!;
 PlayFab.settings.developerSecretKey = process.env['PLAYFAB_SECRET_KEY']!;
-
-export const signalRInput = input.generic({
-	type: 'signalRConnectionInfo',
-	name: 'connectionInfo',
-	hubName: 'gameHub',
-	connectionStringSetting: 'AzureSignalRConnectionString',
-	userId: '{query.userId}',
-});
 
 export const signalROutput = output.generic({
 	type: 'signalR',

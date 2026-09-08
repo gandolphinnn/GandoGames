@@ -37,8 +37,8 @@ const gameActionInner: InnerFunction<typeof API.game.action> = async (body, para
 const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (body, params, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (!room) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('Only the host can change game settings');
-	if (room.phase !== 'waiting') throw new Error('Cannot change settings after the game has started');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.phase !== 'waiting') throw new Error('Game already started');
 
 	room.settings = resolveSettings(GAME_SETTINGS[room.game], body.settings);
 	await PlayfabCtx.rooms.upsert(params.roomId, room);

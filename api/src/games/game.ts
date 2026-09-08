@@ -6,7 +6,7 @@ export { GAMES_CONFIG } from '@gandogames/shared/config';
 export abstract class Game<TState extends GameState = GameState> {
 
 	public state: TState | null = null;
-	constructor(public name: GameName) {
+	protected constructor(public name: GameName) {
 	}
 
 	public abstract initialize(players: GamePlayer[], settings?: GameSettings): void;
@@ -24,6 +24,7 @@ export abstract class Game<TState extends GameState = GameState> {
 	}
 
 	public static Factory: (name: GameName) => Game = (_type) => {
-		throw new Error('Game.Factory not wired, import from api/src/games');
+		// Not implemented because it will be overridden in @api/src/games
+		throw new Error('Not implemented');
 	};
 }

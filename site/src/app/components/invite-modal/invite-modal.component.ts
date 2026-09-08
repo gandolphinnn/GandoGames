@@ -2,7 +2,7 @@ import { Component, computed, HostListener, inject, input, output, signal } from
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Friend, GameName, RoomData } from '@gandogames/shared/dto';
-import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
+import { PlayerAvatarComponent } from '@gandogames/components';
 import { FriendService, RoomService, UserService, ToastService } from '@gandogames/services';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 

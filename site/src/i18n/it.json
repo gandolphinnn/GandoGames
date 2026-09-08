@@ -15,7 +15,8 @@
 		"ADMIN": "Admin",
 		"PLAY": "Gioca",
 		"SOCIAL": "Social",
-		"ACTIVE_ROOMS": "Stanze attive"
+		"ACTIVE_ROOMS": "Stanze attive",
+		"LOGIN": "Accedi"
 	},
 	"ABOUT": {
 		"TITLE": "Informazioni",
@@ -101,6 +102,9 @@
 		"REQUEST_RECEIVED": "{{name}} ti ha inviato una richiesta di amicizia",
 		"REQUEST_SENT": "Richiesta di amicizia inviata a {{name}}"
 	},
+	"GAMES": {
+		"TITLE": "Giochi"
+	},
 	"ROOM_LIST": {
 		"TITLE": "Gioca",
 		"JOIN_PLACEHOLDER": "Hai un codice? Inseriscilo per entrare in una stanza privata",
@@ -116,7 +120,7 @@
 		"CREATE": "Crea stanza",
 		"CREATING": "Creazione…"
 	},
-	"GAMES": {
+	"GAME": {
 		"PLAYER_COUNT_FIXED": "{{count}} giocatori",
 		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} giocatori",
 		"PANKOV": {

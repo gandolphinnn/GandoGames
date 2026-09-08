@@ -43,7 +43,7 @@
 		}
 		<gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
 			@if (isPlaying()) {
-				<gg-room-game [roomId]="roomId()" [gameType]="room()!.game" />
+				<gg-room-game [roomId]="roomId()" [gameName]="room()!.game" />
 			} @else {
 				<gg-room-lobby
 					[room]="room()!"

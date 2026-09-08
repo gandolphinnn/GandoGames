@@ -8,6 +8,10 @@ export const routes: Routes = [
 		loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
 	},
 	{
+		path: '',
+		loadComponent: () => import('./pages/games/games.component').then((m) => m.GamesComponent),
+	},
+	{
 		path: 'games',
 		loadComponent: () => import('./pages/games/games.component').then((m) => m.GamesComponent),
 	},

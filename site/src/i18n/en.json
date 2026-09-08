@@ -15,7 +15,8 @@
 		"ADMIN": "Admin",
 		"PLAY": "Play",
 		"SOCIAL": "Social",
-		"ACTIVE_ROOMS": "Active Rooms"
+		"ACTIVE_ROOMS": "Active Rooms",
+		"LOGIN": "Log in"
 	},
 	"ABOUT": {
 		"TITLE": "About",
@@ -101,6 +102,9 @@
 		"REQUEST_RECEIVED": "{{name}} sent you a friend request",
 		"REQUEST_SENT": "Friend request sent to {{name}}"
 	},
+	"GAMES": {
+		"TITLE": "Games"
+	},
 	"ROOM_LIST": {
 		"TITLE": "Play",
 		"JOIN_PLACEHOLDER": "Have a code? Enter it to join a private room",
@@ -116,7 +120,7 @@
 		"CREATE": "Create Room",
 		"CREATING": "Creating…"
 	},
-	"GAMES": {
+	"GAME": {
 		"PLAYER_COUNT_FIXED": "{{count}} players",
 		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} players",
 		"PANKOV": {

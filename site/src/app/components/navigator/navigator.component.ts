@@ -8,26 +8,26 @@ import {
 import { TranslatePipe } from '@ngx-translate/core';
 import { GameName } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 import { UserService, RoomService, FriendService, UrlService } from '@gandogames/services';
+import { PlayerAvatarComponent } from '@gandogames/components';
 
 /**
- * The app's side-menu content: brand header, profile shortcut, navigation and the caller's
+ * The app's navigator content: brand header, profile shortcut, navigation and the caller's
  * active rooms. Rendered inside the shell's overlay `ion-menu` (App owns the menu chrome).
  * The item matching the current page — including the active room — is highlighted.
  */
 @Component({
-	selector: 'gg-side-menu',
+	selector: 'gg-navigator',
 	host: { style: 'display: contents' },
 	imports: [
 		IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg,
 		IonItem, IonLabel, IonList, IonMenuToggle, IonTitle, IonToolbar,
 		PlayerAvatarComponent, RouterLink, RouterLinkActive, TranslatePipe,
 	],
-	templateUrl: './side-menu.component.html',
-	styleUrl: './side-menu.component.scss',
+	templateUrl: './navigator.component.html',
+	styleUrl: './navigator.component.scss',
 })
-export class SideMenuComponent {
+export class Navigator {
 	private readonly userService = inject(UserService);
 	private readonly roomService = inject(RoomService);
 	private readonly friendService = inject(FriendService);

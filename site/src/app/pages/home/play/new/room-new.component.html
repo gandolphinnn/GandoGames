@@ -25,8 +25,8 @@
 						<span class="game-card-desc">{{ game.description | translate }}</span>
 						<span class="game-card-players">
 							{{ (game.minPlayers === game.maxPlayers
-								? ('GAMES.PLAYER_COUNT_FIXED' | translate: { count: game.minPlayers })
-								: ('GAMES.PLAYER_COUNT_RANGE' | translate: { min: game.minPlayers, max: game.maxPlayers })) }}
+								? ('GAME.PLAYER_COUNT_FIXED' | translate: { count: game.minPlayers })
+								: ('GAME.PLAYER_COUNT_RANGE' | translate: { min: game.minPlayers, max: game.maxPlayers })) }}
 						</span>
 					</button>
 				}

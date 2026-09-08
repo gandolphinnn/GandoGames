@@ -1,1 +1,14 @@
-<p>games works!</p>
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>{{ 'GAMES.TITLE' | translate }}</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+	<main class="games-main">
+		<h1>{{ 'GAMES.HEADING' | translate }}</h1>
+	</main>
+</ion-content>

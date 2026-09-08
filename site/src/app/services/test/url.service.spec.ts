@@ -91,7 +91,7 @@ describe('UrlService', () => {
 
 		it('is false on an unrelated url', async () => {
 			await router.navigateByUrl('/profile');
-			expect(service.isActive('play_global')).toBeFalse();
+			expect(service.isActive('play_local')).toBeFalse();
 		});
 
 		it('matches the root branch on /', async () => {

@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { GameState, GameType } from '@gandogames/shared/dto';
+import { GameState, GameName } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { SignalRService, RoomService, UserService, UrlService, ToastService } from '@gandogames/services';
 
@@ -13,7 +13,7 @@ import { SignalRService, RoomService, UserService, UrlService, ToastService } fr
 })
 export class RoomGameComponent implements OnInit, AfterViewInit {
 	public readonly roomId = input.required<string>();
-	public readonly gameType = input.required<GameType>();
+	public readonly gameName = input.required<GameName>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
@@ -50,7 +50,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	}
 
 	public ngAfterViewInit(): void {
-		const ref = this.gameSlot.createComponent(GAME_REGISTRY[this.gameType()].component);
+		const ref = this.gameSlot.createComponent(GAME_REGISTRY[this.gameName()].component);
 		const instance = ref.instance as GameComponent;
 
 		outputToObservable(instance.gameAction)
@@ -66,7 +66,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 
 	private async loadGameState(): Promise<void> {
 		try {
-			const state = await this.roomService.getGameState(this.gameType(), this.roomId());
+			const state = await this.roomService.getGameState(this.gameName(), this.roomId());
 			this.gameState.set(state);
 		} catch {
 			// state arrives via SignalR when the next action occurs
@@ -76,7 +76,7 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	private async sendAction(action: string, data?: unknown): Promise<void> {
 		this.loading.set(true);
 		try {
-			await this.roomService.gameAction(this.gameType(), this.roomId(), action, data);
+			await this.roomService.gameAction(this.gameName(), this.roomId(), action, data);
 		} catch (err) {
 			this.toast.error((err as Error).message);
 		} finally {

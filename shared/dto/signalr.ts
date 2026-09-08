@@ -1,4 +1,4 @@
-import type { GameState, GameType } from './game';
+import type { GameState, GameName } from './game';
 import type { ChatMessage, RoomData } from './room';
 import type { Friend } from './friends';
 
@@ -28,7 +28,7 @@ export interface SignalREventArgs {
 	/** A chat message was posted to a room. */
 	chatMessage: [roomId: string, message: ChatMessage];
 	/** The recipient was invited to a room; carries the room id and the game being played. */
-	roomInvite: [roomId: string, game: GameType];
+	roomInvite: [roomId: string, game: GameName];
 	/** Another (registered) player sent the recipient a friend request. */
 	friendRequest: [from: Friend];
 	/** The recipient's friend graph changed (accepted/declined/cancelled/removed) and should be reloaded. */

@@ -1,5 +1,5 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
-import { GameSettingsSchema, GameState, GameType } from "@gandogames/shared/dto";
+import { GameSettingsSchema, GameState, GameName } from "@gandogames/shared/dto";
 import { BaseGameDescriptor, GAMES_CONFIG } from '@gandogames/shared/config';
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
@@ -16,7 +16,7 @@ export interface GameComponent<TState extends GameState = GameState> {
 }
 
 interface GameDescriptor extends BaseGameDescriptor {
-	id: GameType;
+	id: GameName;
 	name: string;
 	icon: string;
 	/** Translation key: render with the `translate` pipe. */
@@ -28,7 +28,7 @@ interface GameDescriptor extends BaseGameDescriptor {
 	table: TablePreset;
 }
 
-export const GAME_REGISTRY: Record<GameType, GameDescriptor> = {
+export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 	pankov: {
 		id: 'pankov',
 		name: 'Pankov',

@@ -4,12 +4,12 @@ export const BRANCH_DEFINITIONS = {
 	games: 'games?flags',
 	login: 'login?returnUrl',
 	signup: 'signup?returnUrl',
-	admin: 'admin',
+	admin: 'admin', //TODO /:page
 	profile: 'profile',
 	social: 'social',
 	rooms: 'rooms?gameId',
 	play_local: 'play/local/:gameId',
-	play_global: 'play/global/:gameId',
+	play_single: 'play/single/:gameId',
 	play_room: 'play/room/:roomId',
 } as const;
 

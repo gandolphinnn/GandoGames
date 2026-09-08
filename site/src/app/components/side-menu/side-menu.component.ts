@@ -6,7 +6,7 @@ import {
 	MenuController,
 } from '@ionic/angular/standalone';
 import { TranslatePipe } from '@ngx-translate/core';
-import { GameType } from '@gandogames/shared/dto';
+import { GameName } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
 import { UserService, RoomService, FriendService, UrlService } from '@gandogames/services';
@@ -42,11 +42,11 @@ export class SideMenuComponent {
 	/** Room id in the current URL, to highlight the matching entry in the active-rooms list. */
 	public readonly activeRoomId = computed(() => this.urlService.current().segments['roomId'] ?? '');
 
-	public gameLabel(game: GameType): string {
+	public gameLabel(game: GameName): string {
 		return GAME_REGISTRY[game]?.name ?? game;
 	}
 
-	public gameIcon(game: GameType): string {
+	public gameIcon(game: GameName): string {
 		return GAME_REGISTRY[game]?.icon ?? '';
 	}
 

@@ -1,4 +1,4 @@
-import { GameSettingsSchema, GameType } from "..";
+import { GameSettingsSchema, GameName } from "..";
 import { PANKOV_SETTINGS_SCHEMA } from "./pankov";
 import { POKER_SETTINGS_SCHEMA } from "./poker";
 
@@ -7,7 +7,7 @@ import { POKER_SETTINGS_SCHEMA } from "./poker";
  * host's settings edit (defaults are filled from each field's `default` by `resolveSettings`).
  * The site reaches the same schemas through the game registry, so both sides share one definition.
  */
-export const GAME_SETTINGS: Record<GameType, GameSettingsSchema> = {
+export const GAME_SETTINGS: Record<GameName, GameSettingsSchema> = {
 	pankov: PANKOV_SETTINGS_SCHEMA,
 	poker: POKER_SETTINGS_SCHEMA,
 };

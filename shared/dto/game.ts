@@ -1,6 +1,6 @@
 import { GamePlayer } from "./auth";
 
-export type GameType = 'pankov' | 'poker';
+export type GameName = 'pankov' | 'poker';
 
 export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> {
 	lastUpdate: Date;
@@ -12,11 +12,11 @@ export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings ex
 
 /** Which game's state to load (the room travels as the `{roomId}` path segment). */
 export interface GameStateRequest {
-	game: GameType,
+	game: GameName,
 }
 
 export interface GameActionRequest {
-	game: GameType,
+	game: GameName,
 	action: string,
 	data: any,
 }

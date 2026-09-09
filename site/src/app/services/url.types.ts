@@ -7,9 +7,9 @@ export const BRANCH_DEFINITIONS = {
 	admin: 'admin', //TODO /:page
 	profile: 'profile',
 	social: 'social',
-	rooms: 'rooms?gameId',
-	play_local: 'play/local/:gameId',
-	play_single: 'play/single/:gameId',
+	rooms: 'rooms?game',
+	play_local: 'play/local/:game',
+	play_single: 'play/single/:game',
 	play_room: 'play/room/:roomId',
 } as const;
 

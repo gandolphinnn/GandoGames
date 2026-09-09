@@ -43,7 +43,7 @@ export class Navigator {
 	public readonly activeRoomId = computed(() => this.urlService.current().segments['roomId'] ?? '');
 
 	public gameLabel(game: GameName): string {
-		return GAME_REGISTRY[game]?.name ?? game;
+		return GAME_REGISTRY[game]?.title ?? game;
 	}
 
 	public gameIcon(game: GameName): string {

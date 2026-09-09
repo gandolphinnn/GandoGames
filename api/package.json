@@ -27,7 +27,7 @@
 			]
 		},
 		"moduleNameMapper": {
-			"^@gandogames/shared/dto$": "<rootDir>/../shared/index",
+			"^@gandogames/shared/dto$": "<rootDir>/../shared/dto/index",
 			"^@gandogames/shared/(.*)$": "<rootDir>/../shared/games/$1"
 		}
 	},

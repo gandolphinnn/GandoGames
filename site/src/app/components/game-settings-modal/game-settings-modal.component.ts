@@ -32,7 +32,7 @@ export class GameSettingsModalComponent {
 	public readonly closed = output<void>();
 
 	public readonly schema = computed<readonly SettingField[]>(() => GAME_REGISTRY[this.game()].settingsSchema);
-	public readonly gameName = computed(() => GAME_REGISTRY[this.game()].name);
+	public readonly gameName = computed(() => GAME_REGISTRY[this.game()].title);
 
 	/** Working copy the form mutates; seeded from the room's current (resolved) settings. */
 	public readonly working = signal<GameSettings>({});

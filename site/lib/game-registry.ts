@@ -15,8 +15,8 @@ export interface GameComponent<TState extends GameState = GameState> {
 }
 
 interface GameDescriptor extends BaseGameDescriptor {
-	id: GameName;
-	name: string;
+	name: GameName;
+	title: string;
 	icon: string;
 	/** Translation key: render with the `translate` pipe. */
 	description: string;
@@ -29,8 +29,8 @@ interface GameDescriptor extends BaseGameDescriptor {
 
 export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 	pankov: {
-		id: 'pankov',
-		name: 'Pankov',
+		name: 'pankov',
+		title: 'Pankov',
 		icon: 'fa-solid fa-dice',
 		description: 'GAME.PANKOV.DESCRIPTION',
 		...GAMES_CONFIG.pankov,
@@ -39,8 +39,8 @@ export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 		table: PANKOV_TABLE_PRESET,
 	},
 	poker: {
-		id: 'poker',
-		name: 'Texas Hold\'em',
+		name: 'poker',
+		title: 'Texas Hold\'em',
 		icon: 'fa-solid fa-hat-cowboy',
 		description: 'GAME.POKER.DESCRIPTION',
 		...GAMES_CONFIG.poker,
@@ -49,8 +49,8 @@ export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 		table: POKER_TABLE_PRESET,
 	},
 	mastermind: {
-		id: 'mastermind',
-		name: 'Mastermind',
+		name: 'mastermind',
+		title: 'Mastermind',
 		icon: 'fa-solid fa-brain',
 		description: 'GAME.MASTERMIND.DESCRIPTION',
 		...GAMES_CONFIG.mastermind,

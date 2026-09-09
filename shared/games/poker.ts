@@ -1,4 +1,4 @@
-import { BlindLevel, GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "..";
+import { BlindLevel, GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "../dto";
 import { type Card, type Rank, RANKS, cardKey, createDeck, shuffle } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {

@@ -1,4 +1,4 @@
-import { GamePlayer, GameSettings, GameName } from "..";
+import { GamePlayer, GameSettings, GameName } from ".";
 
 export interface ChatMessage {
 	playerId: string;

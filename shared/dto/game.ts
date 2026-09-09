@@ -1,6 +1,5 @@
 import { GamePlayer } from "./auth";
-
-export type GameName = 'pankov' | 'poker';
+import { GameName } from "./config";
 
 export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> {
 	lastUpdate: Date;

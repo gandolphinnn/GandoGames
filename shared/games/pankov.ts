@@ -1,4 +1,4 @@
-import { GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "..";
+import { GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "../dto";
 
 export type RollValue =
 	| 31 | 32 | 41 | 42 | 43 | 51 | 52 | 53 | 54 | 61 | 62 | 63 | 64 | 65

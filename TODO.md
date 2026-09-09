@@ -1,3 +1,8 @@
+- Admin tabs
+	Rooms: list all active rooms and apply actions on them
+	Labels: CRUD on all labels in multiple languages
+	Games: CMS for names and descriptions, visibility ecc... (only on existing games, this feature is not for creating or changing games and their behaviour)
+	Users: list all active users, change roles, ban. (TODO: see if its actually feasible, otherwise just use the playfab page) 
 - Og meta tags
 - API middleware to apply DRY on api methods for checks early returns
 - Improved login page:

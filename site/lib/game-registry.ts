@@ -1,6 +1,5 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
-import { GameSettingsSchema, GameState, GameName } from "@gandogames/shared/dto";
-import { BaseGameDescriptor, GAMES_CONFIG } from '@gandogames/shared/config';
+import { GameSettingsSchema, GameState, GameName, BaseGameDescriptor, GAMES_CONFIG } from "@gandogames/shared/dto";
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
 import { TablePreset } from '@gandogames/lib/common/game-table';
@@ -49,4 +48,14 @@ export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 		settingsSchema: POKER_SETTINGS_SCHEMA,
 		table: POKER_TABLE_PRESET,
 	},
+	mastermind: {
+		id: 'mastermind',
+		name: 'Mastermind',
+		icon: 'fa-solid fa-brain',
+		description: 'GAME.MASTERMIND.DESCRIPTION',
+		...GAMES_CONFIG.mastermind,
+		component: PokerGameComponent,
+		settingsSchema: POKER_SETTINGS_SCHEMA,
+		table: POKER_TABLE_PRESET,
+	}
 };

@@ -1,5 +1,3 @@
-import { GameName } from "..";
-
 export type GameCategory = 'local' | 'single' | 'room';
 
 export interface BaseGameDescriptor {
@@ -8,10 +6,8 @@ export interface BaseGameDescriptor {
 	supportsBots: boolean;
 	category: GameCategory;
 }
-/**
- * Per-game player limits, keyed by game name. The single source of truth shared by the API
- * (join/start validation) and the site (game registry / lobby UI), so the two can never disagree.
- */
+
+export type GameName = 'pankov' | 'poker' | 'mastermind';
 export const GAMES_CONFIG: Record<GameName, BaseGameDescriptor> = {
 	pankov: {
 		minPlayers: 2,
@@ -24,5 +20,11 @@ export const GAMES_CONFIG: Record<GameName, BaseGameDescriptor> = {
 		maxPlayers: 8,
 		supportsBots: false,
 		category: 'room',
+	},
+	mastermind: {
+		minPlayers: 1,
+		maxPlayers: 1,
+		supportsBots: false,
+		category: 'single',
 	},
 };

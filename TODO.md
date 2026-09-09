@@ -1,17 +1,15 @@
-- ReturnUrl BUG when the url included the room code
+- Og meta tags
 - API middleware to apply DRY on api methods for checks early returns
-- Save/import game settings presets:
-	Let a player save a favourite combination of game settings and import them into a room in one click.
-	(The per-room Game settings editor — game/settings/get & set, schema-driven modal, pankov & poker settings — is already implemented; this presets feature was deferred.)
 - Improved login page:
 	login with other means (google, facebook, apple...)
 	alert guest login that many functionalities are not available and that the profile could be deleted
 - Push notifications
 - Game statistics
-- AI bot mutation logic: higly tested code, with random number generation based on an initial seed.
+- Save/import game settings presets:
+	Let a player save a favourite combination of game settings and import them into a room in one click.
+	(The per-room Game settings editor — game/settings/get & set, schema-driven modal, pankov & poker settings — is already implemented; this presets feature was deferred.)
 - Room list filters
 	By games (dropdown combo)
-	By friends only (DEPENDS ON FRIENDS FEATURE)
 	By players range
 	By flags (like "canAddBot", "canPlayLocally", ecc...) (these flags are just ideas)
 - Online player counter based on last request done

@@ -3,6 +3,7 @@ import { GameState, GameName, RoomData } from "@gandogames/shared/dto";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
 import { pfPromise } from "..";
+import { MastermindGameState } from "@gandogames/shared/mastermind";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
@@ -109,6 +110,8 @@ export class PlayfabCtx {
 	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', HOOKS.lastUpdate());
 
 	public static readonly game: Record<GameName, PlayFabEntity<GameState>> = {
+		// TODO REMOVE!!!
+		'mastermind': new PlayFabEntity<MastermindGameState>('MASTERMIND_GAMES_INDEX', HOOKS.lastUpdate()),
 		'pankov': new PlayFabEntity<PankovGameState>('PANKOV_GAMES_INDEX', HOOKS.lastUpdate()),
 		'poker': new PlayFabEntity<PokerGameState>('POKER_GAMES_INDEX', HOOKS.lastUpdate()),
 	}

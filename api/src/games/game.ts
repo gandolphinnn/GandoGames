@@ -1,7 +1,4 @@
-import { GamePlayer, GameSettings, GameState, GameName } from '@gandogames/shared/dto';
-import { GAMES_CONFIG } from './game';
-
-export { GAMES_CONFIG } from '@gandogames/shared/config';
+import { GamePlayer, GameSettings, GameState, GameName, GAMES_CONFIG } from '@gandogames/shared/dto';
 
 export abstract class Game<TState extends GameState = GameState> {
 

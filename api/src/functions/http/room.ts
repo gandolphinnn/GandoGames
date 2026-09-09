@@ -1,7 +1,6 @@
-import { API, RoomData, buildBot, resolveAccessPolicy } from '@gandogames/shared/dto';
-import { Game, GAMES_CONFIG } from '../../games';
+import { API, GAMES_CONFIG, RoomData, buildBot, resolveAccessPolicy } from '@gandogames/shared/dto';
+import { Game } from '../../games';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
-import { areFriends } from './friends';
 
 const roomCreateInner: InnerFunction<typeof API.rooms.create> = async (body, _params, notifier, player) => {
 	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();

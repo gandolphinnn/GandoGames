@@ -1,7 +1,20 @@
-import { API, resolveSettings } from '@gandogames/shared/dto';
-import { GAME_SETTINGS } from '@gandogames/shared/settings';
+import { API, GameName, GameSettingsSchema, resolveSettings } from '@gandogames/shared/dto';
+import { MASTERMIND_SETTINGS_SCHEMA } from '@gandogames/shared/mastermind';
+import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
+import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
 import { Game } from '../../games';
+
+/**
+ * Per-game settings schema, keyed by game type. The single backend-side lookup for validating a
+ * host's settings edit (defaults are filled from each field's `default` by `resolveSettings`).
+ * The site reaches the same schemas through the game registry, so both sides share one definition.
+ */
+const GAME_SETTINGS: Record<GameName, GameSettingsSchema> = {
+	mastermind: MASTERMIND_SETTINGS_SCHEMA,
+	pankov: PANKOV_SETTINGS_SCHEMA,
+	poker: POKER_SETTINGS_SCHEMA,
+};
 
 const gameStateInner: InnerFunction<typeof API.game.state> = async (body, params, _notifier, player) => {
 	const state = await PlayfabCtx.game[body.game].get(params.roomId);

@@ -6,4 +6,4 @@ export * from './languages';
 export * from './player-icons';
 export * from './room';
 export * from './signalr';
-export * from './config';
+export * from './game_config';

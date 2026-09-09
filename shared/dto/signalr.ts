@@ -1,6 +1,7 @@
-import type { GameState, GameName } from './game';
+import type { GameState } from './game';
 import type { ChatMessage, RoomData } from './room';
 import type { Friend } from './friends';
+import type { GameName } from './game_config';
 
 /** Response from the SignalR negotiate endpoint: the hub URL + access token the client connects with. */
 export interface NegotiateResponse {

@@ -302,7 +302,6 @@ export class UrlService {
 			},
 		);
 
-
 		return {
 			url: branch.url,
 			branchName,

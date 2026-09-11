@@ -103,6 +103,6 @@ export class RoomListComponent implements OnInit {
 	}
 
 	public goToCreate(): void {
-		void this.urlService.buildState('rooms').navigate();
+		void this.urlService.buildState('rooms_new').navigate();
 	}
 }

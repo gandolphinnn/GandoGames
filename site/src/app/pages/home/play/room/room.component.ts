@@ -8,8 +8,8 @@ import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
 import { UrlService, RoomService, UserService, SignalRService, ToastService } from '@gandogames/services';
 import { ChatComponent, RefreshableContentComponent, RoomAccessModalComponent } from '@gandogames/components';
-import { RoomLobbyComponent } from './lobby/room-lobby.component';
-import { RoomGameComponent } from './game/room-game.component';
+import { RoomLobbyComponent } from '../lobby/room-lobby.component';
+import { RoomGameComponent } from '../game/room-game.component';
 
 /**
  * Room shell: owns room loading/state and renders the header, chat and refreshable
@@ -128,6 +128,6 @@ export class RoomComponent implements OnInit {
 	}
 
 	private navigateToRoomsList() {
-		void this.urlService.buildState('rooms').navigate();
+		void this.urlService.buildState('rooms_list').navigate();
 	}
 }

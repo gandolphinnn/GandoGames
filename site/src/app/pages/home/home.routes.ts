@@ -16,8 +16,12 @@ export const HOME_ROUTES: Routes = [
 		loadComponent: () => import('./social/social.component').then((m) => m.SocialComponent),
 	},
 	{
-		path: 'rooms',
-		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
+		path: 'rooms/list',
+		loadComponent: () => import('./room/list/room-list.component').then((m) => m.RoomListComponent),
+	},
+	{
+		path: 'rooms/new',
+		loadComponent: () => import('./room/new/room-new.component').then((m) => m.RoomNewComponent),
 	},
 	{
 		path: 'play',

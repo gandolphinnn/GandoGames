@@ -16,7 +16,7 @@ export class RoomNewComponent {
 	private readonly roomService = inject(RoomService);
 
 	public readonly allGames = Object.values(GAME_REGISTRY);
-	public readonly selectedGameId = signal<string>(this.allGames[0]?.id ?? '');
+	public readonly selectedGameId = signal<string>(this.allGames[0]?.name ?? '');
 	public readonly loading = signal(false);
 
 	public select(id: string): void {
@@ -28,7 +28,7 @@ export class RoomNewComponent {
 		try {
 			this.loading.set(true);
 			const room = await this.roomService.createRoom(this.selectedGameId() as any);
-			void this.urlService.get('play').navigate({ roomId: room.id });
+			void this.urlService.buildState('play_room', { roomId: room.id }).navigate();
 		} finally {
 			this.loading.set(false);
 		}

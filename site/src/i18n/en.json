@@ -15,7 +15,8 @@
 		"ADMIN": "Admin",
 		"PLAY": "Play",
 		"SOCIAL": "Social",
-		"ACTIVE_ROOMS": "Active Rooms"
+		"ACTIVE_ROOMS": "Active Rooms",
+		"LOGIN": "Log in"
 	},
 	"ABOUT": {
 		"TITLE": "About",
@@ -101,6 +102,9 @@
 		"REQUEST_RECEIVED": "{{name}} sent you a friend request",
 		"REQUEST_SENT": "Friend request sent to {{name}}"
 	},
+	"GAMES": {
+		"TITLE": "Games"
+	},
 	"ROOM_LIST": {
 		"TITLE": "Play",
 		"JOIN_PLACEHOLDER": "Have a code? Enter it to join a private room",
@@ -116,7 +120,7 @@
 		"CREATE": "Create Room",
 		"CREATING": "Creating…"
 	},
-	"GAMES": {
+	"GAME": {
 		"PLAYER_COUNT_FIXED": "{{count}} players",
 		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} players",
 		"PANKOV": {
@@ -157,7 +161,6 @@
 		"FIND_ANOTHER": "Find another room",
 		"BLOCKED_KICKED": "You have been kicked from this room.",
 		"BLOCKED_CLOSED": "This room is closed.",
-		"BLOCKED_FRIENDS": "Only the host's friends can join this room.",
 		"BLOCKED_FULL": "This room is full.",
 		"KICK_CONFIRM": "Kick {{name}} from the room?"
 	},
@@ -191,10 +194,6 @@
 		"PUBLIC": {
 			"LABEL": "Public",
 			"DESCRIPTION": "Anyone can find and join this room."
-		},
-		"FRIENDS": {
-			"LABEL": "Friends only",
-			"DESCRIPTION": "Only your friends can join, others see it locked."
 		},
 		"LINK": {
 			"LABEL": "With link",

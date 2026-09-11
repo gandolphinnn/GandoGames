@@ -21,17 +21,17 @@ describe('PankovGame', () => {
 	let game: PankovGame;
 
 	beforeEach(() => {
-		game = new PankovGame('pankov');
+		game = new PankovGame();
 		game.initialize([p1, p2]);
+		game.state!.currentPlayerIndex = 0;
 	});
 
 	afterEach(() => jest.restoreAllMocks());
 
 	describe('initialize', () => {
-		it('starts in turn-start phase with player 0 as current', () => {
+		it('starts in turn-start phase', () => {
 			const state = game.state!;
 			expect(state.gamePhase).toBe('turn-start');
-			expect(state.currentPlayerIndex).toBe(0);
 			expect(state.previousTurn?.declaration).toBeFalsy();
 		});
 
@@ -60,7 +60,7 @@ describe('PankovGame', () => {
 		});
 
 		it('throws when game not initialized', () => {
-			expect(() => new PankovGame('pankov').action(p1, 'roll', {})).toThrow('Game not initialized');
+			expect(() => new PankovGame().action(p1, 'roll', {})).toThrow('Game not initialized');
 		});
 	});
 
@@ -198,7 +198,7 @@ describe('PankovGame', () => {
 		});
 
 		it('throws when game not initialized', () => {
-			expect(() => new PankovGame('pankov').getPublicState('p1')).toThrow('Game not initialized');
+			expect(() => new PankovGame().getPublicState('p1')).toThrow('Game not initialized');
 		});
 	});
 

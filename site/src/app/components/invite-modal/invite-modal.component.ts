@@ -1,8 +1,8 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Friend, GameType, RoomData } from '@gandogames/shared/dto';
-import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
+import { Friend, GameName, RoomData } from '@gandogames/shared/dto';
+import { PlayerAvatarComponent } from '@gandogames/components';
 import { FriendService, RoomService, UserService, ToastService } from '@gandogames/services';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 
@@ -20,7 +20,7 @@ export class InviteModalComponent {
 	private readonly translate = inject(TranslateService);
 	
 	public readonly room = input.required<RoomData>();
-	public readonly gameType = input.required<GameType>();
+	public readonly gameName = input.required<GameName>();
 	public readonly isHost = input.required<boolean>();
 	public readonly playerCount = input.required<number>();
 	public readonly maxPlayers = input.required<number>();

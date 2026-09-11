@@ -1,5 +1,5 @@
 import { computed, inject, Service, signal } from '@angular/core';
-import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameStateRequest, GameType, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
+import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameStateRequest, GameName, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 import { UserService } from './user.service';
@@ -27,7 +27,7 @@ export class RoomService {
 		return this.rooms().filter(r => {
 			const access = r.access ?? 'public';
 			const notInRoom = !userId || !r.players.some(p => p.id === userId);
-			return notInRoom && (access === 'public' || access === 'friends');
+			return notInRoom && access === 'public';
 		});
 	});
 
@@ -55,7 +55,7 @@ export class RoomService {
 		this.rooms.set(summaries);
 	}
 
-	public createRoom(game: GameType): Promise<RoomData> {
+	public createRoom(game: GameName): Promise<RoomData> {
 		const request: RoomCreateRequest = { game };
 		return this.backend.call(API.rooms.create, { body: request });
 	}
@@ -109,12 +109,12 @@ export class RoomService {
 		return this.backend.call(API.rooms.addBot, { params: { roomId } });
 	}
 
-	public getGameState(game: GameType, roomId: string): Promise<GameState | null> {
+	public getGameState(game: GameName, roomId: string): Promise<GameState | null> {
 		const request: GameStateRequest = { game };
 		return this.backend.call(API.game.state, { params: { roomId }, body: request });
 	}
 
-	public gameAction(game: GameType, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
+	public gameAction(game: GameName, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
 		const request: GameActionRequest = { game, action, data: data ?? null };
 		return this.backend.call(API.game.action, { params: { roomId }, body: request });
 	}

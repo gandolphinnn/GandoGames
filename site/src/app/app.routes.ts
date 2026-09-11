@@ -8,6 +8,15 @@ export const routes: Routes = [
 		loadComponent: () => import('./pages/about/about.component').then((m) => m.AboutComponent),
 	},
 	{
+		path: '',
+		pathMatch: 'full',
+		redirectTo: 'games',
+	},
+	{
+		path: 'games',
+		loadComponent: () => import('./pages/games/games.component').then((m) => m.GamesComponent),
+	},
+	{
 		path: 'login',
 		loadComponent: () => import('./pages/auth/login/login.component').then((m) => m.LoginComponent),
 		canActivate: [noAuthGuard],
@@ -22,10 +31,6 @@ export const routes: Routes = [
 		loadComponent: () => import('./pages/home/home.component').then((m) => m.HomeComponent),
 		canActivate: [authGuard],
 		loadChildren: () => import('./pages/home/home.routes').then((m) => m.HOME_ROUTES),
-	},
-	{
-		path: 'test/palette',
-		loadComponent: () => import('./pages/test/palette/palette.component').then((m) => m.PaletteComponent),
 	},
 	{
 		path: '**',

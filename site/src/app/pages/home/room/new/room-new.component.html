@@ -2,7 +2,7 @@
 	<ion-toolbar>
 		<ion-buttons slot="start">
 			<ion-menu-button />
-			<ion-button [routerLink]="['/play']" fill="clear">
+			<ion-button [routerLink]="['/rooms/list']" fill="clear">
 				<ion-icon name="arrow-back" slot="icon-only" />
 			</ion-button>
 		</ion-buttons>
@@ -14,19 +14,19 @@
 	<div class="create-page">
 		<div class="create-form">
 			<div class="game-grid">
-				@for (game of allGames; track game.id) {
+				@for (game of allGames; track game.name) {
 					<button
 						class="game-card"
-						[class.selected]="selectedGameId() === game.id"
-						(click)="select(game.id)"
+						[class.selected]="selectedGameId() === game.name"
+						(click)="select(game.name)"
 					>
 						<i [class]="'game-card-icon ' + game.icon"></i>
 						<span class="game-card-name">{{ game.name }}</span>
 						<span class="game-card-desc">{{ game.description | translate }}</span>
 						<span class="game-card-players">
 							{{ (game.minPlayers === game.maxPlayers
-								? ('GAMES.PLAYER_COUNT_FIXED' | translate: { count: game.minPlayers })
-								: ('GAMES.PLAYER_COUNT_RANGE' | translate: { min: game.minPlayers, max: game.maxPlayers })) }}
+								? ('GAME.PLAYER_COUNT_FIXED' | translate: { count: game.minPlayers })
+								: ('GAME.PLAYER_COUNT_RANGE' | translate: { min: game.minPlayers, max: game.maxPlayers })) }}
 						</span>
 					</button>
 				}

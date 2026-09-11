@@ -1,7 +1,7 @@
 import { Component, computed, effect, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon, IonToggle } from '@ionic/angular/standalone';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { BlindLevel, GameSettings, GameType, SettingField, resolveSettings } from '@gandogames/shared/dto';
+import { BlindLevel, GameSettings, GameName, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BlindLevelsEditorComponent } from './blind-levels-editor.component';
 import { RoomService, ToastService } from '@gandogames/services';
@@ -22,7 +22,7 @@ export class GameSettingsModalComponent {
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
-	public readonly game = input.required<GameType>();
+	public readonly game = input.required<GameName>();
 	public readonly roomId = input.required<string>();
 	/** The room's current settings, used to pre-fill the form. */
 	public readonly settings = input<GameSettings>({});
@@ -32,7 +32,7 @@ export class GameSettingsModalComponent {
 	public readonly closed = output<void>();
 
 	public readonly schema = computed<readonly SettingField[]>(() => GAME_REGISTRY[this.game()].settingsSchema);
-	public readonly gameName = computed(() => GAME_REGISTRY[this.game()].name);
+	public readonly gameName = computed(() => GAME_REGISTRY[this.game()].title);
 
 	/** Working copy the form mutates; seeded from the room's current (resolved) settings. */
 	public readonly working = signal<GameSettings>({});

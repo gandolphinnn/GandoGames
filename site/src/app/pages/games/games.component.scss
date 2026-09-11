@@ -1,0 +1,192 @@
+@use 'styles/variables' as *;
+
+.games-page {
+	padding: $s6;
+	max-width: 720px;
+	margin: 0 auto;
+}
+
+.filter {
+	&-bar {
+		display: flex; gap: $s2; flex-wrap: wrap; margin-bottom: $s6;
+	}
+
+	&-btn {
+		display: flex;
+		align-items: center;
+		gap: $s2;
+		padding: $s2 $s4;
+		border-radius: $radius-full;
+		border: 1px solid $border;
+		background: transparent;
+		color: $text-muted;
+		font-size: $text-sm;
+		cursor: pointer;
+		transition: background $transition, color $transition, border-color $transition;
+		min-height: 44px;
+
+		&:hover {
+			color: $text; border-color: $text-muted;
+		}
+		&.active {
+			background: $accent; border-color: $accent; color: $color-on-accent;
+		}
+	}
+}
+
+.status-msg {
+	color: $text-muted; font-size: $text-sm;
+}
+
+.join-code {
+	display: flex;
+	gap: $s2;
+	align-items: stretch;
+
+	&-input {
+		flex: 1;
+		min-width: 0;
+		padding: $s2 $s4;
+		min-height: 44px;
+		background: $bg-card;
+		color: $text;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		font-size: $text-sm;
+		text-transform: uppercase;
+		transition: border-color $transition;
+
+		&::placeholder {
+			text-transform: none; color: $text-muted;
+		}
+		&:focus {
+			outline: none; border-color: $accent;
+		}
+	}
+}
+
+.my-games {
+	display: flex;
+	flex-direction: column;
+	gap: $s2;
+
+	&-label {
+		font-size: $text-sm;
+		font-weight: 600;
+		color: $text-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	&-chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: $s2;
+	}
+
+	&-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: $s2;
+		padding: $s1 $s4;
+		min-height: 44px;
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-full;
+		color: $text;
+		font-size: $text-sm;
+		cursor: pointer;
+		transition: border-color $transition, background $transition;
+
+		&:hover {
+			border-color: $accent;
+			background: $accent-tint;
+		}
+
+		&-icon {
+			color: $text-muted;
+			font-size: $text-sm;
+		}
+
+		&-id {
+			font-family: monospace;
+			font-weight: 600;
+		}
+
+		&-live {
+			width: 8px;
+			height: 8px;
+			flex-shrink: 0;
+			border-radius: $radius-full;
+			background: $color-success;
+		}
+	}
+}
+
+.game {
+	&-list {
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: $s3;
+
+		&-wrap {
+			display: flex; flex-direction: column; gap: $s4;
+		}
+	}
+
+	&-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: $s4 $s6;
+		background: $bg-card;
+		border: 1px solid $border;
+		border-radius: $radius-md;
+		cursor: pointer;
+		transition: border-color $transition, background $transition;
+		min-height: 44px;
+
+		&:hover {
+			border-color: $accent; background: $accent-tint;
+		}
+
+		&-info {
+			display: flex; flex-direction: column; gap: $s1;
+		}
+		&-game {
+			font-weight: 600; font-size: $text-base;
+			display: flex; align-items: center; gap: $s2;
+		}
+		&-badge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			color: $text-muted;
+
+			ion-icon { font-size: 1rem; }
+		}
+		&-players-list {
+			font-size: $text-sm; color: $text-muted;
+		}
+		&-count {
+			font-size: $text-sm; color: $accent; font-weight: 600; white-space: nowrap;
+		}
+	}
+}
+
+.empty {
+	&-state {
+		display: flex; flex-direction: column; align-items: flex-start; gap: $s3; padding: $s8 0;
+	}
+	&-icon {
+		font-size: 2.5rem; line-height: 1;
+	}
+	&-title {
+		font-size: $text-xl; font-weight: 700; color: $text;
+	}
+	&-subtitle {
+		font-size: $text-sm; color: $text-muted; margin-top: -$s2;
+	}
+}
+

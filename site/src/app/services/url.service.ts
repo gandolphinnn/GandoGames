@@ -1,169 +1,315 @@
-import { computed, inject, Service, Signal } from '@angular/core';
+import { inject, Service, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, NavigationExtras, Params, PRIMARY_OUTLET, Router, UrlTree } from '@angular/router';
+import { NavigationEnd, Router, UrlTree } from '@angular/router';
 import { filter, map } from 'rxjs';
+import { Branch, BRANCH_DEFINITIONS, BranchName, BuildStateArguments } from './url.types';
+export { type BranchName } from './url.types';
 
-/**
- * Insert here and in the TREE object all the url branches of the app
- */
-export type BranchName = ''
-	| 'about'
-	| 'admin'
-	| 'login'
-	| 'play'
-	| 'play/new'
-	| 'profile'
-	| 'signup'
-	| 'social'
-	;
 
-type UrlTreeBranch = {
-	url: string,
-	variables?: Record<string, { type: 'segment' | 'queryParam'; mandatory: boolean }>,
+const BRANCHES: Record<BranchName, Branch> = Object.fromEntries(
+	Object.entries(BRANCH_DEFINITIONS)
+		.map(([name, path]) => {
+			const match = path.match(
+				/^(?<path>[^?:]+)(?<segments>(?::[^?:]+)*)(?:\?(?<queryParams>[^:]+(?:\?[^:]+)*))?$/
+			);
+
+			if (path === '') {
+				return [name, { url: '', segments: [], queryParams: []}]
+			}
+
+			if (!match?.groups)
+				throw new Error(`Invalid URL: ${path}`);
+
+			const branch: Branch = {
+				url: match.groups['path'].replace(/\/$/, '').trim(),
+				segments: match.groups['segments'].split(/\/?:/).filter(Boolean) ?? [],
+				queryParams: match.groups['queryParams']?.split(/\/?\?/).filter(Boolean) ?? [],
+			};
+			return [name, branch];
+		})
+) as Record<BranchName, Branch>;
+
+export type BranchState = {
+	branchName: BranchName;
+	url: string;
+	segments: Record<string, string>;
+	queryParams: Record<string, string>;
+	urlTree: UrlTree;
+	navigate: () => Promise<boolean>;
 };
 
-/**
- * `as const` keeps the literal keys and `mandatory` flags of each branch's `variables`,
- * so `BranchVariables` can derive a per-branch typed params object; `satisfies` still
- * enforces the `UrlTreeBranch` shape and that every `BranchName` is present.
- */
-const TREE = {
-	'': { url: '' },
-	'about': { url: '/about' },
-	'admin': { url: '/admin' },
-	'login': { url: '/login', variables: { returnUrl: { type: 'queryParam', mandatory: false } } },
-	'signup': { url: '/signup', variables: { returnUrl: { type: 'queryParam', mandatory: false } } },
-	'profile': { url: '/profile' },
-	'social': { url: '/social' },
-	'play': { url: '/play', variables: { roomId: { type: 'segment', mandatory: false } } },
-	'play/new': { url: '/play/new' },
-} as const satisfies Record<BranchName, UrlTreeBranch>;
-
-/**
- * The variables object accepted by a branch: `mandatory: true` keys are required,
- * the others are optional. Branches without variables accept no keys at all.
- */
-type BranchVariables<B extends BranchName> = typeof TREE[B] extends { variables: infer V }
-	? { [K in keyof V as V[K] extends { mandatory: true } ? K : never]: string }
-	& { [K in keyof V as V[K] extends { mandatory: false } ? K : never]?: string }
-	: Record<string, never>;
-
-/** The `variables` argument itself is optional only when the branch has no mandatory variables. */
-type VariablesArg<B extends BranchName> = {} extends BranchVariables<B>
-	? [variables?: BranchVariables<B>]
-	: [variables: BranchVariables<B>];
-
-type TreeObject<B extends BranchName> = UrlTreeBranch & {
-	navigate: (...args: [...VariablesArg<B>, extras?: NavigationExtras]) => Promise<boolean>;
-	urlTree: (...args: VariablesArg<B>) => UrlTree;
-	/**
-	 * The branch's variables as read from the current URL (the inverse of `navigate`).
-	 * All keys are optional: they are absent when the current URL is not on this branch.
-	 */
-	currentVariables: Signal<Partial<BranchVariables<B>>>;
-};
+/* -------------------------------------------------------------------------- */
+/*                                UrlService                                  */
+/* -------------------------------------------------------------------------- */
 
 @Service()
 export class UrlService {
 	private readonly router = inject(Router);
+
 	/**
-	 * A signal that tracks the current URL of the application.
+	 * Current application branch.
+	 *
+	 * It is updated reactively after every successful navigation.
 	 */
-	public readonly current = toSignal(
+	public readonly current: Signal<BranchState> = toSignal(
 		this.router.events.pipe(
-			filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-			map(e => e.urlAfterRedirects),
+			filter(
+				(event): event is NavigationEnd =>
+					event instanceof NavigationEnd
+			),
+			map(event => this.getState(event.urlAfterRedirects)),
 		),
-		{ initialValue: this.router.url },
+		{
+			initialValue: this.getState(this.router.url),
+		},
 	);
 
-	/**
-	 * Usage: `this.urlService.get('play').navigate({ roomId: 'V1LYBR' })`
-	 */
-	public get<B extends BranchName>(branchName: B): TreeObject<B> {
-		const branch: UrlTreeBranch = TREE[branchName];
-		if (!branch) throw new Error(`UrlService: unknown branch '${branchName}'`);
-
-		// The closures are loosely typed: TS can't match them against the still-generic
-		// VariablesArg<B>, so the per-branch typing is applied via the return type only.
-		return {
-			...branch,
-			navigate: (variables: Record<string, string | undefined> = {}, extras: NavigationExtras = {}) => {
-				const { commands, queryParams } = this.resolve(branchName, variables);
-				return this.router.navigate(commands, {
-					queryParams: queryParams,
-					...extras,
-				});
-			},
-			urlTree: (variables: Record<string, string | undefined> = {}) => {
-				const { commands, queryParams } = this.resolve(branchName, variables);
-				return this.router.createUrlTree(commands, { queryParams: queryParams });
-			},
-			currentVariables: computed(() => this.readVariables(branchName)),
-		} as unknown as TreeObject<B>;
+	public isActive(branchName: BranchName) {
+		return this.current().branchName == branchName;
 	}
 
 	/**
-	 * True when the current URL (ignoring query params) is exactly the given branch's url.
+	 * Get the BranchState from a real URL.
+	 *
+	 * Examples:
+	 *
+	 * 'play/room/ABC123'
+	 * =>
+	 * {
+	 *   branchName: 'play_room',
+	 *   segments: {
+	 *     roomId: 'ABC123'
+	 *   },
+	 *   queryParams: {}
+	 * }
+	 *
+	 * 'rooms?gameId=poker'
+	 * =>
+	 * {
+	 *   branchName: 'rooms',
+	 *   segments: {},
+	 *   queryParams: {
+	 *     gameId: 'poker'
+	 *   }
+	 * }
 	 */
-	public isActive(branchName: BranchName): boolean {
-		return this.current().split('?')[0] === (TREE[branchName].url || '/');
-	}
+	public getState(url: string): BranchState {
+		url = url.replace(/\/$/, '').trim();
+		const urlTree = this.router.parseUrl(url);
+		const primary = urlTree.root.children['primary'];
 
-	public parse(url: string): UrlTree {
-		return this.router.parseUrl(url);
-	}
+		if (url === '')
+			return this.createState('', {}, {});
 
-	private resolve(branchName: BranchName, variables: Record<string, string | undefined>): { commands: string[]; queryParams: Params } {
-		const branch: UrlTreeBranch = TREE[branchName];
-		const segments: string[] = [];
-		const queryParams: Params = {};
+		if (!primary)
+			throw new Error(`Invalid URL: ${url}`);
 
-		for (const [key, variable] of Object.entries(branch.variables ?? {})) {
-			const value = variables[key];
-			if (value === undefined) {
-				if (variable.mandatory) {
-					throw new Error(`UrlService: missing mandatory variable '${key}' for branch '${branchName}'`);
-				}
+		const actualSegments = primary?.segments.map(segment => segment.path) ?? [];
+
+		const branchEntry = Object.entries(BRANCHES).find(
+			([, branch]) => this.matchesBranch(actualSegments, branch)
+		);
+
+		if (!branchEntry)
+			throw new Error(`Unknown branch URL: ${url}`);
+
+		const [branchName, branch] = branchEntry as [BranchName, Branch];
+
+
+		/* ----------------------------- Segments ----------------------------- */
+
+		const fixedPathSegments = branch.url
+			.split('/')
+			.filter(Boolean);
+
+		const segments: Record<string, string> = {};
+
+		branch.segments.forEach((segmentName, index) => {
+			const actualIndex = fixedPathSegments.length + index;
+
+			const value = actualSegments[actualIndex];
+
+			if (value === undefined)
+				throw new Error(`Missing segment '${segmentName}' in URL: ${url}`);
+
+			segments[segmentName] = value;
+		});
+
+
+		/* --------------------------- Query params --------------------------- */
+
+		const queryParams: Record<string, string> = {};
+
+		for (const paramName of branch.queryParams) {
+			const value = urlTree.queryParams[paramName];
+
+			// Query params are optional.
+			if (value === undefined)
 				continue;
-			}
-			if (variable.type === 'segment') {
-				segments.push(value);
-			} else {
-				queryParams[key] = value;
-			}
+
+			// This service only supports one string value per parameter.
+			if (Array.isArray(value))
+				throw new Error(`Query parameter '${paramName}' has multiple values: ${url}`);
+
+			queryParams[paramName] = String(value);
 		}
 
-		return { commands: [branch.url, ...segments], queryParams: queryParams };
+
+		/* -------------------------- Unknown params -------------------------- */
+
+		/* for (const paramName of Object.keys(urlTree.queryParams)) {
+			if (!branch.queryParams.includes(paramName))
+				throw new Error(`Unexpected query parameter '${paramName}' in URL: ${url}`);
+		} */
+
+
+		return this.createState(
+			branchName,
+			segments,
+			queryParams,
+		);
 	}
 
-	/**
-	 * Reads the branch's variables out of the current URL: query params by key, segment
-	 * variables (in declaration order) from the segments that follow the branch's base url.
-	 */
-	private readVariables(branchName: BranchName): Record<string, string> {
-		const branch: UrlTreeBranch = TREE[branchName];
-		const tree = this.router.parseUrl(this.current());
-		const segments = tree.root.children[PRIMARY_OUTLET]?.segments.map(s => s.path) ?? [];
-		const baseSegments = branch.url.split('/').filter(Boolean);
-		// A url that exactly matches another branch belongs to that branch: e.g. '/play/new'
-		// is the 'play/new' branch, not the 'play' branch with 'new' as its roomId segment.
-		const path = '/' + segments.join('/');
-		const isOtherBranchUrl = Object.entries(TREE).some(([name, b]) => name !== branchName && b.url === path);
-		const onBranch = !isOtherBranchUrl && baseSegments.every((seg, i) => segments[i] === seg);
-		const result: Record<string, string> = {};
-		let segmentIndex = baseSegments.length;
 
-		for (const [key, variable] of Object.entries(branch.variables ?? {})) {
-			if (variable.type === 'segment') {
-				const value = onBranch ? segments[segmentIndex++] : undefined;
-				if (value !== undefined) result[key] = value;
-			} else {
-				const value: unknown = tree.queryParams[key];
-				if (typeof value === 'string') result[key] = value;
-			}
+	/**
+	 * Build a BranchState from a BranchName and its parameters.
+	 *
+	 * The required parameters are inferred from the branch definition.
+	 *
+	 * Examples:
+	 *
+	 * buildState('about')
+	 * buildState('play_room', { roomId: 'ABC123' })
+	 * buildState('login', { returnUrl: '/play/room/ABC123' })
+	 */
+	public buildState<Name extends BranchName>(
+		name: Name,
+		...args: BuildStateArguments<Name>
+	): BranchState {
+		const params = (args[0] ?? {}) as Record<string, string>;
+
+		const branch = BRANCHES[name];
+
+		const segments: Record<string, string> = {};
+		const queryParams: Record<string, string> = {};
+
+		for (const segmentName of branch.segments) {
+			const value = params[segmentName];
+
+			if (value === undefined)
+				throw new Error(`Missing segment '${segmentName}' for branch '${name}'`);
+
+			segments[segmentName] = value;
 		}
 
-		return result;
+		for (const paramName of branch.queryParams) {
+			const value = params[paramName];
+
+			if (value !== undefined)
+				queryParams[paramName] = value;
+		}
+
+
+		return this.createState(
+			name,
+			segments,
+			queryParams,
+		);
+	}
+
+
+	/* ---------------------------------------------------------------------- */
+	/*                              Internals                                 */
+	/* ---------------------------------------------------------------------- */
+
+	/**
+	 * Checks whether a real URL matches a Branch definition.
+	 *
+	 * The branch has:
+	 *
+	 *   fixed path segments
+	 *   +
+	 *   dynamic segments
+	 *
+	 * Example:
+	 *
+	 * Branch:
+	 *   play/room/:roomId
+	 *
+	 * URL:
+	 *   play/room/ABC123
+	 *
+	 * => true
+	 */
+	private matchesBranch(
+		actualSegments: string[],
+		branch: Branch,
+	): boolean {
+		const fixedPathSegments = branch.url
+			.split('/')
+			.filter(Boolean);
+
+		const expectedSegmentCount = fixedPathSegments.length + branch.segments.length;
+
+		if (actualSegments.length !== expectedSegmentCount)
+			return false;
+
+		for (let i = 0; i < fixedPathSegments.length; i++) {
+			if (actualSegments[i] !== fixedPathSegments[i])
+				return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Creates a fully functional BranchState.
+	 *
+	 * This is the ONLY place where navigate() and urlTree
+	 * are assigned.
+	 */
+	private createState(
+		branchName: BranchName,
+		segments: Record<string, string>,
+		queryParams: Record<string, string>,
+	): BranchState {
+		const branch = BRANCHES[branchName];
+
+		const fixedPathSegments = branch.url
+			.split('/')
+			.filter(Boolean);
+
+		const commands = [
+			...fixedPathSegments,
+			...branch.segments.map(
+				segmentName => {
+					const value = segments[segmentName];
+
+					if (value === undefined)
+						throw new Error(`Missing segment '${segmentName}'`);
+
+					return value;
+				},
+			),
+		];
+
+
+		const tree = this.router.createUrlTree(
+			['/', ...commands],
+			{
+				queryParams,
+			},
+		);
+
+		return {
+			url: branch.url,
+			branchName,
+			segments,
+			queryParams,
+
+			urlTree: tree,
+			navigate: async() => await this.router.navigateByUrl(tree),
+		};
 	}
 }

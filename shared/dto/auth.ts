@@ -58,7 +58,7 @@ export function buildBot(id: string, name: string): GamePlayer {
 }
 
 /** Minimal player shape needed to render an avatar (id drives the colour hash, icon the glyph). */
-export type AvatarPlayer = Pick<GamePlayer, 'id' | 'icon'>;
+export type GamePlayerAvatar = Pick<GamePlayer, 'id' | 'icon'>;
 
 export interface AuthResponse {
 	player: GamePlayer;

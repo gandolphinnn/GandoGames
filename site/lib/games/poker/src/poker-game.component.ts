@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonButton, IonInput } from '@ionic/angular/standalone';
 import { type Card, createDeck } from '@gandogames/shared/common/cards';
 import { type PokerGameState, type PokerPlayer, MIN_RAISE, describeHand, estimateAllInEquities, evaluateHand, levelEndMs, pokerDeckRanks } from '@gandogames/shared/poker';
@@ -6,8 +7,7 @@ import { GameComponent } from '@gandogames/lib/game-registry';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
 import { FrenchCardComponent } from '@gandogames/lib/common/french-card';
-import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { PlayerAvatarComponent } from '@gandogames/components';
 import { ToastService } from '@gandogames/services';
 
 /** Seconds each street lingers before the next one is revealed during an all-in run-out. */

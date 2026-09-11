@@ -3,11 +3,6 @@ import { adminGuard } from '../../guards/admin.guard';
 
 export const HOME_ROUTES: Routes = [
 	{
-		path: '',
-		redirectTo: 'play',
-		pathMatch: 'full',
-	},
-	{
 		path: 'admin',
 		loadComponent: () => import('./admin/admin.component').then((m) => m.AdminComponent),
 		canActivate: [adminGuard],
@@ -21,7 +16,20 @@ export const HOME_ROUTES: Routes = [
 		loadComponent: () => import('./social/social.component').then((m) => m.SocialComponent),
 	},
 	{
+		path: 'rooms/list',
+		loadComponent: () => import('./room/list/room-list.component').then((m) => m.RoomListComponent),
+	},
+	{
+		path: 'rooms/new',
+		loadComponent: () => import('./room/new/room-new.component').then((m) => m.RoomNewComponent),
+	},
+	{
 		path: 'play',
 		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
+	},
+	{
+		path: 'test/palette',
+		loadComponent: () => import('./test/palette/palette.component').then((m) => m.PaletteComponent),
+		canActivate: [adminGuard],
 	},
 ];

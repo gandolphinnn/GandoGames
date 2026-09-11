@@ -35,15 +35,15 @@ export class RoomListComponent implements OnInit {
 	};
 
 	public gameLabel(id: string): string {
-		return this.allGames.find((g) => g.id === id)?.name ?? id;
+		return this.allGames.find((g) => g.name === id)?.title ?? id;
 	}
 
 	public gameIcon(id: string): string {
-		return this.allGames.find((g) => g.id === id)?.icon ?? '';
+		return this.allGames.find((g) => g.name === id)?.icon ?? '';
 	}
 
 	public maxPlayers(id: string): number {
-		return this.allGames.find((g) => g.id === id)?.maxPlayers ?? 0;
+		return this.allGames.find((g) => g.name === id)?.maxPlayers ?? 0;
 	}
 
 	public playerNames(room: RoomSummary): string {
@@ -68,14 +68,14 @@ export class RoomListComponent implements OnInit {
 		this.checkingCode.set(true);
 		try {
 			await this.roomService.getRoom(code);
-			void this.urlService.get('play').navigate({ roomId: code });
+			void this.urlService.buildState('play_room', { roomId: code }).navigate();
 		} finally {
 			this.checkingCode.set(false);
 		}
 	}
 
 	public ngOnInit(): void {
-		this.activeGames.set(this.allGames.map((g) => g.id));
+		this.activeGames.set(this.allGames.map((g) => g.name));
 		void this.fetchRooms();
 	}
 
@@ -99,10 +99,10 @@ export class RoomListComponent implements OnInit {
 	}
 
 	public navigateToRoom(room: RoomSummary): void {
-		void this.urlService.get('play').navigate({ roomId: room.id });
+		void this.urlService.buildState('play_room', { roomId: room.id }).navigate();
 	}
 
 	public goToCreate(): void {
-		void this.urlService.get('play/new').navigate();
+		void this.urlService.buildState('rooms_new').navigate();
 	}
 }

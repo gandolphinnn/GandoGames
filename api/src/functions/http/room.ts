@@ -1,7 +1,6 @@
-import { API, RoomData, buildBot, resolveAccessPolicy } from '@gandogames/shared/dto';
-import { Game, GAMES_CONFIG } from '../../games';
+import { API, GAMES_CONFIG, RoomData, buildBot, resolveAccessPolicy } from '@gandogames/shared/dto';
+import { Game } from '../../games';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
-import { areFriends } from './friends';
 
 const roomCreateInner: InnerFunction<typeof API.rooms.create> = async (body, _params, notifier, player) => {
 	const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -60,17 +59,11 @@ const roomJoinInner: InnerFunction<typeof API.rooms.join> = async (_body, params
 	if (room == null) throw new Error('Room not found');
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 	if (room.players.some(p => p.id === player.id)) throw new Error('Already in this room');
-	if (room.kickedPlayers?.includes(player.id)) throw new Error('You have been kicked from this room');
+	if (room.kickedPlayers?.includes(player.id)) throw new Error('This room is closed');
 	if (room.access === 'closed') throw new Error('This room is closed');
 
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Max players for this game');
-
-	// Friends-only rooms admit only the host's accepted friends. Link rooms need no extra check:
-	// reaching join with the right room code is itself proof of access (the code is the room id).
-	if (room.access === 'friends' && !(await areFriends(room.hostId, player.id))) {
-		throw new Error("Only the host's friends can join this room");
-	}
 
 	room.players.push(player);
 	await PlayfabCtx.rooms.upsert(params.roomId, room);
@@ -157,7 +150,7 @@ const roomAccessSetInner: InnerFunction<typeof API.rooms.setAccess> = async (bod
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'waiting') throw new Error('Cannot change access after the game has started');
+	if (room.phase !== 'waiting') throw new Error('Game already started');
 
 	room.access = resolveAccessPolicy(body.access);
 	await PlayfabCtx.rooms.upsert(params.roomId, room);
@@ -169,7 +162,7 @@ const roomKickInner: InnerFunction<typeof API.rooms.kick> = async (_body, params
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'waiting') throw new Error('Cannot kick players after the game has started');
+	if (room.phase !== 'waiting') throw new Error('Game already started');
 	if (params.playerId === player.id) throw new Error('You cannot kick yourself');
 	if (!room.players.some(p => p.id === params.playerId)) throw new Error('Player not found in this room');
 
@@ -188,8 +181,8 @@ const roomKickInner: InnerFunction<typeof API.rooms.kick> = async (_body, params
 const roomInviteInner: InnerFunction<typeof API.rooms.invite> = async (body, params, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('Only the host can invite players');
-	if (room.phase !== 'waiting') throw new Error('Cannot invite after game has started');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.phase !== 'waiting') throw new Error('Game already started');
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
 	if (room.players.some(p => p.id === body.friendId)) throw new Error('Player is already in this room');
@@ -207,8 +200,8 @@ const roomInviteInner: InnerFunction<typeof API.rooms.invite> = async (body, par
 const roomAddBotInner: InnerFunction<typeof API.rooms.addBot> = async (_body, params, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('Only the host can add bots');
-	if (room.phase !== 'waiting') throw new Error('Cannot add bots after game has started');
+	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.phase !== 'waiting') throw new Error('Game already started');
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (!gameConfig.supportsBots) throw new Error('Bots are not supported in this game');
 	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');

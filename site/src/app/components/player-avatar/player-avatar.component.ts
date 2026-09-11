@@ -1,14 +1,20 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { IonPopover, IonButton } from '@ionic/angular/standalone';
-import { AvatarPlayer, PLAYER_ICONS } from '@gandogames/shared/dto';
+import { GamePlayerAvatar, PLAYER_ICONS } from '@gandogames/shared/dto';
 import { UserService } from '@gandogames/services';
-import { hueFromString } from './hue-from-string';
+
+/** Maps any string to a stable hue (0-359), so a given player always gets the same colour. */
+function hueFromString(value: string): number {
+	let hash = 0;
+	for (let i = 0; i < value.length; i++) hash = (hash * 31 + value.charCodeAt(i)) & 0xffff;
+	return hash % 360;
+}
 
 const SETTINGS_ICON_CLASS = 'fas fa-user-gear';
 
 @Component({
 	selector: 'gg-player-avatar',
-	imports: [IonPopover, IonButton],
+	//imports: [IonPopover, IonButton],
 	template: `
 		<i
 			[class]="isHovered()? settingsIconFaClass : iconFaClass()"
@@ -51,7 +57,7 @@ export class PlayerAvatarComponent {
 	private readonly userService = inject(UserService);
 	public readonly isLightTheme = computed(() => !this.userService.isDarkTheme());
 
-	public readonly player = input.required<AvatarPlayer>();
+	public readonly player = input.required<GamePlayerAvatar>();
 	public readonly isMe = computed(() => this.userService.user()?.player.id === this.player().id);
 
 

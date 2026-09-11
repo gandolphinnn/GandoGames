@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+		</ion-buttons>
+		<ion-title>{{ 'GAMES.TITLE' | translate }}</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<gg-refreshable-content [fullscreen]="true" [onRefresh]="refreshFn">
+	<div class="games-page">
+		<div class="game-list-wrap">
+			<ul class="game-list">
+				@for (game of games; track game.name) {
+					<li class="game-card">
+						<div class="game-card-info">
+							<span class="game-card-game">
+								<!-- {{ gameLabel(game.game) }}
+								@if (accessBadge(game); as badge) {
+									<span class="game-card-badge" [title]="badge.label | translate">
+										<ion-icon [name]="badge.icon" />
+									</span>
+								} -->
+									{{ game.title}}
+							</span>
+							<span class="game-card-players-list">{{ game.description | translate }}</span>
+							<span class="game-card-players-list">{{ game.category| translate }}</span>
+							<ion-button (click)="play(game.name)">PLAY</ion-button>
+						</div>
+					</li>
+				}
+			</ul>
+		</div>
+	</div>
+</gg-refreshable-content>

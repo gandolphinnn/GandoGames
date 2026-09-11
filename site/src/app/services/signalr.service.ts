@@ -1,7 +1,7 @@
 import { effect, inject, Service } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { API, ChatMessage, Friend, GameState, GameType, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
+import { API, ChatMessage, Friend, GameState, GameName, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { UserService } from './user.service';
 
@@ -17,7 +17,7 @@ export class SignalRService {
 		roomDeleted: new Subject<string>(),
 		gameStateUpdated: new Subject<{ roomId: string; state: GameState }>(),
 		chatMessage: new Subject<{ roomId: string; message: ChatMessage }>(),
-		roomInvite: new Subject<{ roomId: string; game: GameType }>(),
+		roomInvite: new Subject<{ roomId: string; game: GameName }>(),
 		friendRequest: new Subject<Friend>(),
 		friendsChanged: new Subject<void>(),
 	}

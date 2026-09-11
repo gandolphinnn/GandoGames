@@ -15,7 +15,8 @@
 		"ADMIN": "Admin",
 		"PLAY": "Gioca",
 		"SOCIAL": "Social",
-		"ACTIVE_ROOMS": "Stanze attive"
+		"ACTIVE_ROOMS": "Stanze attive",
+		"LOGIN": "Accedi"
 	},
 	"ABOUT": {
 		"TITLE": "Informazioni",
@@ -101,6 +102,9 @@
 		"REQUEST_RECEIVED": "{{name}} ti ha inviato una richiesta di amicizia",
 		"REQUEST_SENT": "Richiesta di amicizia inviata a {{name}}"
 	},
+	"GAMES": {
+		"TITLE": "Giochi"
+	},
 	"ROOM_LIST": {
 		"TITLE": "Gioca",
 		"JOIN_PLACEHOLDER": "Hai un codice? Inseriscilo per entrare in una stanza privata",
@@ -116,7 +120,7 @@
 		"CREATE": "Crea stanza",
 		"CREATING": "Creazione…"
 	},
-	"GAMES": {
+	"GAME": {
 		"PLAYER_COUNT_FIXED": "{{count}} giocatori",
 		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} giocatori",
 		"PANKOV": {
@@ -157,7 +161,6 @@
 		"FIND_ANOTHER": "Trova un'altra stanza",
 		"BLOCKED_KICKED": "Sei stato espulso da questa stanza.",
 		"BLOCKED_CLOSED": "Questa stanza è chiusa.",
-		"BLOCKED_FRIENDS": "Solo gli amici dell'host possono entrare in questa stanza.",
 		"BLOCKED_FULL": "Questa stanza è piena.",
 		"KICK_CONFIRM": "Espellere {{name}} dalla stanza?"
 	},
@@ -191,10 +194,6 @@
 		"PUBLIC": {
 			"LABEL": "Pubblica",
 			"DESCRIPTION": "Chiunque può trovare questa stanza ed entrarci."
-		},
-		"FRIENDS": {
-			"LABEL": "Solo amici",
-			"DESCRIPTION": "Solo i tuoi amici possono entrare, gli altri la vedono bloccata."
 		},
 		"LINK": {
 			"LABEL": "Con link",

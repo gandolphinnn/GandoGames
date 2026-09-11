@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PankovGameState, type PankovPlayer, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue, getValidDeclarations } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
-import { PlayerAvatarComponent } from '@gandogames/lib/common/player-avatar';
+import { PlayerAvatarComponent } from '@gandogames/components';
 
 @Component({
 	selector: 'gg-pankov-game',

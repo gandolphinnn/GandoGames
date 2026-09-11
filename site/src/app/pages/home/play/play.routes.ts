@@ -2,15 +2,15 @@ import { Routes } from '@angular/router';
 
 export const PLAY_ROUTES: Routes = [
 	{
-		path: '',
-		loadComponent: () => import('./list/room-list.component').then((m) => m.RoomListComponent),
+		path: 'local/:game',
+		loadComponent: () => import('./room/room.component').then((m) => m.RoomComponent),
 	},
 	{
-		path: 'new',
-		loadComponent: () => import('./new/room-new.component').then((m) => m.RoomNewComponent),
+		path: 'single/:game',
+		loadComponent: () => import('./room/room.component').then((m) => m.RoomComponent),
 	},
 	{
-		path: ':roomId',
+		path: 'room/:room',
 		loadComponent: () => import('./room/room.component').then((m) => m.RoomComponent),
 	},
 ];

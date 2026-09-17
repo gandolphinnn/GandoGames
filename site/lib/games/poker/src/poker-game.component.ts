@@ -13,6 +13,8 @@ import { ToastService } from '@gandogames/services';
 /** Seconds each street lingers before the next one is revealed during an all-in run-out. */
 const REVEAL_DELAY_MS = 2000;
 
+// TODO: convert chips system into BLINDS system
+
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,

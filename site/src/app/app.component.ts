@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular/standalone';
+import { IonApp, IonMenu, IonRouterOutlet } from '@ionic/angular';
 
 import { UserService } from '@gandogames/services';
 import { Navigator, ToastComponent } from '@gandogames/components';

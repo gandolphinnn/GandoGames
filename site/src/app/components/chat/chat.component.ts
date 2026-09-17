@@ -2,7 +2,7 @@ import { afterRenderEffect, Component, computed, DestroyRef, effect, ElementRef,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonIcon, IonTextarea } from '@ionic/angular/standalone';
+import { IonIcon, IonTextarea } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ChatMessage } from '@gandogames/shared/dto';
 import { RoomService, SignalRService, UserService } from '@gandogames/services';

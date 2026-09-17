@@ -1,5 +1,5 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
-import { IonButton, IonIcon } from '@ionic/angular/standalone';
+import { IonButton, IonIcon } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Friend, GameName, RoomData } from '@gandogames/shared/dto';
 import { PlayerAvatarComponent } from '@gandogames/components';

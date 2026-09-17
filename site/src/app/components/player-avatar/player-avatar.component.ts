@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { IonPopover, IonButton } from '@ionic/angular/standalone';
+import { IonPopover, IonButton } from '@ionic/angular';
 import { GamePlayerAvatar, PLAYER_ICONS } from '@gandogames/shared/dto';
 import { UserService } from '@gandogames/services';
 

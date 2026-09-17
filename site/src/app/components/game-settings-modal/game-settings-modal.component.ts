@@ -1,5 +1,5 @@
 import { Component, computed, effect, HostListener, inject, input, output, signal } from '@angular/core';
-import { IonIcon, IonToggle } from '@ionic/angular/standalone';
+import { IonIcon, IonToggle } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BlindLevel, GameSettings, GameName, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';

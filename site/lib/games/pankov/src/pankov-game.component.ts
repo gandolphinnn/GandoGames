@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, output } from '@angular/core';
-import { IonButton } from '@ionic/angular/standalone';
+import { IonButton } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PankovGameState, type PankovPlayer, INITIAL_LIVES, PANKOV_VALUE, ROLL_VALUES, type RollValue, getValidDeclarations } from '@gandogames/shared/pankov';
 import { GameComponent } from '@gandogames/lib/game-registry';

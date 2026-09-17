@@ -2,7 +2,7 @@ import { Component, inject, signal, Signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { addIcons } from 'ionicons';
 import { contrastOutline, languageOutline, logOutOutline, moonOutline, sunnyOutline, trashOutline } from 'ionicons/icons';
-import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, ViewDidLeave, } from '@ionic/angular/standalone';
+import { IonCard, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, ViewDidLeave, } from '@ionic/angular';
 import { GamePlayer, IconType, LangCode, LANGUAGES, PLAYER_ICONS, PlayerIcon } from '@gandogames/shared/dto';
 import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { UserService, ToastService, UrlService } from '@gandogames/services';

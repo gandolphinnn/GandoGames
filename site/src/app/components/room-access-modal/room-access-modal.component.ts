@@ -1,5 +1,5 @@
 import { Component, effect, HostListener, inject, input, output, signal } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RoomAccessPolicy } from '@gandogames/shared/dto';
 import { ROOM_ACCESS_OPTIONS } from '@gandogames/lib/room-access';

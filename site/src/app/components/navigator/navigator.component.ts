@@ -4,7 +4,7 @@ import {
 	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg,
 	IonItem, IonLabel, IonList, IonMenuToggle, IonTitle, IonToolbar,
 	MenuController,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { GameName } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';

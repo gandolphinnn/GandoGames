@@ -3,7 +3,7 @@ import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BranchName, UserService, UrlService } from '@gandogames/services';
-import { IonButton, IonContent, IonInput } from '@ionic/angular/standalone';
+import { IonButton, IonContent, IonInput } from '@ionic/angular';
 
 
 @Component({

@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { IonRouterOutlet } from '@ionic/angular/standalone';
+import { IonRouterOutlet } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { SignalRService, ToastService, UrlService } from '@gandogames/services';

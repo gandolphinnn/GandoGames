@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { ToastService } from '@gandogames/services';
 
 export interface Swatch {

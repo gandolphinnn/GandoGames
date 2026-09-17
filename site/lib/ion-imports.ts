@@ -1,6 +1,6 @@
 import {
 	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar,
-} from '@ionic/angular/standalone';
+} from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 
 /**

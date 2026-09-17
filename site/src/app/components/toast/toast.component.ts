@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Toast, ToastService } from '@gandogames/services';
 

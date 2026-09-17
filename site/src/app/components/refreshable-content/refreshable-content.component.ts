@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular/standalone';
+import { IonContent, IonRefresher, IonRefresherContent } from '@ionic/angular';
 import type { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core';
 
 @Component({

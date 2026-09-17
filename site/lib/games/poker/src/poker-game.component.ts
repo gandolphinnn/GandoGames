@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { IonButton, IonInput } from '@ionic/angular/standalone';
+import { IonButton, IonInput } from '@ionic/angular';
 import { type Card, createDeck } from '@gandogames/shared/common/cards';
 import { type PokerGameState, type PokerPlayer, MIN_RAISE, describeHand, estimateAllInEquities, evaluateHand, levelEndMs, pokerDeckRanks } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';

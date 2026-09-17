@@ -1,7 +1,7 @@
 import { Component, effect, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { RoomAccessPolicy } from '@gandogames/shared/dto';
+import { RoomAccessPolicy, RoomData } from '@gandogames/shared/dto';
 import { ROOM_ACCESS_OPTIONS } from '@gandogames/lib/room-access';
 import { RoomService, ToastService } from '@gandogames/services';
 
@@ -20,10 +20,7 @@ export class RoomAccessModalComponent {
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
-	public readonly roomId = input.required<string>();
-	public readonly access = input<RoomAccessPolicy>('public');
-	/** Whether the viewer (the host) may edit; otherwise the form is read-only. */
-	public readonly editable = input<boolean>(false);
+	public readonly room = input.required<RoomData>();
 
 	public readonly closed = output<void>();
 
@@ -34,18 +31,14 @@ export class RoomAccessModalComponent {
 	public readonly saving = signal(false);
 
 	constructor() {
-		effect(() => this.selected.set(this.access()));
-	}
-
-	public choose(value: RoomAccessPolicy): void {
-		if (this.editable()) this.selected.set(value);
+		effect(() => this.selected.set(this.room().access));
 	}
 
 	public async save(): Promise<void> {
-		if (!this.editable() || this.saving()) return;
+		if (this.saving()) return;
 		this.saving.set(true);
 		try {
-			await this.roomService.setRoomAccess(this.roomId(), this.selected());
+			await this.roomService.setRoomAccess(this.room().id, this.selected());
 			this.toast.success(this.translate.instant('ACCESS_MODAL.SAVED') as string);
 			this.closed.emit();
 		} finally {

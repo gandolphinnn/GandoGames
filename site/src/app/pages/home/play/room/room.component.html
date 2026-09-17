@@ -24,7 +24,7 @@
 						<ion-icon name="trash" slot="icon-only" />
 					</ion-button>
 				}
-				@if (isInRoom()) {
+				@if (isInRoom() && canLeave()) {
 					<ion-button fill="clear" color="danger" (click)="leave()" [title]="'ROOM.LEAVE_ROOM' | translate">
 						<ion-icon name="close" />
 					</ion-button>
@@ -58,8 +58,6 @@
 
 @if (showAccessModal() && room()) {
 	<gg-room-access-modal
-		[roomId]="roomId()"
-		[access]="room()!.access"
-		[editable]="isHost() && room()!.phase === 'waiting'"
+		[room]="room()!"
 		(closed)="showAccessModal.set(false)" />
 }

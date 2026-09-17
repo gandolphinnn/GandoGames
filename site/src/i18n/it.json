@@ -187,7 +187,6 @@
 	},
 	"ACCESS_MODAL": {
 		"TITLE": "Accesso alla stanza",
-		"HOST_ONLY": "Solo l'host può cambiare l'accesso alla stanza.",
 		"SAVED": "Accesso alla stanza aggiornato"
 	},
 	"ROOM_ACCESS": {

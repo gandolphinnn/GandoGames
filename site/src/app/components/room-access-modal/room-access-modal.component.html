@@ -10,10 +10,6 @@
 	</header>
 
 	<div class="modal-body">
-		@if (!editable()) {
-			<p class="empty-msg">{{ 'ACCESS_MODAL.HOST_ONLY' | translate }}</p>
-		}
-
 		<ul class="access-list">
 			@for (opt of options; track opt.value) {
 				<li>
@@ -21,8 +17,7 @@
 						type="button"
 						class="access-option"
 						[class.selected]="selected() === opt.value"
-						[disabled]="!editable()"
-						(click)="choose(opt.value)">
+						(click)="selected.set(opt.value)">
 						<ion-icon class="access-option-icon" [name]="opt.icon" />
 						<span class="access-option-text">
 							<span class="access-option-label">{{ opt.label | translate }}</span>
@@ -37,10 +32,8 @@
 		</ul>
 	</div>
 
-	@if (editable()) {
-		<footer class="modal-footer">
-			<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ (saving() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}</button>
-		</footer>
-	}
+	<footer class="modal-footer">
+		<button class="btn-primary" [disabled]="saving()" (click)="save()">{{ (saving() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}</button>
+	</footer>
 
 </div>

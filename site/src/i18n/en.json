@@ -187,7 +187,6 @@
 	},
 	"ACCESS_MODAL": {
 		"TITLE": "Room access",
-		"HOST_ONLY": "Only the host can change room access.",
 		"SAVED": "Room access updated"
 	},
 	"ROOM_ACCESS": {

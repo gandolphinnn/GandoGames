@@ -10,7 +10,11 @@ export interface Toast {
 	resolve?: (result: boolean) => void;
 }
 
-const DEFAULT_DURATION = 4000;
+const DEFAULT_SHOW_DURATION = 2000;
+const DEFAULT_ERROR_DURATION = 5000;
+const DEFAULT_SUCCESS_DURATION = 2000;
+const DEFAULT_WARNING_DURATION = 3500;
+const DEFAULT_YESNO_DURATION = 30000;
 
 @Service()
 export class ToastService {
@@ -18,19 +22,19 @@ export class ToastService {
 	private readonly _toasts = signal<Toast[]>([]);
 	public readonly toasts = this._toasts.asReadonly();
 
-	public show(message: string, type: ToastType = 'info', duration = DEFAULT_DURATION): void {
+	public show(message: string, type: ToastType = 'info', duration = DEFAULT_SHOW_DURATION): void {
 		this.add({ message, type }, duration);
 	}
 
-	public error(message: string | Error, duration = DEFAULT_DURATION): void {
+	public error(message: string | Error, duration = DEFAULT_ERROR_DURATION): void {
 		this.add({ message: message instanceof Error ? message.message : message, type: 'error' }, duration);
 	}
 
-	public success(message: string, duration = DEFAULT_DURATION): void {
+	public success(message: string, duration = DEFAULT_SUCCESS_DURATION): void {
 		this.add({ message, type: 'success' }, duration);
 	}
 
-	public warning(message: string, duration = DEFAULT_DURATION): void {
+	public warning(message: string, duration = DEFAULT_WARNING_DURATION): void {
 		this.add({ message, type: 'warning' }, duration);
 	}
 
@@ -41,7 +45,7 @@ export class ToastService {
 	public yesNo(message: string): Promise<boolean> {
 		return new Promise(resolve => {
 			const id = this.add({ message, type: 'info', yesno: true, resolve }, 0);
-			setTimeout(() => { this.dismiss(id); resolve(false); }, 30000);
+			setTimeout(() => { this.dismiss(id); resolve(false); }, DEFAULT_YESNO_DURATION);
 		});
 		// TODO: add a progress bar counting down the 30 seconds until auto-dismissal, to make it more clear to the user that this is a time-sensitive prompt.
 	}

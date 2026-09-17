@@ -35,6 +35,9 @@ export class RoomComponent implements OnInit {
 	public readonly room = signal<RoomData | null>(null);
 	public readonly copied = signal(false);
 	public readonly showAccessModal = signal(false);
+	
+	/** Can just leave the room only if there is another human player in it, otherwise it is forced to delete the room */
+	public readonly canLeave = computed(() => this.room()!.players.some(p => p.type != 'bot' && p.id != this.myId()))
 
 	/** Icon + label describing the room's current access policy, for the toolbar action. */
 	public readonly accessBadge = computed(() => roomAccessOption(this.room()?.access ?? 'public'));

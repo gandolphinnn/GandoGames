@@ -114,8 +114,8 @@ const roomLeaveInner: InnerFunction<typeof API.rooms.leave> = async (_body, para
 	
 	if (room.hostId == player.id) {
 		room.hostId = nonBotPlayers[0].id;
-		await PlayfabCtx.rooms.upsert(room.id, room);
 	}
+	await PlayfabCtx.rooms.upsert(room.id, room);
 
 	if (room.phase === 'playing') {
 		const gameState = await PlayfabCtx.game[room.game].get(room.id);
@@ -136,7 +136,7 @@ const roomLeaveInner: InnerFunction<typeof API.rooms.leave> = async (_body, para
 const roomResetInner: InnerFunction<typeof API.rooms.reset> = async (_body, params, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	//if (room.hostId !== player.id) throw new Error('You are not the host of this room');
 	if (room.phase !== 'playing') throw new Error('Game is not in progress');
 
 	room.phase = 'waiting';

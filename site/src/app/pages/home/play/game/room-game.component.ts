@@ -41,12 +41,12 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	}
 
 	public ngOnInit(): void {
-		void this.loadGameState();
 		this.signalR.events.gameStateUpdated
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(({ roomId, state }) => {
 				if (roomId === this.roomId()) this.gameState.set(state);
 			});
+		void this.loadGameState();
 	}
 
 	public ngAfterViewInit(): void {
@@ -65,31 +65,21 @@ export class RoomGameComponent implements OnInit, AfterViewInit {
 	}
 
 	private async loadGameState(): Promise<void> {
-		try {
-			const state = await this.roomService.getGameState(this.gameName(), this.roomId());
-			this.gameState.set(state);
-		} catch {
-			// state arrives via SignalR when the next action occurs
-		}
+		const state = await this.roomService.getGameState(this.gameName(), this.roomId());
+		this.gameState.set(state);
 	}
 
 	private async sendAction(action: string, data?: unknown): Promise<void> {
 		this.loading.set(true);
 		try {
 			await this.roomService.gameAction(this.gameName(), this.roomId(), action, data);
-		} catch (err) {
-			this.toast.error((err as Error).message);
 		} finally {
 			this.loading.set(false);
 		}
 	}
 
 	private async resetRoom(): Promise<void> {
-		try {
-			await this.roomService.resetRoom(this.roomId());
-			void this.urlService.buildState('play_room', { roomId: this.roomId() }).navigate();
-		} catch (err) {
-			this.toast.error((err as Error).message);
-		}
+		await this.roomService.resetRoom(this.roomId());
+		void this.urlService.buildState('play_room', { roomId: this.roomId() }).navigate();
 	}
 }

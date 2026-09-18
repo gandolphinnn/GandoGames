@@ -9,9 +9,8 @@ export const BRANCH_DEFINITIONS = {
 	social: 'social',
 	rooms_list: 'rooms/list?game',
 	rooms_new: 'rooms/new?game',
-	play_local: 'play/local/:game',
-	play_single: 'play/single/:game',
-	play_room: 'play/room/:roomId',
+	play_game: 'play/:game',
+	play_room: 'room/:roomId',
 } as const;
 
 export type BranchName = keyof typeof BRANCH_DEFINITIONS;

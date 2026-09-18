@@ -5,14 +5,13 @@ import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { SignalRService, RoomService, UserService, UrlService, ToastService } from '@gandogames/services';
 
 @Component({
-	selector: 'gg-room-game',
-	standalone: true,
 	imports: [],
-	templateUrl: './room-game.component.html',
-	styleUrl: './room-game.component.scss',
+	selector: 'gg-game-shell',
+	styleUrl: './game-shell.component.scss',
+	templateUrl: './game-shell.component.html',
 })
-export class RoomGameComponent implements OnInit, AfterViewInit {
-	public readonly roomId = input.required<string>();
+export class GameShellComponent implements OnInit, AfterViewInit {
+public readonly roomId = input.required<string>();
 	public readonly gameName = input.required<GameName>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })

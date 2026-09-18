@@ -1,4 +1,4 @@
-export type GameCategory = 'local' | 'single' | 'room';
+export type GameCategory = 'single' | 'room';
 
 export interface BaseGameDescriptor {
 	minPlayers: number;

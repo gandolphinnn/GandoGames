@@ -30,8 +30,7 @@ export class GamesComponent {
 	public play(gameName: GameName) {
 		const game = GAME_REGISTRY[gameName];
 		switch(game.category) {
-			case 'single': return this.url.buildState('play_single', { game: game.name }).navigate();
-			case 'local': return this.url.buildState('play_local', { game: game.name }).navigate();
+			case 'single': return this.url.buildState('play_game', { game: game.name }).navigate();
 			case 'room': return this.url.buildState('rooms_list', { game: game.name }).navigate();
 		}
 	}

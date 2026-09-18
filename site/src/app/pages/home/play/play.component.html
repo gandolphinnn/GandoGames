@@ -1,0 +1,48 @@
+<ion-header [translucent]="true">
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button />
+			<ion-button [routerLink]="['/games']" fill="clear">
+				<ion-icon name="arrow-back" slot="icon-only" />
+			</ion-button>
+		</ion-buttons>
+		<ion-title>{{ game()?.title }}</ion-title>
+		<!-- @if (room()) {
+			<ion-buttons slot="end">
+				@if (!isPlaying()) {
+					<ion-button fill="clear" (click)="copyCode()" [title]="(copied() ? 'ROOM.COPIED' : 'ROOM.COPY_LINK') | translate">
+						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
+					</ion-button>
+				}
+				@if (isHost() && room()!.phase === 'waiting') {
+					<ion-button fill="clear" (click)="openAccess()" [title]="'ROOM.ACCESS_TITLE' | translate: { label: (accessBadge().label | translate) }">
+						<ion-icon [name]="accessBadge().icon" slot="icon-only" />
+					</ion-button>
+				}
+				@if (isHost()) {
+					<ion-button fill="clear" color="danger" (click)="closeRoom()" [title]="'ROOM.CLOSE_ROOM' | translate">
+						<ion-icon name="trash" slot="icon-only" />
+					</ion-button>
+				}
+				@if (isInRoom() && canLeave()) {
+					<ion-button fill="clear" color="danger" (click)="leave()" [title]="'ROOM.LEAVE_ROOM' | translate">
+						<ion-icon name="close" />
+					</ion-button>
+				}
+			</ion-buttons>
+		} -->
+	</ion-toolbar>
+</ion-header>
+
+@if (game() != null) {
+	<div class="room-layout">
+		<!-- @if (isInRoom()) {
+			<div class="room-layout-left">
+				<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
+			</div>
+		} -->
+		<!-- <gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
+			<gg-game-shell [roomId]="roomId()" [gameName]="room()!.game" />
+		</gg-refreshable-content> -->
+	</div>
+}

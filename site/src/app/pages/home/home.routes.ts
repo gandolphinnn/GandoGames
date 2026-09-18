@@ -25,7 +25,11 @@ export const HOME_ROUTES: Routes = [
 		loadComponent: () => import('./rooms/new/room-new.component').then((m) => m.RoomNewComponent),
 	},
 	{
-		path: 'play',
-		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
+		path: 'room/:roomId',
+		loadComponent: () => import('./room/room.component').then((m) => m.RoomComponent),
+	},
+	{
+		path: 'play/:game',
+		loadComponent: () => import('./play/play.component').then((m) => m.PlayComponent),
 	},
 ];

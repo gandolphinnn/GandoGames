@@ -40,7 +40,7 @@ describe('UrlService', () => {
 
 		it('appends a segment variable as a url segment', async () => {
 			await service.buildState('play_room', { roomId: 'V1LYBR' }).navigate();
-			const tree = router.createUrlTree(['play', 'room', 'V1LYBR'])
+			const tree = router.createUrlTree(['room', 'V1LYBR'])
 			expect(navigateSpy).toHaveBeenCalledWith(tree);
 		});
 
@@ -54,7 +54,7 @@ describe('UrlService', () => {
 	describe('get().urlTree', () => {
 		it('builds the tree with segment variables', () => {
 			const tree = service.buildState('play_room', { roomId: 'V1LYBR' }).urlTree;
-			expect(router.serializeUrl(tree)).toBe('/play/room/V1LYBR');
+			expect(router.serializeUrl(tree)).toBe('/room/V1LYBR');
 		});
 
 		it('builds the tree with queryParam variables', () => {
@@ -91,7 +91,7 @@ describe('UrlService', () => {
 
 		it('is false on an unrelated url', async () => {
 			await router.navigateByUrl('/profile');
-			expect(service.isActive('play_local')).toBeFalse();
+			expect(service.isActive('play_game')).toBeFalse();
 		});
 
 		it('matches the root branch on /', async () => {

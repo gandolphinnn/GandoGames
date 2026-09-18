@@ -13,7 +13,8 @@ Defined in `site/src/app/app.routes.ts`, with the authenticated area lazy-loaded
 ### Authenticated — `authGuard` (redirects to `/login?returnUrl=…` if not logged in)
 `HomeComponent` is the shell (renders an `ion-router-outlet`); the rest are its children:
 - `/` → redirects to `/games`
-- `/admin` — admin panel
+- `/admin/rooms` — admin panel with a list of all the rooms
+- `/admin/playground` — admin panel with the old test/palette page
 - `/profile` — profile & preferences (icon, theme, language), logout, delete account
 - `/social` — friends list and requests
 - `/rooms` — room list (the caller's active rooms + browsable rooms, with a per-game filter)
@@ -21,8 +22,5 @@ Defined in `site/src/app/app.routes.ts`, with the authenticated area lazy-loaded
 - `/play/global/:gameId` — play in a single player game with global leaderboard
 - `/play/room/:roomId` — room detail: lobby while `waiting`, hosts the game while `playing`
 
-### Testing
-- `/test/palette` — design-system palette preview (development aid)
-
 ### Fallback
-- `**` → redirects to `/`
+- `**` → redirects to `/games`

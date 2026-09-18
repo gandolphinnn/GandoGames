@@ -50,7 +50,7 @@ export class SocialComponent {
 				: kind === 'decline'
 					? 'SOCIAL.DECLINED'
 					: 'SOCIAL.CANCELLED';
-			this.toast.show(this.translate.instant(messageKey, params) as string, 'success');
+			this.toast.success(this.translate.instant(messageKey, params) as string);
 		} finally {
 			this.busyId.set(null);
 		}

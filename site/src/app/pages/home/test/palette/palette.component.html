@@ -1,12 +1,10 @@
 <div class="test-panel">
 	<div class="test-group">
-		<span class="test-label">ToastService</span>
-		<button class="btn btn-danger btn-sm" (click)="toast.error('Something went wrong on the server.')">Error</button>
-		<button class="btn btn-success btn-sm" (click)="toast.success('Operation completed successfully.')">Success</button>
-		<button class="btn btn-warning btn-sm" (click)="toast.warning('Proceed with caution.')">Warning</button>
-		<button class="btn btn-info btn-sm" (click)="toast.show('Here is some info.')">Info</button>
-		<button class="btn btn-info btn-sm" (click)="testProgress()">Progress (3s)</button>
-		<button class="btn btn-primary btn-sm" (click)="testYesNo()">Yes / No</button>
+		<ion-button (click)="error()">Error</ion-button>
+		<ion-button (click)="success()">Success</ion-button>
+		<ion-button (click)="warning()">Warning</ion-button>
+		<ion-button (click)="info()">Info</ion-button>
+		<ion-button (click)="toastYesNo()">Yes / No</ion-button>
 		<a href="https://witty-mushroom-027658110-staging.centralus.1.azurestaticapps.net/login?returnUrl=%2Fplay" target="_blank">STAGING</a>
 	</div>
 </div>

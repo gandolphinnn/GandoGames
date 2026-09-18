@@ -1,16 +1,16 @@
-import { Service, signal } from '@angular/core';
+import { computed, Service, signal } from '@angular/core';
 
-export type ToastType = 'info' | 'success' | 'warning' | 'error';
+export type ToastType = 'info' | 'success' | 'warning' | 'error' | 'yesNo';
 
+type ToastResolve = (result: boolean) => void;
 export interface Toast {
 	id: number;
 	message: string;
 	type: ToastType;
-	yesno?: boolean;
-	resolve?: (result: boolean) => void;
+	resolve: ToastResolve;
 }
 
-const DEFAULT_SHOW_DURATION = 2000;
+const DEFAULT_INFO_DURATION = 2000;
 const DEFAULT_ERROR_DURATION = 5000;
 const DEFAULT_SUCCESS_DURATION = 2000;
 const DEFAULT_WARNING_DURATION = 3500;
@@ -22,42 +22,46 @@ export class ToastService {
 	private readonly _toasts = signal<Toast[]>([]);
 	public readonly toasts = this._toasts.asReadonly();
 
-	public show(message: string, type: ToastType = 'info', duration = DEFAULT_SHOW_DURATION): void {
-		this.add({ message, type }, duration);
+	public info(message: string, duration = DEFAULT_INFO_DURATION): Promise<boolean> {
+		return this.add(message, 'info', duration);
 	}
 
-	public error(message: string | Error, duration = DEFAULT_ERROR_DURATION): void {
-		this.add({ message: message instanceof Error ? message.message : message, type: 'error' }, duration);
+	public success(message: string, duration = DEFAULT_SUCCESS_DURATION): Promise<boolean> {
+		return this.add(message, 'success', duration);
 	}
 
-	public success(message: string, duration = DEFAULT_SUCCESS_DURATION): void {
-		this.add({ message, type: 'success' }, duration);
+	public warning(message: string, duration = DEFAULT_WARNING_DURATION): Promise<boolean> {
+		return this.add(message, 'warning', duration);
 	}
 
-	public warning(message: string, duration = DEFAULT_WARNING_DURATION): void {
-		this.add({ message, type: 'warning' }, duration);
+	public error(error: string | Error, duration = DEFAULT_ERROR_DURATION): Promise<boolean> {
+		const message = error instanceof Error ? error.message : error;
+		return this.add(message, 'error', duration);
 	}
 
-	public progress(message: string): number {
-		return this.add({ message, type: 'info' }, 0);
+	public yesNo(message: string, duration = DEFAULT_YESNO_DURATION): Promise<boolean> {
+		/* const yesNoToasts = this.toasts().filter(t => t.type == 'yesNo');
+		yesNoToasts.forEach(t => {
+			t.resolve(false);
+			this.dismiss(t.id);
+		}); */
+		return this.add(message, 'yesNo', duration);
 	}
-
-	public yesNo(message: string): Promise<boolean> {
-		return new Promise(resolve => {
-			const id = this.add({ message, type: 'info', yesno: true, resolve }, 0);
-			setTimeout(() => { this.dismiss(id); resolve(false); }, DEFAULT_YESNO_DURATION);
-		});
-		// TODO: add a progress bar counting down the 30 seconds until auto-dismissal, to make it more clear to the user that this is a time-sensitive prompt.
-	}
-
+	
 	public dismiss(id: number): void {
 		this._toasts.update(t => t.filter(toast => toast.id !== id));
 	}
-
-	private add(partial: Omit<Toast, 'id'>, duration: number): number {
-		const id = this.nextId++;
-		this._toasts.update(t => [...t, { id, ...partial }]);
-		if (duration > 0) setTimeout(() => this.dismiss(id), duration);
-		return id;
+	
+	// TODO: add a progress bar counting down the 30 seconds until auto-dismissal, to make it more clear to the user that this is a time-sensitive prompt.
+	private add(message: string, type: ToastType, duration: number): Promise<boolean> {
+		return new Promise(resolve => {
+			const id = this.nextId++;
+			const newToast: Toast = {
+				id, message, type, resolve
+			};
+			this._toasts.update(t => [...t, newToast]);
+			if (duration > 0)
+				setTimeout(() => { this.dismiss(id); resolve(false); }, duration);
+		});
 	}
 }

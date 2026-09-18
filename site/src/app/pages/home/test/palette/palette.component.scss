@@ -20,10 +20,6 @@
 	&-group {
 		display: flex; align-items: center; flex-wrap: wrap; gap: $s2;
 	}
-
-	&-label {
-		font-size: $text-sm; font-weight: 700; color: var(--text-muted); margin-right: $s1;
-	}
 }
 
 .palette {

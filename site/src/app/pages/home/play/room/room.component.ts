@@ -90,7 +90,7 @@ export class RoomComponent implements OnInit {
 		this.signalR.events.roomUpsert.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((room) => {
 			if (room.id !== this.roomId()) return;
 			if (room.kickedPlayers?.includes(this.myId())) {
-				this.toast.show(this.translate.instant('ROOM.KICKED') as string, 'warning');
+				this.toast.warning(this.translate.instant('ROOM.KICKED') as string);
 			this.navigateToRoomsList();
 				return;
 			}

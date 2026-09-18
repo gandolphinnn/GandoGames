@@ -29,22 +29,24 @@
 	pointer-events: auto;
 	animation: toast-in 200ms ease;
 	cursor: pointer;
+	background: $bg-card;
 
 	@media (min-width: $bp-sm) {
 		border-radius: $radius-md; margin-bottom: $s2;
 	}
 
+	&-yesNo,
 	&-info {
-		background: $bg-card;          border: 1px solid $border;               color: $text;
+		border: 1px solid $border;               color: $text;
 	}
 	&-success {
-		background: $color-success-bg; border: 1px solid $color-success-border; color: $color-success;
+		border: 1px solid $color-success-border; color: $color-success;
 	}
 	&-warning {
-		background: $color-warning-bg; border: 1px solid $color-warning-border; color: $color-warning;
+		border: 1px solid $color-warning-border; color: $color-warning;
 	}
 	&-error {
-		background: $color-danger-bg;  border: 1px solid $color-danger-border;  color: $color-danger;
+		border: 1px solid $color-danger-border;  color: $color-danger;
 	}
 
 	&-message {

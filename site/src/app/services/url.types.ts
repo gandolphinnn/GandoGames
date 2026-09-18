@@ -12,6 +12,7 @@ export const BRANCH_DEFINITIONS = {
 	play_local: 'play/local/:game',
 	play_single: 'play/single/:game',
 	play_room: 'play/room/:roomId',
+	test: 'test/:page',
 } as const;
 
 export type BranchName = keyof typeof BRANCH_DEFINITIONS;

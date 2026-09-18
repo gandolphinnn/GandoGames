@@ -1,13 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { IonIcon } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Toast, ToastService } from '@gandogames/services';
+import { Toast, ToastService, ToastType } from '@gandogames/services';
 
-const ICONS: Record<string, string> = {
+const ICONS: Record<ToastType, string> = {
 	info: 'information-circle',
 	success: 'checkmark-circle',
 	warning: 'warning',
 	error: 'alert-circle',
+	yesNo: 'help-circle',
 };
 
 @Component({
@@ -21,20 +22,24 @@ export class ToastComponent {
 	public readonly toastService = inject(ToastService);
 
 	public getIcon(toast: Toast): string {
-		return toast.yesno ? 'help-circle' : (ICONS[toast.type] ?? '');
+		return ICONS[toast.type];
 	}
 
 	public onToastClick(toast: Toast): void {
-		if (!toast.yesno) this.toastService.dismiss(toast.id);
+		if (toast.type === 'yesNo')
+			return;
+
+		toast.resolve(true);
+		//this.toastService.dismiss(toast.id);
 	}
 
 	public doYes(toast: Toast): void {
-		toast.resolve?.(true);
+		toast.resolve(true);
 		this.toastService.dismiss(toast.id);
 	}
 
 	public doNo(toast: Toast): void {
-		toast.resolve?.(false);
+		toast.resolve(false);
 		this.toastService.dismiss(toast.id);
 	}
 }

@@ -2,7 +2,7 @@
 	<div class="toast toast-{{ toast.type }}" (click)="onToastClick(toast)">
 		<ion-icon [name]="getIcon(toast)" />
 		<span class="toast-message">{{ toast.message }}</span>
-		@if (toast.yesno) {
+		@if (toast.type === 'yesNo') {
 			<div class="toast-actions">
 				<button class="btn-yes" (click)="doYes(toast)">
 					<ion-icon name="checkmark" /> {{ 'COMMON.YES' | translate }}

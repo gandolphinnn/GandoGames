@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { IonIcon } from '@ionic/angular';
+import { IonButton, IonIcon } from '@ionic/angular';
 import { ToastService } from '@gandogames/services';
 
 export interface Swatch {
@@ -18,21 +18,29 @@ export interface Section {
 
 @Component({
 	selector: 'gg-palette',
-	imports: [IonIcon, NgTemplateOutlet],
+	imports: [IonIcon, IonButton, NgTemplateOutlet],
 	templateUrl: './palette.component.html',
 	styleUrl: './palette.component.scss',
 })
 export class PaletteComponent {
 	public readonly toast = inject(ToastService);
 
-	public testProgress(): void {
-		const id = this.toast.progress('Loading something heavy…');
-		setTimeout(() => this.toast.dismiss(id), 3000);
+	public async error(): Promise<void> {
+		console.log(await this.toast.error('Something went wrong on the server.'));
 	}
-
-	public async testYesNo(): Promise<void> {
-		const confirmed = await this.toast.yesNo('Do you confirm this action?');
-		this.toast.success(confirmed ? 'You clicked Yes' : 'You clicked No');
+	public async success(): Promise<void> {
+		console.log(await this.toast.success('Operation completed successfully.'));
+	}
+	public async warning(): Promise<void> {
+		console.log(await this.toast.warning('Proceed with caution.'));
+	}
+	public async info(): Promise<void> {
+		console.log(await this.toast.info('Here is some info.'));
+	}
+	public async toastYesNo(): Promise<void> {
+		await this.toast.yesNo('Do you confirm this action?') ? 
+			this.toast.success('You clicked Yes', 1000) :
+			this.toast.error('You clicked No', 1000);
 	}
 
 	public getValue(swatch: Swatch, theme: string): string {

@@ -38,7 +38,7 @@ export class FriendService {
 		});
 
 		this.signalR.events.friendRequest.subscribe(from => {
-			this.toast.show(this.translate.instant('SOCIAL.REQUEST_RECEIVED', { name: from.name }) as string, 'info');
+			this.toast.info(this.translate.instant('SOCIAL.REQUEST_RECEIVED', { name: from.name }) as string);
 			void this.loadFriends();
 		});
 		this.signalR.events.friendsChanged.subscribe(() => void this.loadFriends());

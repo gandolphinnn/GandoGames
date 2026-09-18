@@ -20,6 +20,7 @@
 }
 
 .toast {
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: $s3;
@@ -30,6 +31,7 @@
 	animation: toast-in 200ms ease;
 	cursor: pointer;
 	background: $bg-card;
+	overflow: hidden;
 
 	@media (min-width: $bp-sm) {
 		border-radius: $radius-md; margin-bottom: $s2;
@@ -55,6 +57,28 @@
 
 	&-actions {
 		display: flex; gap: $s2; flex-shrink: 0;
+	}
+
+	&-progress {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		height: 2px;
+		width: 100%;
+		background: var(--ion-color-primary);
+
+		transform-origin: left;
+		animation: toast-countdown linear forwards;
+	}
+
+	@keyframes toast-countdown {
+		from {
+			transform: scaleX(1);
+		}
+
+		to {
+			transform: scaleX(0);
+		}
 	}
 }
 

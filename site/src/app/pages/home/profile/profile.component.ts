@@ -68,14 +68,16 @@ export class ProfileComponent implements ViewDidLeave {
 	}
 
 	public async logout(): Promise<void> {
-		const confirmed = await this.toast.yesNo(this.translate.instant('PROFILE.LOGOUT_CONFIRM') as string);
+		const msg = this.translate.instant('PROFILE.LOGOUT_CONFIRM') as string;
+		const confirmed = await this.toast.yesNo(msg).result;
 		if (!confirmed) return;
 		this.userService.logout();
 		void this.urlService.buildState('login').navigate();
 	}
 
 	public async deleteAccount(): Promise<void> {
-		const confirmed = await this.toast.yesNo(this.translate.instant('PROFILE.DELETE_CONFIRM') as string);
+		const msg = this.translate.instant('PROFILE.DELETE_CONFIRM') as string;
+		const confirmed = await this.toast.yesNo(msg).result;
 		if (!confirmed) return;
 		this.deleting.set(true);
 		try {

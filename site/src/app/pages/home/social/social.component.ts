@@ -41,7 +41,8 @@ export class SocialComponent {
 
 	public async remove(friend: Friend, kind: 'decline' | 'cancel' | 'unfriend'): Promise<void> {
 		const params = { name: friend.name };
-		if (kind === 'unfriend' && !(await this.toast.yesNo(this.translate.instant('SOCIAL.REMOVE_CONFIRM', params) as string))) return;
+		const msg = this.translate.instant('SOCIAL.REMOVE_CONFIRM', params) as string;
+		if (kind === 'unfriend' && !(await this.toast.yesNo(msg).result)) return;
 		this.busyId.set(friend.id);
 		try {
 			await this.friendService.removeFriend(friend.id);

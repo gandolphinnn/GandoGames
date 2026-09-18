@@ -126,7 +126,8 @@ export class RoomLobbyComponent {
 	}
 
 	public async kick(player: GamePlayer): Promise<void> {
-		const confirmed = await this.toast.yesNo(this.translate.instant('LOBBY.KICK_CONFIRM', { name: player.name }) as string);
+		const msg = this.translate.instant('LOBBY.KICK_CONFIRM', { name: player.name }) as string;
+		const confirmed = await this.toast.yesNo(msg).result;
 		if (!confirmed) return;
 
 		await this.roomService.kickPlayer(this.roomId(), player.id);

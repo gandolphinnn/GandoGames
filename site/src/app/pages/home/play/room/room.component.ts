@@ -106,14 +106,16 @@ export class RoomComponent implements OnInit {
 	}
 
 	public async leave(): Promise<void> {
-		const confirmed = await this.toast.yesNo(this.translate.instant('ROOM.LEAVE_CONFIRM') as string);
+		const msg = this.translate.instant('ROOM.LEAVE_CONFIRM') as string;
+		const confirmed = await this.toast.yesNo(msg).result;
 		if (!confirmed) return;
 
 		await this.roomService.leaveRoom(this.roomId());
 	}
 
 	public async closeRoom(): Promise<void> {
-		const confirmed = await this.toast.yesNo(this.translate.instant('ROOM.CLOSE_CONFIRM') as string);
+		const msg = this.translate.instant('ROOM.CLOSE_CONFIRM') as string;
+		const confirmed = await this.toast.yesNo(msg).result;
 		if (!confirmed) return;
 
 		await this.roomService.deleteRoom(this.roomId());

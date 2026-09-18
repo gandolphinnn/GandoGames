@@ -297,7 +297,8 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	protected async allIn(): Promise<void> {
 		const me = this.myPlayer();
 		if (!me || me.chips <= 0) return;
-		const confirmed = await this.toast.yesNo(this.translate.instant('POKER.ALL_IN_CONFIRM', { amount: me.chips }) as string);
+		const msg = this.translate.instant('POKER.ALL_IN_CONFIRM', { amount: me.chips }) as string;
+		const confirmed = await this.toast.yesNo(msg).result;
 		if (confirmed) this.gameAction.emit({ action: 'all-in' });
 	}
 }

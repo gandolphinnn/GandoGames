@@ -11,6 +11,10 @@ const ICONS: Record<ToastType, string> = {
 	yesNo: 'help-circle',
 };
 
+const PROGRESSBAR_MIN_DURATION = 2000;
+const PROGRESSBAR_TYPES: ToastType[] = [
+	'yesNo',
+];
 @Component({
 	selector: 'gg-toast',
 	imports: [IonIcon, TranslatePipe],
@@ -30,16 +34,17 @@ export class ToastComponent {
 			return;
 
 		toast.resolve(true);
-		//this.toastService.dismiss(toast.id);
 	}
 
 	public doYes(toast: Toast): void {
 		toast.resolve(true);
-		this.toastService.dismiss(toast.id);
 	}
 
 	public doNo(toast: Toast): void {
 		toast.resolve(false);
-		this.toastService.dismiss(toast.id);
+	}
+
+	public displayProgress(toast: Toast) {
+		return toast.duration > PROGRESSBAR_MIN_DURATION && PROGRESSBAR_TYPES.includes(toast.type)
 	}
 }

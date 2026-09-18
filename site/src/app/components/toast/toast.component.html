@@ -12,5 +12,8 @@
 				</button>
 			</div>
 		}
+		@if (displayProgress(toast)) {
+			<div class="toast-progress" [style.animation-duration.ms]="toast.duration"></div>
+		}
 	</div>
 }

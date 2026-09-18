@@ -26,19 +26,19 @@ export class PaletteComponent {
 	public readonly toast = inject(ToastService);
 
 	public async error(): Promise<void> {
-		console.log(await this.toast.error('Something went wrong on the server.'));
+		console.log(await this.toast.error('Something went wrong on the server.').result);
 	}
 	public async success(): Promise<void> {
-		console.log(await this.toast.success('Operation completed successfully.'));
+		console.log(await this.toast.success('Operation completed successfully.').result);
 	}
 	public async warning(): Promise<void> {
-		console.log(await this.toast.warning('Proceed with caution.'));
+		console.log(await this.toast.warning('Proceed with caution.').result);
 	}
 	public async info(): Promise<void> {
-		console.log(await this.toast.info('Here is some info.'));
+		console.log(await this.toast.info('Here is some info.').result);
 	}
 	public async toastYesNo(): Promise<void> {
-		await this.toast.yesNo('Do you confirm this action?') ? 
+		await this.toast.yesNo('Do you confirm this action?', 50000).result ? 
 			this.toast.success('You clicked Yes', 1000) :
 			this.toast.error('You clicked No', 1000);
 	}

@@ -17,12 +17,12 @@ export interface Section {
 }
 
 @Component({
-	selector: 'gg-palette',
+	selector: 'gg-playground',
 	imports: [IonIcon, IonButton, NgTemplateOutlet],
-	templateUrl: './palette.component.html',
-	styleUrl: './palette.component.scss',
+	templateUrl: './playground.component.html',
+	styleUrl: './playground.component.scss',
 })
-export class PaletteComponent {
+export class PlaygroundComponent {
 	public readonly toast = inject(ToastService);
 
 	public async error(): Promise<void> {

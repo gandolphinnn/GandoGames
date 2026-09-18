@@ -1,7 +1,15 @@
 @use 'styles/variables' as *;
 
-:host {
-	display: flex;
-	flex: 1;
-	flex-direction: column;
+ion-item.selected {
+	--background: #{$accent-subtle};
+	color: $accent;
+	font-weight: 600;
+
+	ion-icon[slot="start"] {
+		color: $accent;
+	}
+}
+
+ion-button.selected {
+	--color: #{$accent};
 }

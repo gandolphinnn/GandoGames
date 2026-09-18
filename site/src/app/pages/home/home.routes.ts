@@ -6,6 +6,7 @@ export const HOME_ROUTES: Routes = [
 		path: 'admin',
 		loadComponent: () => import('./admin/admin.component').then((m) => m.AdminComponent),
 		canActivate: [adminGuard],
+		loadChildren: () => import('./admin/admin.routes').then((m) => m.ADMIN_ROUTES),
 	},
 	{
 		path: 'profile',
@@ -26,10 +27,5 @@ export const HOME_ROUTES: Routes = [
 	{
 		path: 'play',
 		loadChildren: () => import('./play/play.routes').then((m) => m.PLAY_ROUTES),
-	},
-	{
-		path: 'test/palette',
-		loadComponent: () => import('./test/palette/palette.component').then((m) => m.PaletteComponent),
-		canActivate: [adminGuard],
 	},
 ];

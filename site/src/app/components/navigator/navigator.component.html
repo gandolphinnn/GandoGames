@@ -29,7 +29,7 @@
 					<!-- <ion-icon name="chevron-forward" slot="end" class="menu-user-chevron" /> -->
 				</ion-item>
 				@if (isAdmin()) {
-					<ion-item routerDirection="root" routerLink="/admin" detail="false" routerLinkActive="selected"
+					<ion-item routerDirection="root" routerLink="/admin/rooms" detail="false" routerLinkActive="selected"
 						[routerLinkActiveOptions]="{ exact: true }">
 						<ion-icon name="flash" slot="start" />
 						<ion-label>{{ 'MENU.ADMIN' | translate }}</ion-label>

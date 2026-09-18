@@ -1,5 +1,6 @@
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
-	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonMenuButton, IonTitle, IonToolbar,
+	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonMenuButton, IonRouterOutlet, IonTitle, IonToolbar,
 } from '@ionic/angular';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -15,5 +16,11 @@ import { TranslatePipe } from '@ngx-translate/core';
  * ```
  */
 export const BASE_IMPORTS = [
-	IonHeader, IonToolbar, IonButtons, IonMenuButton, IonTitle, IonIcon, IonButton, IonContent, TranslatePipe,
+	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonLabel, IonMenuButton, IonTitle, IonToolbar,
+	TranslatePipe,
+] as const;
+
+export const ROUTING_IMPORTS = [
+	RouterLink, RouterLinkActive,
+	IonRouterOutlet, 
 ] as const;

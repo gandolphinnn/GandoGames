@@ -1,13 +1,12 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
-	IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg,
-	IonItem, IonLabel, IonList, IonMenuToggle, IonTitle, IonToolbar,
+	IonImg,
+	IonList, IonMenuToggle, 
 	MenuController,
 } from '@ionic/angular';
-import { TranslatePipe } from '@ngx-translate/core';
 import { GameName } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
+import { BASE_IMPORTS, ROUTING_IMPORTS } from '@gandogames/lib/ion-imports';
 import { UserService, RoomService, FriendService, UrlService } from '@gandogames/services';
 import { PlayerAvatarComponent } from '@gandogames/components';
 
@@ -20,9 +19,7 @@ import { PlayerAvatarComponent } from '@gandogames/components';
 	selector: 'gg-navigator',
 	host: { style: 'display: contents' },
 	imports: [
-		IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonImg,
-		IonItem, IonLabel, IonList, IonMenuToggle, IonTitle, IonToolbar,
-		PlayerAvatarComponent, RouterLink, RouterLinkActive, TranslatePipe,
+		BASE_IMPORTS, ROUTING_IMPORTS, PlayerAvatarComponent, IonMenuToggle, IonImg, IonList,
 	],
 	templateUrl: './navigator.component.html',
 	styleUrl: './navigator.component.scss',

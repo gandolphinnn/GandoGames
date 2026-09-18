@@ -1,12 +1,10 @@
 <div class="test-panel">
-	<div class="test-group">
-		<ion-button (click)="error()">Error</ion-button>
-		<ion-button (click)="success()">Success</ion-button>
-		<ion-button (click)="warning()">Warning</ion-button>
-		<ion-button (click)="info()">Info</ion-button>
-		<ion-button (click)="toastYesNo()">Yes / No</ion-button>
-		<a href="https://witty-mushroom-027658110-staging.centralus.1.azurestaticapps.net/login?returnUrl=%2Fplay" target="_blank">STAGING</a>
-	</div>
+	<ion-button size="small" (click)="error()">Error</ion-button>
+	<ion-button size="small" (click)="success()">Success</ion-button>
+	<ion-button size="small" (click)="warning()">Warning</ion-button>
+	<ion-button size="small" (click)="info()">Info</ion-button>
+	<ion-button size="small" (click)="toastYesNo()">Yes / No</ion-button>
+	<a href="https://witty-mushroom-027658110-staging.centralus.1.azurestaticapps.net/login?returnUrl=%2Fplay" target="_blank">STAGING</a>
 </div>
 
 <div class="palette-split">
@@ -16,7 +14,6 @@
 		<ng-container *ngTemplateOutlet="halfContent; context: { $implicit: 'light' }"></ng-container>
 	</div>
 
-	<div class="split-divider"></div>
 
 	<!-- Dark half -->
 	<div class="palette-half" data-theme="dark">

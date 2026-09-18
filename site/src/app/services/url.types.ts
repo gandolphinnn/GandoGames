@@ -4,7 +4,7 @@ export const BRANCH_DEFINITIONS = {
 	games: 'games?flags',
 	login: 'login?returnUrl',
 	signup: 'signup?returnUrl',
-	admin: 'admin', //TODO /:page
+	admin: 'admin/:page',
 	profile: 'profile',
 	social: 'social',
 	rooms_list: 'rooms/list?game',
@@ -12,7 +12,6 @@ export const BRANCH_DEFINITIONS = {
 	play_local: 'play/local/:game',
 	play_single: 'play/single/:game',
 	play_room: 'play/room/:roomId',
-	test: 'test/:page',
 } as const;
 
 export type BranchName = keyof typeof BRANCH_DEFINITIONS;

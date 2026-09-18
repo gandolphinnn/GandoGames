@@ -1,0 +1,31 @@
+<gg-refreshable-content [fullscreen]="true" [onRefresh]="refreshFn">
+	<div class="table-wrapper">
+	<table class="label-table">
+		<thead>
+			<tr>
+				<th>{{ 'ADMIN.LABEL.ID' | translate }}</th>
+				<th>{{ 'ADMIN.LABEL.LAST_UPDATED' | translate }}</th>
+				<th class="actions"></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			@for (label of labels(); track label.id) {
+				<tr>
+					<td>{{ label.id }}</td>
+					<td>{{ label.lastUpdate | date:'short':'':locale() }}</td>
+					<td class="actions">
+						<ion-button
+							[disabled]="loading()"
+							(click)="deleteLabel(label.id)"
+							fill="clear"
+							color="danger">
+							<ion-icon name="trash" />
+						</ion-button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
+</gg-refreshable-content>

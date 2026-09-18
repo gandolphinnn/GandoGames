@@ -47,7 +47,7 @@ const guestUsername = (customId: string): string => {
 	return `Guest${String(hash).padStart(6, '0')}`;
 };
 
-const guestLoginInner: InnerPublicFunction<typeof API.auth.guestLogin> = async (body, notifier) => {
+const guestLoginInner: InnerPublicFunction<typeof API.auth.guestLogin> = async (body, _params, notifier) => {
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Invalid custom ID';
 	const result = await pfPromise<PlayFabClientModels.LoginResult>(
@@ -77,7 +77,7 @@ const guestLoginInner: InnerPublicFunction<typeof API.auth.guestLogin> = async (
 	return toAuthResponse(result, name, true, result.InfoResultPayload?.UserData);
 };
 
-const loginInner: InnerPublicFunction<typeof API.auth.login> = async (body, notifier) => {
+const loginInner: InnerPublicFunction<typeof API.auth.login> = async (body, _params, notifier) => {
 	notifier.errorCode = 401;
 	notifier.errorMessage = 'Invalid email or password';
 	const infoRequestParameters = INFO_REQUEST_PARAMS;
@@ -87,7 +87,7 @@ const loginInner: InnerPublicFunction<typeof API.auth.login> = async (body, noti
 	return toAuthResponse(result, result.InfoResultPayload?.AccountInfo?.Username, false, result.InfoResultPayload?.UserData);
 };
 
-const registerInner: InnerPublicFunction<typeof API.auth.register> = async (body, notifier) => {
+const registerInner: InnerPublicFunction<typeof API.auth.register> = async (body, _params, notifier) => {
 	notifier.errorCode = 400;
 	notifier.errorMessage = 'Invalid registration data';
 	const result = await pfPromise<PlayFabClientModels.RegisterPlayFabUserResult>(

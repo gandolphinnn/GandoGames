@@ -6,13 +6,13 @@ import { RefreshableContentComponent } from '@gandogames/components';
 import { DatePipe } from '@angular/common';
 
 @Component({
-	selector: 'gg-admin-rooms',
+	selector: 'gg-labels',
 	host: { class: 'ion-page' },
 	imports: [...BASE_IMPORTS, RefreshableContentComponent, DatePipe],
-	templateUrl: './admin-rooms.component.html',
-	styleUrl: './admin-rooms.component.scss',
+	templateUrl: './labels.component.html',
+	styleUrl: './labels.component.scss',
 })
-export class AdminRoomsComponent implements OnInit {
+export class LabelsComponent implements OnInit {
 	private readonly admin = inject(AdminService);
 	private readonly user = inject(UserService);
 	private readonly toast = inject(ToastService);
@@ -20,38 +20,29 @@ export class AdminRoomsComponent implements OnInit {
 
 	public readonly locale = this.user.locale;
 	public readonly loading = signal(false);
-	public readonly rooms = computed(() => this.admin.rooms().map(room => {
-		const host = room.players.find(u => u.id === room.hostId);
-		return {
-			id: room.id,
-			host: host?.name ?? room.hostId,
-			game: room.game,
-			phase: room.phase,
-			lastUpdate: room.lastUpdate
-		}
-	}));
+	public readonly labels = this.admin.labels;
 
 	public ngOnInit(): void {
-		void this.fetchRooms();
+		void this.fetchLabels();
 	}
 
 	public readonly refreshFn = async (): Promise<void> => {
-		await this.fetchRooms();
+		await this.fetchLabels();
 	};
 	
-	private async fetchRooms(): Promise<void> {
+	private async fetchLabels(): Promise<void> {
 		try {
 			this.loading.set(true);
-			await this.admin.loadRooms();
+			await this.admin.loadLabels();
 		} finally {
 			this.loading.set(false);
 		}
 	}
 	
-	public async deleteRoom(roomId: string) {
+	public async deleteLabel(labelId: string) {
 		try {
 			this.loading.set(true);
-			await this.admin.deleteRoom(roomId);
+			await this.admin.deleteLabel(labelId);
 		} finally {
 			this.loading.set(false);
 		}

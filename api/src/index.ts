@@ -64,7 +64,8 @@ export function registerPublicEndpoint<E extends AnyEndpoint>(
 			const notifier = new InnerFunctionNotifier();
 			try {
 				const body = await readBody(def, request);
-				const result = await innerPublicFunction(body, notifier);
+				const params = request.params as unknown as EndpointParams<E>;
+				const result = await innerPublicFunction(body, params, notifier);
 				notifier.prepareContext(context);
 				toRet.jsonBody = result;
 				toRet.status = 200;

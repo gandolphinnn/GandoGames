@@ -1,5 +1,5 @@
 import { PlayFabServer } from "playfab-sdk";
-import { GameState, GameName, RoomData } from "@gandogames/shared/dto";
+import { GameState, GameName, RoomData, Label } from "@gandogames/shared/dto";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
 import { pfPromise } from "..";
@@ -107,6 +107,7 @@ class PlayFabEntity<T> {
 }
 
 export class PlayfabCtx {
+	public static readonly labels = new PlayFabEntity<Label>('LABELS', HOOKS.lastUpdate());
 	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', HOOKS.lastUpdate());
 
 	public static readonly game: Record<GameName, PlayFabEntity<GameState>> = {

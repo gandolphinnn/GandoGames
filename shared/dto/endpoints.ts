@@ -1,6 +1,7 @@
 import type { AuthResponse, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest } from './auth';
 import type { FriendsListResponse } from './friends';
 import type { GameActionRequest, GameSettingsSetRequest, GameState, GameStateRequest } from './game';
+import type { Label, LabelCreateRequest } from './labels';
 import type { ChatSendRequest, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from './room';
 import type { NegotiateQuery, NegotiateResponse } from './signalr';
 
@@ -78,6 +79,9 @@ export interface AliveResponse {
 export const API = {
 	/** Health probe (registered without the SignalR binding so it works with no configuration). */
 	alive: endpoint<void, AliveResponse>()('alive', 'GET', 'alive'),
+	labels: {
+		list: endpoint<void, Record<string, string>>()('labels_list', 'GET', 'labels/{langCode}'),
+	},
 	auth: {
 		/** Log in with email + password; mints a new session ticket. */
 		login: endpoint<LoginRequest, AuthResponse>()('auth_login', 'POST', 'auth/login'),
@@ -114,6 +118,12 @@ export const API = {
 		rooms: {
 			list: endpoint<void, RoomData[]>()('moderator_rooms_list', 'GET', 'moderator/rooms'),
 			delete: endpoint<void, RoomData[]>()('moderator_rooms_delete', 'DELETE', 'moderator/rooms/{roomId}'),
+		},
+		labels: {
+			list: endpoint<void, Label[]>()('moderator_labels_list', 'GET', 'moderator/labels'),
+			create: endpoint<LabelCreateRequest, Label>()('moderator_labels_create', 'POST', 'moderator/labels'),
+			delete: endpoint<void, Label[]>()('moderator_labels_delete', 'DELETE', 'moderator/labels/{labelId}'),
+			get: endpoint<void, Label>()('moderator_labels_get', 'GET', 'moderator/labels/{labelId}'),
 		},
 	},
 	profile: {

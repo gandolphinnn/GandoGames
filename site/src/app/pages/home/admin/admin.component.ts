@@ -5,7 +5,7 @@ import { IonList, IonTab, IonTabBar, IonTabButton, IonTabs } from '@ionic/angula
 @Component({
 	selector: 'gg-admin',
 	host: { class: 'ion-page' },
-	imports: [...BASE_IMPORTS, ...ROUTING_IMPORTS, IonList, IonTabs, IonTabBar, IonTabButton],
+	imports: [...BASE_IMPORTS, ...ROUTING_IMPORTS, IonTabs, IonTabBar, IonTabButton],
 	templateUrl: './admin.component.html',
 	styleUrl: './admin.component.scss',
 })

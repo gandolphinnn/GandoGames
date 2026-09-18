@@ -1,0 +1,68 @@
+@use 'styles/variables' as *;
+
+.table-wrapper {
+	width: 100%;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.rooms-table {
+	width: 100%;
+	min-width: 700px;
+	border-collapse: collapse;
+	font-size: $text-sm;
+
+	th,
+	td {
+		padding: $s3 $s4;
+		text-align: left;
+		border-bottom: 1px solid $border;
+	}
+
+	thead {
+		th {
+			color: $text-muted;
+			background: $bg-card;
+			font-size: $text-sm;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			white-space: nowrap;
+		}
+	}
+
+	tbody {
+		td {
+			color: $text;
+			vertical-align: middle;
+		}
+
+		tr {
+			transition: background $transition;
+
+			&:hover {
+				background: $hover-overlay;
+			}
+
+			&:last-child td {
+				border-bottom: none;
+			}
+		}
+	}
+
+	// ID
+	th:first-child,
+	td:first-child {
+		width: 1%;
+		white-space: nowrap;
+	}
+
+	// Azioni
+	.actions {
+		width: 1%;
+		text-align: right;
+		white-space: nowrap;
+		padding-left: $s2;
+		padding-right: $s2;
+	}
+}

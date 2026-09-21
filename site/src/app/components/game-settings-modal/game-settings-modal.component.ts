@@ -4,7 +4,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BlindLevel, GameSettings, GameName, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BlindLevelsEditorComponent } from './blind-levels-editor.component';
-import { RoomService, ToastService } from '@gandogames/services';
+import { GameService, RoomService, ToastService } from '@gandogames/services';
 
 /**
  * Schema-driven editor for a room's game settings. Renders the fields declared by
@@ -18,7 +18,7 @@ import { RoomService, ToastService } from '@gandogames/services';
 	styleUrl: './game-settings-modal.component.scss',
 })
 export class GameSettingsModalComponent {
-	private readonly roomService = inject(RoomService);
+	private readonly gameService = inject(GameService);
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
@@ -90,7 +90,7 @@ export class GameSettingsModalComponent {
 		try {
 			// Clamp/normalize once more before sending; the server validates again against the schema.
 			const settings = resolveSettings(this.schema(), this.working());
-			await this.roomService.setGameSettings(this.roomId(), settings);
+			await this.gameService.setGameSettings(this.game(), settings, this.roomId());
 			this.toast.success(this.translate.instant('SETTINGS_MODAL.SAVED') as string);
 			this.closed.emit();
 		} finally {

@@ -1,15 +1,15 @@
-import { PlayFabServer } from "playfab-sdk";
+import { PlayFabData, PlayFabServer } from "playfab-sdk";
+import { pfPromise } from "..";
 import { GameState, GameName, RoomData } from "@gandogames/shared/dto";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
-import { pfPromise } from "..";
 import { MastermindGameState } from "@gandogames/shared/mastermind";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 interface PlayFabEntityHooks<T> {
-	onParse?(value: T | null): T | null;
 	beforeUpsert?(id: string, value: T): void | Promise<void>;
+	afterParse?(value: T | null): T | null;
 }
 
 const HOOKS = {
@@ -18,26 +18,38 @@ const HOOKS = {
 	})
 }
 
-class PlayFabEntity<T> {
 
+abstract class PlayFabEntity<T> {
 	constructor(
-		public readonly groupId: string,
-		public readonly hooks: PlayFabEntityHooks<T> = {},
+		public readonly hooks: PlayFabEntityHooks<T>,
 	) {
 	}
-	
-	private parse(raw: string | undefined): T | null {
+
+	protected parse(raw: string | undefined): T | null {
 		const deserialized = raw ? JSON.parse(raw, (_key, value) => {
 			if (typeof value === 'string' && DATE_REGEX.test(value))
 				return new Date(value);
 			return value;
 		}) as T : null;
-		return this.hooks.onParse ? this.hooks.onParse(deserialized) : deserialized;
+		return this.hooks.afterParse ? this.hooks.afterParse(deserialized) : deserialized;
 	}
 
-	private hasInit = false;
+	public abstract get(id: string): Promise<T | null>;
+	public abstract upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult>;
+	public abstract delete(id: string): Promise<PlayFabServerModels.UpdateSharedGroupDataResult>;
+}
+
+class PlayFabSharedGroupEntity<T> extends PlayFabEntity<T> {
+	protected hasInit = false;
+	constructor(
+		public readonly groupId: string,
+		hooks: PlayFabEntityHooks<T> = {},
+	) {
+		super(hooks);
+	}
+
 	/** Init the entity shared group ensuring it exists */
-	private async init(): Promise<void> {
+	protected async init(): Promise<void> {
 		if (this.hasInit)
 			return;
 
@@ -47,9 +59,10 @@ class PlayFabEntity<T> {
 				cb => PlayFabServer.CreateSharedGroup({ SharedGroupId: this.groupId }, cb),
 			);
 		} catch (err) {
+			console.error(err);
 		}
 	}
-	
+
 	public async list(): Promise<T[]> {
 		await this.init();
 		try {
@@ -85,34 +98,71 @@ class PlayFabEntity<T> {
 			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: this.groupId, Data: data }, cb),
 		);
 	}
-	
+
 	public async delete(id: string): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
 		await this.init();
 		return await pfPromise<PlayFabServerModels.UpdateSharedGroupDataResult>(
 			cb => PlayFabServer.UpdateSharedGroupData({ SharedGroupId: this.groupId, KeysToRemove: [id] }, cb),
 		);
 	}
+}
 
-	public async exists(id: string): Promise<boolean> {
-		await this.init();
+class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
+	constructor(
+		public readonly objectName: string,
+		hooks: PlayFabEntityHooks<T> = {},
+	) {
+		super(hooks);
+	}
+
+	public async get(id: string): Promise<T | null> {
 		try {
-			const result = await pfPromise<PlayFabServerModels.GetSharedGroupDataResult>(
-				cb => PlayFabServer.GetSharedGroupData({ SharedGroupId: this.groupId, Keys: [id] }, cb),
+			const result = await pfPromise<PlayFabDataModels.GetObjectsResponse>(
+				cb => PlayFabData.GetObjects({ Entity: { Id: id, Type: 'title_player_account' } }, cb),
 			);
-			return !!result.Data?.[id]?.Value;
+			return this.parse(result?.Objects?.[this.objectName]?.DataObject);
 		} catch {
-			return false;
+			return null;
 		}
+	}
+
+	public async upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
+		if (this.hooks.beforeUpsert) await this.hooks.beforeUpsert(id, value);
+
+		return await pfPromise<PlayFabDataModels.SetObjectsResponse>(
+			cb => PlayFabData.SetObjects({
+				Entity: { Id: id, Type: 'title_player_account' },
+				Objects: [
+					{
+						ObjectName: this.objectName,
+						DataObject: value,
+					}
+				]
+			}, cb),
+		);
+	}
+
+	public async delete(id: string): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
+		return await pfPromise<PlayFabDataModels.SetObjectsResponse>(
+			cb => PlayFabData.SetObjects({
+				Entity: { Id: id, Type: 'title_player_account' },
+				Objects: [
+					{
+						ObjectName: this.objectName,
+						DeleteObject: true,
+					}
+				]
+			}, cb),
+		);
 	}
 }
 
 export class PlayfabCtx {
-	public static readonly rooms = new PlayFabEntity<RoomData>('ROOMS_INDEX', HOOKS.lastUpdate());
+	public static readonly rooms = new PlayFabSharedGroupEntity<RoomData>('ROOMS_INDEX', HOOKS.lastUpdate());
 
 	public static readonly game: Record<GameName, PlayFabEntity<GameState>> = {
-		// TODO REMOVE!!!
-		'mastermind': new PlayFabEntity<MastermindGameState>('MASTERMIND_GAMES_INDEX', HOOKS.lastUpdate()),
-		'pankov': new PlayFabEntity<PankovGameState>('PANKOV_GAMES_INDEX', HOOKS.lastUpdate()),
-		'poker': new PlayFabEntity<PokerGameState>('POKER_GAMES_INDEX', HOOKS.lastUpdate()),
+		'mastermind': new PlayFabPlayerObjectEntity<MastermindGameState>('MASTERMIND_GAMES', HOOKS.lastUpdate()),
+		'pankov': new PlayFabSharedGroupEntity<PankovGameState>('PANKOV_GAMES_INDEX', HOOKS.lastUpdate()),
+		'poker': new PlayFabSharedGroupEntity<PokerGameState>('POKER_GAMES_INDEX', HOOKS.lastUpdate()),
 	}
 }

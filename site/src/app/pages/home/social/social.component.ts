@@ -26,7 +26,7 @@ export class SocialComponent {
 	/** Id of the friend currently being acted on, to disable its buttons. */
 	public readonly busyId = signal<string | null>(null);
 
-	public readonly refreshFn = async (): Promise<void> => {
+	public async refreshFn() {
 		if (!this.isGuest()) await this.friendService.loadFriends();
 	};
 

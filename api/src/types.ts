@@ -1,5 +1,5 @@
 import { InvocationContext, Timer } from '@azure/functions';
-import { AnyEndpoint, ChatMessage, EndpointParams, EndpointRequest, EndpointResponse, Friend, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/shared/dto';
+import { AnyEndpoint, ChatMessage, EndpointParams, EndpointRequest, EndpointResponse, Friend, GameName, GamePlayer, GameState, RoomData, SignalREventType } from '@gandogames/shared/dto';
 import { signalROutput } from '.';
 import { Game } from './games';
 
@@ -41,7 +41,7 @@ export class InnerFunctionNotifier {
 	public chatMessage(roomId: string, message: ChatMessage) {
 		this.signalR.push({ target: 'chatMessage', arguments: [roomId, message], groupName: `room-${roomId}` });
 	}
-	public roomInviteForPlayer(userId: string, roomId: string, game: string) {
+	public roomInviteForPlayer(userId: string, roomId: string, game: GameName) {
 		this.signalR.push({ target: 'roomInvite', arguments: [roomId, game], userId });
 	}
 	public friendRequest(userId: string, from: Friend) {

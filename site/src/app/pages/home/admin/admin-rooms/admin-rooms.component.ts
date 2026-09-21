@@ -35,7 +35,7 @@ export class AdminRoomsComponent {
 		void this.fetchRooms();
 	}
 
-	public readonly refreshFn = async (): Promise<void> => {
+	public async refreshFn() {
 		await this.fetchRooms();
 	};
 	

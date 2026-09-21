@@ -1,4 +1,4 @@
-import { API, GAMES_CONFIG, RoomData, buildBot, resolveAccessPolicy } from '@gandogames/shared/dto';
+import { API, GAMES_CONFIG, GamePlayer, RoomData, resolveAccessPolicy } from '@gandogames/shared/dto';
 import { Game } from '../../games';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
 
@@ -133,19 +133,6 @@ const roomLeaveInner: InnerFunction<typeof API.rooms.leave> = async (_body, para
 	notifier.roomUpsert(room);
 };
 
-const roomResetInner: InnerFunction<typeof API.rooms.reset> = async (_body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
-	//if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'playing') throw new Error('Game is not in progress');
-
-	room.phase = 'waiting';
-	room.lastUpdate = new Date();
-	await PlayfabCtx.rooms.upsert(params.roomId, room);
-	notifier.roomUpsert(room);
-	return room;
-};
-
 const roomAccessSetInner: InnerFunction<typeof API.rooms.setAccess> = async (body, params, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -208,7 +195,16 @@ const roomAddBotInner: InnerFunction<typeof API.rooms.addBot> = async (_body, pa
 
 	const botsInRoom = room.players.filter(p => p.type === 'bot').length;
 	const id = Math.random().toString(36).substring(2, 8).toUpperCase();
-	const bot = buildBot(id, `Bot ${botsInRoom + 1}`);
+	const bot: GamePlayer = {
+		id: id,
+		name: `Bot ${botsInRoom + 1}`,
+		entityId: id,
+		type: 'bot',
+		icon: 'bot',
+		theme: 'light',
+		language: 'en',
+		role: '',
+	};
 	room.players.push(bot);
 	await PlayfabCtx.rooms.upsert(params.roomId, room);
 	notifier.roomUpsert(room);
@@ -232,7 +228,6 @@ registerEndpoint(API.rooms.list, roomListInner);
 registerEndpoint(API.rooms.get, roomGetInner);
 registerEndpoint(API.rooms.join, roomJoinInner);
 registerEndpoint(API.rooms.start, roomStartInner);
-registerEndpoint(API.rooms.reset, roomResetInner);
 registerEndpoint(API.rooms.setAccess, roomAccessSetInner);
 registerEndpoint(API.rooms.kick, roomKickInner);
 registerEndpoint(API.rooms.leave, roomLeaveInner);

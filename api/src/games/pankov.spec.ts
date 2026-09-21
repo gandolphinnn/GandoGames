@@ -1,6 +1,19 @@
-import { buildPlayer, type GamePlayer } from '@gandogames/shared/dto';
+import { type GamePlayer } from '@gandogames/shared/dto';
 import type { RollValue } from '@gandogames/shared/pankov';
 import { PankovGame } from './pankov';
+
+function buildPlayer(id: string, name: string): GamePlayer {
+	return {
+		id,
+		name,
+		entityId: id,
+		type: 'user',
+		icon: 'profile',
+		theme: 'light',
+		language: 'en',
+		role: '',
+	};
+}
 
 const p1: GamePlayer = buildPlayer('p1', 'Alice');
 const p2: GamePlayer = buildPlayer('p2', 'Bob');

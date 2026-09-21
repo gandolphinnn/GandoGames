@@ -16,7 +16,7 @@ export class GamesComponent {
 	private url = inject(UrlService)
 	public games = Object.values(GAME_REGISTRY)
 
-	public readonly refreshFn = async (): Promise<void> => {
+	public async refreshFn() {
 		await this.fetchGames();
 	};
 

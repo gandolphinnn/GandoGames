@@ -1,5 +1,5 @@
 import { computed, inject, Service, signal } from '@angular/core';
-import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameStateRequest, GameName, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
+import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameRequest, GameName, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { SignalRService } from './signalr.service';
 import { UserService } from './user.service';
@@ -79,10 +79,6 @@ export class RoomService {
 		return this.backend.call(API.rooms.start, { params: { roomId } });
 	}
 
-	public resetRoom(roomId: string): Promise<RoomData> {
-		return this.backend.call(API.rooms.reset, { params: { roomId } });
-	}
-
 	public setRoomAccess(roomId: string, access: RoomAccessPolicy): Promise<RoomData> {
 		const request: RoomAccessSetRequest = { access };
 		return this.backend.call(API.rooms.setAccess, { params: { roomId }, body: request });
@@ -107,20 +103,5 @@ export class RoomService {
 
 	public addBot(roomId: string): Promise<void> {
 		return this.backend.call(API.rooms.addBot, { params: { roomId } });
-	}
-
-	public getGameState(game: GameName, roomId: string): Promise<GameState | null> {
-		const request: GameStateRequest = { game };
-		return this.backend.call(API.game.state, { params: { roomId }, body: request });
-	}
-
-	public gameAction(game: GameName, roomId: string, action: string, data?: unknown): Promise<GameState | null> {
-		const request: GameActionRequest = { game, action, data: data ?? null };
-		return this.backend.call(API.game.action, { params: { roomId }, body: request });
-	}
-
-	public setGameSettings(roomId: string, settings: GameSettings): Promise<RoomData> {
-		const request: GameSettingsSetRequest = { settings };
-		return this.backend.call(API.game.setSettings, { params: { roomId }, body: request });
 	}
 }

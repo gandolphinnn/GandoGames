@@ -1,8 +1,8 @@
-import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, signal, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, output, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { GameState, GameName } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { SignalRService, RoomService, UserService, UrlService, ToastService } from '@gandogames/services';
+import { SignalRService, RoomService, UserService, UrlService, ToastService, GameService } from '@gandogames/services';
 
 @Component({
 	imports: [],
@@ -11,23 +11,26 @@ import { SignalRService, RoomService, UserService, UrlService, ToastService } fr
 	templateUrl: './game-shell.component.html',
 })
 export class GameShellComponent implements OnInit, AfterViewInit {
-public readonly roomId = input.required<string>();
 	public readonly gameName = input.required<GameName>();
+	public readonly descriptor = computed(() => GAME_REGISTRY[this.gameName()])
+	public readonly roomId = input<string>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
 	private readonly gameSlot!: ViewContainerRef;
 
 	private readonly signalR = inject(SignalRService);
+	private readonly gameService = inject(GameService);
 	private readonly roomService = inject(RoomService);
 	private readonly auth = inject(UserService);
 	private readonly urlService = inject(UrlService);
 	private readonly destroyRef = inject(DestroyRef);
-	private readonly toast = inject(ToastService);
 
 	private readonly gameState = signal<GameState | null>(null);
 	private readonly loading = signal(false);
 	private readonly myPlayFabId = computed(() => this.auth.user()?.player.id ?? null);
-	private readonly gameRef = signal<ComponentRef<unknown> | null>(null);
+	private readonly gameRef = signal<ComponentRef<GameComponent> | null>(null);
+
+	public readonly gameAction = output<{action: string, data?: unknown}>();
 
 	constructor() {
 		effect(() => {
@@ -39,18 +42,20 @@ public readonly roomId = input.required<string>();
 		});
 	}
 
-	public ngOnInit(): void {
+	public async ngOnInit(): Promise<void> {
 		this.signalR.events.gameStateUpdated
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(({ roomId, state }) => {
 				if (roomId === this.roomId()) this.gameState.set(state);
 			});
-		void this.loadGameState();
+
+		const state = await this.gameService.getGameState(this.gameName(), this.roomId());
+		this.gameState.set(state);
 	}
 
 	public ngAfterViewInit(): void {
-		const ref = this.gameSlot.createComponent(GAME_REGISTRY[this.gameName()].component);
-		const instance = ref.instance as GameComponent;
+		const ref = this.gameSlot.createComponent(this.descriptor().component) as ComponentRef<GameComponent>;
+		const instance = ref.instance;
 
 		outputToObservable(instance.gameAction)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -58,27 +63,22 @@ public readonly roomId = input.required<string>();
 
 		outputToObservable(instance.playAgain)
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(() => void this.resetRoom());
+			.subscribe(() => void this.playAgain());
 
 		this.gameRef.set(ref);
-	}
-
-	private async loadGameState(): Promise<void> {
-		const state = await this.roomService.getGameState(this.gameName(), this.roomId());
-		this.gameState.set(state);
 	}
 
 	private async sendAction(action: string, data?: unknown): Promise<void> {
 		this.loading.set(true);
 		try {
-			await this.roomService.gameAction(this.gameName(), this.roomId(), action, data);
+			await this.gameService.gameAction(this.gameName(), action, data, this.roomId());
 		} finally {
 			this.loading.set(false);
 		}
 	}
 
-	private async resetRoom(): Promise<void> {
-		await this.roomService.resetRoom(this.roomId());
-		void this.urlService.buildState('play_room', { roomId: this.roomId() }).navigate();
+	private async playAgain(): Promise<void> {
+		await this.gameService.reset(this.gameName(), this.roomId());
+		//TODO probably do something with the room
 	}
 }

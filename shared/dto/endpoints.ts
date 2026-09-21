@@ -1,6 +1,6 @@
 import type { AuthResponse, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest } from './auth';
 import type { FriendsListResponse } from './friends';
-import type { GameActionRequest, GameSettingsSetRequest, GameState, GameStateRequest } from './game';
+import type { GameActionRequest, GameRequest, GameSettingsSetRequest, GameState } from './game';
 import type { ChatSendRequest, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from './room';
 import type { NegotiateQuery, NegotiateResponse } from './signalr';
 
@@ -104,11 +104,13 @@ export const API = {
 		 * The caller's public view of the game state. A safe read whose input (`game`) is a JSON
 		 * body, which is exactly what QUERY exists for — GET could only smuggle it into the URL.
 		 */
-		state: endpoint<GameStateRequest, GameState | null>()('game_state', 'QUERY', 'rooms/{roomId}/game/state'),
+		state: endpoint<GameRequest, GameState | null>()('game_state', 'QUERY', 'game/{gameId}/state'),
 		/** Play a move; returns the caller's updated public state. */
-		action: endpoint<GameActionRequest, GameState | null>()('game_action', 'POST', 'rooms/{roomId}/game/action'),
+		action: endpoint<GameActionRequest, GameState | null>()('game_action', 'POST', 'game/{gameId}/action'),
 		/** Host only: replace the room's game settings (server re-validates against the schema). */
-		setSettings: endpoint<GameSettingsSetRequest, RoomData>()('game_settings_set', 'PUT', 'rooms/{roomId}/game/settings'),
+		setSettings: endpoint<GameSettingsSetRequest, RoomData>()('game_settings_set', 'PUT', 'game/{gameId}/settings'),
+		/** Host only: end the current game and return the room to the lobby. */
+		reset: endpoint<GameRequest, RoomData>()('game_settings_reset', 'POST', 'game/{gameId}/reset'),
 	},
 	moderator: {
 		rooms: {
@@ -131,8 +133,6 @@ export const API = {
 		join: endpoint<void, RoomData>()('room_join', 'POST', 'rooms/{roomId}/join'),
 		/** Host only: start the game. */
 		start: endpoint<void, RoomData>()('room_start', 'POST', 'rooms/{roomId}/start'),
-		/** Host only: end the current game and return the room to the lobby. */
-		reset: endpoint<void, RoomData>()('room_reset', 'POST', 'rooms/{roomId}/reset'),
 		/** Host only: replace the room's access policy. */
 		setAccess: endpoint<RoomAccessSetRequest, RoomData>()('room_access', 'PUT', 'rooms/{roomId}/access'),
 		/** Host only: invite a friend (delivered as a SignalR `roomInvite`). */

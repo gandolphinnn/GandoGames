@@ -9,13 +9,11 @@ export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings ex
 	settings: TSettings;
 }
 
-/** Which game's state to load (the room travels as the `{roomId}` path segment). */
-export interface GameStateRequest {
-	game: GameName,
+export interface GameRequest {
+	roomId?: string;
 }
 
-export interface GameActionRequest {
-	game: GameName,
+export interface GameActionRequest extends GameRequest {
 	action: string,
 	data: any,
 }
@@ -55,7 +53,7 @@ export interface SettingField {
 
 export type GameSettingsSchema = readonly SettingField[];
 
-export interface GameSettingsSetRequest {
+export interface GameSettingsSetRequest extends GameRequest {
 	settings: GameSettings;
 }
 

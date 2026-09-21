@@ -5,6 +5,7 @@ import { InnerFunction, InnerPublicFunction, pfPromise, registerEndpoint, regist
 type LoginLike = {
 	PlayFabId?: string;
 	SessionTicket?: string;
+	EntityToken?: PlayFabServerModels.EntityTokenResponse;
 };
 
 const INFO_REQUEST_PARAMS: PlayFabClientModels.GetPlayerCombinedInfoRequestParams = {
@@ -30,6 +31,7 @@ const toAuthResponse = (
 	player: {
 		id: response.PlayFabId!,
 		name: name || response.PlayFabId!,
+		entityId: response.EntityToken?.Entity!.Id!,
 		type: isGuest ? 'guest' : 'user',
 		icon: (userData?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (userData?.['theme']?.Value as Theme) ?? 'dark',

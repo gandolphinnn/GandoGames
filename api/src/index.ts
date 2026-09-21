@@ -159,6 +159,7 @@ export async function authenticateSession(sessionTicket: string | undefined, not
 	notifier.errorCode = errorCode;
 	notifier.errorMessage = errorMessage;
 	const id = authResult.UserInfo!.PlayFabId!;
+	const entity = authResult.UserInfo!.TitleInfo!.TitlePlayerAccount!.Id;
 	const name = authResult.UserInfo!.TitleInfo?.DisplayName || authResult.UserInfo!.Username || 'Guest';
 	const isGuest = !authResult.UserInfo!.Username;
 	const profileResult = await pfPromise<PlayFabServerModels.GetUserDataResult>(
@@ -168,6 +169,7 @@ export async function authenticateSession(sessionTicket: string | undefined, not
 	const player: GamePlayer = {
 		id,
 		name,
+		entityId: entity,
 		icon: (data?.['icon']?.Value as IconType) ?? 'profile',
 		theme: (data?.['theme']?.Value as Theme) ?? 'dark',
 		language: (data?.['language']?.Value as LangCode) ?? 'en',

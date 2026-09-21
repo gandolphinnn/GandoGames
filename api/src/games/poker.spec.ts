@@ -1,8 +1,21 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
-import { buildPlayer, resolveSettings } from '@gandogames/shared/dto';
+import { resolveSettings } from '@gandogames/shared/dto';
 import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
+
+function buildPlayer(id: string, name: string): GamePlayer {
+	return {
+		id,
+		name,
+		entityId: id,
+		type: 'user',
+		icon: 'profile',
+		theme: 'light',
+		language: 'en',
+		role: '',
+	};
+}
 
 const c = (rank: Card['rank'], suit: Card['suit']): Card => ({ rank, suit });
 const DEFAULT_BLINDS = [{ bigBlind: 20, durationMinutes: 10 }, { bigBlind: 40, durationMinutes: 0 }]

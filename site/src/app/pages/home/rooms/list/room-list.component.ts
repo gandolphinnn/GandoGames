@@ -30,7 +30,7 @@ export class RoomListComponent implements OnInit {
 		return this.browsableRooms().filter((r) => active.includes(r.game));
 	});
 
-	public readonly refreshFn = async (): Promise<void> => {
+	public async refreshFn() {
 		await this.fetchRooms();
 	};
 

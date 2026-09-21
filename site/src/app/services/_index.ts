@@ -1,6 +1,7 @@
 export { AdminService } from './admin.service';
 export { BackendService } from './backend.service';
 export { FriendService } from './friend.service';
+export { GameService } from './game.service';
 export { RoomService } from './room.service';
 export { SignalRService } from './signalr.service';
 export { StorageService } from './storage.service';

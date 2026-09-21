@@ -12,7 +12,7 @@
 			(seatClick)="onSeatClick($event.seat)">
 
 			<div table-center class="lobby-meta">
-				<span class="lobby-meta-game"><i [class]="gameInfo()?.icon"></i> {{ gameInfo()?.name }}</span>
+				<span class="lobby-meta-game"><i [class]="gameInfo()?.icon"></i> {{ gameInfo()?.title | translate }}</span>
 				<span class="lobby-meta-count">{{ 'LOBBY.PLAYER_COUNT' | translate: { current: room()!.players.length, max: gameInfo()!.maxPlayers } }}</span>
 				<span class="room-access-badge"
 					[class]="room()!.access"
@@ -93,7 +93,7 @@
 		@if (showInviteModal() && room()) {
 			<gg-invite-modal
 				[room]="room()"
-				[gameName]="room()!.game"
+				[gameId]="room()!.game"
 				[isHost]="isHost()"
 				[playerCount]="room()!.players.length"
 				[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
@@ -103,7 +103,7 @@
 
 		@if (showSettingsModal() && room()) {
 			<gg-game-settings-modal
-				[game]="room()!.game"
+				[gameId]="room()!.game"
 				[roomId]="roomId()"
 				[settings]="room()!.settings ?? {}"
 				[editable]="isHost() && room()!.phase === 'waiting'"

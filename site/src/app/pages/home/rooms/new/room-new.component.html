@@ -14,14 +14,14 @@
 	<div class="create-page">
 		<div class="create-form">
 			<div class="game-grid">
-				@for (game of allGames; track game.name) {
+				@for (game of allGames; track game.id) {
 					<button
 						class="game-card"
-						[class.selected]="selectedGameId() === game.name"
-						(click)="select(game.name)"
+						[class.selected]="selectedGameId() === game.id"
+						(click)="select(game.id)"
 					>
 						<i [class]="'game-card-icon ' + game.icon"></i>
-						<span class="game-card-name">{{ game.name }}</span>
+						<span class="game-card-name">{{ game.title | translate }}</span>
 						<span class="game-card-desc">{{ game.description | translate }}</span>
 						<span class="game-card-players">
 							{{ (game.minPlayers === game.maxPlayers

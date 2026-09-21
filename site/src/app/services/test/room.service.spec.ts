@@ -9,7 +9,7 @@ import { API } from '@gandogames/shared/dto';
 import type { AuthResponse, GamePlayer, RoomData } from '@gandogames/shared/dto';
 
 function makePlayer(id: string, name: string): GamePlayer {
-	return { id, name, icon: 'profile', theme: 'dark', language: 'en', type: 'user', role: '' };
+	return { id, name, entityId: id, icon: 'profile', theme: 'dark', language: 'en', type: 'user', role: '' };
 }
 
 function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
@@ -143,14 +143,6 @@ describe('RoomService', () => {
 			backendSpy.call.and.returnValue(Promise.resolve(undefined));
 			await service.leaveRoom('room-1');
 			expect(backendSpy.call).toHaveBeenCalledWith(API.rooms.leave, { params: { roomId: 'room-1' } });
-		});
-	});
-
-	describe('getGameState()', () => {
-		it('calls the game.state QUERY endpoint with the game in the body', async () => {
-			backendSpy.call.and.returnValue(Promise.resolve(null));
-			await service.getGameState('pankov', 'room-1');
-			expect(backendSpy.call).toHaveBeenCalledWith(API.game.state, { params: { roomId: 'room-1' }, body: { game: 'pankov' } });
 		});
 	});
 

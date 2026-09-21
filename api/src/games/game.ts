@@ -1,9 +1,9 @@
-import { GamePlayer, GameSettings, GameState, GameName, GAMES_CONFIG } from '@gandogames/shared/dto';
+import { GamePlayer, GameSettings, GameState, GameId, GAMES_CONFIG } from '@gandogames/shared/dto';
 
 export abstract class Game<TState extends GameState = GameState> {
 
 	public state: TState | null = null;
-	protected constructor(public name: GameName) {
+	protected constructor(public name: GameId) {
 	}
 
 	public abstract initialize(players: GamePlayer[], settings?: GameSettings): void;
@@ -20,7 +20,7 @@ export abstract class Game<TState extends GameState = GameState> {
 		return supportsBots && state.players[state.currentPlayerIndex].type === 'bot';
 	}
 
-	public static Factory: (name: GameName) => Game = (_type) => {
+	public static Factory: (name: GameId) => Game = (_type) => {
 		// Not implemented because it will be overridden in @api/src/games
 		throw new Error('Not implemented');
 	};

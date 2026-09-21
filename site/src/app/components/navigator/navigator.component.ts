@@ -4,7 +4,7 @@ import {
 	IonList, IonMenuToggle, 
 	MenuController,
 } from '@ionic/angular';
-import { GameName } from '@gandogames/shared/dto';
+import { GameId } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BASE_IMPORTS, ROUTING_IMPORTS } from '@gandogames/lib/ion-imports';
 import { UserService, RoomService, FriendService, UrlService } from '@gandogames/services';
@@ -39,11 +39,11 @@ export class Navigator {
 	/** Room id in the current URL, to highlight the matching entry in the active-rooms list. */
 	public readonly activeRoomId = computed(() => this.urlService.current().segments['roomId'] ?? '');
 
-	public gameLabel(game: GameName): string {
-		return GAME_REGISTRY[game]?.title ?? game;
+	public gameLabel(game: GameId): string {
+		return GAME_REGISTRY[game]?.title ?? '';
 	}
 
-	public gameIcon(game: GameName): string {
+	public gameIcon(game: GameId): string {
 		return GAME_REGISTRY[game]?.icon ?? '';
 	}
 

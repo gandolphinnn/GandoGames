@@ -3,7 +3,7 @@
 <div class="modal" (click)="$event.stopPropagation()">
 
 	<header class="modal-header">
-		<h2 class="modal-title">{{ 'SETTINGS_MODAL.TITLE' | translate: { game: gameName() } }}</h2>
+		<h2 class="modal-title">{{ 'SETTINGS_MODAL.TITLE' | translate: { game: descriptor().id } }}</h2>
 		<button class="modal-close" (click)="closed.emit()" [title]="'COMMON.CLOSE' | translate">
 			<ion-icon name="close" />
 		</button>

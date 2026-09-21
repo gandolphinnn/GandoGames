@@ -22,9 +22,9 @@ export class HomeComponent implements OnInit {
 	public ngOnInit(): void {
 		this.signalR.events.roomInvite
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(async ({ roomId, game }) => {
-				const gameName = GAME_REGISTRY[game]?.title ?? game;
-				const msg = this.translate.instant('ROOM.INVITED', { game: gameName }) as string;
+			.subscribe(async ({ roomId, gameId }) => {
+				const gameTitle = this.translate.instant(GAME_REGISTRY[gameId]?.title);
+				const msg = this.translate.instant('ROOM.INVITED', { game: gameTitle }) as string;
 				const accepted = await this.toast.yesNo(msg).result;
 				if (accepted) void this.urlService.buildState('play_room', { roomId: roomId }).navigate();
 			});

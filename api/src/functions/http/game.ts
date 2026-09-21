@@ -1,4 +1,4 @@
-import { API, GameName, GameSettingsSchema, resolveSettings } from '@gandogames/shared/dto';
+import { API, GameId, GameSettingsSchema, resolveSettings } from '@gandogames/shared/dto';
 import { MASTERMIND_SETTINGS_SCHEMA } from '@gandogames/shared/mastermind';
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
@@ -10,14 +10,14 @@ import { Game } from '../../games';
  * host's settings edit (defaults are filled from each field's `default` by `resolveSettings`).
  * The site reaches the same schemas through the game registry, so both sides share one definition.
  */
-const GAME_SETTINGS: Record<GameName, GameSettingsSchema> = {
+const GAME_SETTINGS: Record<GameId, GameSettingsSchema> = {
 	mastermind: MASTERMIND_SETTINGS_SCHEMA,
 	pankov: PANKOV_SETTINGS_SCHEMA,
 	poker: POKER_SETTINGS_SCHEMA,
 };
 
 const gameStateInner: InnerFunction<typeof API.game.state> = async (body, params, _notifier, player) => {
-	const gameId = params.gameId as GameName;
+	const gameId = params.gameId as GameId;
 	const state = await PlayfabCtx.game[gameId].get(body.roomId!);
 	if (!state) return null;
 	const game = Game.Factory(gameId);
@@ -26,7 +26,7 @@ const gameStateInner: InnerFunction<typeof API.game.state> = async (body, params
 };
 
 const gameActionInner: InnerFunction<typeof API.game.action> = async (body, params, notifier, player) => {
-	const gameId = params.gameId as GameName;
+	const gameId = params.gameId as GameId;
 	const [savedState, room] = await Promise.all([
 		PlayfabCtx.game[gameId].get(body.roomId!),
 		PlayfabCtx.rooms.get(body.roomId!),
@@ -50,7 +50,7 @@ const gameActionInner: InnerFunction<typeof API.game.action> = async (body, para
 };
 
 const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (body, params, notifier, player) => {
-	const gameId = params.gameId as GameName;
+	const gameId = params.gameId as GameId;
 	const room = await PlayfabCtx.rooms.get(body.roomId!);
 	if (!room) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
@@ -63,7 +63,7 @@ const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (
 };
 
 const resetInner: InnerFunction<typeof API.game.reset> = async (body, params, notifier, player) => {
-	const gameId = params.gameId as GameName;
+	const gameId = params.gameId as GameId;
 	const room = await PlayfabCtx.rooms.get(body.roomId ?? 'TODO');
 	if (room == null) throw new Error('Room not found');
 	//if (room.hostId !== player.id) throw new Error('You are not the host of this room');

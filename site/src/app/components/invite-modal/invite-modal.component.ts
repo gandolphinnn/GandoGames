@@ -1,14 +1,14 @@
 import { Component, computed, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Friend, GameName, RoomData } from '@gandogames/shared/dto';
+import { Friend, GameId, RoomData } from '@gandogames/shared/dto';
 import { PlayerAvatarComponent } from '@gandogames/components';
 import { FriendService, RoomService, UserService, ToastService } from '@gandogames/services';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 
 @Component({
 	selector: 'gg-invite-modal',
-	imports: [IonIcon, PlayerAvatarComponent, TranslatePipe, IonButton],
+	imports: [IonButton, IonIcon, PlayerAvatarComponent, TranslatePipe],
 	templateUrl: './invite-modal.component.html',
 	styleUrl: './invite-modal.component.scss',
 })
@@ -20,7 +20,7 @@ export class InviteModalComponent {
 	private readonly translate = inject(TranslateService);
 	
 	public readonly room = input.required<RoomData>();
-	public readonly gameName = input.required<GameName>();
+	public readonly gameId = input.required<GameId>();
 	public readonly isHost = input.required<boolean>();
 	public readonly playerCount = input.required<number>();
 	public readonly maxPlayers = input.required<number>();

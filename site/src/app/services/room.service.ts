@@ -1,8 +1,6 @@
 import { computed, inject, Service, signal } from '@angular/core';
-import { API, ChatSendRequest, GameActionRequest, GameSettings, GameSettingsSetRequest, GameState, GameRequest, GameName, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
-import { BackendService } from './backend.service';
-import { SignalRService } from './signalr.service';
-import { UserService } from './user.service';
+import { API, ChatSendRequest, GameId, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
+import { BackendService, SignalRService, UserService } from '@gandogames/services';
 
 @Service()
 export class RoomService {
@@ -55,7 +53,7 @@ export class RoomService {
 		this.rooms.set(summaries);
 	}
 
-	public createRoom(game: GameName): Promise<RoomData> {
+	public createRoom(game: GameId): Promise<RoomData> {
 		const request: RoomCreateRequest = { game };
 		return this.backend.call(API.rooms.create, { body: request });
 	}

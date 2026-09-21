@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { GameName } from '@gandogames/shared/dto';
+import { GameId } from '@gandogames/shared/dto';
 import { UrlService } from '@gandogames/services';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
@@ -27,11 +27,11 @@ export class GamesComponent {
 
 	}
 
-	public play(gameName: GameName) {
-		const game = GAME_REGISTRY[gameName];
+	public play(gameId: GameId) {
+		const game = GAME_REGISTRY[gameId];
 		switch(game.category) {
-			case 'single': return this.url.buildState('play_game', { game: game.name }).navigate();
-			case 'room': return this.url.buildState('rooms_list', { game: game.name }).navigate();
+			case 'single': return this.url.buildState('play_game', { game: game.id }).navigate();
+			case 'room': return this.url.buildState('rooms_list', { game: game.id }).navigate();
 		}
 	}
 }

@@ -6,7 +6,7 @@
 				<ion-icon name="arrow-back" slot="icon-only" />
 			</ion-button>
 		</ion-buttons>
-		<ion-title>{{ isPlaying() ? (gameInfo()?.name ?? roomId()) : roomId() }}</ion-title>
+		<ion-title>{{ isPlaying() ? (gameInfo()?.id ?? roomId()) : roomId() }}</ion-title>
 		@if (room()) {
 			<ion-buttons slot="end">
 				@if (!isPlaying()) {
@@ -43,7 +43,7 @@
 		}
 		<gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
 			@if (isPlaying()) {
-				<gg-game-shell [roomId]="roomId()" [gameName]="room()!.game" />
+				<gg-game-shell [roomId]="roomId()" [gameId]="room()!.game" />
 			} @else {
 				<gg-room-lobby
 					[room]="room()!"

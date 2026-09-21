@@ -7,9 +7,8 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
 import { UrlService, RoomService, UserService, SignalRService, ToastService } from '@gandogames/services';
-import { ChatComponent, RefreshableContentComponent, RoomAccessModalComponent } from '@gandogames/components';
+import { ChatComponent, GameShellComponent, RefreshableContentComponent, RoomAccessModalComponent } from '@gandogames/components';
 import { RoomLobbyComponent } from './lobby/room-lobby.component';
-import { GameShellComponent } from '../../../components/game-shell/game-shell.component';
 
 /**
  * Room shell: owns room loading/state and renders the header, chat and refreshable

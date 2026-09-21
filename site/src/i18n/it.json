@@ -124,9 +124,11 @@
 		"PLAYER_COUNT_FIXED": "{{count}} giocatori",
 		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} giocatori",
 		"PANKOV": {
+			"TITLE": "Pankov",
 			"DESCRIPTION": "Tira due dadi e bleffa fino alla vittoria. Smaschera i bugiardi o perdi una vita."
 		},
 		"POKER": {
+			"TITLE": "Texas Hold'em",
 			"DESCRIPTION": "Punta, bleffa e resisti più di tutti al tavolo."
 		}
 	},
@@ -204,7 +206,6 @@
 		}
 	},
 	"SETTINGS_MODAL": {
-		"TITLE": "Impostazioni {{game}}",
 		"HOST_ONLY": "Solo l'host può cambiare queste impostazioni.",
 		"RESET": "Ripristina predefinite",
 		"SAVED": "Impostazioni di gioco salvate",

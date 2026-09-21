@@ -1,6 +1,6 @@
 import { PlayFabData, PlayFabServer } from "playfab-sdk";
 import { pfPromise } from "..";
-import { GameState, GameName, RoomData } from "@gandogames/shared/dto";
+import { GameState, GameId, RoomData } from "@gandogames/shared/dto";
 import { PankovGameState } from "@gandogames/shared/pankov";
 import { PokerGameState } from "@gandogames/shared/poker";
 import { MastermindGameState } from "@gandogames/shared/mastermind";
@@ -160,7 +160,7 @@ class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
 export class PlayfabCtx {
 	public static readonly rooms = new PlayFabSharedGroupEntity<RoomData>('ROOMS_INDEX', HOOKS.lastUpdate());
 
-	public static readonly game: Record<GameName, PlayFabEntity<GameState>> = {
+	public static readonly game: Record<GameId, PlayFabEntity<GameState>> = {
 		'mastermind': new PlayFabPlayerObjectEntity<MastermindGameState>('MASTERMIND_GAMES', HOOKS.lastUpdate()),
 		'pankov': new PlayFabSharedGroupEntity<PankovGameState>('PANKOV_GAMES_INDEX', HOOKS.lastUpdate()),
 		'poker': new PlayFabSharedGroupEntity<PokerGameState>('POKER_GAMES_INDEX', HOOKS.lastUpdate()),

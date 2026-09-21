@@ -69,11 +69,11 @@ describe('BackendService', () => {
 		});
 
 		it('sends QUERY reads with their JSON body', async () => {
-			const promise = service.call(API.game.state, { params: { roomId: 'R1' }, body: { game: 'pankov' } });
+			const promise = service.call(API.game.state, { params: { gameId: 'pankov' }, body: { roomId: 'R1' } });
 
-			const req = httpMock.expectOne(`${API_BASE}/rooms/R1/game/state`);
+			const req = httpMock.expectOne(`${API_BASE}/game/pankov/state`);
 			expect(req.request.method).toBe('QUERY');
-			expect(req.request.body).toEqual({ game: 'pankov' });
+			expect(req.request.body).toEqual({ roomId: 'R1' });
 			req.flush(null);
 
 			await promise;

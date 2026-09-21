@@ -35,15 +35,15 @@ export class RoomListComponent implements OnInit {
 	};
 
 	public gameLabel(id: string): string {
-		return this.allGames.find((g) => g.name === id)?.title ?? id;
+		return this.allGames.find((g) => g.id === id)?.title ?? '';
 	}
 
 	public gameIcon(id: string): string {
-		return this.allGames.find((g) => g.name === id)?.icon ?? '';
+		return this.allGames.find((g) => g.id === id)?.icon ?? '';
 	}
 
 	public maxPlayers(id: string): number {
-		return this.allGames.find((g) => g.name === id)?.maxPlayers ?? 0;
+		return this.allGames.find((g) => g.id === id)?.maxPlayers ?? 0;
 	}
 
 	public playerNames(room: RoomSummary): string {
@@ -75,7 +75,7 @@ export class RoomListComponent implements OnInit {
 	}
 
 	public ngOnInit(): void {
-		this.activeGames.set(this.allGames.map((g) => g.name));
+		this.activeGames.set(this.allGames.map((g) => g.id));
 		void this.fetchRooms();
 	}
 

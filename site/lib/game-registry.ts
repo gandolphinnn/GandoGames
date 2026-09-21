@@ -1,5 +1,5 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
-import { GameSettingsSchema, GameState, GameName, BaseGameDescriptor, GAMES_CONFIG } from "@gandogames/shared/dto";
+import { GameSettingsSchema, GameState, GameId, BaseGameDescriptor, GAMES_CONFIG } from "@gandogames/shared/dto";
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
 import { TablePreset } from '@gandogames/lib/common/game-table';
@@ -15,9 +15,10 @@ export interface GameComponent<TState extends GameState = GameState> {
 }
 
 interface GameDescriptor extends BaseGameDescriptor {
-	name: GameName;
-	title: string;
+	id: GameId;
 	icon: string;
+	/** Translation key: render with the `translate` pipe. */
+	title: string;
 	/** Translation key: render with the `translate` pipe. */
 	description: string;
 	component: Type<unknown>;
@@ -27,11 +28,11 @@ interface GameDescriptor extends BaseGameDescriptor {
 	table: TablePreset;
 }
 
-export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
+export const GAME_REGISTRY: Record<GameId, GameDescriptor> = {
 	pankov: {
-		name: 'pankov',
-		title: 'Pankov',
+		id: 'pankov',
 		icon: 'fa-solid fa-dice',
+		title: 'GAME.PANKOV.TITLE',
 		description: 'GAME.PANKOV.DESCRIPTION',
 		...GAMES_CONFIG.pankov,
 		component: PankovGameComponent,
@@ -39,9 +40,9 @@ export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 		table: PANKOV_TABLE_PRESET,
 	},
 	poker: {
-		name: 'poker',
-		title: 'Texas Hold\'em',
+		id: 'poker',
 		icon: 'fa-solid fa-hat-cowboy',
+		title: 'GAME.POKER.TITLE',
 		description: 'GAME.POKER.DESCRIPTION',
 		...GAMES_CONFIG.poker,
 		component: PokerGameComponent,
@@ -49,9 +50,9 @@ export const GAME_REGISTRY: Record<GameName, GameDescriptor> = {
 		table: POKER_TABLE_PRESET,
 	},
 	mastermind: {
-		name: 'mastermind',
-		title: 'Mastermind',
+		id: 'mastermind',
 		icon: 'fa-solid fa-brain',
+		title: 'Mastermind',
 		description: 'GAME.MASTERMIND.DESCRIPTION',
 		...GAMES_CONFIG.mastermind,
 		component: PokerGameComponent,

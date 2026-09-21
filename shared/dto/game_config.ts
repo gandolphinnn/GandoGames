@@ -7,8 +7,8 @@ export interface BaseGameDescriptor {
 	category: GameCategory;
 }
 
-export type GameName = 'pankov' | 'poker' | 'mastermind';
-export const GAMES_CONFIG: Record<GameName, BaseGameDescriptor> = {
+export type GameId = 'pankov' | 'poker' | 'mastermind';
+export const GAMES_CONFIG: Record<GameId, BaseGameDescriptor> = {
 	pankov: {
 		minPlayers: 2,
 		maxPlayers: 6,

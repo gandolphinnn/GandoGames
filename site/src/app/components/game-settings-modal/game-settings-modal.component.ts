@@ -1,7 +1,7 @@
 import { Component, computed, effect, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon, IonToggle } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { BlindLevel, GameSettings, GameName, SettingField, resolveSettings } from '@gandogames/shared/dto';
+import { BlindLevel, GameSettings, GameId, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BlindLevelsEditorComponent } from './blind-levels-editor.component';
 import { GameService, RoomService, ToastService } from '@gandogames/services';
@@ -22,7 +22,7 @@ export class GameSettingsModalComponent {
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
 
-	public readonly game = input.required<GameName>();
+	public readonly gameId = input.required<GameId>();
 	public readonly roomId = input.required<string>();
 	/** The room's current settings, used to pre-fill the form. */
 	public readonly settings = input<GameSettings>({});
@@ -31,8 +31,8 @@ export class GameSettingsModalComponent {
 
 	public readonly closed = output<void>();
 
-	public readonly schema = computed<readonly SettingField[]>(() => GAME_REGISTRY[this.game()].settingsSchema);
-	public readonly gameName = computed(() => GAME_REGISTRY[this.game()].title);
+	public readonly descriptor = computed(() => GAME_REGISTRY[this.gameId()]);
+	public readonly schema = computed(() => this.descriptor().settingsSchema);
 
 	/** Working copy the form mutates; seeded from the room's current (resolved) settings. */
 	public readonly working = signal<GameSettings>({});
@@ -46,7 +46,7 @@ export class GameSettingsModalComponent {
 	/** i18n key for a schema field's label/hint: GAME_SETTINGS.<GAME>.<FIELD_KEY>.<part> (field.key camelCase → UPPER_SNAKE). */
 	public fieldKey(field: SettingField, part: 'LABEL' | 'HINT'): string {
 		const fieldSegment = field.key.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toUpperCase();
-		return `GAME_SETTINGS.${this.game().toUpperCase()}.${fieldSegment}.${part}`;
+		return `GAME_SETTINGS.${this.gameId().toUpperCase()}.${fieldSegment}.${part}`;
 	}
 
 	public num(key: string): number {
@@ -90,7 +90,7 @@ export class GameSettingsModalComponent {
 		try {
 			// Clamp/normalize once more before sending; the server validates again against the schema.
 			const settings = resolveSettings(this.schema(), this.working());
-			await this.gameService.setGameSettings(this.game(), settings, this.roomId());
+			await this.gameService.setGameSettings(this.gameId(), settings, this.roomId());
 			this.toast.success(this.translate.instant('SETTINGS_MODAL.SAVED') as string);
 			this.closed.emit();
 		} finally {

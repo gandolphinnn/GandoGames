@@ -124,9 +124,11 @@
 		"PLAYER_COUNT_FIXED": "{{count}} players",
 		"PLAYER_COUNT_RANGE": "{{min}}-{{max}} players",
 		"PANKOV": {
+			"TITLE": "Pankov",
 			"DESCRIPTION": "Roll two dice and bluff your way to victory. Call out liars or lose a life."
 		},
 		"POKER": {
+			"TITLE": "Texas Hold'em",
 			"DESCRIPTION": "Bet, bluff, and outlast everyone at the table."
 		}
 	},
@@ -204,7 +206,6 @@
 		}
 	},
 	"SETTINGS_MODAL": {
-		"TITLE": "{{game}} settings",
 		"HOST_ONLY": "Only the host can change these settings.",
 		"RESET": "Reset to defaults",
 		"SAVED": "Game settings saved",

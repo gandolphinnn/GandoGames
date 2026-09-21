@@ -30,7 +30,7 @@
 					<span class="my-rooms-label">{{ 'ROOM_LIST.YOUR_ROOMS' | translate }}</span>
 					<div class="my-rooms-chips">
 						@for (room of myRooms(); track room.id) {
-							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.game)" (click)="navigateToRoom(room)">
+							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.game) | translate" (click)="navigateToRoom(room)">
 								<i [class]="'my-rooms-chip-icon ' + gameIcon(room.game)"></i>
 								<span class="my-rooms-chip-id">{{ room.id }}</span>
 								@if (room.phase === 'playing') {
@@ -55,7 +55,7 @@
 						<li class="room-card" (click)="navigateToRoom(room)">
 							<div class="room-card-info">
 								<span class="room-card-game">
-									{{ gameLabel(room.game) }}
+									{{ gameLabel(room.game) | translate }}
 									@if (accessBadge(room); as badge) {
 										<span class="room-card-badge" [title]="badge.label | translate">
 											<ion-icon [name]="badge.icon" />

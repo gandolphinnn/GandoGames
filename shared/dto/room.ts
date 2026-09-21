@@ -1,4 +1,4 @@
-import { GamePlayer, GameSettings, GameName } from ".";
+import { GamePlayer, GameSettings, GameId } from ".";
 
 export interface ChatMessage {
 	playerId: string;
@@ -25,7 +25,7 @@ export function resolveAccessPolicy(value: unknown): RoomAccessPolicy {
 export interface RoomSummary {
 	id: string;
 	hostId: string;
-	game: GameName;
+	game: GameId;
 	players: GamePlayer[];
 	phase: 'waiting' | 'playing' | 'ended';
 	/** Who may discover/join this room. */
@@ -41,7 +41,7 @@ export interface RoomData extends RoomSummary {
 }
 
 export interface RoomCreateRequest {
-	game: GameName;
+	game: GameId;
 }
 
 export interface RoomAccessSetRequest {

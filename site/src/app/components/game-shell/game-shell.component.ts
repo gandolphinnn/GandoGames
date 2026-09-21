@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, inject, input, OnInit, output, signal, ViewChild, ViewContainerRef } from '@angular/core';
 import { outputToObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { GameState, GameName } from '@gandogames/shared/dto';
+import { GameState, GameId } from '@gandogames/shared/dto';
 import { GameComponent, GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { SignalRService, RoomService, UserService, UrlService, ToastService, GameService } from '@gandogames/services';
 
@@ -11,8 +11,8 @@ import { SignalRService, RoomService, UserService, UrlService, ToastService, Gam
 	templateUrl: './game-shell.component.html',
 })
 export class GameShellComponent implements OnInit, AfterViewInit {
-	public readonly gameName = input.required<GameName>();
-	public readonly descriptor = computed(() => GAME_REGISTRY[this.gameName()])
+	public readonly gameId = input.required<GameId>();
+	public readonly descriptor = computed(() => GAME_REGISTRY[this.gameId()])
 	public readonly roomId = input<string>();
 
 	@ViewChild('gameSlot', { read: ViewContainerRef })
@@ -49,7 +49,7 @@ export class GameShellComponent implements OnInit, AfterViewInit {
 				if (roomId === this.roomId()) this.gameState.set(state);
 			});
 
-		const state = await this.gameService.getGameState(this.gameName(), this.roomId());
+		const state = await this.gameService.getGameState(this.gameId(), this.roomId());
 		this.gameState.set(state);
 	}
 
@@ -71,14 +71,14 @@ export class GameShellComponent implements OnInit, AfterViewInit {
 	private async sendAction(action: string, data?: unknown): Promise<void> {
 		this.loading.set(true);
 		try {
-			await this.gameService.gameAction(this.gameName(), action, data, this.roomId());
+			await this.gameService.gameAction(this.gameId(), action, data, this.roomId());
 		} finally {
 			this.loading.set(false);
 		}
 	}
 
 	private async playAgain(): Promise<void> {
-		await this.gameService.reset(this.gameName(), this.roomId());
+		await this.gameService.reset(this.gameId(), this.roomId());
 		//TODO probably do something with the room
 	}
 }

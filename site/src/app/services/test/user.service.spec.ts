@@ -5,9 +5,13 @@ import { BackendService } from '../backend.service';
 import { StorageService } from '../storage.service';
 import { ToastService } from '../toast.service';
 import { API } from '@gandogames/shared/dto';
-import type { AnyEndpoint, AuthResponse, GamePlayer } from '@gandogames/shared/dto';
+import type { AnyEndpoint, AuthResponse, GamePlayer, PlayerType } from '@gandogames/shared/dto';
 
-const MOCK_PLAYER: GamePlayer = { id: 'player-1', name: 'Alice', type: 'user', icon: 'profile', theme: 'dark', language: 'en', role: '' };
+function makePlayer(id: string, name: string, type: PlayerType): GamePlayer {
+	return { id, name, entityId: id, icon: 'profile', theme: 'dark', language: 'en', type, role: '' };
+}
+
+const MOCK_PLAYER: GamePlayer = makePlayer('player-1', 'Alice', 'user');
 
 const MOCK_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
@@ -16,7 +20,7 @@ const MOCK_RESPONSE: AuthResponse = {
 
 const MOCK_GUEST_RESPONSE: AuthResponse = {
 	sessionTicket: 'ticket-123',
-	player: { id: 'guest-1', name: 'Guest123456', type: 'guest', icon: 'profile', theme: 'dark', language: 'en', role: '' },
+	player: makePlayer('guest-1', 'Guest123456', 'guest'),
 };
 
 // jasmine derives a generic method's spy signature from its widest instantiation, where call()'s

@@ -1,7 +1,7 @@
 import { effect, inject, Service } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subject } from 'rxjs';
-import { API, ChatMessage, Friend, GameState, GameName, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
+import { API, ChatMessage, Friend, GameState, GameId, NegotiateResponse, RoomData, SignalREventHandler, SignalREventType } from '@gandogames/shared/dto';
 import { BackendService } from './backend.service';
 import { UserService } from './user.service';
 
@@ -17,7 +17,7 @@ export class SignalRService {
 		roomDeleted: new Subject<string>(),
 		gameStateUpdated: new Subject<{ roomId: string; state: GameState }>(),
 		chatMessage: new Subject<{ roomId: string; message: ChatMessage }>(),
-		roomInvite: new Subject<{ roomId: string; game: GameName }>(),
+		roomInvite: new Subject<{ roomId: string; gameId: GameId }>(),
 		friendRequest: new Subject<Friend>(),
 		friendsChanged: new Subject<void>(),
 	}
@@ -62,7 +62,7 @@ export class SignalRService {
 			this.on('roomDeleted', (roomId) => this.events.roomDeleted.next(roomId));
 			this.on('gameStateUpdated', (roomId, state) => this.events.gameStateUpdated.next({ roomId, state }));
 			this.on('chatMessage', (roomId, message) => this.events.chatMessage.next({ roomId, message }));
-			this.on('roomInvite', (roomId, game) => this.events.roomInvite.next({ roomId, game }));
+			this.on('roomInvite', (roomId, gameId) => this.events.roomInvite.next({ roomId, gameId }));
 			this.on('friendRequest', (from) => this.events.friendRequest.next(from));
 			this.on('friendsChanged', () => this.events.friendsChanged.next());
 

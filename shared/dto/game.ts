@@ -1,5 +1,4 @@
 import { GamePlayer } from "./auth";
-import { GameName } from "./game_config";
 
 export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> {
 	lastUpdate: Date;

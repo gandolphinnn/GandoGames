@@ -27,30 +27,51 @@ const gameStateInner: InnerFunction<typeof API.game.state> = async (body, params
 
 const gameActionInner: InnerFunction<typeof API.game.action> = async (body, params, notifier, player) => {
 	const gameId = params.gameId as GameId;
-	const [savedState, room] = await Promise.all([
-		PlayfabCtx.game[gameId].get(body.roomId!),
-		PlayfabCtx.rooms.get(body.roomId!),
-	]);
-	if (!savedState || !room) throw new Error('Game not found');
 
-	const game = Game.Factory(gameId);
-	game.state = savedState;
-	game.action(player, body.action, body.data);
+	if (body.roomId) {
+		const [savedState, room] = await Promise.all([
+			PlayfabCtx.game[gameId].get(body.roomId!),
+			PlayfabCtx.rooms.get(body.roomId!),
+		]);
+		if (!savedState || !room) throw new Error('Game not found');
+	
+		const game = Game.Factory(gameId);
+		game.state = savedState;
+		game.action(player, body.action, body.data);
+	
+		await Promise.all([
+			PlayfabCtx.game[gameId].upsert(body.roomId!, game.state!),
+			PlayfabCtx.rooms.upsert(body.roomId!, room),
+		]);
+	
+		notifier.gameStateUpdatedForAll(room, game);
+		notifier.roomUpsert(room);
 
-	await Promise.all([
-		PlayfabCtx.game[gameId].upsert(body.roomId!, game.state!),
-		PlayfabCtx.rooms.upsert(body.roomId!, room),
-	]);
+		return game.getPublicState(player.id);
+	}
+	else {
+		const savedState = await PlayfabCtx.game[gameId].get(player.entityId);
+		if (!savedState) throw new Error('Game not found');
 
-	notifier.gameStateUpdatedForAll(room, game);
+		const game = Game.Factory(gameId);
+		game.state = savedState;
+		game.action(player, body.action, body.data);
 
-	notifier.roomUpsert(room);
+		await PlayfabCtx.game[gameId].upsert(player.entityId, game.state!);
 
-	return game.getPublicState(player.id);
+		const publicState = game.getPublicState(player.id);
+		notifier.gameStateUpdatedForPlayer(player.id, publicState);
+
+		return publicState;
+	}
 };
 
 const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (body, params, notifier, player) => {
 	const gameId = params.gameId as GameId;
+
+	if (body.roomId) {
+
+	}
 	const room = await PlayfabCtx.rooms.get(body.roomId!);
 	if (!room) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');

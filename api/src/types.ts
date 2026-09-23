@@ -33,9 +33,9 @@ export class InnerFunctionNotifier {
 	}
 	public gameStateUpdatedForAll(room: RoomData, game: Game) {
 		for (const p of room.players)
-			this.gameStateUpdatedForPlayer(p.id, room.id, game.getPublicState(p.id))
+			this.gameStateUpdatedForPlayer(p.id, game.getPublicState(p.id), room.id)
 	}
-	public gameStateUpdatedForPlayer(userId: string, roomId: string, state: GameState) {
+	public gameStateUpdatedForPlayer(userId: string, state: GameState, roomId?: string) {
 		this.signalR.push({ target: 'gameStateUpdated', arguments: [roomId, state], userId });
 	}
 	public chatMessage(roomId: string, message: ChatMessage) {

@@ -36,7 +36,7 @@ export interface RoomData extends RoomSummary {
 	kickedPlayers: string[];
 	chat: ChatMessage[];
 	/** Host-chosen game settings for this room; undefined until set (server resolves to defaults). */
-	settings?: GameSettings;
+	settings?: GameSettings; //TODO move to the game data
 	lastUpdate: Date;
 }
 

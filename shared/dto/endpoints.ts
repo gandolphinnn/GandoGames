@@ -1,8 +1,7 @@
-import type { AuthResponse, GamePlayer, GuestLoginRequest, LoginRequest, ProfileData, ProfileUpdateRequest, RegisterRequest } from './auth';
-import type { FriendsListResponse } from './friends';
-import type { GameActionRequest, GameRequest, GameSettingsSetRequest, GameState } from './game';
-import type { ChatSendRequest, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from './room';
-import type { NegotiateQuery, NegotiateResponse } from './signalr';
+import type { AuthResponse, ChatSendRequest, FriendsListResponse, GameActionRequest,
+	GamePlayer, GameRequest, GameSettingsSetRequest, GameState, GuestLoginRequest,
+	LoginRequest, ModeratorRoomsListResponse, NegotiateQuery, NegotiateResponse, ProfileData, ProfileUpdateRequest,
+	RegisterRequest, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '.';
 
 /**
  * ─── The API contract ─────────────────────────────────────────────────────────────
@@ -114,8 +113,8 @@ export const API = {
 	},
 	moderator: {
 		rooms: {
-			list: endpoint<void, RoomData[]>()('moderator_rooms_list', 'GET', 'moderator/rooms'),
-			delete: endpoint<void, RoomData[]>()('moderator_rooms_delete', 'DELETE', 'moderator/rooms/{roomId}'),
+			list: endpoint<void, ModeratorRoomsListResponse>()('moderator_rooms_list', 'GET', 'moderator/rooms'),
+			delete: endpoint<void, ModeratorRoomsListResponse>()('moderator_rooms_delete', 'DELETE', 'moderator/rooms/{roomId}'),
 		},
 	},
 	profile: {

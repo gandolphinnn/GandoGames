@@ -1,4 +1,4 @@
-import { IconType } from "./auth";
+import { IconType } from ".";
 
 export interface PlayerIcon {
 	id: IconType;

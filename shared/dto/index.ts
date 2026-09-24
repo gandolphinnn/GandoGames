@@ -3,6 +3,7 @@ export * from './endpoints';
 export * from './friends';
 export * from './game';
 export * from './languages';
+export * from './moderator';
 export * from './player-icons';
 export * from './room';
 export * from './signalr';

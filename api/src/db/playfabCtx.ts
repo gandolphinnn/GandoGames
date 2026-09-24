@@ -40,6 +40,7 @@ abstract class PlayFabEntity<T> {
 		return deserialized;
 	}
 
+	public abstract list(id?: string): Promise<T[] | null>;
 	public abstract get(id: string): Promise<T | null>;
 	public abstract upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult>;
 	public abstract delete(id: string): Promise<PlayFabServerModels.UpdateSharedGroupDataResult>;
@@ -119,6 +120,12 @@ class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
 		hooks: PlayFabEntityHooks<T>[] = [],
 	) {
 		super(hooks);
+	}
+
+	public async list(id: string) {
+		if (!id) return null;
+		const get = await this.get(id);
+		return get? [get] : null;
 	}
 
 	public async get(id: string): Promise<T | null> {

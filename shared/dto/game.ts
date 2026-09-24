@@ -1,4 +1,4 @@
-import { GamePlayer } from "./auth";
+import { GamePlayer } from ".";
 
 export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> {
 	lastUpdate: Date;

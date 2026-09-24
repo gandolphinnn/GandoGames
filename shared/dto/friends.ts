@@ -1,4 +1,4 @@
-import { IconType } from './auth';
+import { IconType } from '.';
 
 /** A friend or pending friend-request counterpart (always a registered player). */
 export interface Friend {

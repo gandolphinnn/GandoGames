@@ -86,7 +86,7 @@ describe('InnerFunctionNotifier', () => {
 	});
 
 	it('gameStateUpdatedForPlayer queues a user-targeted gameStateUpdated message', () => {
-		notifier.gameStateUpdatedForPlayer('user-3', 'room-7', { lastUpdate: new Date() } as any);
+		notifier.gameStateUpdatedForPlayer('user-3', { lastUpdate: new Date() } as any, 'room-7');
 		notifier.prepareContext(mockCtx as any);
 		const [, messages] = mockCtx.extraOutputs.set.mock.calls[0];
 		expect(messages).toContainEqual(expect.objectContaining({

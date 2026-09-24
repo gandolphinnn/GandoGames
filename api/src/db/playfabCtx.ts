@@ -8,20 +8,24 @@ import { MastermindGameState } from "@gandogames/shared/mastermind";
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$/;
 
 interface PlayFabEntityHooks<T> {
-	beforeUpsert?(id: string, value: T): void | Promise<void>;
-	afterParse?(value: T | null): T | null;
+	beforeUpsert?(id: string, value: T): void;
+	afterParse?(value: T | null): void;
 }
 
 const HOOKS = {
 	lastUpdate: <T extends { lastUpdate?: Date }>(): PlayFabEntityHooks<T> => ({
 		beforeUpsert: (_id, value) => { value.lastUpdate = new Date() }
+	}),
+	//TODO if a PlayFabEntity gets this hook, it should not return a "T | null" but just a "T". Maybe hange it from "hooks" to "constraint"
+	notNullable: <T>(msg?: string): PlayFabEntityHooks<T> => ({
+		afterParse: (value) => { if (value == null) throw new Error(msg) }
 	})
 }
 
 
 abstract class PlayFabEntity<T> {
 	constructor(
-		public readonly hooks: PlayFabEntityHooks<T>,
+		public readonly hooks: PlayFabEntityHooks<T>[],
 	) {
 	}
 
@@ -31,7 +35,9 @@ abstract class PlayFabEntity<T> {
 				return new Date(value);
 			return value;
 		}) as T : null;
-		return this.hooks.afterParse ? this.hooks.afterParse(deserialized) : deserialized;
+
+		this.hooks.forEach(h => h.afterParse?.(deserialized));
+		return deserialized;
 	}
 
 	public abstract get(id: string): Promise<T | null>;
@@ -43,7 +49,7 @@ class PlayFabSharedGroupEntity<T> extends PlayFabEntity<T> {
 	protected hasInit = false;
 	constructor(
 		public readonly groupId: string,
-		hooks: PlayFabEntityHooks<T> = {},
+		hooks: PlayFabEntityHooks<T>[] = [],
 	) {
 		super(hooks);
 	}
@@ -90,7 +96,7 @@ class PlayFabSharedGroupEntity<T> extends PlayFabEntity<T> {
 
 	public async upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
 		await this.init();
-		if (this.hooks.beforeUpsert) await this.hooks.beforeUpsert(id, value);
+		this.hooks.forEach(async h => h.beforeUpsert?.(id, value));
 		const data = {
 			[id]: JSON.stringify(value),
 		}
@@ -110,7 +116,7 @@ class PlayFabSharedGroupEntity<T> extends PlayFabEntity<T> {
 class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
 	constructor(
 		public readonly objectName: string,
-		hooks: PlayFabEntityHooks<T> = {},
+		hooks: PlayFabEntityHooks<T>[] = [],
 	) {
 		super(hooks);
 	}
@@ -127,7 +133,7 @@ class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
 	}
 
 	public async upsert(id: string, value: T): Promise<PlayFabServerModels.UpdateSharedGroupDataResult> {
-		if (this.hooks.beforeUpsert) await this.hooks.beforeUpsert(id, value);
+		this.hooks.forEach(async h => h.beforeUpsert?.(id, value));
 
 		return await pfPromise<PlayFabDataModels.SetObjectsResponse>(
 			cb => PlayFabData.SetObjects({
@@ -157,12 +163,14 @@ class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
 	}
 }
 
+const DEF_GAMES_HOOKS = [HOOKS.lastUpdate(), HOOKS.notNullable('Game not found')];
+
 export class PlayfabCtx {
-	public static readonly rooms = new PlayFabSharedGroupEntity<RoomData>('ROOMS_INDEX', HOOKS.lastUpdate());
+	public static readonly rooms = new PlayFabSharedGroupEntity<RoomData>('ROOMS_INDEX', [HOOKS.lastUpdate(), HOOKS.notNullable('Room not found')]);
 
 	public static readonly game: Record<GameId, PlayFabEntity<GameState>> = {
-		'mastermind': new PlayFabPlayerObjectEntity<MastermindGameState>('MASTERMIND_GAMES', HOOKS.lastUpdate()),
-		'pankov': new PlayFabSharedGroupEntity<PankovGameState>('PANKOV_GAMES_INDEX', HOOKS.lastUpdate()),
-		'poker': new PlayFabSharedGroupEntity<PokerGameState>('POKER_GAMES_INDEX', HOOKS.lastUpdate()),
+		'mastermind': new PlayFabPlayerObjectEntity<MastermindGameState>('MASTERMIND_GAMES', DEF_GAMES_HOOKS),
+		'pankov': new PlayFabSharedGroupEntity<PankovGameState>('PANKOV_GAMES_INDEX', DEF_GAMES_HOOKS),
+		'poker': new PlayFabSharedGroupEntity<PokerGameState>('POKER_GAMES_INDEX', DEF_GAMES_HOOKS),
 	}
 }

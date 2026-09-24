@@ -72,28 +72,6 @@ const roomJoinInner: InnerFunction<typeof API.rooms.join> = async (_body, params
 	return room;
 };
 
-const roomStartInner: InnerFunction<typeof API.rooms.start> = async (_body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'waiting') throw new Error('Game already started');
-
-	const gameConfig = GAMES_CONFIG[room.game];
-	if (room.players.length > gameConfig.maxPlayers) throw new Error('Max players for this game');
-	if (room.players.length < gameConfig.minPlayers) throw new Error('Not enough players for this game');
-
-	room.phase = 'playing';
-	await PlayfabCtx.rooms.upsert(params.roomId, room);
-
-	const game = Game.Factory(room.game);
-	game.initialize(room.players, room.settings);
-	await PlayfabCtx.game[room.game].upsert(params.roomId, game.state!);
-	notifier.gameStateUpdatedForAll(room, game);
-
-	notifier.roomUpsert(room);
-	return room;
-};
-
 const roomLeaveInner: InnerFunction<typeof API.rooms.leave> = async (_body, params, notifier, player) => {
 	const room = await PlayfabCtx.rooms.get(params.roomId);
 	if (room == null) throw new Error('Room not found');
@@ -133,10 +111,36 @@ const roomLeaveInner: InnerFunction<typeof API.rooms.leave> = async (_body, para
 	notifier.roomUpsert(room);
 };
 
-const roomAccessSetInner: InnerFunction<typeof API.rooms.setAccess> = async (body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
+/** Get the room from its ID anche checks that the current player is actually the host */
+async function getHostedRoom(roomId: string, playerId: string) {
+	const room = await PlayfabCtx.rooms.get(roomId);
 	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	if (room.hostId !== playerId) throw new Error('You are not the host of this room');
+	return room;
+}
+
+const roomStartInner: InnerFunction<typeof API.rooms.start> = async (_body, params, notifier, player) => {
+	const room = await getHostedRoom(params.roomId, player.id);
+	if (room.phase !== 'waiting') throw new Error('Game already started');
+
+	const gameConfig = GAMES_CONFIG[room.game];
+	if (room.players.length > gameConfig.maxPlayers) throw new Error('Max players for this game');
+	if (room.players.length < gameConfig.minPlayers) throw new Error('Not enough players for this game');
+
+	room.phase = 'playing';
+	await PlayfabCtx.rooms.upsert(params.roomId, room);
+
+	const game = Game.Factory(room.game);
+	game.initialize(room.players, room.settings);
+	await PlayfabCtx.game[room.game].upsert(params.roomId, game.state!);
+	notifier.gameStateUpdatedForAll(room, game);
+
+	notifier.roomUpsert(room);
+	return room;
+};
+
+const roomSetAccessInner: InnerFunction<typeof API.rooms.setAccess> = async (body, params, notifier, player) => {
+	const room = await getHostedRoom(params.roomId, player.id);
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 
 	room.access = resolveAccessPolicy(body.access);
@@ -145,10 +149,25 @@ const roomAccessSetInner: InnerFunction<typeof API.rooms.setAccess> = async (bod
 	return room;
 };
 
+const roomInviteInner: InnerFunction<typeof API.rooms.invite> = async (body, params, notifier, player) => {
+	const room = await getHostedRoom(params.roomId, player.id);
+	if (room.phase !== 'waiting') throw new Error('Game already started');
+	const gameConfig = GAMES_CONFIG[room.game];
+	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
+	if (room.players.some(p => p.id === body.friendId)) throw new Error('Player is already in this room');
+
+	// Inviting a previously-kicked player clears their kick, so they can accept and rejoin.
+	if (room.kickedPlayers?.includes(body.friendId)) {
+		room.kickedPlayers = room.kickedPlayers.filter(id => id !== body.friendId);
+		await PlayfabCtx.rooms.upsert(params.roomId, room);
+		notifier.roomUpsert(room);
+	}
+
+	notifier.roomInviteForPlayer(body.friendId, params.roomId, room.game);
+};
+
 const roomKickInner: InnerFunction<typeof API.rooms.kick> = async (_body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	const room = await getHostedRoom(params.roomId, player.id);
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 	if (params.playerId === player.id) throw new Error('You cannot kick yourself');
 	if (!room.players.some(p => p.id === params.playerId)) throw new Error('Player not found in this room');
@@ -165,29 +184,8 @@ const roomKickInner: InnerFunction<typeof API.rooms.kick> = async (_body, params
 	return room;
 };
 
-const roomInviteInner: InnerFunction<typeof API.rooms.invite> = async (body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'waiting') throw new Error('Game already started');
-	const gameConfig = GAMES_CONFIG[room.game];
-	if (room.players.length >= gameConfig.maxPlayers) throw new Error('Room is full');
-	if (room.players.some(p => p.id === body.friendId)) throw new Error('Player is already in this room');
-
-	// Inviting a previously-kicked player clears their kick, so they can accept and rejoin.
-	if (room.kickedPlayers?.includes(body.friendId)) {
-		room.kickedPlayers = room.kickedPlayers.filter(id => id !== body.friendId);
-		await PlayfabCtx.rooms.upsert(params.roomId, room);
-		notifier.roomUpsert(room);
-	}
-
-	notifier.roomInviteForPlayer(body.friendId, params.roomId, room.game);
-};
-
 const roomAddBotInner: InnerFunction<typeof API.rooms.addBot> = async (_body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	const room = await getHostedRoom(params.roomId, player.id);
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 	const gameConfig = GAMES_CONFIG[room.game];
 	if (!gameConfig.supportsBots) throw new Error('Bots are not supported in this game');
@@ -211,9 +209,7 @@ const roomAddBotInner: InnerFunction<typeof API.rooms.addBot> = async (_body, pa
 };
 
 const roomDeleteInner: InnerFunction<typeof API.rooms.delete> = async (_body, params, notifier, player) => {
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
-	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+	await getHostedRoom(params.roomId, player.id);
 
 	await PlayfabCtx.rooms.delete(params.roomId);
 	notifier.roomDeleted(params.roomId);
@@ -227,10 +223,10 @@ registerEndpoint(API.rooms.create, roomCreateInner);
 registerEndpoint(API.rooms.list, roomListInner);
 registerEndpoint(API.rooms.get, roomGetInner);
 registerEndpoint(API.rooms.join, roomJoinInner);
-registerEndpoint(API.rooms.start, roomStartInner);
-registerEndpoint(API.rooms.setAccess, roomAccessSetInner);
-registerEndpoint(API.rooms.kick, roomKickInner);
 registerEndpoint(API.rooms.leave, roomLeaveInner);
+registerEndpoint(API.rooms.start, roomStartInner);
+registerEndpoint(API.rooms.setAccess, roomSetAccessInner);
 registerEndpoint(API.rooms.invite, roomInviteInner);
+registerEndpoint(API.rooms.kick, roomKickInner);
 registerEndpoint(API.rooms.addBot, roomAddBotInner);
 registerEndpoint(API.rooms.delete, roomDeleteInner);

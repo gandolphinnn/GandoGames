@@ -110,7 +110,7 @@ export const API = {
 		/** Host only: replace the room's game settings (server re-validates against the schema). */
 		setSettings: endpoint<GameSettingsSetRequest, RoomData>()('game_settings_set', 'PUT', 'game/{gameId}/settings'),
 		/** Host only: end the current game and return the room to the lobby. */
-		reset: endpoint<GameRequest, RoomData>()('game_settings_reset', 'POST', 'game/{gameId}/reset'),
+		reset: endpoint<GameRequest, GameState>()('game_settings_reset', 'POST', 'game/{gameId}/reset'),
 	},
 	moderator: {
 		rooms: {
@@ -126,27 +126,21 @@ export const API = {
 		delete: endpoint<void, void>()('profile_delete', 'DELETE', 'profile'),
 	},
 	rooms: {
-		/** Rooms visible to the caller: their own plus listed (public/friends) ones. */
-		list: endpoint<void, RoomSummary[]>()('room_list', 'GET', 'rooms'),
 		create: endpoint<RoomCreateRequest, RoomData>()('room_create', 'POST', 'rooms'),
+		list: endpoint<void, RoomSummary[]>()('room_list', 'GET', 'rooms'),
 		get: endpoint<void, RoomData>()('room_get', 'GET', 'rooms/{roomId}'),
 		join: endpoint<void, RoomData>()('room_join', 'POST', 'rooms/{roomId}/join'),
+		leave: endpoint<void, void>()('room_leave', 'POST', 'rooms/{roomId}/leave'),
 		/** Host only: start the game. */
 		start: endpoint<void, RoomData>()('room_start', 'POST', 'rooms/{roomId}/start'),
 		/** Host only: replace the room's access policy. */
 		setAccess: endpoint<RoomAccessSetRequest, RoomData>()('room_access', 'PUT', 'rooms/{roomId}/access'),
 		/** Host only: invite a friend (delivered as a SignalR `roomInvite`). */
 		invite: endpoint<RoomInviteRequest, void>()('room_invite', 'POST', 'rooms/{roomId}/invite'),
-		/** Host only: add a bot to the room (delivered as a SignalR `roomInvite`). */
-		addBot: endpoint<void, void>()('room_add_bot', 'POST', 'rooms/{roomId}/add_bot'),
-		/**
-		 * Remove the caller from the room (may migrate the host or delete the room). A POST
-		 * action rather than `DELETE players/me`: the Functions host resolves routes without
-		 * literal-over-parameter precedence, so that route would collide with `players/{playerId}`.
-		 */
-		leave: endpoint<void, void>()('room_leave', 'POST', 'rooms/{roomId}/leave'),
 		/** Host only: remove another player from the room. */
 		kick: endpoint<void, RoomData>()('room_kick', 'DELETE', 'rooms/{roomId}/players/{playerId}'),
+		/** Host only: add a bot to the room. */
+		addBot: endpoint<void, void>()('room_add_bot', 'POST', 'rooms/{roomId}/add_bot'),
 		/** Host only: delete the room. */
 		delete: endpoint<void, void>()('room_delete', 'DELETE', 'rooms/{roomId}'),
 	},

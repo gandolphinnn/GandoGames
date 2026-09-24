@@ -22,8 +22,7 @@ const moderatorRoomListInner: InnerFunction<typeof API.moderator.rooms.list> = a
 const moderatorRoomDeleteInner: InnerFunction<typeof API.moderator.rooms.delete> = async (_body, params, notifier, player) => {
 	const isModerator = moderatorRoles.includes(player.role);
 	if (!isModerator) throw new Error('Unauthorized');
-	const room = await PlayfabCtx.rooms.get(params.roomId);
-	if (room == null) throw new Error('Room not found');
+	const _ = await PlayfabCtx.rooms.get(params.roomId);
 
 	await PlayfabCtx.rooms.delete(params.roomId);
 	notifier.roomDeleted(params.roomId);

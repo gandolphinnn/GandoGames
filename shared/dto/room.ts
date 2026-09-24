@@ -30,6 +30,7 @@ export interface RoomSummary {
 	phase: 'waiting' | 'playing' | 'ended';
 	/** Who may discover/join this room. */
 	access: RoomAccessPolicy;
+	lastUpdate: Date;
 }
 
 export interface RoomData extends RoomSummary {
@@ -37,7 +38,6 @@ export interface RoomData extends RoomSummary {
 	chat: ChatMessage[];
 	/** Host-chosen game settings for this room; undefined until set (server resolves to defaults). */
 	settings?: GameSettings; //TODO move to the game data
-	lastUpdate: Date;
 }
 
 export interface RoomCreateRequest {

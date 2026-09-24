@@ -85,16 +85,37 @@ const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (
 
 const resetInner: InnerFunction<typeof API.game.reset> = async (body, params, notifier, player) => {
 	const gameId = params.gameId as GameId;
-	const room = await PlayfabCtx.rooms.get(body.roomId ?? 'TODO');
-	if (room == null) throw new Error('Room not found');
-	//if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'playing') throw new Error('Game is not in progress');
 
-	room.phase = 'waiting';
-	room.lastUpdate = new Date();
-	await PlayfabCtx.rooms.upsert(body.roomId!, room);
-	notifier.roomUpsert(room);
-	return room;
+	const resetGame = async () => {
+		const savedState = await PlayfabCtx.game[gameId].get(player.entityId);
+		if (!savedState) throw new Error('Game not found');
+
+		const game = Game.Factory(gameId);
+		//game.initialize([player], room.settings);
+		game.initialize([player]); //TODO
+		await PlayfabCtx.game[gameId].upsert(player.entityId, game.state!);
+		return game;
+	}
+	
+	if (body.roomId) {
+		const game = await resetGame();
+		const room = await PlayfabCtx.rooms.get(body.roomId ?? 'TODO');
+		if (room == null) throw new Error('Room not found');
+		//if (room.hostId !== player.id) throw new Error('You are not the host of this room');
+		if (room.phase !== 'playing') throw new Error('Game is not in progress');
+		room.phase = 'waiting';
+		await PlayfabCtx.rooms.upsert(body.roomId!, room);
+		notifier.roomUpsert(room);
+		return game.getPublicState(player.id);
+	}
+	else {
+		const game = await resetGame();
+
+		const publicState = game.getPublicState(player.id);
+		notifier.gameStateUpdatedForPlayer(player.id, publicState);
+
+		return publicState;
+	}
 };
 
 // game state is a safe read (QUERY), so it never takes the per-room lock; action and

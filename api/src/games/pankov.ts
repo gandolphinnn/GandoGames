@@ -17,6 +17,7 @@ export class PankovGame extends Game<PankovGameState> {
 			currentRoll: null,
 			settings: resolved,
 			pankovStreak: 0,
+			phase: 'playing',
 		} as PankovGameState;
 
 		this.botAction();

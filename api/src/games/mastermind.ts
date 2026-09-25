@@ -13,6 +13,7 @@ export class MastermindGame extends Game<MastermindGameState> {
 			currentPlayerIndex: 0,
 			settings: resolved,
 			turns: [],
+			phase: 'playing',
 		} as MastermindGameState;
 
 		this.botAction();

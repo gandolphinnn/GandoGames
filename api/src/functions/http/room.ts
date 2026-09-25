@@ -1,4 +1,4 @@
-import { API, GAMES_CONFIG, GamePlayer, RoomData, resolveAccessPolicy } from '@gandogames/shared/dto';
+import { API, GAMES_CONFIG, GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { Game } from '../../games';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
 
@@ -143,7 +143,7 @@ const roomSetAccessInner: InnerFunction<typeof API.rooms.setAccess> = async (bod
 	const room = await getHostedRoom(params.roomId, player.id);
 	if (room.phase !== 'waiting') throw new Error('Game already started');
 
-	room.access = resolveAccessPolicy(body.access);
+	room.access = body.access;
 	await PlayfabCtx.rooms.upsert(params.roomId, room);
 	notifier.roomUpsert(room);
 	return room;

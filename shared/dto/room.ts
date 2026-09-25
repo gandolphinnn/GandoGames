@@ -15,13 +15,6 @@ export interface ChatMessage {
  */
 export type RoomAccessPolicy = 'public' | 'link' | 'closed';
 
-export const ROOM_ACCESS_POLICIES: readonly RoomAccessPolicy[] = ['public', 'link', 'closed'];
-
-/** Coerce an untrusted value to a valid access policy, defaulting to `public`. */
-export function resolveAccessPolicy(value: unknown): RoomAccessPolicy {
-	return ROOM_ACCESS_POLICIES.includes(value as RoomAccessPolicy) ? value as RoomAccessPolicy : 'public';
-}
-
 export interface RoomSummary {
 	id: string;
 	hostId: string;

@@ -1,14 +1,14 @@
-export type GameCategory = 'single' | 'room';
+export type GameId = 'pankov' | 'poker' | 'mastermind';
 
-export interface BaseGameDescriptor {
+export type GameCategory = 'single' | 'room';
+export interface GameConfig {
 	minPlayers: number;
 	maxPlayers: number;
 	supportsBots: boolean;
 	category: GameCategory;
 }
 
-export type GameId = 'pankov' | 'poker' | 'mastermind';
-export const GAMES_CONFIG: Record<GameId, BaseGameDescriptor> = {
+export const GAMES_CONFIG: Record<GameId, GameConfig> = {
 	pankov: {
 		minPlayers: 2,
 		maxPlayers: 6,

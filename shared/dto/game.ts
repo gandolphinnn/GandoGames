@@ -1,12 +1,17 @@
 import { GamePlayer } from ".";
 
-export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> {
+/** The base data of a game that might not have started yet. */
+export interface GameData<TSettings extends GameSettings = GameSettings> {
+	phase: 'waiting' | 'playing' | 'ended';
+	settings: TSettings;
 	lastUpdate: Date;
+}
+
+/** The current state of a started game */
+export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> extends GameData<TSettings> {
 	players: TPlayer[];
 	currentPlayerIndex: number;
 	winnerName?: string;
-	settings: TSettings;
-	phase: 'waiting' | 'playing' | 'ended';
 }
 
 export interface GameRequest {

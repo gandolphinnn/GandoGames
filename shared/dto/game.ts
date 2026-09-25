@@ -6,6 +6,7 @@ export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings ex
 	currentPlayerIndex: number;
 	winnerName?: string;
 	settings: TSettings;
+	phase: 'waiting' | 'playing' | 'ended';
 }
 
 export interface GameRequest {

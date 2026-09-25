@@ -6,43 +6,30 @@
 				<ion-icon name="arrow-back" slot="icon-only" />
 			</ion-button>
 		</ion-buttons>
-		<ion-title>{{ game()?.title | translate}}</ion-title>
-		<!-- @if (room()) {
-			<ion-buttons slot="end">
-				@if (!isPlaying()) {
-					<ion-button fill="clear" (click)="copyCode()" [title]="(copied() ? 'ROOM.COPIED' : 'ROOM.COPY_LINK') | translate">
-						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
-					</ion-button>
-				}
-				@if (isHost() && room()!.phase === 'waiting') {
-					<ion-button fill="clear" (click)="openAccess()" [title]="'ROOM.ACCESS_TITLE' | translate: { label: (accessBadge().label | translate) }">
-						<ion-icon [name]="accessBadge().icon" slot="icon-only" />
-					</ion-button>
-				}
-				@if (isHost()) {
-					<ion-button fill="clear" color="danger" (click)="closeRoom()" [title]="'ROOM.CLOSE_ROOM' | translate">
-						<ion-icon name="trash" slot="icon-only" />
-					</ion-button>
-				}
-				@if (isInRoom() && canLeave()) {
-					<ion-button fill="clear" color="danger" (click)="leave()" [title]="'ROOM.LEAVE_ROOM' | translate">
-						<ion-icon name="close" />
-					</ion-button>
-				}
-			</ion-buttons>
-		} -->
+		<ion-title>{{ descriptor().title | translate}}</ion-title>
+		<ion-buttons slot="end">
+			<ion-button fill="clear" (click)="showSettingsModal.set(true)" [title]="(isPlaying() ? 'LOBBY.VIEW_SETTINGS' : 'LOBBY.GAME_SETTINGS') | translate">
+				<ion-icon name="settings-outline" slot="icon-only" />
+			</ion-button>
+		</ion-buttons>
 	</ion-toolbar>
 </ion-header>
 
-@if (game() != null) {
-	<div class="room-layout">
-		<!-- @if (isInRoom()) {
-			<div class="room-layout-left">
-				<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
-			</div>
-		} -->
-		<!-- <gg-refreshable-content [fullscreen]="false" [scrollY]="false" [onRefresh]="refreshFn">
-			<gg-game-shell [gameId]="game()!.name" />
-		</gg-refreshable-content> -->
-	</div>
+<div class="room-layout">
+	<!-- @if (isInRoom()) {
+		<div class="room-layout-left">
+			<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
+		</div>
+	} -->
+	<!-- <gg-refreshable-content [fullscreen]="false" [scrollY]="false" [onRefresh]="refreshFn">
+		<gg-game-shell [gameId]="game()!.name" />
+	</gg-refreshable-content> -->
+</div>
+
+@if (showSettingsModal()) {
+	<gg-game-settings-modal
+		[gameId]="descriptor().id"
+		[settings]="gameState().settings ?? {}"
+		[editable]="!isPlaying()"
+		(closed)="showSettingsModal.set(false)" />
 }

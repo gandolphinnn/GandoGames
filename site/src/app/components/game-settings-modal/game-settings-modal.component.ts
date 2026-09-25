@@ -23,7 +23,7 @@ export class GameSettingsModalComponent {
 	private readonly translate = inject(TranslateService);
 
 	public readonly gameId = input.required<GameId>();
-	public readonly roomId = input.required<string>();
+	public readonly roomId = input<string>();
 	/** The room's current settings, used to pre-fill the form. */
 	public readonly settings = input<GameSettings>({});
 	/** Whether the viewer (the host) may edit; otherwise the form is read-only. */

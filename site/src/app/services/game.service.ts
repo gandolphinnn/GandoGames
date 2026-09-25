@@ -24,7 +24,7 @@ export class GameService {
 		return this.backend.call(API.game.setSettings, { params: { gameId }, body: request });
 	}
 
-	public reset(gameId: GameId, roomId?: string): Promise<RoomData> {
+	public reset(gameId: GameId, roomId?: string) {
 		const request: GameRequest = { roomId };
 		return this.backend.call(API.game.reset, { params: { gameId }, body: request });
 	}

@@ -16,10 +16,13 @@ function makeRoom(overrides: Partial<RoomData> = {}): RoomData {
 	return {
 		id: 'room-1',
 		hostId: 'player-1',
-		game: 'pankov',
+		gameId: 'pankov',
 		players: [makePlayer('player-1', 'Alice')],
 		kickedPlayers: [],
-		phase: 'waiting',
+		gameData: {
+			phase: 'waiting',
+			settings: {},
+		},
 		access: 'public',
 		chat: [],
 		lastUpdate: new Date(),
@@ -83,9 +86,9 @@ describe('RoomService', () => {
 
 	describe('myRooms (computed)', () => {
 		it('returns only rooms where current player is a participant and phase is not ended', () => {
-			const mine = makeRoom({ id: 'r1', phase: 'waiting', players: [makePlayer('player-1', 'Alice')] });
-			const other = makeRoom({ id: 'r2', phase: 'waiting', players: [makePlayer('player-2', 'Bob')] });
-			const ended = makeRoom({ id: 'r3', phase: 'ended', players: [makePlayer('player-1', 'Alice')] });
+			const mine = makeRoom({ id: 'r1', gameData: { phase: 'waiting'}, players: [makePlayer('player-1', 'Alice')] });
+			const other = makeRoom({ id: 'r2', gameData: { phase: 'waiting'}, players: [makePlayer('player-2', 'Bob')] });
+			const ended = makeRoom({ id: 'r3', gameData: { phase: 'ended'}, players: [makePlayer('player-1', 'Alice')] });
 			service.rooms.set([mine, other, ended]);
 
 			const result = service.myRooms();
@@ -173,10 +176,10 @@ describe('RoomService', () => {
 		});
 
 		it('roomUpsert replaces an existing room with the same id', () => {
-			service.rooms.set([makeRoom({ id: 'r1', phase: 'waiting' })]);
-			roomUpsert$.next(makeRoom({ id: 'r1', phase: 'playing' }));
+			service.rooms.set([makeRoom({ id: 'r1', gameData.phase: 'waiting' })]);
+			roomUpsert$.next(makeRoom({ id: 'r1', gameData.phase: 'playing' }));
 			expect(service.rooms()).toHaveSize(1);
-			expect(service.rooms()[0].phase).toBe('playing');
+			expect(service.rooms()[0].gameData.phase).toBe('playing');
 		});
 
 		it('roomDeleted removes a room from the signal', () => {

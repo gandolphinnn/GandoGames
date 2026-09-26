@@ -1,4 +1,4 @@
-import { GamePlayer, GameSettings, GameId } from ".";
+import { GamePlayer, GameSettings, GameId, GameData } from ".";
 
 export interface ChatMessage {
 	playerId: string;
@@ -18,12 +18,12 @@ export type RoomAccessPolicy = 'public' | 'link' | 'closed';
 export interface RoomSummary {
 	id: string;
 	hostId: string;
-	game: GameId;
 	players: GamePlayer[];
-	phase: 'waiting' | 'playing' | 'ended';
 	/** Who may discover/join this room. */
 	access: RoomAccessPolicy;
 	lastUpdate: Date;
+	gameId: GameId;
+	gameData: GameData;
 }
 
 export interface RoomData extends RoomSummary {

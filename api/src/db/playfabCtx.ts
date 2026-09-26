@@ -170,14 +170,12 @@ class PlayFabPlayerObjectEntity<T> extends PlayFabEntity<T> {
 	}
 }
 
-const DEF_GAMES_HOOKS = [HOOKS.lastUpdate(), HOOKS.notNullable('Game not found')];
-
 export class PlayfabCtx {
 	public static readonly rooms = new PlayFabSharedGroupEntity<RoomData>('ROOMS_INDEX', [HOOKS.lastUpdate(), HOOKS.notNullable('Room not found')]);
 
 	public static readonly game: Record<GameId, PlayFabEntity<GameState>> = {
-		'mastermind': new PlayFabPlayerObjectEntity<MastermindGameState>('MASTERMIND_GAMES', DEF_GAMES_HOOKS),
-		'pankov': new PlayFabSharedGroupEntity<PankovGameState>('PANKOV_GAMES_INDEX', DEF_GAMES_HOOKS),
-		'poker': new PlayFabSharedGroupEntity<PokerGameState>('POKER_GAMES_INDEX', DEF_GAMES_HOOKS),
+		'mastermind': new PlayFabPlayerObjectEntity<MastermindGameState>('MASTERMIND_GAMES', [HOOKS.notNullable('Game not found')]),
+		'pankov': new PlayFabSharedGroupEntity<PankovGameState>('PANKOV_GAMES_INDEX', [HOOKS.notNullable('Game not found')]),
+		'poker': new PlayFabSharedGroupEntity<PokerGameState>('POKER_GAMES_INDEX', [HOOKS.notNullable('Game not found')]),
 	}
 }

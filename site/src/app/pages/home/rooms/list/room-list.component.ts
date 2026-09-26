@@ -27,7 +27,7 @@ export class RoomListComponent implements OnInit {
 
 	public readonly filteredRooms = computed(() => {
 		const active = this.activeGames();
-		return this.browsableRooms().filter((r) => active.includes(r.game));
+		return this.browsableRooms().filter((r) => active.includes(r.gameId));
 	});
 
 	public async refreshFn() {

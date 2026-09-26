@@ -13,7 +13,7 @@ export class RoomService {
 	public readonly myRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
 		if (!userId) return [];
-		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
+		return this.rooms().filter(r => r.gameData.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
 
 	/** Rooms to show in the browse list (/play): everything except rooms the player is already in

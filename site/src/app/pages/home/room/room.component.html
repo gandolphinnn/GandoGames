@@ -14,7 +14,7 @@
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
 				}
-				@if (isHost() && room()!.phase === 'waiting') {
+				@if (isHost() && room()!.gameData.phase === 'waiting') {
 					<ion-button fill="clear" (click)="openAccess()" [title]="'ROOM.ACCESS_TITLE' | translate: { label: (accessBadge().label | translate) }">
 						<ion-icon [name]="accessBadge().icon" slot="icon-only" />
 					</ion-button>
@@ -43,7 +43,7 @@
 		}
 		<gg-refreshable-content [fullscreen]="!isPlaying()" [scrollY]="!isPlaying()" [onRefresh]="refreshFn()">
 			@if (isPlaying()) {
-				<gg-game-shell [roomId]="roomId()" [gameId]="room()!.game" />
+				<gg-game-shell [roomId]="roomId()" [gameId]="room()!.gameId" />
 			} @else {
 				<gg-room-lobby
 					[room]="room()!"

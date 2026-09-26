@@ -8,7 +8,6 @@ export class PokerGame extends Game<PokerGameState> {
 	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
 		const resolved = resolvePokerSettings(settings);
 		this.state = {
-			lastUpdate: new Date(),
 			gamePhase: 'pre-flop',
 			players: players.map(p => ({
 				...p,

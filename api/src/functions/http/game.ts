@@ -75,9 +75,9 @@ const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (
 	const room = await PlayfabCtx.rooms.get(body.roomId!);
 	if (!room) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-	if (room.phase !== 'waiting') throw new Error('Game already started');
+	if (room.gameData.phase !== 'waiting') throw new Error('Game already started');
 
-	room.settings = resolveSettings(GAME_SETTINGS[room.game], body.settings);
+	room.settings = resolveSettings(GAME_SETTINGS[room.gameId], body.settings);
 	await PlayfabCtx.rooms.upsert(body.roomId!, room);
 	notifier.roomUpsert(room);
 	return room;
@@ -102,8 +102,8 @@ const resetInner: InnerFunction<typeof API.game.reset> = async (body, params, no
 		const room = await PlayfabCtx.rooms.get(body.roomId ?? 'TODO');
 		if (room == null) throw new Error('Room not found');
 		//if (room.hostId !== player.id) throw new Error('You are not the host of this room');
-		if (room.phase !== 'playing') throw new Error('Game is not in progress');
-		room.phase = 'waiting';
+		if (room.gameData.phase !== 'playing') throw new Error('Game is not in progress');
+		room.gameData.phase = 'waiting';
 		await PlayfabCtx.rooms.upsert(body.roomId!, room);
 		notifier.roomUpsert(room);
 		return game.getPublicState(player.id);

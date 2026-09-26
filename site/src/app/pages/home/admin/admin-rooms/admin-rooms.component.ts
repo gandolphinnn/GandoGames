@@ -25,8 +25,8 @@ export class AdminRoomsComponent {
 		return {
 			id: room.id,
 			host: host?.name ?? room.hostId,
-			game: room.game,
-			phase: room.phase,
+			game: room.gameId,
+			phase: room.gameData.phase,
 			lastUpdate: room.lastUpdate
 		}
 	}));

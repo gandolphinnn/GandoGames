@@ -1,10 +1,9 @@
-import { GamePlayer } from ".";
+import { GameId, GamePlayer } from ".";
 
 /** The base data of a game that might not have started yet. */
 export interface GameData<TSettings extends GameSettings = GameSettings> {
 	phase: 'waiting' | 'playing' | 'ended';
 	settings: TSettings;
-	lastUpdate: Date;
 }
 
 /** The current state of a started game */

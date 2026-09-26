@@ -8,7 +8,6 @@ export class MastermindGame extends Game<MastermindGameState> {
 		throw new Error('Not implemented');
 		const resolved = resolveMastermindSettings(settings);
 		this.state = {
-			lastUpdate: new Date(),
 			players: players,
 			currentPlayerIndex: 0,
 			settings: resolved,

@@ -39,7 +39,7 @@ export class InviteModalComponent {
 	public readonly isGuest = computed(() => this.userService.user()?.player.type === 'guest');
 	public readonly isFull = computed(() => this.playerCount() >= this.maxPlayers());
 	public readonly gameInfo = computed(() => {
-		const g = this.room().game;
+		const g = this.room().gameId;
 		return g ? GAME_REGISTRY[g] : undefined;
 	});
 

@@ -44,9 +44,9 @@ export class RoomComponent implements OnInit {
 	public readonly myId = computed(() => this.auth.user()?.player.id ?? '');
 	public readonly isHost = computed(() => this.room()?.hostId === this.myId());
 	public readonly isInRoom = computed(() => this.room()?.players.some((p) => p.id === this.myId()) ?? false);
-	public readonly isPlaying = computed(() => this.room()?.phase === 'playing');
+	public readonly isPlaying = computed(() => this.room()?.gameData.phase === 'playing');
 	public readonly gameInfo = computed(() => {
-		const g = this.room()?.game;
+		const g = this.room()?.gameId;
 		return g ? GAME_REGISTRY[g] : undefined;
 	});
 
@@ -77,7 +77,7 @@ export class RoomComponent implements OnInit {
 				return;
 			}
 			this.room.set(room);
-			if (room.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
+			if (room.gameData.phase === 'playing' && !room.players.some(p => p.id === this.myId())) {
 				void this.urlService.buildState('play_room', { roomId: room.id}).navigate();
 			}
 		} catch {

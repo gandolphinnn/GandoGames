@@ -11,7 +11,7 @@ const cleanerRoomsInner: InnerTimeFunction = async (_timer, notifier) => {
 
 	for (const room of inactiveRooms) {
 		await PlayfabCtx.rooms.delete(room.id);
-		await PlayfabCtx.game[room.game].delete(room.id);
+		await PlayfabCtx.game[room.gameId].delete(room.id);
 		notifier.roomDeleted(room.id);
 	}
 };

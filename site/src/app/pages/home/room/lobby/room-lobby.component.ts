@@ -48,17 +48,17 @@ export class RoomLobbyComponent {
 
 	public readonly canJoin = computed(() => {
 		const room = this.room();
-		if (room.phase !== 'waiting' || this.isInRoom()) return false;
+		if (room.gameData.phase !== 'waiting' || this.isInRoom()) return false;
 		if (room.kickedPlayers?.includes(this.myId())) return false;
 		if ((room.access ?? 'public') === 'closed') return false;
-		const maxPlayers = GAME_REGISTRY[room.game]?.maxPlayers ?? 0;
+		const maxPlayers = GAME_REGISTRY[room.gameId]?.maxPlayers ?? 0;
 		return room.players.length < maxPlayers;
 	});
 
 	/** Why a non-member can't join right now, as a translation key (empty when they can, or are already in). */
 	public readonly joinBlockedReason = computed(() => {
 		const room = this.room();
-		if (room.phase !== 'waiting' || this.isInRoom() || this.canJoin()) return '';
+		if (room.gameData.phase !== 'waiting' || this.isInRoom() || this.canJoin()) return '';
 		if (room.kickedPlayers?.includes(this.myId())) return 'LOBBY.BLOCKED_KICKED';
 		if ((room.access ?? 'public') === 'closed') return 'LOBBY.BLOCKED_CLOSED';
 		return 'LOBBY.BLOCKED_FULL';
@@ -66,14 +66,14 @@ export class RoomLobbyComponent {
 
 	public readonly canStart = computed(() => {
 		const room = this.room();
-		if (!this.isHost() || room.phase !== 'waiting') return false;
-		const game = GAME_REGISTRY[room.game];
+		if (!this.isHost() || room.gameData.phase !== 'waiting') return false;
+		const game = GAME_REGISTRY[room.gameId];
 		if (!game) return false;
 		return room.players.length >= game.minPlayers;
 	});
 
 	public readonly gameInfo = computed(() => {
-		const g = this.room().game;
+		const g = this.room().gameId;
 		return g ? GAME_REGISTRY[g] : undefined;
 	});
 
@@ -84,7 +84,7 @@ export class RoomLobbyComponent {
 
 	/** The game's table look (felt/neutral + label), shared with the in-game view. */
 	public readonly preset = computed<TablePreset>(() => {
-		const g = this.room().game;
+		const g = this.room().gameId;
 		return g ? GAME_REGISTRY[g].table : { variant: 'neutral' };
 	});
 
@@ -95,8 +95,8 @@ export class RoomLobbyComponent {
 	 */
 	public readonly seats = computed<TableSeat[]>(() => {
 		const room = this.room();
-		const max = GAME_REGISTRY[room.game]?.maxPlayers ?? room.players.length;
-		const canInvite = this.isInRoom() && room.phase === 'waiting' && room.players.length < max;
+		const max = GAME_REGISTRY[room.gameId]?.maxPlayers ?? room.players.length;
+		const canInvite = this.isInRoom() && room.gameData.phase === 'waiting' && room.players.length < max;
 		const ringSize = canInvite ? room.players.length + 1 : room.players.length;
 		return buildTableSeats(room.players, this.myId(), ringSize);
 	});
@@ -104,7 +104,7 @@ export class RoomLobbyComponent {
 	/** The lone open seat is an invite affordance for members while waiting. */
 	public onSeatClick(seat: TableSeat): void {
 		if (seat.player) return;
-		if (this.isInRoom() && this.room().phase === 'waiting') this.invite();
+		if (this.isInRoom() && this.room().gameData.phase === 'waiting') this.invite();
 	}
 
 	public async join(): Promise<void> {
@@ -134,7 +134,7 @@ export class RoomLobbyComponent {
 	}
 
 	public invite(): void {
-		if (this.isInRoom() && this.room()?.phase === 'waiting') this.showInviteModal.set(true);
+		if (this.isInRoom() && this.room()?.gameData.phase === 'waiting') this.showInviteModal.set(true);
 	}
 
 	public openSettings(): void {

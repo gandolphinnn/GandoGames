@@ -30,10 +30,10 @@
 					<span class="my-rooms-label">{{ 'ROOM_LIST.YOUR_ROOMS' | translate }}</span>
 					<div class="my-rooms-chips">
 						@for (room of myRooms(); track room.id) {
-							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.game) | translate" (click)="navigateToRoom(room)">
-								<i [class]="'my-rooms-chip-icon ' + gameIcon(room.game)"></i>
+							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.gameId) | translate" (click)="navigateToRoom(room)">
+								<i [class]="'my-rooms-chip-icon ' + gameIcon(room.gameId)"></i>
 								<span class="my-rooms-chip-id">{{ room.id }}</span>
-								@if (room.phase === 'playing') {
+								@if (room.gameData.phase === 'playing') {
 									<span class="my-rooms-chip-live" aria-label="Live"></span>
 								}
 							</button>
@@ -55,7 +55,7 @@
 						<li class="room-card" (click)="navigateToRoom(room)">
 							<div class="room-card-info">
 								<span class="room-card-game">
-									{{ gameLabel(room.game) | translate }}
+									{{ gameLabel(room.gameId) | translate }}
 									@if (accessBadge(room); as badge) {
 										<span class="room-card-badge" [title]="badge.label | translate">
 											<ion-icon [name]="badge.icon" />
@@ -65,7 +65,7 @@
 								<span class="room-card-players-list">{{ playerNames(room) }}</span>
 							</div>
 							<span class="room-card-count">
-								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.game) }}
+								{{ room.players.length }}&thinsp;/&thinsp;{{ maxPlayers(room.gameId) }}
 							</span>
 						</li>
 					}

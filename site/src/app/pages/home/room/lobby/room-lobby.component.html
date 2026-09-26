@@ -27,7 +27,7 @@
 					@if (p.id === room()!.hostId) {
 						<ion-icon name="ribbon" class="seat-crown" [title]="'LOBBY.HOST' | translate" />
 					}
-					@if (isHost() && p.id !== myId() && room()!.phase === 'waiting') {
+					@if (isHost() && p.id !== myId() && room()!.gameData.phase === 'waiting') {
 						<button class="seat-btn seat-kick" (click)="kick(p); $event.stopPropagation()" [title]="'LOBBY.KICK_PLAYER' | translate">
 							<ion-icon name="close" />
 						</button>
@@ -49,7 +49,7 @@
 			</ng-template>
 
 			<div table-footer class="lobby-footer">
-				@switch (room()!.phase) {
+				@switch (room()!.gameData.phase) {
 					@case ('waiting') {
 						@if (!isInRoom()) {
 							@if (canJoin()) {
@@ -93,7 +93,7 @@
 		@if (showInviteModal() && room()) {
 			<gg-invite-modal
 				[room]="room()"
-				[gameId]="room()!.game"
+				[gameId]="room()!.gameId"
 				[isHost]="isHost()"
 				[playerCount]="room()!.players.length"
 				[maxPlayers]="gameInfo()?.maxPlayers ?? 0"
@@ -103,10 +103,10 @@
 
 		@if (showSettingsModal() && room()) {
 			<gg-game-settings-modal
-				[gameId]="room()!.game"
+				[gameId]="room()!.gameId"
 				[roomId]="roomId()"
 				[settings]="room()!.settings ?? {}"
-				[editable]="isHost() && room()!.phase === 'waiting'"
+				[editable]="isHost() && room()!.gameData.phase === 'waiting'"
 				(closed)="showSettingsModal.set(false)" />
 		}
 	}

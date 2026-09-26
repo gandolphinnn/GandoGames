@@ -9,7 +9,6 @@ export class PankovGame extends Game<PankovGameState> {
 		const resolved = resolvePankovSettings(settings);
 		const firstPlayerToGo = resolved.randomStartingPlayer? Math.floor(Math.random() * players.length) : 0;
 		this.state = {
-			lastUpdate: new Date(),
 			gamePhase: 'turn-start',
 			players: players.map(p => ({ ...p, lives: resolved.initialLives })),
 			currentPlayerIndex: firstPlayerToGo,

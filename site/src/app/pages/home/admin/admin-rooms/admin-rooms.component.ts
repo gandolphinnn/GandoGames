@@ -26,7 +26,7 @@ export class AdminRoomsComponent {
 			id: room.id,
 			host: host?.name ?? room.hostId,
 			game: room.gameId,
-			phase: room.gameData.phase,
+			phase: room.phase,
 			lastUpdate: room.lastUpdate
 		}
 	}));

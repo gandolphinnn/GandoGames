@@ -1,5 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RoomSummary } from '@gandogames/shared/dto';
+import { RoomData } from '@gandogames/shared/dto';
 import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { roomAccessOption } from '@gandogames/lib/room-access';
@@ -46,12 +46,12 @@ export class RoomListComponent implements OnInit {
 		return this.allGames.find((g) => g.id === id)?.maxPlayers ?? 0;
 	}
 
-	public playerNames(room: RoomSummary): string {
+	public playerNames(room: RoomData): string {
 		return room.players.map((p) => p.name).join(', ');
 	}
 
 	/** Access badge metadata for a room; null for plain public rooms (no badge shown). */
-	public accessBadge(room: RoomSummary): { icon: string; label: string } | null {
+	public accessBadge(room: RoomData): { icon: string; label: string } | null {
 		const access = room.access ?? 'public';
 		return access === 'public' ? null : roomAccessOption(access);
 	}
@@ -98,7 +98,7 @@ export class RoomListComponent implements OnInit {
 		}
 	}
 
-	public navigateToRoom(room: RoomSummary): void {
+	public navigateToRoom(room: RoomData): void {
 		void this.urlService.buildState('play_room', { roomId: room.id }).navigate();
 	}
 

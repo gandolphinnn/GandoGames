@@ -1,4 +1,4 @@
-import { PlayerRole, API, GAMES_CONFIG, GameId, GameState, RoomSummary, GamePlayer } from '@gandogames/shared/dto';
+import { PlayerRole, API, GAMES_CONFIG, GameId, GameState, RoomData, GamePlayer } from '@gandogames/shared/dto';
 import { InnerFunction, PlayfabCtx, registerEndpoint } from '../..';
 
 const moderatorRoles = ['moderator', 'admin'] as readonly PlayerRole[];
@@ -12,10 +12,10 @@ async function roomList() {
 	const rooms = await PlayfabCtx.rooms.list();
 	return rooms
 		.map(r => {
-			r.settings = undefined;
+			r.settings = {};
 			r.kickedPlayers = [];
 			r.chat = [];
-			return r as RoomSummary;
+			return r as RoomData;
 		});
 }
 async function gamesList() {

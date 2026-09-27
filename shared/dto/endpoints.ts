@@ -1,7 +1,7 @@
 import type { AuthResponse, ChatSendRequest, FriendsListResponse, GameActionRequest,
 	GamePlayer, GameRequest, GameSettingsSetRequest, GameState, GuestLoginRequest,
 	LoginRequest, ModeratorRoomsListResponse, NegotiateQuery, NegotiateResponse, ProfileData, ProfileUpdateRequest,
-	RegisterRequest, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '.';
+	RegisterRequest, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest } from '.';
 
 /**
  * ─── The API contract ─────────────────────────────────────────────────────────────
@@ -126,7 +126,7 @@ export const API = {
 	},
 	rooms: {
 		create: endpoint<RoomCreateRequest, RoomData>()('room_create', 'POST', 'rooms'),
-		list: endpoint<void, RoomSummary[]>()('room_list', 'GET', 'rooms'),
+		list: endpoint<void, RoomData[]>()('room_list', 'GET', 'rooms'),
 		get: endpoint<void, RoomData>()('room_get', 'GET', 'rooms/{roomId}'),
 		join: endpoint<void, RoomData>()('room_join', 'POST', 'rooms/{roomId}/join'),
 		leave: endpoint<void, void>()('room_leave', 'POST', 'rooms/{roomId}/leave'),

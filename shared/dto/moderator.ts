@@ -1,6 +1,6 @@
-import { GameState, RoomSummary } from ".";
+import { GameState, RoomData } from ".";
 
 export interface ModeratorRoomsListResponse {
-	rooms: RoomSummary[],
+	rooms: RoomData[],
 	games: GameState[]
 }

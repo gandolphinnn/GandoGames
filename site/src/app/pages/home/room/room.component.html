@@ -14,7 +14,7 @@
 						<ion-icon [name]="copied() ? 'checkmark' : 'copy'" slot="icon-only" />
 					</ion-button>
 				}
-				@if (isHost() && room()!.gameData.phase === 'waiting') {
+				@if (isHost() && room()!.phase === 'waiting') {
 					<ion-button fill="clear" (click)="openAccess()" [title]="'ROOM.ACCESS_TITLE' | translate: { label: (accessBadge().label | translate) }">
 						<ion-icon [name]="accessBadge().icon" slot="icon-only" />
 					</ion-button>

@@ -1,4 +1,4 @@
-import { GamePlayer, GameSettings, GameId, GameData } from ".";
+import { GamePlayer, GameId, GameData } from ".";
 
 export interface ChatMessage {
 	playerId: string;
@@ -15,22 +15,14 @@ export interface ChatMessage {
  */
 export type RoomAccessPolicy = 'public' | 'link' | 'closed';
 
-export interface RoomSummary {
+export interface RoomData extends GameData {
 	id: string;
 	hostId: string;
-	players: GamePlayer[];
-	/** Who may discover/join this room. */
 	access: RoomAccessPolicy;
-	lastUpdate: Date;
 	gameId: GameId;
-	gameData: GameData;
-}
-
-export interface RoomData extends RoomSummary {
 	kickedPlayers: string[];
 	chat: ChatMessage[];
-	/** Host-chosen game settings for this room; undefined until set (server resolves to defaults). */
-	settings?: GameSettings; //TODO move to the game data
+	lastUpdate: Date;
 }
 
 export interface RoomCreateRequest {

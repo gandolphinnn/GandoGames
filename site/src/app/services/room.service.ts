@@ -1,5 +1,5 @@
 import { computed, inject, Service, signal } from '@angular/core';
-import { API, ChatSendRequest, GameId, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest, RoomSummary } from '@gandogames/shared/dto';
+import { API, ChatSendRequest, GameId, RoomAccessPolicy, RoomAccessSetRequest, RoomCreateRequest, RoomData, RoomInviteRequest } from '@gandogames/shared/dto';
 import { BackendService, SignalRService, UserService } from '@gandogames/services';
 
 @Service()
@@ -8,12 +8,12 @@ export class RoomService {
 	private readonly auth = inject(UserService);
 	private readonly signalR = inject(SignalRService);
 
-	public readonly rooms = signal<RoomSummary[]>([]);
+	public readonly rooms = signal<RoomData[]>([]);
 
 	public readonly myRooms = computed(() => {
 		const userId = this.auth.user()?.player.id;
 		if (!userId) return [];
-		return this.rooms().filter(r => r.gameData.phase !== 'ended' && r.players.some(p => p.id === userId));
+		return this.rooms().filter(r => r.phase !== 'ended' && r.players.some(p => p.id === userId));
 	});
 
 	/** Rooms to show in the browse list (/play): everything except rooms the player is already in

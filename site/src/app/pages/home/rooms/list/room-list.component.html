@@ -33,7 +33,7 @@
 							<button type="button" class="my-rooms-chip" [title]="gameLabel(room.gameId) | translate" (click)="navigateToRoom(room)">
 								<i [class]="'my-rooms-chip-icon ' + gameIcon(room.gameId)"></i>
 								<span class="my-rooms-chip-id">{{ room.id }}</span>
-								@if (room.gameData.phase === 'playing') {
+								@if (room.phase === 'playing') {
 									<span class="my-rooms-chip-live" aria-label="Live"></span>
 								}
 							</button>

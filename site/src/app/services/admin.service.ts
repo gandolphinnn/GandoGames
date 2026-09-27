@@ -1,12 +1,12 @@
 import { inject, Service, signal } from '@angular/core';
-import { API, GameState, RoomSummary } from '@gandogames/shared/dto';
+import { API, GameState, RoomData } from '@gandogames/shared/dto';
 import { BackendService } from '@gandogames/services';
 
 @Service()
 export class AdminService {
 	private readonly backend = inject(BackendService);
 	
-	public readonly rooms = signal<RoomSummary[]>([]);
+	public readonly rooms = signal<RoomData[]>([]);
 	public readonly games = signal<GameState[]>([]);
 
 	public async loadRooms() {

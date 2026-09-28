@@ -1,12 +1,12 @@
 import { InputSignal, OutputEmitterRef, Type } from "@angular/core";
 import { GameSettingsSchema, GameState, GameId, GameConfig, GAMES_CONFIG } from "@gandogames/shared/dto";
+import { MASTERMIND_SETTINGS_SCHEMA } from "@gandogames/shared/mastermind";
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
-import { PankovGameComponent } from '@gandogames/lib/games/pankov';
-import { PokerGameComponent } from '@gandogames/lib/games/poker';
-import { MastermindGameComponent } from "./games/mastermind";
-import { MASTERMIND_SETTINGS_SCHEMA } from "@gandogames/shared/mastermind";
-import { TableVariant } from "./common/game-table/table-layout";
+import { TableVariant } from "@gandogames/lib/common/game-table";
+import { MastermindGameComponent } from "@gandogames/lib/games/mastermind/mastermind-game.component";
+import { PankovGameComponent } from "@gandogames/lib/games/pankov/pankov-game.component";
+import { PokerGameComponent } from "@gandogames/lib/games/poker/poker-game.component";
 
 export interface GameComponent<TState extends GameState = GameState> {
 	gameState: InputSignal<TState | null>;
@@ -31,6 +31,16 @@ interface GameInfo extends GameConfig {
 }
 
 export const GAME_REGISTRY: Record<GameId, GameInfo> = {
+	mastermind: {
+		id: 'mastermind',
+		icon: 'fa-solid fa-brain',
+		title: 'GAME.MASTERMIND.TITLE',
+		description: 'GAME.MASTERMIND.DESCRIPTION',
+		...GAMES_CONFIG.mastermind,
+		component: MastermindGameComponent,
+		settingsSchema: MASTERMIND_SETTINGS_SCHEMA,
+		tableVariant: 'neutral',
+	},
 	pankov: {
 		id: 'pankov',
 		icon: 'fa-solid fa-dice',
@@ -51,14 +61,4 @@ export const GAME_REGISTRY: Record<GameId, GameInfo> = {
 		settingsSchema: POKER_SETTINGS_SCHEMA,
 		tableVariant: 'felt',
 	},
-	mastermind: {
-		id: 'mastermind',
-		icon: 'fa-solid fa-brain',
-		title: 'GAME.MASTERMIND.TITLE',
-		description: 'GAME.MASTERMIND.DESCRIPTION',
-		...GAMES_CONFIG.mastermind,
-		component: MastermindGameComponent,
-		settingsSchema: MASTERMIND_SETTINGS_SCHEMA,
-		tableVariant: 'neutral',
-	}
 };

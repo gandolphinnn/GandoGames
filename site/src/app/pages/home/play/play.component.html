@@ -6,7 +6,7 @@
 				<ion-icon name="arrow-back" slot="icon-only" />
 			</ion-button>
 		</ion-buttons>
-		<ion-title>{{ descriptor().title | translate}}</ion-title>
+		<ion-title>{{ descriptor()?.title | translate}}</ion-title>
 		<ion-buttons slot="end">
 			<ion-button fill="clear" (click)="showSettingsModal.set(true)" [title]="(isPlaying() ? 'LOBBY.VIEW_SETTINGS' : 'LOBBY.GAME_SETTINGS') | translate">
 				<ion-icon name="settings-outline" slot="icon-only" />
@@ -15,16 +15,13 @@
 	</ion-toolbar>
 </ion-header>
 
-<div class="room-layout">
-	<!-- @if (isInRoom()) {
-		<div class="room-layout-left">
-			<gg-chat [roomId]="roomId()" [chatHistory]="room()?.chat ?? []" />
-		</div>
-	} -->
-	<!-- <gg-refreshable-content [fullscreen]="false" [scrollY]="false" [onRefresh]="refreshFn">
-		<gg-game-shell [gameId]="game()!.name" />
-	</gg-refreshable-content> -->
-</div>
+@if (descriptor()) {
+	<div class="room-layout">
+		<gg-refreshable-content [fullscreen]="false" [scrollY]="false" [onRefresh]="refreshFn">
+			<gg-game-shell [gameId]="gameId()" />
+		</gg-refreshable-content>
+	</div>
+}
 
 @if (showSettingsModal()) {
 	<gg-game-settings-modal

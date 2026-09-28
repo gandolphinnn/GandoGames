@@ -4,7 +4,7 @@ import { GamePlayer, RoomData } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 import { BASE_IMPORTS } from '@gandogames/lib/ion-imports';
 import { roomAccessOption } from '@gandogames/lib/room-access';
-import { buildTableSeats, GameTableComponent, GameTableSeatDef, TablePreset, TableSeat } from '@gandogames/lib/common/game-table';
+import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { FriendService, RoomService, ToastService, UserService } from '@gandogames/services';
 import { GameSettingsModalComponent, InviteModalComponent, PlayerAvatarComponent } from '@gandogames/components';
 
@@ -36,7 +36,8 @@ export class RoomLobbyComponent {
 	public readonly showInviteModal = signal(false);
 	public readonly showSettingsModal = signal(false);
 	public readonly addingFriendId = signal<string | null>(null);
-
+	
+	public readonly gameInfo = computed(() => GAME_REGISTRY[this.room().gameId]);
 	/** Whether the room's host is an accepted friend of the viewer — gates friends-only joins. */
 	public readonly isHostFriend = computed(() => {
 		const hostId = this.room().hostId;
@@ -51,7 +52,7 @@ export class RoomLobbyComponent {
 		if (room.phase !== 'waiting' || this.isInRoom()) return false;
 		if (room.kickedPlayers?.includes(this.myId())) return false;
 		if ((room.access ?? 'public') === 'closed') return false;
-		const maxPlayers = GAME_REGISTRY[room.gameId]?.maxPlayers ?? 0;
+		const maxPlayers = this.gameInfo().maxPlayers ?? 0;
 		return room.players.length < maxPlayers;
 	});
 
@@ -67,26 +68,15 @@ export class RoomLobbyComponent {
 	public readonly canStart = computed(() => {
 		const room = this.room();
 		if (!this.isHost() || room.phase !== 'waiting') return false;
-		const game = GAME_REGISTRY[room.gameId];
+		const game = this.gameInfo();
 		if (!game) return false;
 		return room.players.length >= game.minPlayers;
-	});
-
-	public readonly gameInfo = computed(() => {
-		const g = this.room().gameId;
-		return g ? GAME_REGISTRY[g] : undefined;
 	});
 
 	/** Whether this game exposes any configurable settings — hides the settings button when it doesn't. */
 	public readonly hasSettings = computed(() => (this.gameInfo()?.settingsSchema.length ?? 0) > 0);
 
 	public readonly memberIds = computed(() => this.room().players.map(p => p.id) ?? []);
-
-	/** The game's table look (felt/neutral + label), shared with the in-game view. */
-	public readonly preset = computed<TablePreset>(() => {
-		const g = this.room().gameId;
-		return g ? GAME_REGISTRY[g].table : { variant: 'neutral' };
-	});
 
 	/**
 	 * Seat ring: players in playing order, viewer rotated to bottom-centre. Members waiting in a
@@ -95,7 +85,7 @@ export class RoomLobbyComponent {
 	 */
 	public readonly seats = computed<TableSeat[]>(() => {
 		const room = this.room();
-		const max = GAME_REGISTRY[room.gameId]?.maxPlayers ?? room.players.length;
+		const max = this.gameInfo().maxPlayers ?? room.players.length;
 		const canInvite = this.isInRoom() && room.phase === 'waiting' && room.players.length < max;
 		const ringSize = canInvite ? room.players.length + 1 : room.players.length;
 		return buildTableSeats(room.players, this.myId(), ringSize);

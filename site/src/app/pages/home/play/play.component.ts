@@ -13,12 +13,12 @@ import { GameSettingsModalComponent, GameShellComponent, RefreshableContentCompo
 	styleUrl: './play.component.scss',
 })
 export class PlayComponent {
-	private readonly urlService = inject(UrlService);
+	private readonly url = inject(UrlService);
 	private readonly gameService = inject(GameService);
 
-	public readonly gameId = computed(() => this.urlService.current().segments['game'] as GameId ?? '');
-	public readonly descriptor = computed(() => GAME_REGISTRY[this.gameId()] );
-	public readonly isPlaying = computed(() => this.gameState().phase == 'playing');
+	public readonly gameId = computed(() => this.url.current().segments['gameId'] as GameId);
+	public readonly descriptor = computed(() => GAME_REGISTRY[this.gameId()]);
+	public readonly isPlaying = computed(() => this.gameState()?.phase == 'playing');
 	public readonly gameState = signal<GameState>(null!);
 
 	public readonly showSettingsModal = signal(false);

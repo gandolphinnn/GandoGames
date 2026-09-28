@@ -6,8 +6,7 @@
 		<gg-game-table
 			class="lobby-table"
 			fit="contain"
-			[variant]="preset().variant"
-			[label]="preset().label ?? null"
+			[variant]="gameInfo().tableVariant"
 			[seats]="seats()"
 			(seatClick)="onSeatClick($event.seat)">
 

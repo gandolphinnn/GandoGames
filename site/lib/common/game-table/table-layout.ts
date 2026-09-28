@@ -3,23 +3,6 @@ import { GamePlayer } from '@gandogames/shared/dto';
 /** `felt` = poker-green surface; `neutral` = themed surface for non-card games. */
 export type TableVariant = 'felt' | 'neutral';
 
-/**
- * `contain` sizes the felt by aspect-ratio and sits in scroll flow (the lobby, where
- * `ion-content` scrolls). `fill` makes the felt fill leftover flex height so a pinned
- * footer/action bar stays reachable (in-game, where `ion-content` does not scroll).
- */
-export type TableFit = 'contain' | 'fill';
-
-/**
- * A game's table look, read identically by its lobby and its in-game view so the two
- * phases stay consistent. Lives on the game registry (see `GameDescriptor.table`).
- */
-export interface TablePreset {
-	variant: TableVariant;
-	/** Faint label rendered on the felt (usually the game name). */
-	label?: string;
-}
-
 /** One seat around the table. `player` is null for an open seat. */
 export interface TableSeat {
 	/** Stable identity for `@for` tracking — survives hero-rotation as players join/leave. */

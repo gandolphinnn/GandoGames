@@ -2,7 +2,14 @@ import { Component, computed, contentChild, input, output } from '@angular/core'
 import { NgTemplateOutlet } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { GameTableSeatDef } from './game-table-seat.directive';
-import { layoutSeats, TableFit, TableSeat, TableVariant } from './table-layout';
+import { layoutSeats, TableSeat, TableVariant } from './table-layout';
+
+/**
+ * `contain` sizes the felt by aspect-ratio and sits in scroll flow (the lobby, where
+ * `ion-content` scrolls). `fill` makes the felt fill leftover flex height so a pinned
+ * footer/action bar stays reachable (in-game, where `ion-content` does not scroll).
+ */
+type TableFit = 'contain' | 'fill';
 
 /**
  * Presentational table: seats laid out around an oval with the hero pinned
@@ -28,8 +35,6 @@ export class GameTableComponent {
 	public readonly seats = input.required<TableSeat[]>();
 	public readonly variant = input<TableVariant>('neutral');
 	public readonly fit = input<TableFit>('contain');
-	/** Faint label rendered on the felt (e.g. the game name). */
-	public readonly label = input<string | null>(null);
 	/** Render the dealer button on the seat flagged `isDealer`. */
 	public readonly showDealerChip = input<boolean>(false);
 

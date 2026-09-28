@@ -29,7 +29,7 @@ export const HOME_ROUTES: Routes = [
 		loadComponent: () => import('./room/room.component').then((m) => m.RoomComponent),
 	},
 	{
-		path: 'play/:game',
+		path: 'play/:gameId',
 		loadComponent: () => import('./play/play.component').then((m) => m.PlayComponent),
 	},
 ];

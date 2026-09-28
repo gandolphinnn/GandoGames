@@ -1,4 +1,4 @@
-import { API, GameId, GameSettingsSchema, resolveSettings } from '@gandogames/shared/dto';
+import { API, GameId, GAMES_CONFIG, GameSettingsSchema, GameState, resolveSettings, RoomData } from '@gandogames/shared/dto';
 import { MASTERMIND_SETTINGS_SCHEMA } from '@gandogames/shared/mastermind';
 import { PANKOV_SETTINGS_SCHEMA } from '@gandogames/shared/pankov';
 import { POKER_SETTINGS_SCHEMA } from '@gandogames/shared/poker';
@@ -16,23 +16,36 @@ const GAME_SETTINGS: Record<GameId, GameSettingsSchema> = {
 	poker: POKER_SETTINGS_SCHEMA,
 };
 
+async function getData(gameId: GameId, entityId: string, roomId?: string): Promise<[GameState | null, RoomData | null]> {
+	const category = GAMES_CONFIG[gameId].category;
+	if ((category == 'room') !== !roomId)
+		throw new Error();
+
+	if (roomId) {
+		return await Promise.all([
+			PlayfabCtx.game[gameId].get(roomId!),
+			PlayfabCtx.rooms.get(roomId!),
+		]);
+	}
+	else {
+		return [await PlayfabCtx.game[gameId].get(entityId), null];
+	}
+}
+
 const gameStateInner: InnerFunction<typeof API.game.state> = async (body, params, _notifier, player) => {
-	const gameId = params.gameId as GameId;
-	const state = await PlayfabCtx.game[gameId].get(body.roomId!);
-	if (!state) return null;
+	const gameId = params.gameId as GameId
+	const [savedState, _] = await getData(gameId, player.entityId, body.roomId);
+	if (!savedState) return null;
 	const game = Game.Factory(gameId);
-	game.state = state;
+	game.state = savedState;
 	return game.getPublicState(player.id);
 };
 
 const gameActionInner: InnerFunction<typeof API.game.action> = async (body, params, notifier, player) => {
-	const gameId = params.gameId as GameId;
+	const gameId = params.gameId as GameId
+	const [savedState, room] = await getData(gameId, player.entityId, body.roomId);
 
 	if (body.roomId) {
-		const [savedState, room] = await Promise.all([
-			PlayfabCtx.game[gameId].get(body.roomId!),
-			PlayfabCtx.rooms.get(body.roomId!),
-		]);
 		if (!savedState || !room) throw new Error('Game not found');
 	
 		const game = Game.Factory(gameId);
@@ -67,12 +80,12 @@ const gameActionInner: InnerFunction<typeof API.game.action> = async (body, para
 };
 
 const gameSettingsSetInner: InnerFunction<typeof API.game.setSettings> = async (body, params, notifier, player) => {
-	const gameId = params.gameId as GameId;
+	const gameId = params.gameId as GameId
+	const [savedState, room] = await getData(gameId, player.entityId, body.roomId);
 
 	if (body.roomId) {
 
 	}
-	const room = await PlayfabCtx.rooms.get(body.roomId!);
 	if (!room) throw new Error('Room not found');
 	if (room.hostId !== player.id) throw new Error('You are not the host of this room');
 	if (room.phase !== 'waiting') throw new Error('Game already started');

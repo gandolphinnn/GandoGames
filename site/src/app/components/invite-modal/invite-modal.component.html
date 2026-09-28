@@ -36,7 +36,8 @@
 					<ul class="player-list">
 						@for (friend of filteredFriends(); track friend.id) {
 							<li class="player-row">
-								<gg-player-avatar class="player-row-avatar" [player]="friend" />
+								<!-- TODO understand why the player avatar completely breaks this component -->
+								<!-- <gg-player-avatar class="player-row-avatar" [player]="friend" /> -->
 								<span class="player-row-name">{{ friend.name }}</span>
 								@if (isInRoom(friend.id)) {
 									<span class="player-row-status">{{ 'INVITE_MODAL.IN_ROOM' | translate }}</span>

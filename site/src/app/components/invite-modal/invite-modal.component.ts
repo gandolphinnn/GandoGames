@@ -8,7 +8,7 @@ import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
 
 @Component({
 	selector: 'gg-invite-modal',
-	imports: [IonButton, IonIcon, PlayerAvatarComponent, TranslatePipe],
+	imports: [IonButton, IonIcon, TranslatePipe],
 	templateUrl: './invite-modal.component.html',
 	styleUrl: './invite-modal.component.scss',
 })

@@ -16,10 +16,6 @@ export class GamesComponent {
 	private url = inject(UrlService)
 	public games = Object.values(GAME_REGISTRY)
 
-	public async refreshFn() {
-		await this.fetchGames();
-	};
-
 	public readonly filteredRooms = computed(() => {
 	});
 

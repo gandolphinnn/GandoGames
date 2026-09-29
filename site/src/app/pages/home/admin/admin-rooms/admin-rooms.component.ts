@@ -34,12 +34,8 @@ export class AdminRoomsComponent {
 	public ngOnInit(): void {
 		void this.fetchRooms();
 	}
-
-	public async refreshFn() {
-		await this.fetchRooms();
-	};
 	
-	private async fetchRooms(): Promise<void> {
+	public async fetchRooms(): Promise<void> {
 		try {
 			this.loading.set(true);
 			await this.admin.loadRooms();

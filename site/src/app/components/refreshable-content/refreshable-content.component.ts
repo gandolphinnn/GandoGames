@@ -20,7 +20,7 @@ import type { IonRefresherCustomEvent, RefresherEventDetail } from '@ionic/core'
 export class RefreshableContentComponent {
 	public readonly fullscreen = input(false);
 	public readonly scrollY = input(true);
-	public readonly onRefresh = input<(() => Promise<void>) | undefined>(undefined);
+	public readonly onRefresh = input<(() => Promise<any>) | undefined>(undefined);
 
 	protected async handleRefresh(event: IonRefresherCustomEvent<RefresherEventDetail>): Promise<void> {
 		try {

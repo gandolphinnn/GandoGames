@@ -30,10 +30,6 @@ export class RoomListComponent implements OnInit {
 		return this.browsableRooms().filter((r) => active.includes(r.gameId));
 	});
 
-	public async refreshFn() {
-		await this.fetchRooms();
-	};
-
 	public gameLabel(id: string): string {
 		return this.allGames.find((g) => g.id === id)?.title ?? '';
 	}
@@ -79,7 +75,7 @@ export class RoomListComponent implements OnInit {
 		void this.fetchRooms();
 	}
 
-	private async fetchRooms(): Promise<void> {
+	public async fetchRooms(): Promise<void> {
 		try {
 			this.loading.set(true);
 			await this.roomService.loadRooms();

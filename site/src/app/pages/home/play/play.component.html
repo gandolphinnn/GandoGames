@@ -17,7 +17,7 @@
 
 @if (descriptor()) {
 	<div class="room-layout">
-		<gg-refreshable-content [fullscreen]="false" [scrollY]="false" [onRefresh]="refreshFn">
+		<gg-refreshable-content [fullscreen]="false" [scrollY]="false" [onRefresh]="fetchGame">
 			<gg-game-shell [gameId]="gameId()" />
 		</gg-refreshable-content>
 	</div>

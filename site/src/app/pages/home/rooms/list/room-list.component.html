@@ -7,7 +7,7 @@
 	</ion-toolbar>
 </ion-header>
 
-<gg-refreshable-content [fullscreen]="true" [onRefresh]="refreshFn">
+<gg-refreshable-content [fullscreen]="true" [onRefresh]="fetchRooms">
 	<div class="rooms-page">
 		<div class="room-list-wrap">
 			<form class="join-code" (submit)="$event.preventDefault(); joinByCode()">

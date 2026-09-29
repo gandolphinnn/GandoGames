@@ -23,14 +23,10 @@ export class PlayComponent {
 
 	public readonly showSettingsModal = signal(false);
 
-	public async refreshFn() {
-
-	}
-
 	public async fetchGame() {
-		const gameState = await this.gameService.getGameState(this.gameId());
+		let gameState = await this.gameService.getGameState(this.gameId());
 		if (!gameState) {
-			throw new Error();
+			gameState = await this.gameService.reset(this.gameId());
 		}
 		this.gameState.set(gameState);
 		return gameState;

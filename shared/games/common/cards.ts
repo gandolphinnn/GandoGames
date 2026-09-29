@@ -10,27 +10,36 @@ export interface Card {
 	rank: Rank;
 }
 
+export type CardKey = `${Rank}-${Suit}`
+
 /** Stable string identity for a card — for keying, dedup, or change tracking. */
-export function cardKey(card: Card): string {
+export function cardKey(card: Card): CardKey {
 	return `${card.rank}-${card.suit}`;
 }
 
 export const SUITS: Suit[] = ['spades', 'hearts', 'diamonds', 'clubs'];
 export const RANKS: Rank[] = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
 
-/** A fresh, ordered deck. Defaults to the full 52 cards; pass `ranks` for a reduced deck. */
-export function createDeck(ranks: readonly Rank[] = RANKS): Card[] {
-	const deck: Card[] = [];
-	for (const suit of SUITS) for (const rank of ranks) deck.push({ suit, rank });
-	return deck;
-}
-
-/** Fisher-Yates shuffle returning a new array; the input is left untouched. */
-export function shuffle<T>(arr: T[]): T[] {
-	const a = [...arr];
-	for (let i = a.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
-		[a[i], a[j]] = [a[j]!, a[i]!];
+export class Deck {
+	private cards = new Set<CardKey>;
+	
+	public constructor(ranks: readonly Rank[] = RANKS) {
+		for (const suit of SUITS) 
+			for (const rank of ranks) 
+				this.cards.add(cardKey({ suit, rank }));
 	}
-	return a;
+
+	public shuffle() {
+		const cards = [...this.cards]
+		for (let i = cards.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[cards[i], cards[j]] = [cards[j]!, cards[i]!];
+		}
+		this.cards = new Set(cards);
+	}
+
+	public remove(cards: CardKey[]) {
+		for (const card of cards)
+			this.cards.delete(card);
+	}
 }

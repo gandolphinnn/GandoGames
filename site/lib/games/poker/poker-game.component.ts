@@ -1,8 +1,8 @@
 import { Component, computed, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonButton, IonInput } from '@ionic/angular';
-import { type Card, createDeck } from '@gandogames/shared/common/cards';
-import { type PokerGameState, type PokerPlayer, MIN_RAISE, describeHand, estimateAllInEquities, evaluateHand, levelEndMs, pokerDeckRanks } from '@gandogames/shared/poker';
+import { type Card } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type PokerPlayer, MIN_RAISE, describeHand, estimateAllInEquities, evaluateHand } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
@@ -248,12 +248,11 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 			const contenders = this.allInContenders();
 			const board = this.displayedCommunity();
 			if (!contenders.length) { this.equityPercent.set({}); return; }
-			const smallerDeck = untracked(() => this.gameState()?.settings.smallerDeck) ?? false;
 			// The hand was dealt from a deck sized to the players at the table for this hand.
 			const numPlayers = untracked(() => this.gameState()?.players.length) ?? 0;
 			const hands = contenders.map(c => c.cards);
 			const handle = setTimeout(() => {
-				const deck = createDeck(pokerDeckRanks(numPlayers, smallerDeck));
+				const deck = createDeck(pokerDeckRanks(numPlayers));
 				const eq = estimateAllInEquities(hands, board, 1500, deck);
 				const map: Record<string, number> = {};
 				contenders.forEach((c, i) => map[c.id] = Math.round((eq[i] ?? 0) * 100));

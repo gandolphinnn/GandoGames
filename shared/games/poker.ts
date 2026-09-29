@@ -1,5 +1,5 @@
-import { BlindLevel, GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "../dto";
-import { type Card, type Rank, RANKS, cardKey, createDeck, shuffle } from "./common/cards";
+import { GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "../dto";
+import { type Card, CardKey, Deck, type Rank, cardKey } from "./common/cards";
 
 export interface PokerPlayer extends GamePlayer {
 	chips: number;
@@ -17,20 +17,8 @@ export interface PokerHandResult {
 }
 
 export interface PokerSettings extends GameSettings {
-	/** Starting chip stack per player. */
 	startingChips: number;
-	/**
-	 * Blinds schedule: each level's big blind + how long it lasts (minutes) before the next kicks in.
-	 * Small blind is half the big blind (floored); min raise equals the current big blind. The last
-	 * level is terminal and runs until the game ends.
-	 */
-	blindLevels: BlindLevel[];
-	/**
-	 * Short deck: strip the lowest cards so the deck scales with the table. The lowest rank in play
-	 * has value (11 - number of players) — e.g. 5 players → the 6, heads-up → the 9. Hand rankings
-	 * stay standard.
-	 */
-	smallerDeck: boolean;
+	blindsDoublingMinutes: number;
 }
 
 export interface PokerGameState extends GameState<PokerPlayer, PokerSettings> {
@@ -49,15 +37,13 @@ export interface PokerGameState extends GameState<PokerPlayer, PokerSettings> {
 	result?: PokerHandResult;
 }
 
-export const STARTING_CHIPS = 500;
-export const MIN_RAISE = 20;
-
-/** Default schedule: a single terminal level at the base big blind — i.e. blinds never escalate. */
-export const DEFAULT_BLIND_LEVELS: BlindLevel[] = [{ bigBlind: MIN_RAISE, durationMinutes: 10 }, { bigBlind: MIN_RAISE * 2, durationMinutes: 0 }];
+export const STARTING_BLINDS = 25;
+export const BLINDS_DOUBLING_MINUTES = 10;
+export const MIN_RAISE = 12;
 
 export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
-	{ key: 'startingChips', type: 'number', label: 'Player pot', default: STARTING_CHIPS, min: 100, max: 100000, step: 100, hint: 'Starting chips per player.' },
-	{ key: 'blindLevels', type: 'blind-levels', label: 'Blind levels', default: DEFAULT_BLIND_LEVELS, min: 10, max: 5000, step: 10, hint: 'Big blind schedule; small blind is half. The last level runs to the end.' },
+	{ key: 'startingBlinds', type: 'number', label: 'Starting blinds', default: STARTING_BLINDS, min: 10, max: 100, step: 1, hint: 'Starting blinds per player.' },
+	{ key: 'blindsDoublingMinutes', type: 'number', label: 'Blinds doubling minutes', default: BLINDS_DOUBLING_MINUTES, min: 2, max: 10, step: 1, hint: 'How many minutes do the blinds doubles.' },
 ];
 
 /** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */
@@ -68,40 +54,6 @@ export function resolvePokerSettings(raw?: GameSettings): PokerSettings {
 /** Small blind for a given big blind: always half, floored. */
 export function smallBlindFor(bigBlind: number): number {
 	return Math.floor(bigBlind / 2);
-}
-
-/**
- * The ranks in play for a hand. Full 52-card deck normally; with the short deck on, the lowest rank
- * scales with the table — its value is (11 - numPlayers), so fewer players means a higher low card
- * (5-handed → the 6, heads-up → the 9, 8-handed → the 3). RANKS is ascending 2→A, so index i holds
- * value i+2; the lowest included index is therefore (11 - numPlayers) - 2 = 9 - numPlayers.
- */
-export function pokerDeckRanks(numPlayers: number, smallerDeck: boolean): Rank[] {
-	if (!smallerDeck) return [...RANKS];
-	const lowestIndex = Math.min(RANKS.length - 1, Math.max(0, 9 - numPlayers));
-	return RANKS.slice(lowestIndex);
-}
-
-/**
- * The blind level in effect after `elapsedMs` of play. Walks the schedule accumulating each level's
- * duration; the last level is terminal (runs forever), so any time past the penultimate boundary
- * stays on it.
- */
-export function levelForElapsed(levels: BlindLevel[], elapsedMs: number): number {
-	let acc = 0;
-	for (let i = 0; i < levels.length - 1; i++) {
-		acc += levels[i]!.durationMinutes * 60_000;
-		if (elapsedMs < acc) return i;
-	}
-	return Math.max(0, levels.length - 1);
-}
-
-/** Milliseconds from game start at which `level` ends (blinds go up). Null for the terminal level. */
-export function levelEndMs(levels: BlindLevel[], level: number): number | null {
-	if (level >= levels.length - 1) return null;
-	let acc = 0;
-	for (let i = 0; i <= level; i++) acc += levels[i]!.durationMinutes * 60_000;
-	return acc;
 }
 
 // ── Hand evaluation ──────────────────────────────────────────────────────────────
@@ -223,13 +175,13 @@ export function describeHand(rank: HandRank): string {
  * it's a Monte-Carlo estimate over the undealt board. Ties split the pot. Used to show the live win %
  * at each seat during an all-in run-out. `deck` lets short-deck games draw from the right card pool.
  */
-export function estimateAllInEquities(hands: Card[][], community: Card[], iterations = 1500, deck: Card[] = createDeck()): number[] {
+export function estimateAllInEquities(hands: Card[][], community: Card[], iterations = 1500, deck: Deck): number[] {
 	const n = hands.length;
 	if (n === 0) return [];
 	if (n === 1) return [1];
 
-	const used = new Set([...hands.flat(), ...community].map(cardKey));
-	const remaining = deck.filter(c => !used.has(cardKey(c)));
+	const used: CardKey[] = [...hands.flat(), ...community].map(cardKey);
+	const remaining = deck.remove(used);
 	const boardNeeded = 5 - community.length;
 	const equity = new Array<number>(n).fill(0);
 
@@ -248,7 +200,7 @@ export function estimateAllInEquities(hands: Card[][], community: Card[], iterat
 	}
 
 	for (let iter = 0; iter < iterations; iter++) {
-		award([...community, ...shuffle(remaining).slice(0, boardNeeded)]);
+		award([...community, ...remaining. .slice(0, boardNeeded)]);
 	}
 	return equity.map(e => e / iterations);
 }

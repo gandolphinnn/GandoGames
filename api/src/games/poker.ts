@@ -1,6 +1,6 @@
 import type { GamePlayer, GameSettings } from '@gandogames/shared/dto';
-import { type Card, createDeck, shuffle } from '@gandogames/shared/common/cards';
-import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, levelForElapsed, pokerDeckRanks, resolvePokerSettings, smallBlindFor } from '@gandogames/shared/poker';
+import { type Card, createDeck, RANKS, shuffle } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, resolvePokerSettings, smallBlindFor, MIN_RAISE } from '@gandogames/shared/poker';
 import { Game } from './game';
 
 export class PokerGame extends Game<PokerGameState> {
@@ -27,7 +27,7 @@ export class PokerGame extends Game<PokerGameState> {
 			settings: resolved,
 			startedAt: new Date(),
 			blindLevel: 0,
-			bigBlind: resolved.blindLevels[0]!.bigBlind,
+			bigBlind: MIN_RAISE,
 			phase: 'playing',
 		} as PokerGameState;
 		this.startNewHand();
@@ -273,9 +273,6 @@ export class PokerGame extends Game<PokerGameState> {
 
 	private startNewHand(): void {
 		const state = this.state!;
-		// Self-heal a game persisted before blind schedules existed: backfill the schedule/clock so an
-		// in-flight legacy hand can advance instead of crashing on the missing fields.
-		if (!state.settings.blindLevels?.length) state.settings = resolvePokerSettings(state.settings as unknown as GameSettings);
 		if (!state.startedAt) state.startedAt = new Date();
 		for (const p of state.players) {
 			p.cards = [];
@@ -284,7 +281,7 @@ export class PokerGame extends Game<PokerGameState> {
 			p.hasActed = false;
 			p.isAllIn = false;
 		}
-		state.deck = shuffle(createDeck(pokerDeckRanks(state.players.length, state.settings.smallerDeck)));
+		state.deck = shuffle(createDeck());
 		state.communityCards = [];
 		state.pot = 0;
 		state.result = undefined;
@@ -292,7 +289,7 @@ export class PokerGame extends Game<PokerGameState> {
 		for (const p of state.players) p.cards = [state.deck.pop()!, state.deck.pop()!];
 		// Blinds escalate on a real-time clock: pick the level for how long the game's been running and
 		// lock it in for this hand. Big blind = that level's; small blind is half of it (floored).
-		const level = levelForElapsed(state.settings.blindLevels, Date.now() - new Date(state.startedAt).getTime());
+		const level = levelForElapsed(state.settings.blindsDoublingMinutes, Date.now() - new Date(state.startedAt).getTime());
 		state.blindLevel = level;
 		const bigBlind = state.settings.blindLevels[level]!.bigBlind;
 		state.bigBlind = bigBlind;

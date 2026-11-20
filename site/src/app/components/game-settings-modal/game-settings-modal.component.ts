@@ -1,10 +1,9 @@
 import { Component, computed, effect, HostListener, inject, input, output, signal } from '@angular/core';
 import { IonIcon, IonToggle } from '@ionic/angular';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { BlindLevel, GameSettings, GameId, SettingField, resolveSettings } from '@gandogames/shared/dto';
+import { GameSettings, GameId, SettingField, resolveSettings } from '@gandogames/shared/dto';
 import { GAME_REGISTRY } from '@gandogames/lib/game-registry';
-import { BlindLevelsEditorComponent } from './blind-levels-editor.component';
-import { GameService, RoomService, ToastService } from '@gandogames/services';
+import { GameService, ToastService } from '@gandogames/services';
 
 /**
  * Schema-driven editor for a room's game settings. Renders the fields declared by
@@ -13,7 +12,7 @@ import { GameService, RoomService, ToastService } from '@gandogames/services';
  */
 @Component({
 	selector: 'gg-game-settings-modal',
-	imports: [IonIcon, IonToggle, BlindLevelsEditorComponent, TranslatePipe],
+	imports: [IonIcon, IonToggle, TranslatePipe],
 	templateUrl: './game-settings-modal.component.html',
 	styleUrl: './game-settings-modal.component.scss',
 })
@@ -57,11 +56,6 @@ export class GameSettingsModalComponent {
 		return Boolean(this.working()[key]);
 	}
 
-	public list(key: string): BlindLevel[] {
-		const v = this.working()[key];
-		return Array.isArray(v) ? v : [];
-	}
-
 	public onNumber(field: SettingField, event: Event): void {
 		const n = parseInt((event.target as HTMLInputElement).value, 10);
 		if (isNaN(n)) return;
@@ -71,10 +65,6 @@ export class GameSettingsModalComponent {
 	public onToggle(field: SettingField, event: Event): void {
 		const checked = (event as CustomEvent<{ checked: boolean }>).detail?.checked ?? false;
 		this.working.update(w => ({ ...w, [field.key]: checked }));
-	}
-
-	public onBlindLevels(field: SettingField, levels: BlindLevel[]): void {
-		this.working.update(w => ({ ...w, [field.key]: levels }));
 	}
 
 	public resetDefaults(): void {

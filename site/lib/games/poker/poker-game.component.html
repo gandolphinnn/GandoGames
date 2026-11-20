@@ -13,13 +13,10 @@
 		<div table-center class="pk-center">
 			<div class="pk-blinds">
 				<span class="pk-blinds-amount">{{ 'POKER.BIG_BLIND' | translate: { amount: bigBlind() } }}</span>
-				@if (hasBlindSchedule()) {
-					<span class="pk-blinds-level">{{ 'POKER.LEVEL' | translate: { current: gs.blindLevel + 1, total: gs.settings.blindLevels.length } }}</span>
-					@if (blindsUpNextHand()) {
-						<span class="pk-blinds-next pk-blinds-next-due">{{ 'POKER.BLINDS_UP_NEXT' | translate }}</span>
-					} @else if (blindCountdownLabel()) {
-						<span class="pk-blinds-next">↑ {{ blindCountdownLabel() }}</span>
-					}
+				@if (blindsUpNextHand()) {
+					<span class="pk-blinds-next pk-blinds-next-due">{{ 'POKER.BLINDS_UP_NEXT' | translate }}</span>
+				} @else if (blindCountdownLabel()) {
+					<span class="pk-blinds-next">↑ {{ blindCountdownLabel() }}</span>
 				}
 			</div>
 			<span class="pk-pot">{{ 'POKER.POT' | translate: { amount: gs.pot } }}</span>
@@ -95,9 +92,9 @@
 								}
 							</div>
 							<div class="raise-row">
-								<ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="10" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
+								<!-- <ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="10" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
 								<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">{{ 'POKER.RAISE' | translate }}</ion-button>
-							</div>
+							 --></div>
 							<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
 						}
 					</div>

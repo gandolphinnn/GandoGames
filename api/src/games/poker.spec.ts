@@ -1,7 +1,7 @@
 import type { Card } from '@gandogames/shared/common/cards';
 import type { GamePlayer } from '@gandogames/shared/dto';
 import { resolveSettings } from '@gandogames/shared/dto';
-import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, evaluateHand, levelForElapsed, pokerDeckRanks } from '@gandogames/shared/poker';
+import { POKER_SETTINGS_SCHEMA, compareHandRanks, describeHand, estimateAllInEquities, evaluateHand, PokerSettings } from '@gandogames/shared/poker';
 import { PokerGame } from './poker';
 
 function buildPlayer(id: string, name: string): GamePlayer {
@@ -151,7 +151,8 @@ describe('PokerGame settings', () => {
 	it('seeds stacks from startingChips and blinds from the first blind level', () => {
 		const game = new PokerGame();
 		// Dealer=p1, SB=p2, BB=p3. Big blind = first level (200), small blind = half (100).
-		game.initialize([p1, p2, p3], { startingChips: 5000, blindLevels: [{ bigBlind: 200, durationMinutes: 0 }]});
+		const settings: PokerSettings = { blindsDoublingMinutes: 10, startingBlinds: 200 };
+		game.initialize([p1, p2, p3], settings);
 		const sb = game.state!.players.find(p => p.id === 'p2')!;
 		const bb = game.state!.players.find(p => p.id === 'p3')!;
 		const utg = game.state!.players.find(p => p.id === 'p1')!;
@@ -162,7 +163,6 @@ describe('PokerGame settings', () => {
 		expect(bb.chips).toBe(4800);
 		expect(game.state!.currentBet).toBe(200);
 		expect(game.state!.pot).toBe(300);
-		expect(game.state!.blindLevel).toBe(0);
 		expect(game.state!.bigBlind).toBe(200);
 	});
 
@@ -187,72 +187,6 @@ describe('resolveSettings', () => {
 		const s = resolveSettings(POKER_SETTINGS_SCHEMA, { startingChips: 9_999_999, bogus: 5 });
 		expect(s['startingChips']).toBe(100000); // clamped to max
 		expect('bogus' in s).toBe(false);        // unknown key dropped
-	});
-
-	it('normalizes a blind-levels schedule: clamps big blinds, forces whole-minute durations, and makes the last level unlimited', () => {
-		const s = resolveSettings(POKER_SETTINGS_SCHEMA, {
-			blindLevels: [
-				{ bigBlind: 1, durationMinutes: 5 },       // big blind clamped up to the min (10)
-				{ bigBlind: 999_999, durationMinutes: 0 }, // big blind clamped to max (5000); duration forced to ≥ 1
-				{ bigBlind: 200, durationMinutes: 5 },      // last level → terminal, duration wiped to 0
-			],
-		});
-		expect(s['blindLevels']).toEqual([
-			{ bigBlind: 10, durationMinutes: 5 },
-			{ bigBlind: 5000, durationMinutes: 1 },
-			{ bigBlind: 200, durationMinutes: 0 },
-		]);
-	});
-
-	it('falls back to the default schedule when blind-levels is missing or empty', () => {
-		expect(resolveSettings(POKER_SETTINGS_SCHEMA, { blindLevels: [] })['blindLevels'])
-			.toEqual(DEFAULT_BLINDS);
-	});
-});
-
-describe('levelForElapsed', () => {
-	const levels = [
-		{ bigBlind: 20, durationMinutes: 5 },
-		{ bigBlind: 40, durationMinutes: 5 },
-		{ bigBlind: 50, durationMinutes: 0 }, // terminal
-	];
-
-	it('stays on level 0 before the first boundary', () => {
-		expect(levelForElapsed(levels, 0)).toBe(0);
-		expect(levelForElapsed(levels, 4 * 60_000)).toBe(0);
-	});
-
-	it('advances exactly at each duration boundary', () => {
-		expect(levelForElapsed(levels, 5 * 60_000)).toBe(1);
-		expect(levelForElapsed(levels, 9 * 60_000)).toBe(1);
-		expect(levelForElapsed(levels, 10 * 60_000)).toBe(2);
-	});
-
-	it('holds on the terminal level no matter how much time passes', () => {
-		expect(levelForElapsed(levels, 999 * 60_000)).toBe(2);
-	});
-
-	it('returns level 0 for a single-level schedule', () => {
-		expect(levelForElapsed([{ bigBlind: 100, durationMinutes: 0 }], 999 * 60_000)).toBe(0);
-	});
-});
-
-describe('pokerDeckRanks', () => {
-	it('is the full 52-card deck when the short deck is off', () => {
-		expect(pokerDeckRanks(5, false)).toHaveLength(13);
-		expect(pokerDeckRanks(2, false)[0]).toBe('2');
-	});
-
-	it('sets the lowest card to (11 - players) when the short deck is on', () => {
-		expect(pokerDeckRanks(5, true)[0]).toBe('6');  // 11 - 5 = 6
-		expect(pokerDeckRanks(3, true)[0]).toBe('8');  // 11 - 3 = 8
-		expect(pokerDeckRanks(2, true)[0]).toBe('9');  // heads-up → 9
-		expect(pokerDeckRanks(8, true)[0]).toBe('3');  // full ring → 3
-	});
-
-	it('shrinks the rank count as the table shrinks', () => {
-		expect(pokerDeckRanks(5, true)).toHaveLength(9);  // 6..A
-		expect(pokerDeckRanks(2, true)).toHaveLength(6);  // 9..A
 	});
 });
 

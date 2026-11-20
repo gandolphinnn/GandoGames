@@ -227,17 +227,13 @@
 			}
 		},
 		"POKER": {
-			"STARTING_CHIPS": {
-				"LABEL": "Stack iniziale",
-				"HINT": "Fiches iniziali per giocatore."
+			"STARTING_BLINDS": {
+				"LABEL": "Bui iniziali",
+				"HINT": "Bui iniziali per giocatore."
 			},
-			"BLIND_LEVELS": {
-				"LABEL": "Livelli dei bui",
-				"HINT": "Programma del big blind; lo small blind è la metà. L'ultimo livello dura fino alla fine."
-			},
-			"SMALLER_DECK": {
-				"LABEL": "Mazzo ridotto",
-				"HINT": "La carta più bassa è (11 - giocatori)<br>Meno giocatori ⇒ Meno carte."
+			"BLINDS_DOUBLING_MINUTES": {
+				"LABEL": "Minuti per raddoppiare i bui",
+				"HINT": "Quanto spesso i bui si raddoppiano."
 			}
 		}
 	},
@@ -268,7 +264,6 @@
 	},
 	"POKER": {
 		"BIG_BLIND": "Big blind {{amount}}",
-		"LEVEL": "Liv {{current}}/{{total}}",
 		"BLINDS_UP_NEXT": "Bui su alla prossima mano",
 		"POT": "Piatto: {{amount}}",
 		"ALL_IN_TAG": "ALL-IN",

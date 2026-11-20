@@ -13,6 +13,7 @@ export class MastermindGame extends Game<MastermindGameState> {
 			settings: resolved,
 			turns: [],
 			phase: 'playing',
+			startedAt: new Date(),
 		} as MastermindGameState;
 
 		this.botAction();

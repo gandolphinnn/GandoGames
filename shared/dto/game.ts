@@ -10,6 +10,7 @@ export interface GameData<TPlayer extends GamePlayer = GamePlayer, TSettings ext
 /** The current state of a started game */
 export interface GameState<TPlayer extends GamePlayer = GamePlayer, TSettings extends GameSettings = GameSettings> extends GameData<TPlayer, TSettings> {
 	currentPlayerIndex: number;
+	startedAt: Date;
 	winnerName?: string;
 }
 

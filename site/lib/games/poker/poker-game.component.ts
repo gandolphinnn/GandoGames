@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, effect, inject, input, output, signal,
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IonButton, IonInput } from '@ionic/angular';
 import { type Card } from '@gandogames/shared/common/cards';
-import { type PokerGameState, type PokerPlayer, MIN_RAISE, describeHand, estimateAllInEquities, evaluateHand } from '@gandogames/shared/poker';
+import { type PokerGameState, type PokerPlayer, describeHand, estimateAllInEquities, evaluateHand } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';
 import { buildTableSeats, GameTableComponent, GameTableSeatDef, TableSeat } from '@gandogames/lib/common/game-table';
 import { ChipCountComponent } from '@gandogames/lib/common/chips';
@@ -31,9 +31,6 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 
 	private readonly toast = inject(ToastService);
 	private readonly translate = inject(TranslateService);
-
-	/** Raise amount ("raise by"); always defaults to the table minimum at the start of each of my turns. */
-	protected readonly raiseAmount = signal(MIN_RAISE);
 
 	protected readonly myPlayer = computed(() => {
 		const gs = this.gameState();
@@ -95,7 +92,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	});
 
 	/** The minimum legal raise-by — one big blind (the table minimum, which grows as blinds escalate). */
-	protected readonly minRaise = computed(() => this.gameState()?.bigBlind ?? MIN_RAISE);
+	protected readonly minRaise = computed(() => this.gameState()?.bigBlind);
 
 	// ── Blinds & escalation clock ────────────────────────────────────────────────
 
@@ -103,19 +100,15 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 	/** Ticks once a second so the blind countdown stays live between game-state updates. */
 	private readonly now = signal(Date.now());
 
-	protected readonly bigBlind = computed(() => this.gameState()?.bigBlind ?? MIN_RAISE);
-
-	/** True when the room has more than one blind level — only then is a level + countdown worth showing. */
-	protected readonly hasBlindSchedule = computed(() => (this.gameState()?.settings?.blindLevels?.length ?? 0) > 1);
+	protected readonly bigBlind = computed(() => this.gameState()!.bigBlind);
 
 	/** Milliseconds left on the current level, or null when the level is terminal (no next increase). */
 	private readonly blindCountdownMs = computed<number | null>(() => {
 		const gs = this.gameState();
-		// Guard legacy states persisted before blind schedules existed (no blindLevels/startedAt).
-		if (!gs?.settings?.blindLevels?.length || gs.blindLevel == null || !gs.startedAt) return null;
-		const end = levelEndMs(gs.settings.blindLevels, gs.blindLevel);
-		if (end === null) return null;
-		return new Date(gs.startedAt).getTime() + end - this.now();
+		if (!gs?.settings?.blindsDoublingMinutes || !gs.startedAt)
+			return null;
+		const nextDoubling = gs.startedAt.getTime() + (gs.settings.blindsDoublingMinutes * 60_000);
+		return nextDoubling - this.now();
 	});
 
 	/** "4:32"-style time to the next level; null when terminal or the timer has already elapsed. */
@@ -252,8 +245,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 			const numPlayers = untracked(() => this.gameState()?.players.length) ?? 0;
 			const hands = contenders.map(c => c.cards);
 			const handle = setTimeout(() => {
-				const deck = createDeck(pokerDeckRanks(numPlayers));
-				const eq = estimateAllInEquities(hands, board, 1500, deck);
+				const eq = estimateAllInEquities(hands, board, 1500);
 				const map: Record<string, number> = {};
 				contenders.forEach((c, i) => map[c.id] = Math.round((eq[i] ?? 0) * 100));
 				this.equityPercent.set(map);
@@ -262,13 +254,13 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		});
 
 		// The raise input resets to the table minimum whenever it becomes my turn (never leaves a stale 200).
-		effect(() => {
+		/* effect(() => {
 			const myTurn = this.isMyTurn();
 			if (myTurn && !this.wasMyTurn) {
 				this.raiseAmount.set(untracked(() => this.gameState()?.bigBlind) ?? MIN_RAISE);
 			}
 			this.wasMyTurn = myTurn;
-		});
+		}); */
 
 		// Tick the blind countdown every second; the game state only refreshes on actions, so the clock
 		// must advance on its own between hands.
@@ -276,17 +268,17 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		this.destroyRef.onDestroy(() => clearInterval(clock));
 	}
 
-	protected updateRaiseAmount(event: Event): void {
+	/* protected updateRaiseAmount(event: Event): void {
 		const val = parseInt((event as CustomEvent<{ value: string | null | undefined }>).detail?.value ?? '', 10);
 		if (!isNaN(val) && val > 0) this.raiseAmount.set(val);
-	}
+	} */
 
 	protected fold(): void { this.gameAction.emit({ action: 'fold' }); }
 	protected check(): void { this.gameAction.emit({ action: 'check' }); }
 	protected call(): void { this.gameAction.emit({ action: 'call' }); }
 	protected raise(amount: number): void {
 		const me = this.myPlayer();
-		if (!me || me.chips <= 0 || amount < this.minRaise()) return;
+		if (!me || me.chips <= 0 || amount < this.bigBlind()) return;
 		if (amount < me.chips) return this.gameAction.emit({ action: 'raise', data: { amount } });
 		// If the raise amount is equal to or greater than my chips, treat it as an all-in.
 		this.allIn();

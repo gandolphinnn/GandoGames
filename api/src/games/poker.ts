@@ -1,25 +1,26 @@
 import type { GamePlayer, GameSettings } from '@gandogames/shared/dto';
-import { type Card, createDeck, RANKS, shuffle } from '@gandogames/shared/common/cards';
-import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, resolvePokerSettings, smallBlindFor, MIN_RAISE } from '@gandogames/shared/poker';
+import { type Card, Deck } from '@gandogames/shared/common/cards';
+import { type PokerGameState, type HandRank, compareHandRanks, describeHand, evaluateHand, resolvePokerSettings, blindForElapsed, DEFAULT_BIG_BLIND, PokerPlayer } from '@gandogames/shared/poker';
 import { Game } from './game';
 
 export class PokerGame extends Game<PokerGameState> {
 	constructor() {super('poker')}
 	public override initialize(players: GamePlayer[], settings?: GameSettings): void {
 		const resolved = resolvePokerSettings(settings);
+		const deck = new Deck().shuffle();
 		this.state = {
 			gamePhase: 'pre-flop',
 			players: players.map(p => ({
 				...p,
-				chips: resolved.startingChips,
-				cards: [],
+				chips: resolved.startingBlinds * DEFAULT_BIG_BLIND,
+				cards: deck.draw(2),
 				streetBet: 0,
 				folded: false,
 				hasActed: false,
 				isAllIn: false,
 			})),
 			communityCards: [],
-			deck: [],
+			deck: deck,
 			pot: 0,
 			currentBet: 0,
 			currentPlayerIndex: 0,
@@ -27,7 +28,7 @@ export class PokerGame extends Game<PokerGameState> {
 			settings: resolved,
 			startedAt: new Date(),
 			blindLevel: 0,
-			bigBlind: MIN_RAISE,
+			bigBlind: DEFAULT_BIG_BLIND,
 			phase: 'playing',
 		} as PokerGameState;
 		this.startNewHand();
@@ -45,7 +46,7 @@ export class PokerGame extends Game<PokerGameState> {
 			if (contestedShowdown && !p.folded) return p;
 			return { ...p, cards: [] as Card[] };
 		});
-		return { ...this.state, players, deck: [] };
+		return { ...this.state, players, deck: {} as Deck };
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): PokerGameState {
@@ -221,15 +222,15 @@ export class PokerGame extends Game<PokerGameState> {
 		const state = this.state!;
 		switch (state.gamePhase) {
 			case 'pre-flop':
-				state.communityCards = [state.deck.pop()!, state.deck.pop()!, state.deck.pop()!];
+				state.communityCards = state.deck.draw(3);
 				state.gamePhase = 'flop';
 				break;
 			case 'flop':
-				state.communityCards.push(state.deck.pop()!);
+				state.communityCards.push(state.deck.draw());
 				state.gamePhase = 'turn';
 				break;
 			case 'turn':
-				state.communityCards.push(state.deck.pop()!);
+				state.communityCards.push(state.deck.draw());
 				state.gamePhase = 'river';
 				break;
 			case 'river':
@@ -273,44 +274,44 @@ export class PokerGame extends Game<PokerGameState> {
 
 	private startNewHand(): void {
 		const state = this.state!;
-		if (!state.startedAt) state.startedAt = new Date();
+		state.deck = new Deck().shuffle();
 		for (const p of state.players) {
-			p.cards = [];
+			p.cards = state.deck.draw(2);
 			p.streetBet = 0;
 			p.folded = false;
 			p.hasActed = false;
 			p.isAllIn = false;
 		}
-		state.deck = shuffle(createDeck());
 		state.communityCards = [];
 		state.pot = 0;
 		state.result = undefined;
-		const n = state.players.length;
-		for (const p of state.players) p.cards = [state.deck.pop()!, state.deck.pop()!];
+		const nPlayers = state.players.length;
 		// Blinds escalate on a real-time clock: pick the level for how long the game's been running and
 		// lock it in for this hand. Big blind = that level's; small blind is half of it (floored).
-		const level = levelForElapsed(state.settings.blindsDoublingMinutes, Date.now() - new Date(state.startedAt).getTime());
-		state.blindLevel = level;
-		const bigBlind = state.settings.blindLevels[level]!.bigBlind;
+		const bigBlind = blindForElapsed(state.settings.blindsDoublingMinutes, Date.now() - new Date(state.startedAt).getTime());
 		state.bigBlind = bigBlind;
-		const smallBlind = smallBlindFor(bigBlind);
-		const sbIdx = (state.dealerIndex + 1) % n;
-		const bbIdx = (state.dealerIndex + 2) % n;
-		const sb = state.players[sbIdx]!;
-		const bb = state.players[bbIdx]!;
-		const sbAmount = Math.min(smallBlind, sb.chips);
-		sb.chips -= sbAmount;
-		sb.streetBet = sbAmount;
-		state.pot += sbAmount;
-		if (sb.chips === 0) sb.isAllIn = true;
-		const bbAmount = Math.min(bigBlind, bb.chips);
-		bb.chips -= bbAmount;
-		bb.streetBet = bbAmount;
-		state.pot += bbAmount;
-		if (bb.chips === 0) bb.isAllIn = true;
+		const smallBlind = bigBlind / 2;
+
+		const smallBlindPlayerIndex = (state.dealerIndex + 1) % nPlayers;
+		const bigBlindPlayerIndex = (state.dealerIndex + 2) % nPlayers;
+		const smallBlindPlayer = state.players[smallBlindPlayerIndex]!;
+		const bigBlindPlayer = state.players[bigBlindPlayerIndex]!;
+
+		const autoBet = (blind: number, player: PokerPlayer) => {
+			const amount = Math.min(blind, player.chips);
+			player.chips -= amount;
+			player.streetBet = amount;
+			state.pot += amount;
+			if (player.chips === 0) player.isAllIn = true;
+		}
+		autoBet(smallBlind, smallBlindPlayer);
+		autoBet(bigBlind, bigBlindPlayer);
+
 		state.currentBet = bigBlind;
 		// Heads-up: dealer/SB acts first pre-flop; otherwise UTG (after BB) acts first
-		state.currentPlayerIndex = n === 2 ? sbIdx : (bbIdx + 1) % n;
+		state.currentPlayerIndex = nPlayers === 2 ?
+			smallBlindPlayerIndex
+			: (bigBlindPlayerIndex + 1) % nPlayers;
 		state.gamePhase = 'pre-flop';
 	}
 

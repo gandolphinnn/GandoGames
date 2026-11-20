@@ -1,5 +1,8 @@
 import { GamePlayer, GameSettings, GameSettingsSchema, GameState, resolveSettings } from "../dto";
-import { type Card, CardKey, Deck, type Rank, cardKey } from "./common/cards";
+import { type Card, Deck, type Rank } from "./common/cards";
+
+/** The amount of chips for the default initial big blind. */
+export const DEFAULT_BIG_BLIND = 1024;
 
 export interface PokerPlayer extends GamePlayer {
 	chips: number;
@@ -17,33 +20,26 @@ export interface PokerHandResult {
 }
 
 export interface PokerSettings extends GameSettings {
-	startingChips: number;
+	startingBlinds: number;
 	blindsDoublingMinutes: number;
 }
 
 export interface PokerGameState extends GameState<PokerPlayer, PokerSettings> {
 	gamePhase: 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown' | 'game-over';
 	communityCards: Card[];
-	deck: Card[];
+	deck: Deck;
 	pot: number;
 	currentBet: number;
 	dealerIndex: number;
-	/** When the blind clock started (game start); blinds escalate on real elapsed time from here. */
-	startedAt: Date;
-	/** Index into settings.blindLevels in effect for the in-progress hand (locked at each hand start). */
-	blindLevel: number;
-	/** Big blind for the in-progress hand — settings.blindLevels[blindLevel].bigBlind. */
 	bigBlind: number;
 	result?: PokerHandResult;
 }
 
-export const STARTING_BLINDS = 25;
-export const BLINDS_DOUBLING_MINUTES = 10;
-export const MIN_RAISE = 12;
-
+const STARTING_BLINDS = 25;
+const BLINDS_DOUBLING_MINUTES = 10;
 export const POKER_SETTINGS_SCHEMA: GameSettingsSchema = [
-	{ key: 'startingBlinds', type: 'number', label: 'Starting blinds', default: STARTING_BLINDS, min: 10, max: 100, step: 1, hint: 'Starting blinds per player.' },
-	{ key: 'blindsDoublingMinutes', type: 'number', label: 'Blinds doubling minutes', default: BLINDS_DOUBLING_MINUTES, min: 2, max: 10, step: 1, hint: 'How many minutes do the blinds doubles.' },
+	{ key: 'startingBlinds', type: 'number', label: 'Starting blinds', default: STARTING_BLINDS, min: 10, max: 50, step: 1, hint: 'Starting blinds per player.' },
+	{ key: 'blindsDoublingMinutes', type: 'number', label: 'Blinds doubling minutes', default: BLINDS_DOUBLING_MINUTES, min: 2, max: 20, step: 1, hint: 'How many minutes do the blinds doubles.' },
 ];
 
 /** Normalize raw settings into a fully-typed, validated PokerSettings (defaults + clamping). */
@@ -54,6 +50,12 @@ export function resolvePokerSettings(raw?: GameSettings): PokerSettings {
 /** Small blind for a given big blind: always half, floored. */
 export function smallBlindFor(bigBlind: number): number {
 	return Math.floor(bigBlind / 2);
+}
+
+export function blindForElapsed(doublingMinutes: number, elapsedMs: number): number {
+	const minutesPasses = Math.floor(elapsedMs / 60_000);
+	const doublingToApply = Math.floor(minutesPasses / doublingMinutes);
+	return DEFAULT_BIG_BLIND * (2 ** doublingToApply);
 }
 
 // ── Hand evaluation ──────────────────────────────────────────────────────────────
@@ -175,13 +177,13 @@ export function describeHand(rank: HandRank): string {
  * it's a Monte-Carlo estimate over the undealt board. Ties split the pot. Used to show the live win %
  * at each seat during an all-in run-out. `deck` lets short-deck games draw from the right card pool.
  */
-export function estimateAllInEquities(hands: Card[][], community: Card[], iterations = 1500, deck: Deck): number[] {
+export function estimateAllInEquities(hands: Card[][], community: Card[], iterations = 1500): number[] {
 	const n = hands.length;
 	if (n === 0) return [];
 	if (n === 1) return [1];
 
-	const used: CardKey[] = [...hands.flat(), ...community].map(cardKey);
-	const remaining = deck.remove(used);
+	const used: Card[] = [...hands.flat(), ...community];
+	const deck = new Deck().remove(used);
 	const boardNeeded = 5 - community.length;
 	const equity = new Array<number>(n).fill(0);
 
@@ -200,7 +202,7 @@ export function estimateAllInEquities(hands: Card[][], community: Card[], iterat
 	}
 
 	for (let iter = 0; iter < iterations; iter++) {
-		award([...community, ...remaining. .slice(0, boardNeeded)]);
+		award([...community, ...deck.shuffle().draw(boardNeeded)]);
 	}
 	return equity.map(e => e / iterations);
 }

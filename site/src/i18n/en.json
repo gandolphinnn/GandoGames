@@ -227,17 +227,13 @@
 			}
 		},
 		"POKER": {
-			"STARTING_CHIPS": {
-				"LABEL": "Player pot",
-				"HINT": "Starting chips per player."
+			"STARTING_BLINDS": {
+				"LABEL": "Starting blinds",
+				"HINT": "Starting blinds per player."
 			},
-			"BLIND_LEVELS": {
-				"LABEL": "Blind levels",
-				"HINT": "Big blind schedule; small blind is half. The last level runs to the end."
-			},
-			"SMALLER_DECK": {
-				"LABEL": "Smaller deck",
-				"HINT": "The lowest card is (11 - players)<br>Fewer players ⇒ Less cards."
+			"BLINDS_DOUBLING_MINUTES": {
+				"LABEL": "Blinds doubling minutes",
+				"HINT": "How often the blinds double."
 			}
 		}
 	},
@@ -268,7 +264,6 @@
 	},
 	"POKER": {
 		"BIG_BLIND": "Big blind {{amount}}",
-		"LEVEL": "Lv {{current}}/{{total}}",
 		"BLINDS_UP_NEXT": "Blinds up next hand",
 		"POT": "Pot: {{amount}}",
 		"ALL_IN_TAG": "ALL-IN",

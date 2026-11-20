@@ -1,6 +1,6 @@
 import { Component, computed, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { IonButton, IonInput } from '@ionic/angular';
+import { IonButton, IonInput, IonRange } from '@ionic/angular';
 import { type Card } from '@gandogames/shared/common/cards';
 import { type PokerGameState, type PokerPlayer, describeHand, estimateAllInEquities, evaluateHand } from '@gandogames/shared/poker';
 import { GameComponent } from '@gandogames/lib/game-registry';
@@ -13,12 +13,10 @@ import { ToastService } from '@gandogames/services';
 /** Seconds each street lingers before the next one is revealed during an all-in run-out. */
 const REVEAL_DELAY_MS = 2000;
 
-// TODO: convert chips system into BLINDS system
-
 @Component({
 	selector: 'gg-poker-game',
 	standalone: true,
-	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, IonInput, TranslatePipe],
+	imports: [ChipCountComponent, FrenchCardComponent, GameTableComponent, GameTableSeatDef, PlayerAvatarComponent, IonButton, TranslatePipe, IonRange],
 	templateUrl: './poker-game.component.html',
 	styleUrl: './poker-game.component.scss',
 })
@@ -93,6 +91,8 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 
 	/** The minimum legal raise-by — one big blind (the table minimum, which grows as blinds escalate). */
 	protected readonly minRaise = computed(() => this.gameState()?.bigBlind);
+	protected readonly raiseInBlinds = signal(1);
+	protected readonly availableBlinds = signal(100); //TODO
 
 	// ── Blinds & escalation clock ────────────────────────────────────────────────
 
@@ -107,7 +107,7 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		const gs = this.gameState();
 		if (!gs?.settings?.blindsDoublingMinutes || !gs.startedAt)
 			return null;
-		const nextDoubling = gs.startedAt.getTime() + (gs.settings.blindsDoublingMinutes * 60_000);
+		const nextDoubling = new Date(gs.startedAt).getTime() + (gs.settings.blindsDoublingMinutes * 60_000);
 		return nextDoubling - this.now();
 	});
 
@@ -267,11 +267,6 @@ export class PokerGameComponent implements GameComponent<PokerGameState> {
 		const clock = setInterval(() => this.now.set(Date.now()), 1000);
 		this.destroyRef.onDestroy(() => clearInterval(clock));
 	}
-
-	/* protected updateRaiseAmount(event: Event): void {
-		const val = parseInt((event as CustomEvent<{ value: string | null | undefined }>).detail?.value ?? '', 10);
-		if (!isNaN(val) && val > 0) this.raiseAmount.set(val);
-	} */
 
 	protected fold(): void { this.gameAction.emit({ action: 'fold' }); }
 	protected check(): void { this.gameAction.emit({ action: 'check' }); }

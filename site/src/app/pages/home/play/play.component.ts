@@ -28,7 +28,7 @@ export class PlayComponent {
 		if (!gameState) {
 			gameState = await this.gameService.reset(this.gameId());
 		}
-		this.gameState.set(gameState);
+		this.gameState.set(gameState!);
 		return gameState;
 	}
 }

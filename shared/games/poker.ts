@@ -27,7 +27,8 @@ export interface PokerSettings extends GameSettings {
 export interface PokerGameState extends GameState<PokerPlayer, PokerSettings> {
 	gamePhase: 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown' | 'game-over';
 	communityCards: Card[];
-	deck: Deck;
+	/** The cards that have not yet been dealt. */
+	deck: Card[];
 	pot: number;
 	currentBet: number;
 	dealerIndex: number;

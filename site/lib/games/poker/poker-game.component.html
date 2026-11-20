@@ -92,9 +92,17 @@
 								}
 							</div>
 							<div class="raise-row">
-								<!-- <ion-input class="raise-input" fill="outline" type="number" [min]="minRaise()" [step]="10" [value]="raiseAmount()" (ionInput)="updateRaiseAmount($event)"></ion-input>
-								<ion-button fill="outline" class="raise-btn" [disabled]="loading()" (click)="raise(raiseAmount())">{{ 'POKER.RAISE' | translate }}</ion-button>
-							 --></div>
+								<!-- WIP -->
+								<ion-range
+									[disabled]="loading()"
+									[min]="0"
+									[max]="availableBlinds()"
+									[step]="bigBlind()"
+									[value]="raiseInBlinds()"
+									><!-- (touchend)="raise()"
+									(slideend)="raise()" -->
+								></ion-range>
+							</div>
 							<ion-button class="all-in-btn" color="warning" [disabled]="loading()" (click)="allIn()">{{ 'POKER.ALL_IN_BTN' | translate: { amount: me!.chips } }}</ion-button>
 						}
 					</div>

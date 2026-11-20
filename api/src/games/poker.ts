@@ -20,7 +20,7 @@ export class PokerGame extends Game<PokerGameState> {
 				isAllIn: false,
 			})),
 			communityCards: [],
-			deck: deck,
+			deck: deck.draw(5),
 			pot: 0,
 			currentBet: 0,
 			currentPlayerIndex: 0,
@@ -46,7 +46,7 @@ export class PokerGame extends Game<PokerGameState> {
 			if (contestedShowdown && !p.folded) return p;
 			return { ...p, cards: [] as Card[] };
 		});
-		return { ...this.state, players, deck: {} as Deck };
+		return { ...this.state, players, deck: [] };
 	}
 
 	public override action(player: GamePlayer, action: string, data: any): PokerGameState {
@@ -222,15 +222,15 @@ export class PokerGame extends Game<PokerGameState> {
 		const state = this.state!;
 		switch (state.gamePhase) {
 			case 'pre-flop':
-				state.communityCards = state.deck.draw(3);
+				state.communityCards = state.deck.splice(0, 3);
 				state.gamePhase = 'flop';
 				break;
 			case 'flop':
-				state.communityCards.push(state.deck.draw());
+				state.communityCards.push(state.deck.splice(0, 1)[0]);
 				state.gamePhase = 'turn';
 				break;
 			case 'turn':
-				state.communityCards.push(state.deck.draw());
+				state.communityCards.push(state.deck.splice(0, 1)[0]);
 				state.gamePhase = 'river';
 				break;
 			case 'river':
@@ -274,14 +274,15 @@ export class PokerGame extends Game<PokerGameState> {
 
 	private startNewHand(): void {
 		const state = this.state!;
-		state.deck = new Deck().shuffle();
+		const deck = new Deck().shuffle();
 		for (const p of state.players) {
-			p.cards = state.deck.draw(2);
+			p.cards = deck.draw(2);
 			p.streetBet = 0;
 			p.folded = false;
 			p.hasActed = false;
 			p.isAllIn = false;
 		}
+		state.deck = deck.draw(5);
 		state.communityCards = [];
 		state.pot = 0;
 		state.result = undefined;

@@ -39,7 +39,6 @@ async function getData(gameId: GameId, entityId: string, roomId?: string): Promi
 const gameStateInner: InnerFunction<typeof API.game.state> = async (body, params, _notifier, player) => {
 	const gameId = params.gameId as GameId
 	const [savedState, _] = await getData(gameId, player.entityId, body.roomId);
-	console.log('@992907:', savedState);
 	if (!savedState) return null;
 	const game = Game.Factory(gameId);
 	game.state = savedState;
